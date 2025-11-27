@@ -35,7 +35,8 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run:  mvn -B package org.sonarsource.scanner.maven:sonar-maven-plugin:3.11.0.3922:sonar -Dsonar.projectKey=apigateway -Dsonar.organization=arghyam -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
-
+        working-directory: apigateway
+        
       - name: Configure AWS credentials
         if: github.ref == 'refs/heads/main'
         uses: aws-actions/configure-aws-credentials@v4
