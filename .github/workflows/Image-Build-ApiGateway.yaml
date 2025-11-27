@@ -32,15 +32,9 @@ jobs:
           server-id: github
 
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@master
         env:
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
-            -Dsonar.sources=.
-            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+        run:  mvn -B package org.sonarsource.scanner.maven:sonar-maven-plugin:3.11.0.3922:sonar -Dsonar.projectKey=apigateway -Dsonar.organization=arghyam -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
 
       - name: Configure AWS credentials
         if: github.ref == 'refs/heads/main'
