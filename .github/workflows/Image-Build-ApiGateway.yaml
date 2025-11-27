@@ -58,6 +58,5 @@ jobs:
         run: |
           docker build --build-arg WORK_DIR="apigateway" -t $ECR_REGISTRY/apigateway:$IMAGE_TAG -f build/maven/Dockerfile .
           docker push $ECR_REGISTRY/apigateway:$IMAGE_TAG
-        working-directory: apigateway
 
 
