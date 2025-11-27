@@ -18,7 +18,7 @@ FROM openjdk:24-ea-15-oraclelinux8
 
 WORKDIR /opt/arghyam
 
-COPY --from=build /app/target/*.jar /app/start.sh /opt/egov/
+COPY --from=build /app/target/*.jar /app/start.sh /opt/arghyam/
 
 RUN chmod +x /opt/arghyam/start.sh
 
