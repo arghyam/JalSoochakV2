@@ -2,13 +2,12 @@ name: Image Build & SonarQube Scan for Image Processing
 
 on:
   push:
-    branches: ["main"]
     paths:
       - 'imageprocessing/**'
   pull_request:
     types: [opened, synchronize, reopened]
-    paths:
-      - 'imageprocessing/**'
+    # paths:
+    #   - 'imageprocessing/**'
 
 permissions:
   contents: read

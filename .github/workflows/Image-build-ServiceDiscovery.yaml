@@ -7,8 +7,8 @@ on:
       - 'servicediscovery/**'
   pull_request:
     types: [opened, synchronize, reopened]
-    paths:
-      - 'servicediscovery/**'
+    # paths:
+    #   - 'servicediscovery/**'
 
 permissions:
   contents: read

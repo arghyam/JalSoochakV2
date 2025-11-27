@@ -2,13 +2,12 @@ name: Image Build & SonarQube Scan for Api Gateway Service
 
 on:
   push:
-    branches: ["main"]
     paths:
       - 'apigateway/**'
   pull_request:
     types: [opened, synchronize, reopened]
-    paths:
-      - 'apigateway/**'
+    # paths:
+    #   - 'apigateway/**'
 
 permissions:
   contents: read

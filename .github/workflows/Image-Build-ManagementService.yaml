@@ -7,8 +7,8 @@ on:
       - 'ManagementService/**'
   pull_request:
     types: [opened, synchronize, reopened]
-    paths:
-      - 'ManagementService/**'
+    # paths:
+    #   - 'ManagementService/**'
 
 permissions:
   contents: read
