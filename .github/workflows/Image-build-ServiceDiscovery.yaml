@@ -4,11 +4,11 @@ on:
   push:
     branches: ["main"]
     paths:
-      - 'servicediscovery/**'
+      - 'servicediscoveryserver/**'
   pull_request:
     types: [opened, synchronize, reopened]
     # paths:
-    #   - 'servicediscovery/**'
+    #   - 'servicediscoveryserver/**'
 
 permissions:
   contents: read
@@ -38,8 +38,8 @@ jobs:
       - name: SonarQube Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run:  mvn -B package org.sonarsource.scanner.maven:sonar-maven-plugin:3.11.0.3922:sonar -Dsonar.projectKey=servicediscovery -Dsonar.organization=arghyam -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
-        working-directory: servicediscovery
+        run:  mvn -B package org.sonarsource.scanner.maven:sonar-maven-plugin:3.11.0.3922:sonar -Dsonar.projectKey=servicediscoveryserver -Dsonar.organization=arghyam -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
+        working-directory: servicediscoveryserver
         
       - name: Configure AWS credentials
         # if: github.ref == 'refs/heads/main'
@@ -60,8 +60,8 @@ jobs:
           ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build --build-arg WORK_DIR="servicediscovery" -t $ECR_REGISTRY/servicediscovery:$IMAGE_TAG -f build/maven/Dockerfile .
-          docker push $ECR_REGISTRY/servicediscovery:$IMAGE_TAG
+          docker build --build-arg WORK_DIR="servicediscoveryserver" -t $ECR_REGISTRY/servicediscoveryserver:$IMAGE_TAG -f build/maven/Dockerfile .
+          docker push $ECR_REGISTRY/servicediscoveryserver:$IMAGE_TAG
 
 
 
