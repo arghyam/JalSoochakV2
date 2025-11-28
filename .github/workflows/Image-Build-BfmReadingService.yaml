@@ -61,6 +61,5 @@ jobs:
         run: |
           docker build --build-arg WORK_DIR="bfm-reading-service" -t $ECR_REGISTRY/bfm-reading-service:$IMAGE_TAG -f build/maven/Dockerfile .
           docker push $ECR_REGISTRY/bfm-reading-service:$IMAGE_TAG
-        working-directory: bfm-reading-service
 
 
