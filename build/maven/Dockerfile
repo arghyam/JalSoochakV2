@@ -14,7 +14,7 @@ RUN mvn -B -f /app/pom.xml package
 
 
 # Create runtime image
-FROM openjdk:24-ea-15-oraclelinux8
+FROM openjdk:21-jdk-oraclelinux8
 
 WORKDIR /opt/arghyam
 
