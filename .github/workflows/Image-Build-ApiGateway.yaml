@@ -17,7 +17,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  sonarqube:
+  Docker Image Build:
     name: SonarQube scan & push image
     runs-on: ubuntu-latest
 
