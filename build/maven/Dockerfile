@@ -14,7 +14,7 @@ RUN mvn -B -f /app/pom.xml package
 
 
 # Create runtime image
-FROM openjdk:21-jdk-oraclelinux8
+FROM amazoncorretto:21-alpine-jdk
 
 WORKDIR /opt/arghyam
 
