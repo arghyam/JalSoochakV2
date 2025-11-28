@@ -7,8 +7,8 @@ on:
       - 'bfm-reading-service/**'
   pull_request:
     types: [opened, synchronize, reopened]
-    # paths:
-    #   - 'bfm-reading-service/**'
+    paths:
+      - 'bfm-reading-service/**'
 permissions:
   contents: read
   id-token: write
