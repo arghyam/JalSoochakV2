@@ -9,14 +9,15 @@ on:
     types: [opened, synchronize, reopened]
     paths:
       - 'servicediscoveryserver/**'
-
+  workflow_dispatch:
+  workflow_call:
 permissions:
   contents: read
   id-token: write
   pull-requests: write
 
 jobs:
-  sonarqube:
+  Docker-Image-Build:
     name: SonarQube scan & push image
     runs-on: ubuntu-latest
 
