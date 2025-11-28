@@ -11,7 +11,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,json,css}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,json,css}\"",
     "preview": "vite preview",
-    "prepare": "husky"
+    "prepare": "cd .. && git config core.hooksPath .husky || true"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.11",

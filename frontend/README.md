@@ -1,11 +1,11 @@
 ## Tech Stack
 
-- **Framework**: React 18 + TypeScript
+- **Framework**: React 19 + TypeScript
 - **Build Tool**: Vite
-- **Styling**: Tailwind CSS + shadcn/ui
+- **Styling**: Tailwind CSS v4 + shadcn/ui
 - **State Management**: Zustand (client state) + TanStack Query (server state)
-- **Routing**: React Router DOM v6
-- **Tables**: shadcnTanStack Table v8
+- **Routing**: React Router DOM v7
+- **Tables**: TanStack Table v8
 - **Charts**: Recharts
 - **Maps**: React-Leaflet + Leaflet
 - **HTTP Client**: Axios
@@ -18,11 +18,13 @@
 ## Setup Instructions
 
 1. **Install dependencies**:
+
    ```bash
    npm install
    ```
 
 2. **Start development server**:
+
    ```bash
    npm run dev
    ```
@@ -30,11 +32,13 @@
    The app will be available at `http://localhost:3000`
 
 3. **Build for production**:
+
    ```bash
    npm run build
    ```
 
 4. **Preview production build**:
+
    ```bash
    npm run preview
    ```
@@ -105,6 +109,7 @@ npx shadcn@latest add [component-name]
 ```
 
 Example:
+
 ```bash
 npx shadcn@latest add button
 ```
@@ -112,6 +117,7 @@ npx shadcn@latest add button
 ### API Configuration
 
 Update the base URL in:
+
 - `src/shared/lib/axios.ts`
 - Or set `VITE_API_BASE_URL` environment variable
 
@@ -139,4 +145,3 @@ For dev
 // src/features/dashboard/services/mock-data.ts
 export const mockDashboardData = { ... }
 ```
-
