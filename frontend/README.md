@@ -6,8 +6,7 @@
 - **State Management**: Zustand (client state) + TanStack Query (server state)
 - **Routing**: React Router DOM v7
 - **Tables**: TanStack Table v8
-- **Charts**: Recharts
-- **Maps**: React-Leaflet + Leaflet
+- **Charts & Maps**: ECharts (echarts-for-react)
 - **HTTP Client**: Axios
 - **Code Quality**: ESLint + Prettier + Husky
 
