@@ -8,17 +8,14 @@ export function Sidebar() {
   const location = useLocation()
 
   const navItems = [
-    { path: ROUTES.DASHBOARD, label: 'Dashboard' },
-    { path: ROUTES.SCHEMES, label: 'Schemes' },
-    { path: ROUTES.READINGS, label: 'Readings' },
-    // { path: ROUTES.ADMIN, label: 'Admin' },
-    // { path: ROUTES.STATE_ADMIN, label: 'State Admin' },
+    { path: ROUTES.ADMIN, label: 'Super User Dashboard' },
+    { path: ROUTES.STATE_ADMIN, label: 'State Admin Dashboard' },
   ]
 
   if (!sidebarOpen) return null
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r bg-white shadow-lg">
+    <aside className="fixed top-0 left-0 z-40 h-screen w-64 border-r bg-white shadow-lg">
       <nav className="mt-16 space-y-1 p-4">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path
@@ -28,9 +25,7 @@ export function Sidebar() {
               to={item.path}
               className={cn(
                 'block rounded-lg px-4 py-2 text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-blue-50 text-blue-700'
-                  : 'text-gray-700 hover:bg-gray-100'
+                isActive ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
               )}
             >
               {item.label}
@@ -41,4 +36,3 @@ export function Sidebar() {
     </aside>
   )
 }
-

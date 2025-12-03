@@ -1,6 +1,6 @@
 import axios from 'axios'
+import { useAuthStore } from '@/app/store/auth-store'
 
-// Create axios instance with base configuration
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081',
   timeout: 30000,
@@ -12,11 +12,11 @@ export const apiClient = axios.create({
 // Request interceptor
 apiClient.interceptors.request.use(
   (config) => {
-    // Add auth token if available (for Keycloak integration later)
-    // const token = getAuthToken()
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`
-    // }
+    const token = useAuthStore.getState().token
+    if (token) {
+      config.headers = config.headers ?? {}
+      config.headers.Authorization = `Bearer ${token}`
+    }
     return config
   },
   (error) => {
@@ -30,9 +30,7 @@ apiClient.interceptors.response.use(
     return response
   },
   (error) => {
-    // Handle common errors
     if (error.response?.status === 401) {
-      // Handle unauthorized - redirect to login (when auth is implemented)
       console.error('Unauthorized access')
     } else if (error.response?.status === 403) {
       console.error('Forbidden access')
@@ -44,4 +42,3 @@ apiClient.interceptors.response.use(
 )
 
 export default apiClient
-
