@@ -1,3 +1,5 @@
 export { ErrorBoundary } from './error-boundary'
 export { LoadingSpinner } from './loading-spinner'
 export { ForbiddenPage } from './forbidden'
+export { SessionExpiredPage } from './session-expired'
+export { NotFoundPage } from './not-found'

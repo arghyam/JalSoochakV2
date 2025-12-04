@@ -22,4 +22,11 @@ export const authApi = {
     const response = await apiClient.post<LoginResponse>('/auth/login', payload)
     return response.data
   },
+  refresh: async (): Promise<LoginResponse> => {
+    const response = await apiClient.post<LoginResponse>('/auth/refresh')
+    return response.data
+  },
+  logout: async (): Promise<void> => {
+    await apiClient.post('/auth/logout')
+  },
 }

@@ -6,11 +6,11 @@ import { router } from '@/app/router'
 import { useAuthStore } from '@/app/store'
 
 function App() {
-  const restoreFromToken = useAuthStore((state) => state.restoreFromToken)
+  const bootstrap = useAuthStore((state) => state.bootstrap)
 
   useEffect(() => {
-    restoreFromToken()
-  }, [restoreFromToken])
+    void bootstrap()
+  }, [bootstrap])
 
   return (
     <ErrorBoundary>

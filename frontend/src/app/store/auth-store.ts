@@ -1,9 +1,6 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
-import { AUTH_ROLES, AUTH_STORAGE_KEY, type AuthRole } from '@/shared/constants/auth'
 import type { AuthUser, LoginRequest } from '@/features/auth/services/auth-api'
 import { authApi } from '@/features/auth/services/auth-api'
-import { decodeJwt } from '@/shared/utils/jwt'
 
 export interface AuthState {
   token: string | null
@@ -13,78 +10,80 @@ export interface AuthState {
   error: string | null
   login: (payload: LoginRequest) => Promise<void>
   logout: () => void
-  restoreFromToken: () => void
+  bootstrap: () => Promise<void>
+  sessionExpired: boolean
+  setSessionExpired: () => void
 }
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set, get) => ({
+export const useAuthStore = create<AuthState>()((set) => ({
+  token: null,
+  user: null,
+  isAuthenticated: false,
+  loading: false,
+  error: null,
+  sessionExpired: false,
+
+  login: async (payload: LoginRequest) => {
+    set({ loading: true, error: null, sessionExpired: false })
+    try {
+      const { token, user } = await authApi.login(payload)
+      set({
+        token,
+        user,
+        isAuthenticated: true,
+        loading: false,
+        error: null,
+      })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to login. Please try again.'
+      set({
+        loading: false,
+        error: message,
+        token: null,
+        user: null,
+        isAuthenticated: false,
+      })
+      throw error
+    }
+  },
+
+  logout: () => {
+    void authApi.logout().catch(() => undefined)
+    set({
       token: null,
       user: null,
       isAuthenticated: false,
-      loading: false,
       error: null,
+      sessionExpired: false,
+    })
+  },
 
-      login: async (payload: LoginRequest) => {
-        set({ loading: true, error: null })
-        try {
-          const { token, user } = await authApi.login(payload)
-          set({
-            token,
-            user,
-            isAuthenticated: true,
-            loading: false,
-            error: null,
-          })
-        } catch (error) {
-          const message =
-            error instanceof Error ? error.message : 'Unable to login. Please try again.'
-          set({ loading: false, error: message, token: null, user: null, isAuthenticated: false })
-          throw error
-        }
-      },
-
-      logout: () => {
-        set({ token: null, user: null, isAuthenticated: false, error: null })
-      },
-
-      restoreFromToken: () => {
-        const { token } = get()
-        if (!token) return
-
-        const decoded = decodeJwt(token)
-        if (!decoded || (decoded.exp && decoded.exp * 1000 < Date.now())) {
-          // Token invalid or expired
-          set({ token: null, user: null, isAuthenticated: false })
-          return
-        }
-
-        const roles: string[] =
-          decoded.realm_access?.roles ||
-          decoded.resource_access?.['jalsoochak']?.roles ||
-          decoded.resource_access?.['account']?.roles ||
-          []
-
-        let role: AuthRole = AUTH_ROLES.BUSINESS_USER
-        if (roles.includes(AUTH_ROLES.SUPER_USER)) {
-          role = AUTH_ROLES.SUPER_USER
-        } else if (roles.includes(AUTH_ROLES.STATE_ADMIN)) {
-          role = AUTH_ROLES.STATE_ADMIN
-        }
-
-        const user: AuthUser = {
-          id: decoded.sub || '',
-          name: (decoded.name as string) || '',
-          email: (decoded.email as string) || '',
-          role,
-        }
-
-        set({ user, isAuthenticated: true })
-      },
-    }),
-    {
-      name: AUTH_STORAGE_KEY,
-      partialize: (state) => ({ token: state.token }),
+  bootstrap: async () => {
+    try {
+      const { token, user } = await authApi.refresh()
+      set({
+        token,
+        user,
+        isAuthenticated: true,
+        sessionExpired: false,
+        error: null,
+      })
+    } catch {
+      set({
+        token: null,
+        user: null,
+        isAuthenticated: false,
+      })
     }
-  )
-)
+  },
+
+  setSessionExpired: () => {
+    set({
+      token: null,
+      user: null,
+      isAuthenticated: false,
+      sessionExpired: true,
+      error: 'Session expired. Please log in again.',
+    })
+  },
+}))

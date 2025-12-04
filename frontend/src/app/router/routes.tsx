@@ -7,6 +7,7 @@ import { StateAdmin } from '@/features/state-admin/components/state-admin'
 import { LoginPage } from '@/features/auth'
 import { ProtectedRoute, RedirectIfAuthenticated } from '@/shared/components/routing/ProtectedRoute'
 import { AUTH_ROLES } from '@/shared/constants/auth'
+import { NotFoundPage } from '@/shared/components/common'
 
 export const router = createBrowserRouter([
   // Public dashboards
@@ -69,5 +70,9 @@ export const router = createBrowserRouter([
         </MainLayout>
       </ProtectedRoute>
     ),
+  },
+  {
+    path: '*',
+    element: <NotFoundPage />,
   },
 ])

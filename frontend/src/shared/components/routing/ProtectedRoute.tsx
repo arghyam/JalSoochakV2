@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import { useAuthStore } from '@/app/store'
 import { AUTH_ROLES, type AuthRole } from '@/shared/constants/auth'
 import { ROUTES } from '@/shared/constants/routes'
-import { ForbiddenPage } from '@/shared/components/common'
+import { ForbiddenPage, SessionExpiredPage } from '@/shared/components/common'
 
 interface ProtectedRouteProps {
   children: ReactNode
@@ -17,7 +17,11 @@ export function ProtectedRoute({
   allowedRoles,
 }: ProtectedRouteProps) {
   const location = useLocation()
-  const { isAuthenticated, user } = useAuthStore()
+  const { isAuthenticated, user, sessionExpired } = useAuthStore()
+
+  if (sessionExpired) {
+    return <SessionExpiredPage />
+  }
 
   if (requireAuth && !isAuthenticated) {
     return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />
