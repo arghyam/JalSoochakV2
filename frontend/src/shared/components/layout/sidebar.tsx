@@ -8,8 +8,10 @@ export function Sidebar() {
   const location = useLocation()
 
   const navItems = [
-    { path: ROUTES.ADMIN, label: 'Super User Dashboard' },
-    { path: ROUTES.STATE_ADMIN, label: 'State Admin Dashboard' },
+    { path: ROUTES.ADMIN, label: 'Dashboard' },
+    { path: ROUTES.MANAGE_TENANTS, label: 'Manage Tenants' },
+    { path: ROUTES.ADD_STATE_ADMIN, label: 'Add State Admin' },
+    { path: ROUTES.CONFIGURE_SYSTEM, label: 'Configure System' },
   ]
 
   if (!sidebarOpen) return null
