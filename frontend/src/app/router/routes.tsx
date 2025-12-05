@@ -3,10 +3,11 @@ import { ROUTES } from '@/shared/constants/routes'
 import { MainLayout, DashboardLayout } from '@/shared/components/layout'
 import { CentralDashboard } from '@/features/dashboard/components/central-dashboard'
 import { Admin, ManageTenants, StateAdminManagement, ConfigureSystem } from '@/features/admin'
-import { StateAdmin } from '@/features/state-admin/components/state-admin'
+import { StateAdminDashboard, StateAdminConfiguration } from '@/features/state-admin'
 import { LoginPage } from '@/features/auth'
-import { ProtectedRoute, RedirectIfAuthenticated } from '@/shared/components/routing/ProtectedRoute'
-import { AUTH_ROLES } from '@/shared/constants/auth'
+// import { ProtectedRoute } from '@/shared/components/routing/ProtectedRoute'
+import { RedirectIfAuthenticated } from '@/shared/components/routing/ProtectedRoute'
+// import { AUTH_ROLES } from '@/shared/constants/auth'
 import { NotFoundPage } from '@/shared/components/common'
 
 export const router = createBrowserRouter([
@@ -94,11 +95,21 @@ export const router = createBrowserRouter([
   {
     path: ROUTES.STATE_ADMIN,
     element: (
-      <ProtectedRoute allowedRoles={[AUTH_ROLES.STATE_ADMIN]}>
-        <MainLayout>
-          <StateAdmin />
-        </MainLayout>
-      </ProtectedRoute>
+      // <ProtectedRoute allowedRoles={[AUTH_ROLES.STATE_ADMIN]}>
+      <MainLayout>
+        <StateAdminDashboard />
+      </MainLayout>
+      // </ProtectedRoute>
+    ),
+  },
+  {
+    path: ROUTES.STATE_ADMIN_CONFIG,
+    element: (
+      // <ProtectedRoute allowedRoles={[AUTH_ROLES.STATE_ADMIN]}>
+      <MainLayout>
+        <StateAdminConfiguration />
+      </MainLayout>
+      // </ProtectedRoute>
     ),
   },
   {

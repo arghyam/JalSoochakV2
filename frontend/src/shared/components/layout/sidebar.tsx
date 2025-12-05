@@ -1,25 +1,41 @@
 import { Link, useLocation } from 'react-router-dom'
-import { useUIStore } from '@/app/store'
+import { useUIStore, useAuthStore } from '@/app/store'
 import { ROUTES } from '@/shared/constants/routes'
+import { AUTH_ROLES } from '@/shared/constants/auth'
 import { cn } from '@/shared/utils/cn'
+
+interface NavItem {
+  path: string
+  label: string
+  roles: string[]
+}
+
+const NAV_ITEMS: NavItem[] = [
+  // Super User (Admin) navigation
+  { path: ROUTES.ADMIN, label: 'Dashboard', roles: [AUTH_ROLES.SUPER_USER] },
+  { path: ROUTES.MANAGE_TENANTS, label: 'Manage Tenants', roles: [AUTH_ROLES.SUPER_USER] },
+  { path: ROUTES.ADD_STATE_ADMIN, label: 'Add State Admin', roles: [AUTH_ROLES.SUPER_USER] },
+  { path: ROUTES.CONFIGURE_SYSTEM, label: 'Configure System', roles: [AUTH_ROLES.SUPER_USER] },
+
+  // State Admin navigation
+  { path: ROUTES.STATE_ADMIN, label: 'Dashboard', roles: [AUTH_ROLES.STATE_ADMIN] },
+  { path: ROUTES.STATE_ADMIN_CONFIG, label: 'Configuration', roles: [AUTH_ROLES.STATE_ADMIN] },
+]
 
 export function Sidebar() {
   const sidebarOpen = useUIStore((state) => state.sidebarOpen)
+  const user = useAuthStore((state) => state.user)
   const location = useLocation()
 
-  const navItems = [
-    { path: ROUTES.ADMIN, label: 'Dashboard' },
-    { path: ROUTES.MANAGE_TENANTS, label: 'Manage Tenants' },
-    { path: ROUTES.ADD_STATE_ADMIN, label: 'Add State Admin' },
-    { path: ROUTES.CONFIGURE_SYSTEM, label: 'Configure System' },
-  ]
-
   if (!sidebarOpen) return null
+
+  const userRole = user?.role || AUTH_ROLES.SUPER_USER //remove fallback after testing
+  const visibleNavItems = NAV_ITEMS.filter((item) => userRole && item.roles.includes(userRole))
 
   return (
     <aside className="fixed top-0 left-0 z-40 h-screen w-64 border-r bg-white shadow-lg">
       <nav className="mt-16 space-y-1 p-4">
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const isActive = location.pathname === item.path
           return (
             <Link
