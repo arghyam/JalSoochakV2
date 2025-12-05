@@ -19,7 +19,7 @@ permissions:
 jobs:
   Docker-Image-Build:
     name: SonarQube scan & push image
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
 
     steps:
       - name: Checkout
