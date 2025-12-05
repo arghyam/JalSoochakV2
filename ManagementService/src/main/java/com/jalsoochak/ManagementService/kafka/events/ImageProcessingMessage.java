@@ -1,4 +1,4 @@
-package com.jalsoochak.bfm_reading_service.kafka.events;
+package com.jalsoochak.ManagementService.kafka.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
