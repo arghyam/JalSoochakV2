@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.jalsoochak</groupId>
-	<artifactId>ManagementService</artifactId>
+	<artifactId>managementservice</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ManagementService</name>
 	<description>Service for scheme, location and user </description>

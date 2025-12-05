@@ -1,6 +1,6 @@
-package com.jalsoochak.bfm_reading_service.kafka.producer;
+package com.jalsoochak.ManagementService.kafka.producers;
 
-import com.jalsoochak.bfm_reading_service.kafka.events.ImageProcessingMessage;
+import com.jalsoochak.ManagementService.kafka.events.ImageProcessingMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory;
@@ -38,3 +38,4 @@ public class ImageProcessorProducer {
                 });
     }
 }
+

@@ -29,5 +29,28 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.ibd
+*.frm
+*.myd
+*.myi
+*.sock
+*.log
+*.ib_logfile*
+
+# Volume/data directories
+volume-data/
+data/
+mysql_data/
+postgres_data/
+mongo_data/
+
+# Docker volumes
+**/volume-*/
+**/data/
+
 ### VS Code ###
 .vscode/
