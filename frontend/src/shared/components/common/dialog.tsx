@@ -31,18 +31,16 @@ export function Dialog({ open, onClose, title, children, maxWidth = 'md' }: Dial
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div
-        className="bg-opacity-50 absolute inset-0 bg-black transition-opacity"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/50 transition-opacity" onClick={onClose} />
 
       {/* Dialog */}
       <div
         className={cn(
           'relative w-full rounded-lg bg-white shadow-xl transition-all',
-          'mx-4 p-6',
+          'max-h-[90vh] overflow-y-auto',
+          'p-6',
           maxWidthClasses[maxWidth]
         )}
       >

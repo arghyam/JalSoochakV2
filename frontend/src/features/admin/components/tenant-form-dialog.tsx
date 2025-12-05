@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { Dialog } from '@/shared/components/common'
+import { MultiSelect } from '@/shared/components/common/multi-select'
+import { INDIAN_LANGUAGES, COUNTRIES } from '@/shared/constants/languages'
 import type { Tenant, TenantFormData } from '../types/tenant'
 
 interface TenantFormDialogProps {
@@ -16,12 +18,18 @@ function getInitialFormData(tenant: Tenant | null | undefined): TenantFormData {
       name: tenant.name,
       code: tenant.code,
       status: tenant.status,
+      country: tenant.country,
+      defaultLanguages: tenant.defaultLanguages,
+      defaultWaterNorm: tenant.defaultConfig.defaultWaterNorm,
     }
   }
   return {
     name: '',
     code: '',
     status: 'active',
+    country: 'IN',
+    defaultLanguages: ['English'],
+    defaultWaterNorm: 60,
   }
 }
 
@@ -48,6 +56,18 @@ export function TenantFormDialog({
       newErrors.code = 'Code must be 2-3 uppercase letters'
     }
 
+    if (!formData.country) {
+      newErrors.country = 'Country is required'
+    }
+
+    if (formData.defaultLanguages.length === 0) {
+      newErrors.defaultLanguages = 'At least one language is required'
+    }
+
+    if (!formData.defaultWaterNorm || formData.defaultWaterNorm <= 0) {
+      newErrors.defaultWaterNorm = 'Default water norm must be greater than 0'
+    }
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -59,7 +79,7 @@ export function TenantFormDialog({
     }
   }
 
-  const handleChange = (field: keyof TenantFormData, value: string) => {
+  const handleChange = (field: keyof TenantFormData, value: string | string[] | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }))
@@ -116,6 +136,68 @@ export function TenantFormDialog({
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
+        </div>
+
+        <div>
+          <label htmlFor="country" className="mb-1 block text-sm font-medium text-gray-700">
+            Country <span className="text-red-500">*</span>
+          </label>
+          <select
+            id="country"
+            value={formData.country}
+            onChange={(e) => handleChange('country', e.target.value)}
+            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            disabled={isLoading}
+          >
+            {COUNTRIES.map((country) => (
+              <option key={country.code} value={country.code}>
+                {country.name}
+              </option>
+            ))}
+          </select>
+          {errors.country && <p className="mt-1 text-sm text-red-600">{errors.country}</p>}
+        </div>
+
+        <div>
+          <label
+            htmlFor="defaultLanguages"
+            className="mb-1 block text-sm font-medium text-gray-700"
+          >
+            Default Languages <span className="text-red-500">*</span>
+          </label>
+          <MultiSelect
+            options={[...INDIAN_LANGUAGES]}
+            value={formData.defaultLanguages}
+            onChange={(value) => handleChange('defaultLanguages', value)}
+            placeholder="Select languages..."
+            className={isLoading ? 'pointer-events-none opacity-50' : ''}
+          />
+          {errors.defaultLanguages && (
+            <p className="mt-1 text-sm text-red-600">{errors.defaultLanguages}</p>
+          )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="defaultWaterNorm"
+            className="mb-1 block text-sm font-medium text-gray-700"
+          >
+            Default Water Norm (litres per capita per day) <span className="text-red-500">*</span>
+          </label>
+          <input
+            id="defaultWaterNorm"
+            type="number"
+            value={formData.defaultWaterNorm}
+            onChange={(e) => handleChange('defaultWaterNorm', Number(e.target.value))}
+            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            placeholder="e.g., 60"
+            min="1"
+            step="1"
+            disabled={isLoading}
+          />
+          {errors.defaultWaterNorm && (
+            <p className="mt-1 text-sm text-red-600">{errors.defaultWaterNorm}</p>
+          )}
         </div>
 
         <div className="flex justify-end gap-3 pt-4">

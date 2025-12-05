@@ -79,6 +79,14 @@ export function ManageTenants() {
         cell: (info) => <span className="text-gray-700">{info.getValue() as number}</span>,
       },
       {
+        accessorKey: 'defaultConfig.defaultWaterNorm',
+        header: 'Water Norm (LPCD)',
+        cell: (info) => {
+          const tenant = info.row.original
+          return <span className="text-gray-700">{tenant.defaultConfig.defaultWaterNorm}</span>
+        },
+      },
+      {
         id: 'actions',
         header: 'Actions',
         cell: (info) => {
@@ -168,10 +176,29 @@ export function ManageTenants() {
   const handleFormSubmit = async (data: TenantFormData) => {
     try {
       if (editingTenant) {
-        await updateTenant.mutateAsync({ ...data, id: editingTenant.id })
+        await updateTenant.mutateAsync({
+          id: editingTenant.id,
+          name: data.name,
+          code: data.code,
+          status: data.status,
+          country: data.country,
+          defaultLanguages: data.defaultLanguages,
+          defaultConfig: {
+            defaultWaterNorm: data.defaultWaterNorm,
+          },
+        })
         toast.success('Tenant updated successfully')
       } else {
-        await createTenant.mutateAsync(data)
+        await createTenant.mutateAsync({
+          name: data.name,
+          code: data.code,
+          status: data.status,
+          country: data.country,
+          defaultLanguages: data.defaultLanguages,
+          defaultConfig: {
+            defaultWaterNorm: data.defaultWaterNorm,
+          },
+        })
         toast.success('Tenant created successfully')
       }
       setIsFormOpen(false)
