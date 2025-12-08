@@ -1,0 +1,28 @@
+# Common Labels
+labels:
+  app: "ManagementService"
+  group: "core"
+
+# Ingress Configs
+ingress:
+  enabled: true
+  zuul: false
+  context: "management-service"
+
+# Init Containers Configs
+
+# Container Configs
+image:
+  repository: "252649026375.dkr.ecr.ap-south-1.amazonaws.com/managementservice"
+  tag: "b6850fe7058e16360d56dbcd2095be590c532359"
+replicas: "1"
+tracing-enabled: true
+healthChecks:
+  enabled: true
+  livenessProbePath: "/management-service/health"
+  readinessProbePath: "/management-service/health"
+
+# Additional Container Envs
+env: |
+  - name: SERVER_PORT
+    value: "8080"
