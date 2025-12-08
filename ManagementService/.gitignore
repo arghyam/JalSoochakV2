@@ -54,3 +54,5 @@ mongo_data/
 
 ### VS Code ###
 .vscode/
+
+.env
