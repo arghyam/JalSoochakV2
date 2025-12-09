@@ -57,9 +57,12 @@ apiClient.interceptors.response.use(
       return Promise.reject(error)
     }
 
+    // Mark request as retry to prevent infinite loops
+    originalRequest._retry = true
+
+    // If refresh is not already in progress, start it
     if (!isRefreshing) {
       isRefreshing = true
-      originalRequest._retry = true
 
       refreshPromise = (async () => {
         try {
@@ -76,26 +79,35 @@ apiClient.interceptors.response.use(
           throw refreshError
         } finally {
           isRefreshing = false
+          refreshPromise = null
         }
       })()
-    }
 
-    try {
-      await refreshPromise
-      // After successful refresh, retry all pending requests
-      pendingRequests.forEach((cb) => cb())
-      pendingRequests.length = 0
-
-      const newToken = useAuthStore.getState().token
-      if (newToken && originalRequest) {
-        originalRequest.headers = originalRequest.headers ?? {}
-        originalRequest.headers.Authorization = `Bearer ${newToken}`
+      try {
+        await refreshPromise
+        // After successful refresh, retry all queued pending requests
+        for (const cb of pendingRequests) {
+          cb()
+        }
+        pendingRequests.length = 0
+      } catch (refreshError) {
+        // Clear pending requests on refresh failure
+        pendingRequests.length = 0
+        throw refreshError
       }
-      return apiClient(originalRequest)
-    } catch (refreshError) {
-      pendingRequests.length = 0
-      return Promise.reject(refreshError)
     }
+
+    // Queue this request to be retried after refresh completes
+    return new Promise((resolve, reject) => {
+      pendingRequests.push(() => {
+        const newToken = useAuthStore.getState().token
+        if (newToken && originalRequest) {
+          originalRequest.headers = originalRequest.headers ?? {}
+          originalRequest.headers.Authorization = `Bearer ${newToken}`
+        }
+        apiClient(originalRequest).then(resolve).catch(reject)
+      })
+    })
   }
 )
 

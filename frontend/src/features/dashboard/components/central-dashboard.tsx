@@ -43,6 +43,22 @@ export function CentralDashboard() {
     return null
   }
 
+  if (!data) {
+    return null
+  }
+
+  // Guard against incomplete data structure
+  if (!data.kpis || !data.mapData || !data.demandSupply) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-red-600">Invalid data structure</h2>
+          <p className="mt-2 text-gray-600">Dashboard data is incomplete</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6 p-6">
       {/* Header */}

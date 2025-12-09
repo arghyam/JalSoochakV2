@@ -18,10 +18,11 @@ export function EChartsWrapper({
   const chartRef = useRef<HTMLDivElement>(null)
   const chartInstanceRef = useRef<echarts.ECharts | null>(null)
 
+  // Initialize chart and update options
   useEffect(() => {
     if (!chartRef.current) return
 
-    // Initialize chart
+    // Initialize chart instance once
     if (!chartInstanceRef.current) {
       chartInstanceRef.current = echarts.init(chartRef.current)
       onChartReady?.(chartInstanceRef.current)
@@ -29,10 +30,15 @@ export function EChartsWrapper({
 
     const chart = chartInstanceRef.current
 
-    // Set option
+    // Update chart options (doesn't re-create the chart)
     chart.setOption(option, true)
+  }, [option, onChartReady])
 
-    // Handle resize
+  // Handle window resize
+  useEffect(() => {
+    const chart = chartInstanceRef.current
+    if (!chart) return
+
     const handleResize = () => {
       chart.resize()
     }
@@ -40,10 +46,18 @@ export function EChartsWrapper({
 
     return () => {
       window.removeEventListener('resize', handleResize)
-      chart.dispose()
-      chartInstanceRef.current = null
     }
-  }, [option, onChartReady])
+  }, [])
+
+  // Cleanup: dispose chart on unmount only
+  useEffect(() => {
+    return () => {
+      if (chartInstanceRef.current) {
+        chartInstanceRef.current.dispose()
+        chartInstanceRef.current = null
+      }
+    }
+  }, [])
 
   return (
     <div

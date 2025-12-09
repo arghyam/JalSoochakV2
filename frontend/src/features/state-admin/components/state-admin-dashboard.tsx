@@ -59,7 +59,7 @@ export function StateAdminDashboard() {
               <dl>
                 <dt className="truncate text-sm font-medium text-gray-500">Water Norms</dt>
                 <dd className="text-lg font-semibold text-gray-900">
-                  {waterNorms?.norms.length || 0} Categories
+                  {waterNorms?.norms?.length ?? 0} Categories
                 </dd>
               </dl>
             </div>
@@ -85,7 +85,7 @@ export function StateAdminDashboard() {
               <dl>
                 <dt className="truncate text-sm font-medium text-gray-500">Escalation Rules</dt>
                 <dd className="text-lg font-semibold text-gray-900">
-                  {escalationRules?.rules.length || 0} Rules
+                  {escalationRules?.rules?.length ?? 0} Rules
                 </dd>
               </dl>
             </div>

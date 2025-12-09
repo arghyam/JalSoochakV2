@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import { Dialog } from '@/shared/components/common'
 import type { NudgeMessage, NudgeMessageFormData } from '../../types/nudge-message'
 import {
@@ -62,7 +62,7 @@ export function NudgeMessageFormDialog({
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (validate()) {
       onSubmit(formData)

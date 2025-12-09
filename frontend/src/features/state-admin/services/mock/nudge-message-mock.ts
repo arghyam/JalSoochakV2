@@ -48,6 +48,7 @@ const mockNudgeMessages: NudgeMessage[] = [
 ]
 
 let messages = [...mockNudgeMessages]
+let nextId = messages.length + 1
 
 export const nudgeMessageMockService = {
   getNudgeMessages: async (tenantId: string): Promise<NudgeMessage[]> => {
@@ -58,7 +59,7 @@ export const nudgeMessageMockService = {
   createNudgeMessage: async (data: CreateNudgeMessageRequest): Promise<NudgeMessage> => {
     await delay(500)
     const newMessage: NudgeMessage = {
-      id: (messages.length + 1).toString(),
+      id: (nextId++).toString(),
       title: data.title,
       message: data.message,
       targetRole: data.targetRole,

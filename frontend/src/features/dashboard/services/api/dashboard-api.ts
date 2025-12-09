@@ -11,6 +11,9 @@ export const dashboardApi = {
    * @returns Dashboard data
    */
   getDashboardData: async (level: DashboardLevel, entityId?: string): Promise<DashboardData> => {
+    if (level !== 'central' && !entityId) {
+      throw new Error(`entityId is required for dashboard level: ${level}`)
+    }
     const endpoint =
       level === 'central' ? '/api/dashboard/central' : `/api/dashboard/${level}/${entityId}`
     const response = await apiClient.get<DashboardData>(endpoint)
