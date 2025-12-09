@@ -50,8 +50,11 @@ public class PersonMaster {
     @Column(name = "full_name", length = 200)
     private String fullName;
 
-    @Column(name = "phone_number", length = 15)
+    @Column(name = "phone_number", unique = true)
     private String phoneNumber;
+
+    @Column(name = "tenant_id", length = 50)
+    private String tenantId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "person_type_id")

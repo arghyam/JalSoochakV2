@@ -5,4 +5,5 @@ import com.jalsoochak.ManagementService.models.entity.PersonTypeMaster;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PersonMasterRepository extends JpaRepository<PersonMaster, Long> {
+    boolean existsByPhoneNumber(String phoneNumber);
 }

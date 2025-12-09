@@ -2,6 +2,7 @@ package com.jalsoochak.ManagementService.controllers;
 
 import com.jalsoochak.ManagementService.models.app.request.LoginRequest;
 import com.jalsoochak.ManagementService.models.app.request.RegisterRequest;
+import com.jalsoochak.ManagementService.models.app.request.TokenRequest;
 import com.jalsoochak.ManagementService.services.service.KeycloakAdminClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +33,13 @@ public class PersonController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(@RequestParam("refresh_token") String refreshToken) {
-        return keycloakAdminClientService.refreshToken(refreshToken);
+    public ResponseEntity<?> refreshToken(@RequestBody TokenRequest request) {
+        return keycloakAdminClientService.refreshToken(request.getRefreshToken());
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestParam("refresh_token") String refreshToken) {
-        return keycloakAdminClientService.logout(refreshToken);
+    public ResponseEntity<?> logout(@RequestBody TokenRequest request) {
+        return keycloakAdminClientService.logout(request.getRefreshToken());
     }
+
 }

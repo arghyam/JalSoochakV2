@@ -22,6 +22,7 @@ import jakarta.ws.rs.core.Response;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
@@ -65,6 +66,12 @@ public class KeycloakAdminClientService {
         UsersResource usersResource = keycloakProvider.getAdminInstance()
                 .realm(realm)
                 .users();
+
+        if (personMasterRepository.existsByPhoneNumber(user.getPhoneNumber())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Phone number already exists: " + user.getPhoneNumber());
+        }
+
         CredentialRepresentation credentialRepresentation = createPasswordCredentials(user.getPassword());
 
         UserRepresentation keycloakUser = new UserRepresentation();
@@ -81,12 +88,14 @@ public class KeycloakAdminClientService {
         if (response.getStatus() == 201) {
             PersonTypeMaster personType = personTypeMasterRepository.findBycName(user.getPersonType())
                     .orElseThrow(() -> new RuntimeException("PersonType not found: " + user.getPersonType()));
+
             PersonMaster person = PersonMaster.builder()
                     .firstName(user.getFirstName())
                     .lastName(user.getLastName())
                     .fullName(user.getFirstName() + " " + user.getLastName())
                     .phoneNumber(user.getPhoneNumber())
                     .personType(personType)
+                    .tenantId(user.getTenantId())
                     .createdBy("system")
                     .build();
             log.info("Person: {}", person);
