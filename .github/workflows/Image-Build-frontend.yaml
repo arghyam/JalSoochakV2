@@ -88,7 +88,7 @@ jobs:
           helm-plugins: >
             https://github.com/databus23/helm-diff --verify=false
       - name: Helm Deployment
-        run: helmfile deploy -f jalsoochak-helmfile.yaml --selector name=jalsoochak-frontend --set jalsoochak-frontend.image.tag=${{ github.sha }}
+        run: helmfile apply -f jalsoochak-helmfile.yaml --selector name=jalsoochak-frontend --set jalsoochak-frontend.image.tag=${{ github.sha }}
         working-directory: infra/deploy-as-code
 
 
