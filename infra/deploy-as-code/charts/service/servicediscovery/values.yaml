@@ -11,7 +11,4 @@ image:
   repository: "252649026375.dkr.ecr.ap-south-1.amazonaws.com/servicediscoveryserver"
   tag: "3c05336b3262bcc649765a06fa5aaf081b182320"
 replicas: "1"
-# Additional Container Envs
-env: |
-  - name: SERVER_PORT
-    value: "8080"
+httpPort: 8761

@@ -23,7 +23,7 @@ env: |
   - name: SERVER_PORT
     value: "8080"
   - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
-    value: "http://servicediscovery:8080/eureka"
+    value: "http://servicediscovery:8761/eureka"
   - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
     value: "kafka-kraft-controller-headless:9092"
   - name: SPRING_DATASOURCE_URL

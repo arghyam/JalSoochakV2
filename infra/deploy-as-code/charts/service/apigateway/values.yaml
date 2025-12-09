@@ -23,4 +23,4 @@ env: |
   - name: SERVER_PORT
     value: "8080"
   - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
-    value: "http://servicediscovery:8080/eureka"
+    value: "http://servicediscovery:8761/eureka"
