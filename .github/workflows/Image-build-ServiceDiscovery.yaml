@@ -64,7 +64,7 @@ jobs:
           docker build --build-arg WORK_DIR="servicediscoveryserver" -t $ECR_REGISTRY/servicediscoveryserver:$IMAGE_TAG -f build/maven/Dockerfile .
           docker push $ECR_REGISTRY/servicediscoveryserver:$IMAGE_TAG
 
-
+  Helm-Deployment:
     name: Helm Deployment
     needs: sonarqube
     runs-on: [self-hosted, Linux, X64]
