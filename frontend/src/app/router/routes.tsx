@@ -1,60 +1,119 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { ROUTES } from '@/shared/constants/routes'
-import { MainLayout } from '@/shared/components/layout/main-layout'
-import { Dashboard } from '@/features/dashboard'
-import { Schemes } from '@/features/schemes'
-import { Readings } from '@/features/readings'
-// import { Admin } from '@/features/admin/components/admin'
-// import { StateAdmin } from '@/features/state-admin/components/state-admin'
+import { MainLayout, DashboardLayout } from '@/shared/components/layout'
+import { CentralDashboard } from '@/features/dashboard/components/central-dashboard'
+import { Admin, ManageTenants, StateAdminManagement, ConfigureSystem } from '@/features/admin'
+import { StateAdminDashboard, StateAdminConfiguration } from '@/features/state-admin'
+import { LoginPage } from '@/features/auth'
+// import { ProtectedRoute } from '@/shared/components/routing/ProtectedRoute'
+import { RedirectIfAuthenticated } from '@/shared/components/routing/ProtectedRoute'
+// import { AUTH_ROLES } from '@/shared/constants/auth'
+import { NotFoundPage } from '@/shared/components/common'
 
 export const router = createBrowserRouter([
-  // {
-  //   path: ROUTES.HOME,
-  //   element: (
-  //     <MainLayout>
-  //       <Dashboard />
-  //     </MainLayout>
-  //   ),
-  // },
+  // Public dashboards
   {
     path: ROUTES.DASHBOARD,
     element: (
-      <MainLayout>
-        <Dashboard />
-      </MainLayout>
+      <DashboardLayout>
+        <CentralDashboard />
+      </DashboardLayout>
     ),
   },
   {
-    path: ROUTES.SCHEMES,
+    path: '/states/:stateId',
     element: (
-      <MainLayout>
-        <Schemes />
-      </MainLayout>
+      <DashboardLayout>
+        <div className="p-6">
+          <h1 className="text-2xl font-bold">State Dashboard</h1>
+          <p className="text-muted-foreground">State dashboard coming soon...</p>
+        </div>
+      </DashboardLayout>
     ),
   },
   {
-    path: ROUTES.READINGS,
+    path: '/zones/:zoneId',
     element: (
-      <MainLayout>
-        <Readings />
-      </MainLayout>
+      <DashboardLayout>
+        <div className="p-6">
+          <h1 className="text-2xl font-bold">Zone Dashboard</h1>
+          <p className="text-muted-foreground">Zone dashboard coming soon...</p>
+        </div>
+      </DashboardLayout>
     ),
   },
-  // {
-  //   path: ROUTES.ADMIN,
-  //   element: (
-  //     <MainLayout>
-  //       <Admin />
-  //     </MainLayout>
-  //   ),
-  // },
-  // {
-  //   path: ROUTES.STATE_ADMIN,
-  //   element: (
-  //     <MainLayout>
-  //       <StateAdmin />
-  //     </MainLayout>
-  //   ),
-  // },
+  // Auth
+  {
+    path: ROUTES.LOGIN,
+    element: (
+      <RedirectIfAuthenticated>
+        <LoginPage />
+      </RedirectIfAuthenticated>
+    ),
+  },
+  // Protected routes
+  {
+    path: ROUTES.ADMIN,
+    element: (
+      // <ProtectedRoute allowedRoles={[AUTH_ROLES.SUPER_USER]}>
+      <MainLayout>
+        <Admin />
+      </MainLayout>
+      // </ProtectedRoute>
+    ),
+  },
+  {
+    path: ROUTES.ADD_STATE_ADMIN,
+    element: (
+      // <ProtectedRoute allowedRoles={[AUTH_ROLES.SUPER_USER]}>
+      <MainLayout>
+        <StateAdminManagement />
+      </MainLayout>
+      // </ProtectedRoute>
+    ),
+  },
+  {
+    path: ROUTES.CONFIGURE_SYSTEM,
+    element: (
+      // <ProtectedRoute allowedRoles={[AUTH_ROLES.SUPER_USER]}>
+      <MainLayout>
+        <ConfigureSystem />
+      </MainLayout>
+      // </ProtectedRoute>
+    ),
+  },
+  {
+    path: ROUTES.MANAGE_TENANTS,
+    element: (
+      // <ProtectedRoute allowedRoles={[AUTH_ROLES.SUPER_USER]}>
+      <MainLayout>
+        <ManageTenants />
+      </MainLayout>
+      // </ProtectedRoute>
+    ),
+  },
+  {
+    path: ROUTES.STATE_ADMIN,
+    element: (
+      // <ProtectedRoute allowedRoles={[AUTH_ROLES.STATE_ADMIN]}>
+      <MainLayout>
+        <StateAdminDashboard />
+      </MainLayout>
+      // </ProtectedRoute>
+    ),
+  },
+  {
+    path: ROUTES.STATE_ADMIN_CONFIG,
+    element: (
+      // <ProtectedRoute allowedRoles={[AUTH_ROLES.STATE_ADMIN]}>
+      <MainLayout>
+        <StateAdminConfiguration />
+      </MainLayout>
+      // </ProtectedRoute>
+    ),
+  },
+  {
+    path: '*',
+    element: <NotFoundPage />,
+  },
 ])
-
