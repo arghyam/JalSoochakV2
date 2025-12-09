@@ -1,6 +1,6 @@
 # Common Labels
 labels:
-  app: "ManagementService"
+  app: "imageprocessing"
   group: "core"
 
 
@@ -9,7 +9,7 @@ labels:
 
 # Container Configs
 image:
-  repository: "252649026375.dkr.ecr.ap-south-1.amazonaws.com/managementservice"
+  repository: "252649026375.dkr.ecr.ap-south-1.amazonaws.com/imageprocessing"
   tag: "3c05336b3262bcc649765a06fa5aaf081b182320"
 replicas: "1"
 # tracing-enabled: true
@@ -41,5 +41,3 @@ env: |
       secretKeyRef:
         key: password
         name: jalsoochak
-  - name: KEYCLOAK_AUTH_SERVER_URL
-    value: "http://keycloak:8080/keycloak/auth"

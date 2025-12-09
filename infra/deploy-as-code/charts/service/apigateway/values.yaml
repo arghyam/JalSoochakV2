@@ -1,0 +1,26 @@
+# Common Labels
+labels:
+  app: "apigateway"
+  group: "core"
+
+
+
+# Init Containers Configs
+
+# Container Configs
+image:
+  repository: "252649026375.dkr.ecr.ap-south-1.amazonaws.com/apigateway"
+  tag: "1f1602c243b3fa36205c859267320c75cffb58d1"
+replicas: "1"
+# tracing-enabled: true
+# healthChecks:
+#   enabled: true
+#   livenessProbePath: "/management-service/health"
+#   readinessProbePath: "/management-service/health"
+
+# Additional Container Envs
+env: |
+  - name: SERVER_PORT
+    value: "8080"
+  - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+    value: "http://servicediscovery:8080/eureka"

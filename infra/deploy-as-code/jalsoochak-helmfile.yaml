@@ -91,6 +91,30 @@ releases:
     values:
       - ./charts/service/ManagementService/values.yaml
       - ./charts/environments/jalsoochak-dev.yaml
+  - name: servicediscovery
+    chart: ./charts/service/servicediscovery
+    installed: true
+    version: 0.1.0
+    values:
+      - ./charts/service/servicediscovery/values.yaml
+      - ./charts/environments/jalsoochak-dev.yaml
+  
+  - name: apigateway
+    chart: ./charts/service/apigateway
+    installed: true
+    version: 0.1.0
+    values:
+      - ./charts/service/apigateway/values.yaml
+      - ./charts/environments/jalsoochak-dev.yaml
+  
+  - name: imageprocessing
+    chart: ./charts/service/imageprocessing
+    installed: true
+    version: 0.1.0
+    values:
+      - ./charts/service/imageprocessing/values.yaml
+      - ./charts/environments/jalsoochak-dev.yaml
+  
   - name: jalsoochak-frontend
     chart: ./charts/service/jalsoochak-frontend
     installed: true
