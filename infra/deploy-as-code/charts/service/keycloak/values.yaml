@@ -1,0 +1,100 @@
+# keycloak-values.yaml
+replicas: 3
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+image:
+  registry: docker.io
+  repository: venkatramireddyb/keycloak-bitnami
+  tag: 26.3.3-debian-12-r0
+global:
+  security:
+    allowInsecureImages: true
+auth:
+  adminUser: admin
+  adminPassword: admin
+  managementPassword: admin
+httpRelativePath: /keycloak/
+hostnameStrict: true
+postgresql:
+  enabled: false # Using external DB
+externalDatabase:
+  vendor: mysql
+  host: "dummmy"
+  port: "3306"
+  user: ""
+  database: ""
+  password: "dummmy"
+  existingSecret: "jalsoochak"
+  existingSecretHostKey: "host"
+  existingSecretPortKey: ""
+  existingSecretUserKey: "username"
+  existingSecretDatabaseKey: "database"
+  existingSecretPasswordKey: "password"
+  annotations: {}
+extraEnvVars:
+  - name: KC_DB 
+    value: 'mysql'
+  - name: KC_DB_URL
+    valueFrom:
+      secretKeyRef:
+        key: db-url
+        name: jalsoochak
+  - name: KC_DB_SCHEMA # <--- ADD THIS
+    valueFrom:
+      secretKeyRef:
+        key: database
+        name: jalsoochak
+  - name: KC_DB_USERNAME
+    valueFrom:
+      secretKeyRef:
+        key: username
+        name: jalsoochak
+  - name: KC_DB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        key: password
+        name: jalsoochak
+  - name: KC_HOSTNAME
+    value: https://jalsoochak.beehyv.com/keycloak/
+ingress:
+  enabled: true
+  ingressClassName: "nginx"
+  pathType: Prefix
+  apiVersion: ""
+  controller: default
+  hostname: jalsoochak.beehyv.com
+  hostnameStrict: true
+  httpEnabled: false
+  path: /keycloak/
+  servicePort: http
+  annotations:
+    meta.helm.sh/release-name: keycloak
+    meta.helm.sh/release-namespace: default
+    nginx.ingress.kubernetes.io/backend-protocol: HTTP
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header X-Forwarded-Proto https;
+      proxy_set_header X-Forwarded-Host $host;
+      proxy_set_header X-Forwarded-Port 443;
+      proxy_set_header X-Forwarded-Prefix /keycloak;
+    nginx.ingress.kubernetes.io/lua-resty-waf: active
+    nginx.ingress.kubernetes.io/lua-resty-waf-allow-unknown-content-types: "true"
+    nginx.ingress.kubernetes.io/lua-resty-waf-debug: "true"
+    nginx.ingress.kubernetes.io/lua-resty-waf-process-multipart-body: "false"
+    nginx.ingress.kubernetes.io/lua-resty-waf-score-threshold: "10"
+    nginx.ingress.kubernetes.io/proxy-body-size: 64m
+    nginx.ingress.kubernetes.io/ssl-passthrough: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+
+resources:
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+  requests:
+    cpu: 1000m
+    memory: 1Gi
+
+podDisruptionBudget:
+  maxUnavailable: 1

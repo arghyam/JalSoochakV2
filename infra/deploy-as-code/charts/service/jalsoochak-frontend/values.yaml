@@ -1,0 +1,26 @@
+# Common Labels
+labels:
+  app: "jalsoochak-frontend"
+  group: "core"
+
+# Ingress Configs
+ingress:
+  enabled: true
+  zuul: false
+  context: ""
+
+# Init Containers Configs
+
+# Container Configs
+image:
+  repository: "252649026375.dkr.ecr.ap-south-1.amazonaws.com/jalsoochak-frontend"
+  tag: "2865197fd0ed7ef953b47da683e500e3ebb4930b"
+replicas: "1"
+tracing-enabled: true
+httpPort: 80
+healthChecks:
+  enabled: true
+  livenessProbePath: ""
+  readinessProbePath: ""
+
+# Additional Container Envs

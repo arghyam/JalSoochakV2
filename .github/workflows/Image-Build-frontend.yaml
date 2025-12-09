@@ -66,3 +66,30 @@ jobs:
           docker build  -t $ECR_REGISTRY/jalsoochak-frontend:$IMAGE_TAG .
           docker push $ECR_REGISTRY/jalsoochak-frontend:$IMAGE_TAG
         working-directory: frontend
+        
+  Helm-Deployment:
+    name: Helm Deployment
+    needs: sonarqube
+    runs-on: [self-hosted, Linux, X64]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: 'latest' # Specify the version of Helm
+
+      - name: Install Helmfile
+        uses: helmfile/helmfile-action@v1.9.0
+        with:
+          helm-plugins: >
+            https://github.com/databus23/helm-diff --verify=false
+      - name: Helm Deployment
+        if: github.ref == 'refs/heads/main'
+        run: helmfile apply -f jalsoochak-helmfile.yaml --selector name=jalsoochak-frontend --set jalsoochak-frontend.image.tag=${{ github.sha }}
+        working-directory: infra/deploy-as-code
+
+

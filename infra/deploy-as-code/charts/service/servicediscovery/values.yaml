@@ -1,0 +1,14 @@
+# Common Labels
+labels:
+  app: "servicediscovery"
+  group: "core"
+
+
+# Init Containers Configs
+
+# Container Configs
+image:
+  repository: "252649026375.dkr.ecr.ap-south-1.amazonaws.com/servicediscoveryserver"
+  tag: "3c05336b3262bcc649765a06fa5aaf081b182320"
+replicas: "1"
+httpPort: 8761

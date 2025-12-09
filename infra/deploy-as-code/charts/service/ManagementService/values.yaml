@@ -1,0 +1,45 @@
+# Common Labels
+labels:
+  app: "ManagementService"
+  group: "core"
+
+
+
+# Init Containers Configs
+
+# Container Configs
+image:
+  repository: "252649026375.dkr.ecr.ap-south-1.amazonaws.com/managementservice"
+  tag: "3c05336b3262bcc649765a06fa5aaf081b182320"
+replicas: "1"
+# tracing-enabled: true
+# healthChecks:
+#   enabled: true
+#   livenessProbePath: "/management-service/health"
+#   readinessProbePath: "/management-service/health"
+
+# Additional Container Envs
+env: |
+  - name: SERVER_PORT
+    value: "8080"
+  - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+    value: "http://servicediscovery:8761/eureka"
+  - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+    value: "kafka-kraft-controller-headless:9092"
+  - name: SPRING_DATASOURCE_URL
+    valueFrom:
+      secretKeyRef:
+        key: db-url
+        name: jalsoochak
+  - name: SPRING_DATASOURCE_USERNAME
+    valueFrom:
+      secretKeyRef:
+        key: username
+        name: jalsoochak
+  - name: SPRING_DATASOURCE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        key: password
+        name: jalsoochak
+  - name: KEYCLOAK_AUTH_SERVER_URL
+    value: "http://keycloak:8080/keycloak/auth"
