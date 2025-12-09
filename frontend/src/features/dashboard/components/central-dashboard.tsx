@@ -43,12 +43,16 @@ export function CentralDashboard() {
     return null
   }
 
-  if (!data) {
-    return null
-  }
-
   // Guard against incomplete data structure
-  if (!data.kpis || !data.mapData || !data.demandSupply) {
+  if (
+    !data.kpis ||
+    !data.mapData ||
+    !data.demandSupply ||
+    !data.topPerformers ||
+    !data.worstPerformers ||
+    !data.regularityData ||
+    !data.continuityData
+  ) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
