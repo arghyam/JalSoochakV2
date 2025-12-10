@@ -1,42 +1,33 @@
 import { type FormEvent, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/app/store'
-import { AUTH_ROLES } from '@/shared/constants/auth'
-import { ROUTES } from '@/shared/constants/routes'
 
 export function LoginPage() {
   const navigate = useNavigate()
-  const location = useLocation()
   const { login, loading, error } = useAuthStore()
-  const [email, setEmail] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
   const [password, setPassword] = useState('')
   const [localError, setLocalError] = useState<string | null>(null)
+
+  const validatePhoneNumber = (phone: string): boolean => {
+    return /^\d{10}$/.test(phone)
+  }
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setLocalError(null)
-    try {
-      await login({ email, password })
-      const { user } = useAuthStore.getState()
-      if (!user) {
-        navigate(ROUTES.DASHBOARD, { replace: true })
-        return
-      }
 
-      if (user.role === AUTH_ROLES.SUPER_USER) {
-        navigate(ROUTES.ADMIN, { replace: true })
-      } else if (user.role === AUTH_ROLES.STATE_ADMIN) {
-        navigate(ROUTES.STATE_ADMIN, { replace: true })
-      } else {
-        const from =
-          (location.state as { from?: { pathname?: string } } | null | undefined)?.from?.pathname ||
-          ROUTES.DASHBOARD
-        navigate(from, { replace: true })
-      }
+    if (!validatePhoneNumber(phoneNumber)) {
+      setLocalError('Phone number must be 10 digits')
+      return
+    }
+
+    try {
+      const redirectPath = await login({ phoneNumber, password })
+      navigate(redirectPath, { replace: true })
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Login failed. Please check your credentials.'
-      setLocalError(message)
+      console.error(err)
+      setLocalError('Unable to login. Please try again.')
     }
   }
 
@@ -47,13 +38,14 @@ export function LoginPage() {
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <label className="block text-sm font-medium text-gray-700">Phone Number</label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="tel"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
               className="mt-1 w-full rounded-md border px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              placeholder="you@example.com"
+              placeholder="9876543210"
+              maxLength={10}
               required
             />
           </div>

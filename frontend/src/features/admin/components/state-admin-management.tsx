@@ -11,7 +11,8 @@ export function StateAdminManagement() {
   const toast = useToast()
 
   const [formData, setFormData] = useState<StateAdminFormData>({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
     tenantId: '',
@@ -24,8 +25,12 @@ export function StateAdminManagement() {
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof StateAdminFormData, string>> = {}
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Full name is required'
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required'
+    }
+
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required'
     }
 
     if (!formData.email.trim()) {
@@ -36,8 +41,8 @@ export function StateAdminManagement() {
 
     if (!formData.phone.trim()) {
       newErrors.phone = 'Phone number is required'
-    } else if (!/^\+91\d{10}$/.test(formData.phone)) {
-      newErrors.phone = 'Phone must be in format +91XXXXXXXXXX (10 digits)'
+    } else if (!/^\d{10}$/.test(formData.phone)) {
+      newErrors.phone = 'Phone must be 10 digits'
     }
 
     if (!formData.tenantId) {
@@ -76,7 +81,8 @@ export function StateAdminManagement() {
 
     try {
       await createStateAdmin.mutateAsync({
-        name: formData.name,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         email: formData.email,
         phone: formData.phone,
         tenantId: formData.tenantId,
@@ -87,7 +93,8 @@ export function StateAdminManagement() {
 
       // Reset form
       setFormData({
-        name: '',
+        firstName: '',
+        lastName: '',
         email: '',
         phone: '',
         tenantId: '',
@@ -122,20 +129,38 @@ export function StateAdminManagement() {
 
       <div className="max-w-2xl rounded-lg bg-white p-6 shadow">
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label htmlFor="name" className="mb-1 block text-sm font-medium text-gray-700">
-              Full Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              id="name"
-              type="text"
-              value={formData.name}
-              onChange={(e) => handleChange('name', e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              placeholder="Enter full name"
-              disabled={createStateAdmin.isPending}
-            />
-            {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="firstName" className="mb-1 block text-sm font-medium text-gray-700">
+                First Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="firstName"
+                type="text"
+                value={formData.firstName}
+                onChange={(e) => handleChange('firstName', e.target.value)}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                placeholder="Enter first name"
+                disabled={createStateAdmin.isPending}
+              />
+              {errors.firstName && <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="lastName" className="mb-1 block text-sm font-medium text-gray-700">
+                Last Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="lastName"
+                type="text"
+                value={formData.lastName}
+                onChange={(e) => handleChange('lastName', e.target.value)}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                placeholder="Enter last name"
+                disabled={createStateAdmin.isPending}
+              />
+              {errors.lastName && <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>}
+            </div>
           </div>
 
           <div>
@@ -162,13 +187,14 @@ export function StateAdminManagement() {
               id="phone"
               type="tel"
               value={formData.phone}
-              onChange={(e) => handleChange('phone', e.target.value)}
+              onChange={(e) => handleChange('phone', e.target.value.replace(/\D/g, ''))}
               className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              placeholder="+919876543210"
+              placeholder="9876543210"
+              maxLength={10}
               disabled={createStateAdmin.isPending}
             />
             {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
-            <p className="mt-1 text-xs text-gray-500">Format: +91 followed by 10 digits</p>
+            <p className="mt-1 text-xs text-gray-500">Enter 10-digit phone number</p>
           </div>
 
           <div>
@@ -184,7 +210,7 @@ export function StateAdminManagement() {
             >
               <option value="">Select a state/UT</option>
               {activeTenants.map((tenant) => (
-                <option key={tenant.id} value={tenant.id}>
+                <option key={tenant.id} value={tenant.code}>
                   {tenant.name} ({tenant.code})
                 </option>
               ))}

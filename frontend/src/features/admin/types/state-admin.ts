@@ -4,13 +4,13 @@ export interface StateAdmin {
   email: string
   phone: string
   tenantId: string
-  tenantName: string
   status: 'active' | 'inactive'
   createdAt: string
 }
 
 export interface StateAdminFormData {
-  name: string
+  firstName: string
+  lastName: string
   email: string
   phone: string
   tenantId: string
@@ -19,7 +19,8 @@ export interface StateAdminFormData {
 }
 
 export interface CreateStateAdminRequest {
-  name: string
+  firstName: string
+  lastName: string
   email: string
   phone: string
   tenantId: string

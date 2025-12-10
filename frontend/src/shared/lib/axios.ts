@@ -1,22 +1,21 @@
 import axios from 'axios'
 import { useAuthStore } from '@/app/store/auth-store'
-import { authApi } from '@/features/auth/services/auth-api'
 
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8085',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
-// Request interceptor
+// Request interceptor to add access token
 apiClient.interceptors.request.use(
   (config) => {
-    const token = useAuthStore.getState().token
-    if (token) {
+    const accessToken = useAuthStore.getState().accessToken
+    if (accessToken) {
       config.headers = config.headers ?? {}
-      config.headers.Authorization = `Bearer ${token}`
+      config.headers.Authorization = `Bearer ${accessToken}`
     }
     return config
   },
@@ -26,10 +25,10 @@ apiClient.interceptors.request.use(
 )
 
 let isRefreshing = false
-let refreshPromise: Promise<void> | null = null
-const pendingRequests: Array<() => void> = []
+let refreshPromise: Promise<string> | null = null
+const pendingRequests: Array<(token: string) => void> = []
 
-// Response interceptor with refresh logic
+// Response interceptor with auto-refresh on 401
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -43,16 +42,17 @@ apiClient.interceptors.response.use(
 
     // Do not attempt refresh for auth endpoints themselves
     if (
-      originalRequest?.url?.includes('/auth/login') ||
-      originalRequest?.url?.includes('/auth/refresh') ||
+      originalRequest?.url?.includes('/api/auth/login') ||
+      originalRequest?.url?.includes('/api/auth/refresh') ||
+      originalRequest?.url?.includes('/api/auth/register') ||
       originalRequest?._retry
     ) {
       return Promise.reject(error)
     }
 
-    // If we don't have a token in memory, nothing to refresh
-    const { token, setSessionExpired } = useAuthStore.getState()
-    if (!token) {
+    // If we don't have a refresh token, nothing to refresh
+    const { refreshToken, setSessionExpired } = useAuthStore.getState()
+    if (!refreshToken) {
       setSessionExpired()
       return Promise.reject(error)
     }
@@ -66,15 +66,10 @@ apiClient.interceptors.response.use(
 
       refreshPromise = (async () => {
         try {
-          const { token: newToken, user } = await authApi.refresh()
-          useAuthStore.setState({
-            token: newToken,
-            user,
-            isAuthenticated: true,
-            sessionExpired: false,
-          })
+          const newAccessToken = await useAuthStore.getState().refreshAccessToken()
+          return newAccessToken
         } catch (refreshError) {
-          // Refresh failed (likely 401) → mark session expired
+          // Refresh failed → mark session expired
           setSessionExpired()
           throw refreshError
         } finally {
@@ -82,32 +77,34 @@ apiClient.interceptors.response.use(
           refreshPromise = null
         }
       })()
-
-      try {
-        await refreshPromise
-        // After successful refresh, retry all queued pending requests
-        for (const cb of pendingRequests) {
-          cb()
-        }
-        pendingRequests.length = 0
-      } catch (refreshError) {
-        // Clear pending requests on refresh failure
-        pendingRequests.length = 0
-        throw refreshError
-      }
     }
 
-    // Queue this request to be retried after refresh completes
-    return new Promise((resolve, reject) => {
-      pendingRequests.push(() => {
-        const newToken = useAuthStore.getState().token
-        if (newToken && originalRequest) {
-          originalRequest.headers = originalRequest.headers ?? {}
-          originalRequest.headers.Authorization = `Bearer ${newToken}`
-        }
-        apiClient(originalRequest).then(resolve).catch(reject)
-      })
-    })
+    try {
+      const newAccessToken = await refreshPromise
+
+      if (!newAccessToken) {
+        throw new Error('Failed to refresh access token')
+      }
+
+      // After successful refresh, retry all queued pending requests
+      for (const cb of pendingRequests) {
+        cb(newAccessToken)
+      }
+      pendingRequests.length = 0
+
+      // Retry the original request with new token
+      if (originalRequest) {
+        originalRequest.headers = originalRequest.headers ?? {}
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
+        return apiClient(originalRequest)
+      }
+    } catch (refreshError) {
+      // Clear pending requests on refresh failure
+      pendingRequests.length = 0
+      throw refreshError
+    }
+
+    throw error
   }
 )
 

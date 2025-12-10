@@ -2,21 +2,28 @@ import { create } from 'zustand'
 import type { AuthUser, LoginRequest } from '@/features/auth/services/auth-api'
 import { authApi } from '@/features/auth/services/auth-api'
 
+const REFRESH_TOKEN_KEY = 'refresh_token'
+const ACCESS_TOKEN_KEY = 'access_token'
+
 export interface AuthState {
-  token: string | null
+  accessToken: string | null
+  refreshToken: string | null
   user: AuthUser | null
   isAuthenticated: boolean
   loading: boolean
   error: string | null
-  login: (payload: LoginRequest) => Promise<void>
-  logout: () => void
+  login: (payload: LoginRequest) => Promise<string>
+  logout: () => Promise<void>
   bootstrap: () => Promise<void>
   sessionExpired: boolean
   setSessionExpired: () => void
+  setTokens: (accessToken: string, refreshToken: string) => void
+  refreshAccessToken: () => Promise<string>
 }
 
-export const useAuthStore = create<AuthState>()((set) => ({
-  token: null,
+export const useAuthStore = create<AuthState>()((set, get) => ({
+  accessToken: null,
+  refreshToken: localStorage.getItem(REFRESH_TOKEN_KEY),
   user: null,
   isAuthenticated: false,
   loading: false,
@@ -26,20 +33,35 @@ export const useAuthStore = create<AuthState>()((set) => ({
   login: async (payload: LoginRequest) => {
     set({ loading: true, error: null, sessionExpired: false })
     try {
-      const { token, user } = await authApi.login(payload)
+      const { user, accessToken, refreshToken } = await authApi.login(payload)
+
+      localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken)
+      localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
+
       set({
-        token,
+        accessToken,
+        refreshToken,
         user,
         isAuthenticated: true,
         loading: false,
         error: null,
       })
+
+      // Role-based redirect path
+      if (user.role === 'super_user') {
+        return '/admin'
+      } else if (user.role === 'state_admin') {
+        return '/state-admin'
+      } else {
+        return '/'
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unable to login. Please try again.'
       set({
         loading: false,
         error: message,
-        token: null,
+        accessToken: null,
+        refreshToken: null,
         user: null,
         isAuthenticated: false,
       })
@@ -47,10 +69,22 @@ export const useAuthStore = create<AuthState>()((set) => ({
     }
   },
 
-  logout: () => {
-    void authApi.logout().catch(() => undefined)
+  logout: async () => {
+    const { refreshToken } = get()
+    if (refreshToken) {
+      try {
+        await authApi.logout(refreshToken)
+      } catch {
+        // Ignore logout errors
+      }
+    }
+
+    localStorage.removeItem(REFRESH_TOKEN_KEY)
+    localStorage.removeItem(ACCESS_TOKEN_KEY)
+
     set({
-      token: null,
+      accessToken: null,
+      refreshToken: null,
       user: null,
       isAuthenticated: false,
       error: null,
@@ -59,18 +93,42 @@ export const useAuthStore = create<AuthState>()((set) => ({
   },
 
   bootstrap: async () => {
-    try {
-      const { token, user } = await authApi.refresh()
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY)
+    if (!refreshToken) {
       set({
-        token,
+        accessToken: null,
+        refreshToken: null,
+        user: null,
+        isAuthenticated: false,
+      })
+      return
+    }
+
+    try {
+      const {
+        user,
+        accessToken,
+        refreshToken: newRefreshToken,
+      } = await authApi.refresh(refreshToken)
+
+      localStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken)
+      localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
+
+      set({
+        accessToken,
+        refreshToken: newRefreshToken,
         user,
         isAuthenticated: true,
         sessionExpired: false,
         error: null,
       })
     } catch {
+      localStorage.removeItem(REFRESH_TOKEN_KEY)
+      localStorage.removeItem(ACCESS_TOKEN_KEY)
+
       set({
-        token: null,
+        accessToken: null,
+        refreshToken: null,
         user: null,
         isAuthenticated: false,
       })
@@ -78,12 +136,47 @@ export const useAuthStore = create<AuthState>()((set) => ({
   },
 
   setSessionExpired: () => {
+    localStorage.removeItem(REFRESH_TOKEN_KEY)
+    localStorage.removeItem(ACCESS_TOKEN_KEY)
+
     set({
-      token: null,
+      accessToken: null,
+      refreshToken: null,
       user: null,
       isAuthenticated: false,
       sessionExpired: true,
       error: 'Session expired. Please log in again.',
     })
+  },
+
+  setTokens: (accessToken: string, refreshToken: string) => {
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken)
+    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
+
+    set({
+      accessToken,
+      refreshToken,
+    })
+  },
+
+  refreshAccessToken: async () => {
+    const { refreshToken } = get()
+    if (!refreshToken) {
+      throw new Error('No refresh token available')
+    }
+
+    const { user, accessToken, refreshToken: newRefreshToken } = await authApi.refresh(refreshToken)
+
+    localStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken)
+    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
+
+    set({
+      accessToken,
+      refreshToken: newRefreshToken,
+      user,
+      isAuthenticated: true,
+    })
+
+    return accessToken
   },
 }))
