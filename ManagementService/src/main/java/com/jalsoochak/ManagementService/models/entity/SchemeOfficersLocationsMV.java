@@ -27,13 +27,13 @@ public class SchemeOfficersLocationsMV {
     private Long schemeId;
 
     @Column(name = "state_scheme_id")
-    private Integer stateSchemeId;
+    private Long stateSchemeId;
 
     @Column(name = "centre_scheme_id")
-    private Integer centreSchemeId;
+    private Long centreSchemeId;
 
     @Column(name = "scheme_name")
-    private String schemeName;
+    private Long schemeName;
 
     @Column(name = "latitude", precision = 10, scale = 7)
     private BigDecimal latitude;
@@ -90,37 +90,37 @@ public class SchemeOfficersLocationsMV {
     private Integer villageId;
 
     @Column(name = "panchayat_id")
-    private Integer panchayatId;
+    private Long panchayatId;
 
     @Column(name = "block_id")
-    private Integer blockId;
+    private Long blockId;
 
     @Column(name = "district_id")
-    private Integer districtId;
+    private Long districtId;
 
     @Column(name = "state_id")
-    private Integer stateId;
+    private Long stateId;
 
     @Column(name = "subdivision_id")
-    private Integer subdivisionId;
+    private Long subdivisionId;
 
     @Column(name = "division_id")
-    private Integer divisionId;
+    private Long divisionId;
 
     @Column(name = "circle_id")
-    private Integer circleId;
+    private Long circleId;
 
     @Column(name = "zone_id")
-    private Integer zoneId;
+    private Long zoneId;
 
     @Column(name = "jm_id")
-    private Integer jmId;
+    private Long jmId;
 
     @Column(name = "so_id")
-    private Integer soId;
+    private Long soId;
 
     @Column(name = "sdm_id")
-    private Integer sdmId;
+    private Long sdmId;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
