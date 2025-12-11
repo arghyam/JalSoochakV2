@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import type { AuthUser, LoginRequest } from '@/features/auth/services/auth-api'
 import { authApi } from '@/features/auth/services/auth-api'
+import { AUTH_ROLES } from '@/shared/constants/auth'
 
 const REFRESH_TOKEN_KEY = 'refresh_token'
 const ACCESS_TOKEN_KEY = 'access_token'
@@ -48,9 +49,9 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       })
 
       // Role-based redirect path
-      if (user.role === 'super_admin') {
+      if (user.role === AUTH_ROLES.SUPER_ADMIN) {
         return '/admin'
-      } else if (user.role === 'state_admin') {
+      } else if (user.role === AUTH_ROLES.STATE_ADMIN) {
         return '/state-admin'
       } else {
         return '/'
