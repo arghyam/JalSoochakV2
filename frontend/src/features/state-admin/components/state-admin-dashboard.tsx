@@ -6,7 +6,6 @@ import { useNudgeMessages } from '../hooks/use-nudge-messages'
 export function StateAdminDashboard() {
   const user = useAuthStore((state) => state.user)
   const tenantId = user?.tenantId || ''
-  const tenantName = user?.tenantName || 'Your State'
 
   const { data: waterNorms } = useWaterNorms(tenantId)
   const { data: escalationRules } = useEscalationRules(tenantId)
@@ -21,7 +20,7 @@ export function StateAdminDashboard() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="mt-1 text-gray-600">Welcome to {tenantName} State Admin Dashboard</p>
+        <p className="mt-1 text-gray-600">Welcome to {tenantId} State Admin Dashboard</p>
       </div>
 
       {/* Sync Button */}

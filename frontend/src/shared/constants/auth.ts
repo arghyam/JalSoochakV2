@@ -1,5 +1,5 @@
 export const AUTH_ROLES = {
-  SUPER_USER: 'super_user',
+  SUPER_ADMIN: 'super_admin',
   STATE_ADMIN: 'state_admin',
   BUSINESS_USER: 'business_user',
 } as const
