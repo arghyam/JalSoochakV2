@@ -4,7 +4,9 @@ labels:
   group: "core"
 
 
-
+ingress:
+  enabled: true
+  context: "api(/|$)(.*)"
 # Init Containers Configs
 
 # Container Configs
@@ -42,4 +44,4 @@ env: |
         key: password
         name: jalsoochak
   - name: KEYCLOAK_AUTH_SERVER_URL
-    value: "http://keycloak:8080/keycloak/auth"
+    value: "http://keycloak:80/keycloak"
