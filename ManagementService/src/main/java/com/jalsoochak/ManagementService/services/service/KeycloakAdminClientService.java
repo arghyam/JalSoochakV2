@@ -60,6 +60,8 @@ public class KeycloakAdminClientService {
     private final PersonMasterRepository personMasterRepository;
     private final TenantMasterRepository tenantMasterRepository;
 
+    private static final String SUPER_ADMIN_ROLE = "super_admin";
+
     public KeycloakAdminClientService(KeycloakProvider keycloakProvider, PersonTypeMasterRepository personTypeMasterRepository,
                                       PersonMasterRepository personMasterRepository, TenantMasterRepository tenantMasterRepository) {
         this.keycloakProvider = keycloakProvider;
@@ -260,7 +262,7 @@ public class KeycloakAdminClientService {
                 PersonMaster person = personMasterRepository.findByPhoneNumber(username)
                         .orElseThrow(() -> new RuntimeException("User not found"));
 
-                return "super_admin".equals(person.getPersonType().getCName());
+                return SUPER_ADMIN_ROLE.equals(person.getPersonType().getCName());
             }
         } catch (Exception e) {
             log.error("Error verifying super admin", e);
