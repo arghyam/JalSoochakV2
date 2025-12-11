@@ -237,4 +237,35 @@ public class KeycloakAdminClientService {
         passwordCredentials.setValue(password);
         return passwordCredentials;
     }
+
+    public boolean isSuperAdmin(String token) {
+        try {
+            String userInfoUrl = authServerUrl + "/realms/" + realm + "/protocol/openid-connect/userinfo";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(token);
+
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
+            ResponseEntity<Map> response = restTemplate.exchange(
+                    userInfoUrl,
+                    org.springframework.http.HttpMethod.GET,
+                    entity,
+                    Map.class
+            );
+            log.info("response: {} ", response);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                Map<String, Object> userInfo = response.getBody();
+                String username = (String) userInfo.get("preferred_username");
+
+                PersonMaster person = personMasterRepository.findByPhoneNumber(username)
+                        .orElseThrow(() -> new RuntimeException("User not found"));
+
+                return "super_admin".equals(person.getPersonType().getCName());
+            }
+        } catch (Exception e) {
+            log.error("Error verifying super admin", e);
+        }
+        return false;
+    }
+
 }
