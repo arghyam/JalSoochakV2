@@ -169,6 +169,6 @@ releases:
       - ./charts/service/monitoring/grafana.yaml
     set:
       - name: ingress.hosts[0]
-        value: "jalsoochal-dev.arghyam.com"
+        value: "jalsoochak.beehyv.com"
       - name: ingress.tls[0].hosts[0]
-        value: "jalsoochal-dev.arghyam.com"
+        value: "jalsoochak.beehyv.com"
