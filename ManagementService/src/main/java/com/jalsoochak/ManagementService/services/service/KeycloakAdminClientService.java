@@ -254,7 +254,6 @@ public class KeycloakAdminClientService {
                     entity,
                     Map.class
             );
-            log.info("response: {} ", response);
             if (response.getStatusCode().is2xxSuccessful()) {
                 Map<String, Object> userInfo = response.getBody();
                 String username = (String) userInfo.get("preferred_username");
