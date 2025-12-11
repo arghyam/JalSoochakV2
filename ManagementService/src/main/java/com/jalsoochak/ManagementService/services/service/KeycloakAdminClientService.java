@@ -80,7 +80,7 @@ public class KeycloakAdminClientService {
         this.restTemplate = new RestTemplate();
     }
 
-    public Response createKeycloakUser(RegisterRequest user) {
+    public Response createKeycloakUser(RegisterRequest user, Long creatorId) {
         UsersResource usersResource = keycloakProvider.getAdminInstance()
                 .realm(realm)
                 .users();
@@ -119,9 +119,9 @@ public class KeycloakAdminClientService {
                     .phoneNumber(user.getPhoneNumber())
                     .personType(personType)
                     .tenantId(tenant.getTenantName())
-                    .createdBy("system")
+                    .createdBy(creatorId)
                     .build();
-            log.info("Person: {}", person);
+
             personMasterRepository.save(person);
         }
         return response;
@@ -177,7 +177,6 @@ public class KeycloakAdminClientService {
                     .body("Invalid credentials or server error");
         }
     }
-
 
     public ResponseEntity<?> refreshToken(String refreshToken) {
         try {
@@ -317,5 +316,23 @@ public class KeycloakAdminClientService {
 
         return false;
     }
+
+    public Long getPersonIdFromToken(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(getPublicKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            String username = claims.get("preferred_username", String.class);
+            PersonMaster person = personMasterRepository.findByPhoneNumber(username)
+                    .orElseThrow(() -> new RuntimeException("User not found in person_master"));
+            return person.getId();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get person ID from token", e);
+        }
+    }
+
 
 }

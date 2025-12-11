@@ -32,11 +32,11 @@ public class PersonMaster {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "created_by", length = 100)
-    private String createdBy;
+    @Column(name = "created_by")
+    private Long createdBy;
 
-    @Column(name = "updated_by", length = 100)
-    private String updatedBy;
+    @Column(name = "updated_by")
+    private Long updatedBy;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;

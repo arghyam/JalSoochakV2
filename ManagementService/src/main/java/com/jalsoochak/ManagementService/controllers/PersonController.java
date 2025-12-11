@@ -40,7 +40,9 @@ public class PersonController {
                     .body("Only Super Admin can register new users");
         }
 
-        keycloakAdminClientService.createKeycloakUser(request);
+        Long creatorId = keycloakAdminClientService.getPersonIdFromToken(token);
+
+        keycloakAdminClientService.createKeycloakUser(request, creatorId);
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
     }
 
