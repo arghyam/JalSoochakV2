@@ -60,6 +60,8 @@ public class KeycloakAdminClientService {
     private final PersonMasterRepository personMasterRepository;
     private final TenantMasterRepository tenantMasterRepository;
 
+    private static final String SUPER_ADMIN_ROLE = "super_admin";
+
     public KeycloakAdminClientService(KeycloakProvider keycloakProvider, PersonTypeMasterRepository personTypeMasterRepository,
                                       PersonMasterRepository personMasterRepository, TenantMasterRepository tenantMasterRepository) {
         this.keycloakProvider = keycloakProvider;
@@ -237,4 +239,55 @@ public class KeycloakAdminClientService {
         passwordCredentials.setValue(password);
         return passwordCredentials;
     }
+
+    public boolean isSuperAdmin(String token) {
+        try {
+            String userInfoUrl = authServerUrl + "/realms/" + realm + "/protocol/openid-connect/userinfo";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(token);
+
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+            @SuppressWarnings("unchecked")
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    userInfoUrl,
+                    org.springframework.http.HttpMethod.GET,
+                    entity,
+                    (Class<Map<String, Object>>) (Class<?>) Map.class
+            );
+
+            log.debug("Userinfo response status: {}", response.getStatusCode());
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                Map<String, Object> userInfo = response.getBody();
+                if (userInfo == null) {
+                    log.warn("Userinfo response body is null");
+                    return false;
+                }
+
+                String username = (String) userInfo.get("preferred_username");
+                if (username == null || username.isBlank()) {
+                    log.warn("preferred_username claim is missing or empty");
+                    return false;
+                }
+
+                PersonMaster person = personMasterRepository.findByPhoneNumber(username)
+                        .orElseThrow(() -> new RuntimeException("User not found in person_master"));
+
+                return person.getPersonType() != null
+                        && SUPER_ADMIN_ROLE.equals(person.getPersonType().getCName());
+            }
+
+        } catch (org.springframework.web.client.HttpClientErrorException e) {
+            log.debug("Token validation failed: {}", e.getStatusCode());
+        } catch (RuntimeException e) {
+            log.debug("Expected error verifying super admin: {}", e.getMessage());
+        } catch (Exception e) {
+            log.error("Unexpected error verifying super admin", e);
+        }
+
+        return false;
+    }
+
 }
