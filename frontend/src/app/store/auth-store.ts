@@ -24,7 +24,7 @@ export interface AuthState {
 
 export const useAuthStore = create<AuthState>()((set, get) => ({
   accessToken: null,
-  refreshToken: localStorage.getItem(REFRESH_TOKEN_KEY),
+  refreshToken: null,
   user: null,
   isAuthenticated: false,
   loading: false,
