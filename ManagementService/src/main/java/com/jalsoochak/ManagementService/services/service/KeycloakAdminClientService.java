@@ -28,9 +28,15 @@ import org.springframework.web.server.ResponseStatusException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
+import java.security.KeyFactory;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 
 @Slf4j
 @Service
@@ -52,6 +58,9 @@ public class KeycloakAdminClientService {
 
     @Value("${keycloak.admin-client-secret}")
     private String adminClientSecret;
+
+    @Value("${keycloak.public-key}")
+    private String publicKeyPem;
 
     private final RestTemplate restTemplate;
 
@@ -184,21 +193,35 @@ public class KeycloakAdminClientService {
             requestBody.add("refresh_token", refreshToken);
             requestBody.add("grant_type", "refresh_token");
 
-            HttpEntity<MultiValueMap<String, String>> requestEntity =
-                    new HttpEntity<>(requestBody, headers);
+            HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(tokenUrl, requestEntity, String.class);
 
-            ResponseEntity<String> response = restTemplate.postForEntity(
-                    tokenUrl,
-                    requestEntity,
-                    String.class
-            );
+            if (response.getStatusCode() == HttpStatus.OK) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> tokenResponse = objectMapper.readValue(response.getBody(), Map.class);
+
+                String accessToken = (String) tokenResponse.get("access_token");
+
+                Claims claims = Jwts.parserBuilder()
+                        .setSigningKey(getPublicKey())
+                        .build()
+                        .parseClaimsJws(accessToken)
+                        .getBody();
+
+                String username = claims.get("preferred_username", String.class);
+                PersonMaster person = personMasterRepository.findByPhoneNumber(username)
+                        .orElseThrow(() -> new RuntimeException("User not found in person_master"));
+
+                tokenResponse.put("tenant_id", person.getTenantId());
+                tokenResponse.put("person_type", person.getPersonType().getCName());
+
+                return ResponseEntity.ok(tokenResponse);
+            }
 
             return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
-
         } catch (Exception e) {
             log.error("Token refresh error: ", e);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Token refresh failed");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token refresh failed");
         }
     }
 
@@ -230,6 +253,11 @@ public class KeycloakAdminClientService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Logout failed");
         }
+    }
+
+    public RSAPublicKey getPublicKey() throws Exception {
+        return (RSAPublicKey) KeyFactory.getInstance("RSA")
+                .generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(publicKeyPem)));
     }
 
     private static CredentialRepresentation createPasswordCredentials(String password) {
