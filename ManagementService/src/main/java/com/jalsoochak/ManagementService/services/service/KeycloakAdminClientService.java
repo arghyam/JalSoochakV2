@@ -5,8 +5,10 @@ import com.jalsoochak.ManagementService.models.app.request.LoginRequest;
 import com.jalsoochak.ManagementService.models.app.request.RegisterRequest;
 import com.jalsoochak.ManagementService.models.entity.PersonMaster;
 import com.jalsoochak.ManagementService.models.entity.PersonTypeMaster;
+import com.jalsoochak.ManagementService.models.entity.TenantMaster;
 import com.jalsoochak.ManagementService.repositories.PersonMasterRepository;
 import com.jalsoochak.ManagementService.repositories.PersonTypeMasterRepository;
+import com.jalsoochak.ManagementService.repositories.TenantMasterRepository;
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -23,9 +25,12 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -53,12 +58,14 @@ public class KeycloakAdminClientService {
     private final KeycloakProvider keycloakProvider;
     private final PersonTypeMasterRepository personTypeMasterRepository;
     private final PersonMasterRepository personMasterRepository;
+    private final TenantMasterRepository tenantMasterRepository;
 
     public KeycloakAdminClientService(KeycloakProvider keycloakProvider, PersonTypeMasterRepository personTypeMasterRepository,
-                                      PersonMasterRepository personMasterRepository) {
+                                      PersonMasterRepository personMasterRepository, TenantMasterRepository tenantMasterRepository) {
         this.keycloakProvider = keycloakProvider;
         this.personTypeMasterRepository = personTypeMasterRepository;
         this.personMasterRepository = personMasterRepository;
+        this.tenantMasterRepository = tenantMasterRepository;
         this.restTemplate = new RestTemplate();
     }
 
@@ -71,6 +78,10 @@ public class KeycloakAdminClientService {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Phone number already exists: " + user.getPhoneNumber());
         }
+
+        TenantMaster tenant = tenantMasterRepository.findByTenantName(user.getTenantId().toLowerCase())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Invalid tenant_id: " + user.getTenantId()));
 
         CredentialRepresentation credentialRepresentation = createPasswordCredentials(user.getPassword());
 
@@ -89,13 +100,14 @@ public class KeycloakAdminClientService {
             PersonTypeMaster personType = personTypeMasterRepository.findBycName(user.getPersonType())
                     .orElseThrow(() -> new RuntimeException("PersonType not found: " + user.getPersonType()));
 
+            log.info("TenantId: {}", user.getTenantId());
             PersonMaster person = PersonMaster.builder()
                     .firstName(user.getFirstName())
                     .lastName(user.getLastName())
                     .fullName(user.getFirstName() + " " + user.getLastName())
                     .phoneNumber(user.getPhoneNumber())
                     .personType(personType)
-                    .tenantId(user.getTenantId())
+                    .tenantId(tenant.getTenantName())
                     .createdBy("system")
                     .build();
             log.info("Person: {}", person);
@@ -130,7 +142,19 @@ public class KeycloakAdminClientService {
             );
 
             if (response.getStatusCode() == HttpStatus.OK) {
-                return ResponseEntity.ok(response.getBody());
+
+                PersonMaster person = personMasterRepository.findByPhoneNumber(loginRequest.getUsername())
+                        .orElseThrow(() -> new RuntimeException("User not found in person_master"));
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> tokenResponse = objectMapper.readValue(
+                        response.getBody(), Map.class
+                );
+
+                tokenResponse.put("tenant_id", person.getTenantId());
+                tokenResponse.put("person_type", person.getPersonType().getCName());
+
+                return ResponseEntity.ok(tokenResponse);
             } else {
                 return ResponseEntity.status(response.getStatusCode())
                         .body("Login failed: " + response.getBody());
@@ -142,6 +166,7 @@ public class KeycloakAdminClientService {
                     .body("Invalid credentials or server error");
         }
     }
+
 
     public ResponseEntity<?> refreshToken(String refreshToken) {
         try {
