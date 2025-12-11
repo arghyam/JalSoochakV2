@@ -23,4 +23,12 @@ healthChecks:
   livenessProbePath: ""
   readinessProbePath: ""
 
-# Additional Container Envs
+extraVolumes: |
+  - name: configmap
+    configMap:
+      name: frontend-env
+
+extraVolumeMounts: |
+  - mountPath: /usr/share/nginx/html/config.js
+    name: configmap
+    subPath: config.js
