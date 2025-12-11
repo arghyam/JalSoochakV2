@@ -166,18 +166,40 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       throw new Error('No refresh token available')
     }
 
-    const { user, accessToken, refreshToken: newRefreshToken } = await authApi.refresh(refreshToken)
+    try {
+      const {
+        user,
+        accessToken,
+        refreshToken: newRefreshToken,
+      } = await authApi.refresh(refreshToken)
 
-    localStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken)
-    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
+      localStorage.setItem(REFRESH_TOKEN_KEY, newRefreshToken)
+      localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
 
-    set({
-      accessToken,
-      refreshToken: newRefreshToken,
-      user,
-      isAuthenticated: true,
-    })
+      set({
+        accessToken,
+        refreshToken: newRefreshToken,
+        user,
+        isAuthenticated: true,
+        sessionExpired: false,
+      })
 
-    return accessToken
+      return accessToken
+    } catch (error) {
+      // Clean up invalid tokens from localStorage
+      localStorage.removeItem(REFRESH_TOKEN_KEY)
+      localStorage.removeItem(ACCESS_TOKEN_KEY)
+
+      // Reset authentication state
+      set({
+        accessToken: null,
+        refreshToken: null,
+        user: null,
+        isAuthenticated: false,
+      })
+
+      // Re-throw error so axios interceptor can call setSessionExpired()
+      throw error
+    }
   },
 }))

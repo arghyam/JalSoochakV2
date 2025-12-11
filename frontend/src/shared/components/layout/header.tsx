@@ -5,7 +5,6 @@ import { useUIStore, useAuthStore } from '@/app/store'
 export function Header() {
   const toggleSidebar = useUIStore((state) => state.toggleSidebar)
   const { user, isAuthenticated, logout } = useAuthStore()
-  console.log('user in Header.tsx:', user)
   const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
