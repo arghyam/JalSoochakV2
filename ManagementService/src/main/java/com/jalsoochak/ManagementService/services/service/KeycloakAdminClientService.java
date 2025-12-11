@@ -248,24 +248,45 @@ public class KeycloakAdminClientService {
             headers.setBearerAuth(token);
 
             HttpEntity<Void> entity = new HttpEntity<>(headers);
-            ResponseEntity<Map> response = restTemplate.exchange(
+
+            @SuppressWarnings("unchecked")
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                     userInfoUrl,
                     org.springframework.http.HttpMethod.GET,
                     entity,
-                    Map.class
+                    (Class<Map<String, Object>>) (Class<?>) Map.class
             );
+
+            log.debug("Userinfo response status: {}", response.getStatusCode());
+
             if (response.getStatusCode().is2xxSuccessful()) {
                 Map<String, Object> userInfo = response.getBody();
+                if (userInfo == null) {
+                    log.warn("Userinfo response body is null");
+                    return false;
+                }
+
                 String username = (String) userInfo.get("preferred_username");
+                if (username == null || username.isBlank()) {
+                    log.warn("preferred_username claim is missing or empty");
+                    return false;
+                }
 
                 PersonMaster person = personMasterRepository.findByPhoneNumber(username)
-                        .orElseThrow(() -> new RuntimeException("User not found"));
+                        .orElseThrow(() -> new RuntimeException("User not found in person_master"));
 
-                return SUPER_ADMIN_ROLE.equals(person.getPersonType().getCName());
+                return person.getPersonType() != null
+                        && SUPER_ADMIN_ROLE.equals(person.getPersonType().getCName());
             }
+
+        } catch (org.springframework.web.client.HttpClientErrorException e) {
+            log.debug("Token validation failed: {}", e.getStatusCode());
+        } catch (RuntimeException e) {
+            log.debug("Expected error verifying super admin: {}", e.getMessage());
         } catch (Exception e) {
-            log.error("Error verifying super admin", e);
+            log.error("Unexpected error verifying super admin", e);
         }
+
         return false;
     }
 

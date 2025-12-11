@@ -23,12 +23,24 @@ public class PersonController {
     private KeycloakAdminClientService keycloakAdminClientService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request,  @RequestHeader("Authorization") String authorizationHeader) {
-        String token = authorizationHeader.replace("Bearer ", "");
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request,
+                                      @RequestHeader("Authorization") String authorizationHeader) {
+        if (authorizationHeader == null || !authorizationHeader.toLowerCase().startsWith("bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Missing or invalid Authorization header");
+        }
+
+        String token = authorizationHeader.substring(7).trim();
+        if (token.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Authorization token is empty");
+        }
+
         if (!keycloakAdminClientService.isSuperAdmin(token)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Only Super Admin can register new users");
         }
+
         keycloakAdminClientService.createKeycloakUser(request);
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
     }
