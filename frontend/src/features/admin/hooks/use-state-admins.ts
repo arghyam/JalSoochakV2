@@ -15,7 +15,7 @@ export function useCreateStateAdmin() {
         email: data.email,
         phoneNumber: data.phone,
         password: data.password,
-        personType: 'state-admin',
+        personType: 'state_admin',
         tenantId: data.tenantId,
       })
     },

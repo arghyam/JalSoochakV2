@@ -210,7 +210,7 @@ export function StateAdminManagement() {
             >
               <option value="">Select a state/UT</option>
               {activeTenants.map((tenant) => (
-                <option key={tenant.id} value={tenant.code}>
+                <option key={tenant.id} value={tenant.name}>
                   {tenant.name} ({tenant.code})
                 </option>
               ))}

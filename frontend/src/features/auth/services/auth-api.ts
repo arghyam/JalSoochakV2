@@ -23,6 +23,8 @@ export interface TokenResponse {
   expires_in: number
   refresh_expires_in: number
   token_type: string
+  person_type: string
+  tenant_id: string
 }
 
 export interface RefreshRequest {
@@ -54,11 +56,17 @@ export const authApi = {
       username: payload.phoneNumber,
       password: payload.password,
     })
-    const { access_token, refresh_token, id_token } = response.data
+    const { access_token, refresh_token, id_token, person_type, tenant_id } = response.data
 
-    const user = extractUserFromJWT(id_token)
-    if (!user) {
+    const userFromToken = extractUserFromJWT(id_token)
+    if (!userFromToken) {
       throw new Error('Failed to extract user information')
+    }
+
+    const user: AuthUser = {
+      ...userFromToken,
+      role: person_type || '',
+      tenantId: tenant_id || '',
     }
 
     return {
@@ -69,14 +77,24 @@ export const authApi = {
   },
 
   refresh: async (refreshToken: string): Promise<LoginResponse> => {
-    const response = await apiClient.post<TokenResponse>('/api/auth/refresh', {
+    const response = await apiClient.post<Partial<TokenResponse>>('/api/auth/refresh', {
       refreshToken,
     })
-    const { access_token, refresh_token, id_token } = response.data
+    const { access_token, refresh_token, id_token, person_type, tenant_id } = response.data
 
-    const user = extractUserFromJWT(id_token)
-    if (!user) {
+    if (!access_token || !refresh_token || !id_token) {
+      throw new Error('Invalid token response')
+    }
+
+    const userFromToken = extractUserFromJWT(id_token)
+    if (!userFromToken) {
       throw new Error('Failed to extract user information')
+    }
+
+    const user: AuthUser = {
+      ...userFromToken,
+      role: person_type || '',
+      tenantId: tenant_id || '',
     }
 
     return {

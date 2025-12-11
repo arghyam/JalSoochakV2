@@ -2,9 +2,7 @@ interface JWTPayload {
   sub: string
   email?: string
   name?: string
-  role?: string
-  tenantId?: string
-  phone_number?: string
+  preferred_username?: string
   exp?: number
   iat?: number
 }
@@ -13,9 +11,7 @@ export interface UserFromJWT {
   id: string
   name: string
   email: string
-  role: string
   phoneNumber: string
-  tenantId: string
 }
 
 export function parseJWT(token: string): JWTPayload | null {
@@ -46,9 +42,7 @@ export function extractUserFromJWT(idToken: string): UserFromJWT | null {
     id: payload.sub || '',
     name: payload.name || '',
     email: payload.email || '',
-    role: payload.role || '',
-    phoneNumber: payload.phone_number || '',
-    tenantId: payload.tenantId || '',
+    phoneNumber: payload.preferred_username || '',
   }
 }
 
