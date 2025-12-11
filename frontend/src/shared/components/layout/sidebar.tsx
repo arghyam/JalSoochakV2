@@ -11,11 +11,11 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  // Super User (Admin) navigation
-  { path: ROUTES.ADMIN, label: 'Dashboard', roles: [AUTH_ROLES.SUPER_USER] },
-  { path: ROUTES.MANAGE_TENANTS, label: 'Manage Tenants', roles: [AUTH_ROLES.SUPER_USER] },
-  { path: ROUTES.ADD_STATE_ADMIN, label: 'Add State Admin', roles: [AUTH_ROLES.SUPER_USER] },
-  { path: ROUTES.CONFIGURE_SYSTEM, label: 'Configure System', roles: [AUTH_ROLES.SUPER_USER] },
+  // Super Admin navigation
+  { path: ROUTES.ADMIN, label: 'Dashboard', roles: [AUTH_ROLES.SUPER_ADMIN] },
+  { path: ROUTES.MANAGE_TENANTS, label: 'Manage Tenants', roles: [AUTH_ROLES.SUPER_ADMIN] },
+  { path: ROUTES.ADD_STATE_ADMIN, label: 'Add State Admin', roles: [AUTH_ROLES.SUPER_ADMIN] },
+  { path: ROUTES.CONFIGURE_SYSTEM, label: 'Configure System', roles: [AUTH_ROLES.SUPER_ADMIN] },
 
   // State Admin navigation
   { path: ROUTES.STATE_ADMIN, label: 'Dashboard', roles: [AUTH_ROLES.STATE_ADMIN] },
@@ -29,7 +29,7 @@ export function Sidebar() {
 
   if (!sidebarOpen) return null
 
-  const userRole = user?.role || AUTH_ROLES.SUPER_USER //remove fallback after testing
+  const userRole = user?.role
   const visibleNavItems = NAV_ITEMS.filter((item) => userRole && item.roles.includes(userRole))
 
   return (

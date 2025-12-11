@@ -40,7 +40,7 @@ import { NudgeMessageFormDialog } from './nudge-message-form-dialog'
 
 export function StateAdminConfiguration() {
   const user = useAuthStore((state) => state.user)
-  const tenantId = user?.tenantId || 'tenant-1'
+  const tenantId = user?.tenantId || ''
   const toast = useToast()
 
   // Water Norms State
