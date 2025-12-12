@@ -60,7 +60,7 @@ export function Header() {
             />
           </svg>
         </button>
-        <h1 className="text-xl font-semibold">JalSoochak V2</h1>
+        <h1 className="text-xl font-semibold">JalSoochak</h1>
       </div>
 
       <div className="flex items-center gap-4">
