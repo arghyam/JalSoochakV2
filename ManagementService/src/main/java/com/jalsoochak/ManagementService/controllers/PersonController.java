@@ -3,7 +3,7 @@ package com.jalsoochak.ManagementService.controllers;
 import com.jalsoochak.ManagementService.models.app.request.LoginRequest;
 import com.jalsoochak.ManagementService.models.app.request.RegisterRequest;
 import com.jalsoochak.ManagementService.models.app.request.TokenRequest;
-import com.jalsoochak.ManagementService.services.service.KeycloakAdminClientService;
+import com.jalsoochak.ManagementService.services.impl.KeycloakAdminClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,8 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class PersonController {
-    @Autowired
-    private KeycloakAdminClientService keycloakAdminClientService;
+    private final KeycloakAdminClientService keycloakAdminClientService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request,
