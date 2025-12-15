@@ -39,9 +39,9 @@ jobs:
       - name: SonarQube Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run:  mvn -B package org.sonarsource.scanner.maven:sonar-maven-plugin:3.11.0.3922:sonar -Dsonar.projectKey=imageprocessing -Dsonar.organization=arghyam -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
+        run:  mvn -B package org.sonarsource.scanner.maven:sonar-maven-plugin:3.11.0.3922:sonar -Dsonar.projectKey=jalsoochak-imageprocessing -Dsonar.organization=arghyam -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} -Dsonar.qualitygate.wait=true
         working-directory: imageprocessing
-        
+         
       - name: Configure AWS credentials
         if: github.ref == 'refs/heads/main'
         uses: aws-actions/configure-aws-credentials@v4
