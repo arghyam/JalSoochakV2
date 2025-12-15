@@ -18,8 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class PersonController {
-    @Autowired
-    private KeycloakAdminClientService keycloakAdminClientService;
+    private final KeycloakAdminClientService keycloakAdminClientService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request,
