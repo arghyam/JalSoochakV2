@@ -1,4 +1,4 @@
-package com.jalsoochak.ManagementService.services.service;
+package com.jalsoochak.ManagementService.services.impl;
 
 import com.jalsoochak.ManagementService.config.KeycloakProvider;
 import com.jalsoochak.ManagementService.models.app.request.LoginRequest;
