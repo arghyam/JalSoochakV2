@@ -3,9 +3,12 @@ package com.jalsoochak.water_supply_calculation_service.models.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,13 +40,11 @@ public class PersonSchemeMapping {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @Column(name = "scheme_id", nullable = false)
-    private Long schemeId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "scheme_id")
+    private SchemeMaster scheme;
 
-    @Column(name = "person_id", nullable = false)
-    private Long personId;
-
-    @Column(name = "tenant_id", nullable = false)
-    private String tenantId;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "person_id")
+    private PersonMaster person;
 }

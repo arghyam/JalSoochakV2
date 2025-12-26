@@ -2,9 +2,13 @@ package com.jalsoochak.ManagementService.models.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -42,9 +47,14 @@ public class VillageMaster {
     @Column(name = "lgd_code")
     private Integer lgdCode;
 
-    @Column(name = "parent_administrative_location_id")
-    private Long parentAdministrativeLocationId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_administrative_location_id")
+    private AdministrativeLocationMaster parentAdministrativeLocation;
 
-    @Column(name = "parent_lgd_location_id")
-    private Long parentLgdLocationId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_lgd_location_id")
+    private LgdLocationMaster parentLgdLocation;
+
+    @OneToMany(mappedBy = "village", fetch = FetchType.LAZY)
+    private List<SchemeMaster> schemes;
 }

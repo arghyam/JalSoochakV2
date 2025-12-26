@@ -6,6 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,6 +44,7 @@ public class LgdLocationMaster {
     @Column(name = "lgd_code")
     private Integer lgdCode;
 
-    @Column(name = "lgd_location_type_id", nullable = false)
-    private Long lgdLocationTypeId;
+    @ManyToOne
+    @JoinColumn(name = "lgd_location_type_id", referencedColumnName = "id")
+    private LgdLocationTypeMaster lgdLocationType;
 }

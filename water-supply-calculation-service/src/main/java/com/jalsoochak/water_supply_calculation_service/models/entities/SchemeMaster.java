@@ -2,9 +2,13 @@ package com.jalsoochak.water_supply_calculation_service.models.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -37,10 +42,10 @@ public class SchemeMaster {
     private LocalDateTime deletedAt;
 
     @Column(name = "state_scheme_id")
-    private Long stateSchemeId;
+    private Integer stateSchemeId;
 
     @Column(name = "centre_scheme_id")
-    private Long centreSchemeId;
+    private Integer centreSchemeId;
 
     @Column(name = "scheme_name", length = 200)
     private String schemeName;
@@ -54,13 +59,20 @@ public class SchemeMaster {
     @Column(columnDefinition = "GEOMETRY")
     private String geolocation;
 
-    @Column(name = "scheme_type_id", nullable = false)
-    private Long schemeTypeId;
-
-    @Column(name = "village_id", nullable = false)
-    private Long villageId;
-
-    @Column(name = "tenant_id", nullable = false)
+    @Column(name = "tenant_id")
     private String tenantId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "scheme_type_id")
+    private SchemeTypeMaster schemeType;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "village_id")
+    private VillageMaster village;
+
+    @OneToMany(mappedBy = "scheme", fetch = FetchType.LAZY)
+    private List<PersonSchemeMapping> personSchemeMappings;
+
+    @OneToMany(mappedBy = "scheme", fetch = FetchType.LAZY)
+    private List<BfmReading> bfmReadings;
 }

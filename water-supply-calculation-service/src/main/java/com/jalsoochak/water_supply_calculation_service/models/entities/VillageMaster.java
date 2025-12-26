@@ -1,5 +1,6 @@
 package com.jalsoochak.water_supply_calculation_service.models.entities;
 
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -8,16 +9,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,14 +26,12 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "bfm_reading")
-public class BfmReading {
+@Table(name = "village_master")
+public class VillageMaster {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "tenant_id")
-    private String tenantId;
 
     @Column(name = "created_by")
     private Long createdBy;
@@ -43,31 +42,20 @@ public class BfmReading {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @CreationTimestamp
-    @Column(name = "reading_date_time", updatable = false)
-    private LocalDateTime readingDateTime;
+    @Column(name = "title", length = 100)
+    private String title;
 
-    @Column(name = "confirmed_reading", precision = 10, scale = 1)
-    private BigDecimal confirmedReading;
-
-    @Column(name = "extracted_reading", precision = 10, scale = 1)
-    private BigDecimal extractedReading;
-
-    @Column(name = "reading_url", length = 2048)
-    private String readingUrl;
-
-    @Column(columnDefinition = "GEOMETRY")
-    private String geolocation;
-
-    @Column(name = "correlation_id", length = 36)
-    private String correlationId;
+    @Column(name = "lgd_code")
+    private Integer lgdCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "scheme_id")
-    private SchemeMaster scheme;
+    @JoinColumn(name = "parent_administrative_location_id")
+    private AdministrativeLocationMaster parentAdministrativeLocation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "person_id")
-    private PersonMaster person;
+    @JoinColumn(name = "parent_lgd_location_id")
+    private LgdLocationMaster parentLgdLocation;
+
+    @OneToMany(mappedBy = "village", fetch = FetchType.LAZY)
+    private List<SchemeMaster> schemes;
 }
-

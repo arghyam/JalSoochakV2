@@ -117,7 +117,7 @@ public class KeycloakAdminClientService {
                     .lastName(user.getLastName())
                     .fullName(user.getFirstName() + " " + user.getLastName())
                     .phoneNumber(user.getPhoneNumber())
-                    .personTypeId(personType.getId())
+                    .personType(personType)
                     .tenantId(tenant.getTenantName())
                     .createdBy(creatorId)
                     .build();
@@ -162,12 +162,8 @@ public class KeycloakAdminClientService {
                         response.getBody(), Map.class
                 );
 
-                PersonTypeMaster personType = personTypeMasterRepository.findById(person.getPersonTypeId())
-                        .orElseThrow(() -> new RuntimeException("PersonType not found"));
-
-
                 tokenResponse.put("tenant_id", person.getTenantId());
-                tokenResponse.put("person_type", personType.getCName());
+                tokenResponse.put("person_type", person.getPersonType().getCName());
 
                 return ResponseEntity.ok(tokenResponse);
             } else {
@@ -215,11 +211,8 @@ public class KeycloakAdminClientService {
                 PersonMaster person = personMasterRepository.findByPhoneNumber(username)
                         .orElseThrow(() -> new RuntimeException("User not found in person_master"));
 
-                PersonTypeMaster personType = personTypeMasterRepository.findById(person.getPersonTypeId())
-                        .orElseThrow(() -> new RuntimeException("PersonType not found"));
-
                 tokenResponse.put("tenant_id", person.getTenantId());
-                tokenResponse.put("person_type", personType.getCName());
+                tokenResponse.put("person_type", person.getPersonType().getCName());
 
                 return ResponseEntity.ok(tokenResponse);
             }
@@ -309,11 +302,8 @@ public class KeycloakAdminClientService {
                 PersonMaster person = personMasterRepository.findByPhoneNumber(username)
                         .orElseThrow(() -> new RuntimeException("User not found in person_master"));
 
-                // fetch personType using personTypeId
-                PersonTypeMaster personType = personTypeMasterRepository.findById(person.getPersonTypeId())
-                        .orElse(null);
-
-                return personType != null && SUPER_ADMIN_ROLE.equals(personType.getCName());
+                return person.getPersonType() != null
+                        && SUPER_ADMIN_ROLE.equals(person.getPersonType().getCName());
             }
 
         } catch (org.springframework.web.client.HttpClientErrorException e) {

@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface BfmReadingRepository extends JpaRepository<BfmReading, Long> {
-    Optional<BfmReading> findTopBySchemeIdAndTenantIdOrderByReadingDateTimeDesc(Long schemeId, String tenantId);
+    Optional<BfmReading> findTopByScheme_IdAndTenantIdOrderByReadingDateTimeDesc(Long schemeId, String tenantId);
 }

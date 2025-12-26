@@ -28,28 +28,25 @@ import java.util.UUID;
 @Slf4j
 @Transactional
 public class BfmReadingService {
+
     private final SchemeRepository schemeRepository;
     private final PersonRepository personRepository;
     private final PersonSchemeRepository personSchemeRepository;
     private final BfmReadingRepository bfmReadingRepository;
 
-    public CreateReadingResponse createReading(CreateReadingRequest request){
+    public CreateReadingResponse createReading(CreateReadingRequest request) {
         String tenantId = TenantContext.getTenantId();
 
         SchemeMaster scheme = schemeRepository
                 .findByIdAndTenantId(request.getSchemeId(), tenantId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "State scheme not found"));
 
-        Long schemeId = scheme.getId();
-
         PersonMaster operator = personRepository
                 .findByIdAndTenantId(request.getOperatorId(), tenantId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Operator not found"));
 
-        Long operatorId = operator.getId();
-
         boolean personBelongsToScheme = personSchemeRepository
-                .findByPersonIdAndSchemeId(operatorId, schemeId)
+                .findByPerson_IdAndScheme_Id(operator.getId(), scheme.getId())
                 .isPresent();
 
         if (!personBelongsToScheme) {
@@ -63,15 +60,17 @@ public class BfmReadingService {
             if (request.getReadingUrl() == null || request.getReadingUrl().isBlank()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Either readingValue or readingUrl must be provided");
             }
-            //i need the flow vision api here
-//            ocrResult = flowVisionService.extractReading(request.getReadingUrl());
-//            if (ocrResult != null && ocrResult.getAdjustedReading() != null) {
-//                finalReading = ocrResult.getAdjustedReading();
-//            }
+            // I will call flowvision here just need the complete url
+
+            // ocrResult = flowVisionService.extractReading(request.getReadingUrl());
+            // if (ocrResult != null && ocrResult.getAdjustedReading() != null) {
+            //     finalReading = ocrResult.getAdjustedReading();
+            // }
         }
+
         BfmReading reading = BfmReading.builder()
-                .schemeId(schemeId)
-                .personId(operatorId)
+                .scheme(scheme)
+                .person(operator)
                 .readingUrl(request.getReadingUrl())
                 .extractedReading(finalReading)
                 .confirmedReading(request.getReadingValue())
@@ -90,7 +89,7 @@ public class BfmReadingService {
                 .qualityStatus(ocrResult != null ? ocrResult.getQualityStatus() : null)
                 .qualityConfidence(ocrResult != null ? ocrResult.getQualityConfidence() : null)
                 .lastConfirmedReading(
-                        bfmReadingRepository.findTopBySchemeIdAndTenantIdOrderByReadingDateTimeDesc(schemeId, tenantId)
+                        bfmReadingRepository.findTopByScheme_IdAndTenantIdOrderByReadingDateTimeDesc(scheme.getId(), tenantId)
                                 .map(BfmReading::getConfirmedReading)
                                 .orElse(null)
                 )

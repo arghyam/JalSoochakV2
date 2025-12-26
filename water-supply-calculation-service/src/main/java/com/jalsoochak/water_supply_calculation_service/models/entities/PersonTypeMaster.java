@@ -1,4 +1,4 @@
-package com.jalsoochak.ManagementService.models.entity;
+package com.jalsoochak.water_supply_calculation_service.models.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,8 +23,8 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "scheme_type_master")
-public class SchemeTypeMaster {
+@Table(name = "person_type_master")
+public class PersonTypeMaster {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,6 +45,6 @@ public class SchemeTypeMaster {
     @Column(name = "title", length = 100)
     private String title;
 
-    @OneToMany(mappedBy = "schemeType", fetch = FetchType.LAZY)
-    private List<SchemeMaster> schemes;
+    @OneToMany(mappedBy = "personType", fetch = FetchType.LAZY)
+    private List<PersonMaster> persons;
 }

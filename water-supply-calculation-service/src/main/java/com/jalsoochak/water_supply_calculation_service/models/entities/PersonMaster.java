@@ -3,9 +3,13 @@ package com.jalsoochak.water_supply_calculation_service.models.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -52,7 +57,14 @@ public class PersonMaster {
     @Column(name = "tenant_id", length = 50)
     private String tenantId;
 
-    @Column(name = "person_type_id", nullable = false)
-    private Long personTypeId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "person_type_id")
+    private PersonTypeMaster personType;
+
+    @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
+    private List<PersonSchemeMapping> personSchemeMappings;
+
+    @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
+    private List<BfmReading> bfmReadings;
 
 }
