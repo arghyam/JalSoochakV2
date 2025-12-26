@@ -8,16 +8,20 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
 @Service
 public class ReminderService {
+
     private final PersonRepository personRepository;
     private final GlificService glificService;
     private final BfmReadingRepository bfmReadingRepository;
 
-    public ReminderService(PersonRepository personRepository, GlificService glificService, BfmReadingRepository bfmReadingRepository) {
+    public ReminderService(PersonRepository personRepository,
+                           GlificService glificService,
+                           BfmReadingRepository bfmReadingRepository) {
         this.personRepository = personRepository;
         this.glificService = glificService;
         this.bfmReadingRepository = bfmReadingRepository;
@@ -27,16 +31,24 @@ public class ReminderService {
     @SchedulerLock(name = "dailyMeterReadingReminder", lockAtMostFor = "10m", lockAtLeastFor = "5m")
     public void sendDailyMeterReadingReminders() {
         List<PersonMaster> operators = personRepository.findAllOperators("Jal Mitra");
+
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Kolkata"));
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
+
         for (PersonMaster operator : operators) {
-            boolean alreadySubmitted = bfmReadingRepository.existsReadingForPersonOnDate(operator.getId(), today);
-            if (alreadySubmitted) {
-                continue;
-            }
+            boolean alreadySubmitted = bfmReadingRepository.existsReadingForPersonOnDate(
+                    operator.getId(),
+                    startOfDay,
+                    endOfDay
+            );
+
+            if (alreadySubmitted) continue;
+
             String phone = operator.getPhoneNumber();
             String message = "Good morning! Please send today’s meter reading.";
+
             glificService.sendWhatsAppMessage(phone, message);
         }
     }
-
-    }
+}
