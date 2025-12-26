@@ -2,12 +2,9 @@ package com.jalsoochak.ManagementService.models.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -62,12 +59,10 @@ public class BfmReading {
     @Column(name = "correlation_id", length = 36)
     private String correlationId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "scheme_id")
-    private SchemeMaster scheme;
+    @Column(name = "scheme_id", nullable = false)
+    private Long schemeId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "person_id")
-    private PersonMaster person;
+    @Column(name = "person_id", nullable = false)
+    private Long personId;
 
 }

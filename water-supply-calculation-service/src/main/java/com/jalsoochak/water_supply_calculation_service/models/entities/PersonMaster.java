@@ -1,4 +1,5 @@
-package com.jalsoochak.ManagementService.models.entity;
+package com.jalsoochak.water_supply_calculation_service.models.entities;
+
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,16 +14,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
 @Entity
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "scheme_type_master")
-public class SchemeTypeMaster {
+@Table(name = "person_master")
+public class PersonMaster {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,10 +37,22 @@ public class SchemeTypeMaster {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @Column(name = "c_name", length = 100)
-    private String cName;
+    @Column(name = "first_name", length = 100)
+    private String firstName;
 
-    @Column(name = "title", length = 100)
-    private String title;
+    @Column(name = "last_name", length = 100)
+    private String lastName;
+
+    @Column(name = "full_name", length = 200)
+    private String fullName;
+
+    @Column(name = "phone_number", unique = true)
+    private String phoneNumber;
+
+    @Column(name = "tenant_id", length = 50)
+    private String tenantId;
+
+    @Column(name = "person_type_id", nullable = false)
+    private Long personTypeId;
 
 }

@@ -1,4 +1,4 @@
-package com.jalsoochak.ManagementService.models.entity;
+package com.jalsoochak.water_supply_calculation_service.models.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,8 +20,8 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "person_scheme_mapping")
-public class PersonSchemeMapping {
+@Table(name = "scheme_master")
+public class SchemeMaster {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,12 +36,31 @@ public class PersonSchemeMapping {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @Column(name = "scheme_id", nullable = false)
-    private Long schemeId;
+    @Column(name = "state_scheme_id")
+    private Long stateSchemeId;
 
-    @Column(name = "person_id", nullable = false)
-    private Long personId;
+    @Column(name = "centre_scheme_id")
+    private Long centreSchemeId;
+
+    @Column(name = "scheme_name", length = 200)
+    private String schemeName;
+
+    @Column(name = "fhtc_count")
+    private Integer fhtcCount;
+
+    @Column(name = "house_hold_count")
+    private Integer houseHoldCount;
+
+    @Column(columnDefinition = "GEOMETRY")
+    private String geolocation;
+
+    @Column(name = "scheme_type_id", nullable = false)
+    private Long schemeTypeId;
+
+    @Column(name = "village_id", nullable = false)
+    private Long villageId;
 
     @Column(name = "tenant_id", nullable = false)
     private String tenantId;
+
 }

@@ -2,13 +2,9 @@ package com.jalsoochak.ManagementService.models.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +13,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -59,17 +54,12 @@ public class SchemeMaster {
     @Column(columnDefinition = "GEOMETRY")
     private String geolocation;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "scheme_type_id")
-    private SchemeTypeMaster schemeType;
+    @Column(name = "scheme_type_id", nullable = false)
+    private Long schemeTypeId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "village_id")
-    private VillageMaster village;
+    @Column(name = "village_id", nullable = false)
+    private Long villageId;
 
-    @OneToMany(mappedBy = "scheme", fetch = FetchType.LAZY)
-    private List<PersonSchemeMapping> personSchemeMappings;
-
-    @OneToMany(mappedBy = "scheme", fetch = FetchType.LAZY)
-    private List<BfmReading> bfmReadings;
+    @Column(name = "tenant_id", nullable = false)
+    private String tenantId;
 }

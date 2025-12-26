@@ -2,11 +2,9 @@ package com.jalsoochak.ManagementService.models.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +13,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -45,6 +42,4 @@ public class PersonTypeMaster {
     @Column(name = "title", length = 100)
     private String title;
 
-    @OneToMany(mappedBy = "personType", fetch = FetchType.LAZY)
-    private List<PersonMaster> persons;
 }
