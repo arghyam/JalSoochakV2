@@ -1,13 +1,13 @@
-package com.jalsoochak.ManagementService.models.entity;
+package com.jalsoochak.water_supply_calculation_service.models.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,8 +22,9 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "administrative_location_master")
-public class AdministrativeLocationMaster {
+@Table(name = "lgd_location_master")
+public class LgdLocationMaster {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -40,8 +41,10 @@ public class AdministrativeLocationMaster {
     @Column(name = "title", length = 100)
     private String title;
 
-    @ManyToOne
-    @JoinColumn(name = "administrative_location_type_id", referencedColumnName = "id")
-    private AdministrativeLocationTypeMaster administrativeLocationType;
+    @Column(name = "lgd_code")
+    private Integer lgdCode;
 
+    @ManyToOne
+    @JoinColumn(name = "lgd_location_type_id", referencedColumnName = "id")
+    private LgdLocationTypeMaster lgdLocationType;
 }

@@ -1,12 +1,15 @@
-package com.jalsoochak.ManagementService.models.entity;
+package com.jalsoochak.water_supply_calculation_service.models.entities;
+
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,8 +26,9 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "administrative_location_master")
-public class AdministrativeLocationMaster {
+@Table(name = "village_master")
+public class VillageMaster {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -40,8 +45,17 @@ public class AdministrativeLocationMaster {
     @Column(name = "title", length = 100)
     private String title;
 
-    @ManyToOne
-    @JoinColumn(name = "administrative_location_type_id", referencedColumnName = "id")
-    private AdministrativeLocationTypeMaster administrativeLocationType;
+    @Column(name = "lgd_code")
+    private Integer lgdCode;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_administrative_location_id")
+    private AdministrativeLocationMaster parentAdministrativeLocation;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_lgd_location_id")
+    private LgdLocationMaster parentLgdLocation;
+
+    @OneToMany(mappedBy = "village", fetch = FetchType.LAZY)
+    private List<SchemeMaster> schemes;
 }
