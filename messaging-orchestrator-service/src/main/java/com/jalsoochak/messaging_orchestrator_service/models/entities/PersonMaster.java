@@ -1,4 +1,4 @@
-package com.jalsoochak.ManagementService.models.entity;
+package com.jalsoochak.messaging_orchestrator_service.models.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

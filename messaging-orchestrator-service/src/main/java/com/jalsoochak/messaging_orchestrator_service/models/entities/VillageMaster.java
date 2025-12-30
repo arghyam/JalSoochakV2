@@ -1,4 +1,4 @@
-package com.jalsoochak.ManagementService.models.entity;
+package com.jalsoochak.messaging_orchestrator_service.models.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,11 +22,11 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Builder(toBuilder = true)
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "person_master")
-public class PersonMaster {
+@Table(name = "village_master")
+public class VillageMaster {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,31 +41,20 @@ public class PersonMaster {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @Column(name = "first_name", length = 100)
-    private String firstName;
+    @Column(name = "title", length = 100)
+    private String title;
 
-    @Column(name = "last_name", length = 100)
-    private String lastName;
-
-    @Column(name = "full_name", length = 200)
-    private String fullName;
-
-    @Column(name = "phone_number", unique = true)
-    private String phoneNumber;
-
-    @Column(name = "tenant_id", length = 50)
-    private String tenantId;
-
-    @Column(name = "welcome_sent")
-    private boolean welcomeSent = false;
+    @Column(name = "lgd_code")
+    private Integer lgdCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "person_type_id")
-    private PersonTypeMaster personType;
+    @JoinColumn(name = "parent_administrative_location_id")
+    private AdministrativeLocationMaster parentAdministrativeLocation;
 
-    @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
-    private List<PersonSchemeMapping> personSchemeMappings;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_lgd_location_id")
+    private LgdLocationMaster parentLgdLocation;
 
-    @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
-    private List<BfmReading> bfmReadings;
+    @OneToMany(mappedBy = "village", fetch = FetchType.LAZY)
+    private List<SchemeMaster> schemes;
 }

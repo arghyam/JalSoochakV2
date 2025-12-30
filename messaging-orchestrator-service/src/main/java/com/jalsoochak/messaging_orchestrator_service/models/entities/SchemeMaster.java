@@ -1,4 +1,4 @@
-package com.jalsoochak.ManagementService.models.entity;
+package com.jalsoochak.messaging_orchestrator_service.models.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,11 +22,11 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Builder(toBuilder = true)
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "person_master")
-public class PersonMaster {
+@Table(name = "scheme_master")
+public class SchemeMaster {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,31 +41,35 @@ public class PersonMaster {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @Column(name = "first_name", length = 100)
-    private String firstName;
+    @Column(name = "state_scheme_id")
+    private Integer stateSchemeId;
 
-    @Column(name = "last_name", length = 100)
-    private String lastName;
+    @Column(name = "centre_scheme_id")
+    private Integer centreSchemeId;
 
-    @Column(name = "full_name", length = 200)
-    private String fullName;
+    @Column(name = "scheme_name", length = 200)
+    private String schemeName;
 
-    @Column(name = "phone_number", unique = true)
-    private String phoneNumber;
+    @Column(name = "fhtc_count")
+    private Integer fhtcCount;
 
-    @Column(name = "tenant_id", length = 50)
-    private String tenantId;
+    @Column(name = "house_hold_count")
+    private Integer houseHoldCount;
 
-    @Column(name = "welcome_sent")
-    private boolean welcomeSent = false;
+    @Column(columnDefinition = "GEOMETRY")
+    private String geolocation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "person_type_id")
-    private PersonTypeMaster personType;
+    @JoinColumn(name = "scheme_type_id")
+    private SchemeTypeMaster schemeType;
 
-    @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "village_id")
+    private VillageMaster village;
+
+    @OneToMany(mappedBy = "scheme", fetch = FetchType.LAZY)
     private List<PersonSchemeMapping> personSchemeMappings;
 
-    @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "scheme", fetch = FetchType.LAZY)
     private List<BfmReading> bfmReadings;
 }
