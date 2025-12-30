@@ -10,4 +10,8 @@ import java.util.List;
 public interface PersonRepository extends JpaRepository<PersonMaster, Long> {
     @Query("SELECT p FROM PersonMaster p WHERE p.personType.title = :title")
     List<PersonMaster> findAllOperators(@Param("title") String title);
+
+    List<PersonMaster> findByWelcomeSentFalseAndDeletedAtIsNull();
+
+    List<PersonMaster> findByWelcomeSentFalseAndDeletedAtIsNullAndPersonType_CName(String cName);
 }

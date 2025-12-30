@@ -1,48 +1,87 @@
 package com.jalsoochak.messaging_orchestrator_service.services;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
 
-import java.time.Duration;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
 public class GlificService {
 
-    private static final Logger log = LoggerFactory.getLogger(GlificService.class);
+    private final GlificGraphqlClient client;
+    private final String welcomeTemplateId;
 
-    private final String GLIFIC_API_URL = "https://api.glific.org/v1/messages";
-    private final String GLIFIC_TOKEN = "YOUR_GLIFIC_TOKEN";
+    public GlificService(
+            GlificGraphqlClient client,
+            @Value("${glific.welcome-template-id}") String welcomeTemplateId
+    ) {
+        this.client = client;
+        this.welcomeTemplateId = welcomeTemplateId;
+    }
 
-    private final WebClient webClient = WebClient.builder()
-            .build();
+    public Long createContact(String name, String phone) {
 
-    public Mono<String> sendWhatsAppMessage(String phoneNumber, String message) {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("to", phoneNumber);
-        payload.put("type", "text");
-        payload.put("text", message);
+        String query = """
+            mutation createContact($input: ContactInput!) {
+              createContact(input: $input) {
+                contact { id }
+                errors { key message }
+              }
+            }
+        """;
 
-        return webClient.post()
-                .uri(GLIFIC_API_URL)
-                .header("Authorization", "Bearer " + GLIFIC_TOKEN)
-                .header("Content-Type", "application/json")
-                .bodyValue(payload)
-                .retrieve()
-                .bodyToMono(String.class)
-                .timeout(Duration.ofSeconds(10))
-                .doOnSuccess(resp -> log.info("Message sent to {}: {}", phoneNumber, resp))
-                .doOnError(err -> {
-                    if (err instanceof WebClientResponseException e) {
-                        log.error("Error sending message to {}: Status {}, Body {}", phoneNumber, e.getRawStatusCode(), e.getResponseBodyAsString());
-                    } else {
-                        log.error("Error sending message to {}: {}", phoneNumber, err.getMessage(), err);
-                    }
-                });
+        JsonNode response = client.execute(query, Map.of(
+                "input", Map.of("name", name, "phone", phone)
+        ));
+
+        return response.path("data")
+                .path("createContact")
+                .path("contact")
+                .path("id")
+                .asLong();
+    }
+
+    public void optIn(String phone) {
+
+        String query = """
+            mutation optinContact($phone: String!) {
+              optinContact(phone: $phone) {
+                contact { id }
+                errors { key message }
+              }
+            }
+        """;
+
+        client.execute(query, Map.of("phone", phone));
+    }
+
+
+    public void sendWelcomeHsm(Long receiverId) {
+
+        String query = """
+            mutation sendHsmMessage(
+              $templateId: ID!,
+              $receiverId: ID!,
+              $parameters: [String]
+            ) {
+              sendHsmMessage(
+                templateId: $templateId,
+                receiverId: $receiverId,
+                parameters: $parameters
+              ) {
+                message { id body isHSM }
+                errors { key message }
+              }
+            }
+        """;
+
+        client.execute(query, Map.of(
+                "templateId", welcomeTemplateId,
+                "receiverId", receiverId,
+                "parameters", List.of()
+        ));
     }
 }
+
