@@ -56,9 +56,6 @@ public class PersonMaster {
     @Column(name = "tenant_id", length = 50)
     private String tenantId;
 
-    @Column(name = "welcome_sent")
-    private boolean welcomeSent = false;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "person_type_id")
     private PersonTypeMaster personType;
