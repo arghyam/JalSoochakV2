@@ -5,7 +5,7 @@
 - **Styling**: Tailwind CSS v3.4 + Tremor React
 - **State Management**: Zustand (client state) + TanStack Query (server state)
 - **Routing**: React Router DOM v7
-- **Tables**: TanStack Table v8
+- **Tables**: Tremor Tables
 - **Charts & Maps**: ECharts (echarts-for-react) + Tremor Charts
 - **HTTP Client**: Axios
 - **Code Quality**: ESLint + Prettier + Husky
