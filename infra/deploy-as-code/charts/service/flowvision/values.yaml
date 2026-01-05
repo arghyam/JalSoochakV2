@@ -7,6 +7,7 @@ labels:
 ingress:
   enabled: true
   context: "flowvision(/|$)(.*)"
+  pathType: " ImplementationSpecific"
   annotations:
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/rewrite-target: /flowvision/$2
@@ -40,16 +41,16 @@ env: |
         key: password
   - name: FLOWVISION_DB_HOST
     valueFrom:
-      configMapKeyRef:
+      secretKeyRef:
         name: jalsoochak
         key: host
   - name: FLOWVISION_DB_PORT
     valueFrom:
-      configMapKeyRef:
+      secretKeyRef:
         name: jalsoochak
         key: port
   - name: FLOWVISION_DB_NAME
     valueFrom:
-      configMapKeyRef:
+      secretKeyRef:
         name: jalsoochak
         key: database
