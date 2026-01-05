@@ -44,6 +44,7 @@ public class WelcomeMessageConsumer {
 
             if (!pendingMessages.isEmpty()) {
                 Message message = pendingMessages.get(0);
+                message.setReceiverId(receiverId);
                 message.setStatus(MessageStatus.SENT);
                 message.setSentAt(Instant.now());
                 messageRepository.save(message);

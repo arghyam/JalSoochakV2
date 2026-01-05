@@ -23,4 +23,25 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             @Param("type") MessageType type,
             @Param("status") MessageStatus status
     );
+
+    @Query("""
+        SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END
+        FROM Message m
+        WHERE m.person.id = :personId
+          AND m.type = 'BFM_REMINDER'
+          AND m.status = 'SENT'
+          AND DATE(m.sentAt) = CURRENT_DATE
+    """)
+    boolean existsBfmReminderSentToday(@Param("personId") Long personId);
+
+    @Query("""
+        SELECT m.receiverId
+        FROM Message m
+        WHERE m.person.id = :personId
+          AND m.receiverId IS NOT NULL
+          AND m.status = 'SENT'
+        ORDER BY m.sentAt DESC
+        LIMIT 1
+    """)
+    Long findLatestReceiverId(@Param("personId") Long personId);
 }

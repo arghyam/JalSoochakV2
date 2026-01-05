@@ -41,6 +41,9 @@ public class Message {
 
     private String phoneNumber;
 
+    @Column(name = "receiver_id")
+    private Long receiverId;
+
     @Enumerated(EnumType.STRING)
     private MessageType type;
 
