@@ -12,13 +12,16 @@ public class GlificService {
 
     private final GlificGraphqlClient client;
     private final String welcomeTemplateId;
+    private final String bfmReminderTemplateId;
 
     public GlificService(
             GlificGraphqlClient client,
-            @Value("${glific.welcome-template-id}") String welcomeTemplateId
+            @Value("${glific.welcome-template-id}") String welcomeTemplateId,
+            @Value("${glific.bfm-reminder-template-id}") String bfmReminderTemplateId
     ) {
         this.client = client;
         this.welcomeTemplateId = welcomeTemplateId;
+        this.bfmReminderTemplateId = bfmReminderTemplateId;
     }
 
     public Long createContact(String name, String phone) {
@@ -79,6 +82,33 @@ public class GlificService {
 
         client.execute(query, Map.of(
                 "templateId", welcomeTemplateId,
+                "receiverId", receiverId,
+                "parameters", List.of()
+        ));
+
+    }
+
+    public void sendBfmReminderHsm(Long receiverId) {
+
+        String query = """
+                    mutation sendHsmMessage(
+                      $templateId: ID!,
+                      $receiverId: ID!,
+                      $parameters: [String]
+                    ) {
+                      sendHsmMessage(
+                        templateId: $templateId,
+                        receiverId: $receiverId,
+                        parameters: $parameters
+                      ) {
+                        message { id }
+                        errors { key message }
+                      }
+                    }
+                """;
+
+        client.execute(query, Map.of(
+                "templateId", bfmReminderTemplateId,
                 "receiverId", receiverId,
                 "parameters", List.of()
         ));
