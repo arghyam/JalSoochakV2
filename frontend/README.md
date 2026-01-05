@@ -1,12 +1,12 @@
 ## Tech Stack
 
-- **Framework**: React 19 + TypeScript
+- **Framework**: React 18.3 + TypeScript
 - **Build Tool**: Vite
-- **Styling**: Tailwind CSS v4 + shadcn/ui
+- **Styling**: Tailwind CSS v3.4 + Tremor React
 - **State Management**: Zustand (client state) + TanStack Query (server state)
 - **Routing**: React Router DOM v7
 - **Tables**: TanStack Table v8
-- **Charts & Maps**: ECharts (echarts-for-react)
+- **Charts & Maps**: ECharts (echarts-for-react) + Tremor Charts
 - **HTTP Client**: Axios
 - **Code Quality**: ESLint + Prettier + Husky
 
@@ -56,6 +56,9 @@ frontend/
 │   │   ├── providers/          # React context providers
 │   │   ├── router/            # Route configuration
 │   │   └── store/              # Zustand stores
+│   ├── design-system/          # Design system & tokens
+│   │   ├── tokens/            # Design tokens (colors, typography, etc.)
+│   │   └── components/        # Tremor component exports
 │   ├── features/               # Feature-based modules
 │   │   ├── dashboard/         # Dashboard feature
 │   │   ├── schemes/           # Schemes management
@@ -64,7 +67,6 @@ frontend/
 │   │   └── state-admin/       # State Admin
 │   ├── shared/                 # Shared components & utilities
 │   │   ├── components/        # Reusable components
-│   │   │   ├── ui/           # shadcn/ui components
 │   │   │   ├── layout/        # Layout components
 │   │   │   └── common/       # Common components
 │   │   ├── hooks/             # Shared custom hooks
@@ -73,8 +75,7 @@ frontend/
 │   │   ├── types/             # Shared TypeScript types
 │   │   └── lib/               # Third-party library configs
 │   └── assets/                # Static assets
-├── public/                     # Public assets
-└── components.json            # shadcn/ui configuration
+└── public/                     # Public assets
 ```
 
 ## Path Aliases
@@ -101,17 +102,17 @@ The project uses path aliases for cleaner imports:
 
 Husky is configured to run lint-staged on commits. Only files in the `frontend/` folder will be checked.
 
-### Adding shadcn/ui Components
+### Using Tremor Components
 
-```bash
-npx shadcn@latest add [component-name]
+Import Tremor components from the design system:
+
+```typescript
+import { Button, Card, Text, Title } from '@/design-system'
 ```
 
-Example:
+All Tremor components are re-exported through `@/design-system/components` for easier imports.
 
-```bash
-npx shadcn@latest add button
-```
+For detailed component documentation, visit [Tremor Docs](https://www.tremor.so/docs/getting-started/installation).
 
 ### API Configuration
 
