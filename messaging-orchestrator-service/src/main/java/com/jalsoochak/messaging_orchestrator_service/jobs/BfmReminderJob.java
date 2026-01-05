@@ -25,23 +25,23 @@ public class BfmReminderJob {
     private final MessageRepository messageRepository;
     private final GlificService glificService;
 
-//    @Scheduled(
-//            cron = "0 0 5 * * ?",
-//            zone = "Asia/Kolkata"
-//    )
-//    @SchedulerLock(
-//            name = "BfmReminderJob_sendDailyReminder",
-//            lockAtMostFor = "10m",
-//            lockAtLeastFor = "1m"
-//    )
-@Scheduled(
-        fixedRate = 60000 // runs every 1 minute
-)
-@SchedulerLock(
-        name = "BfmReminderJob_sendDailyReminder",
-        lockAtMostFor = "10m",
-        lockAtLeastFor = "1m"
-)
+    @Scheduled(
+            cron = "0 0 5 * * ?",
+            zone = "Asia/Kolkata"
+    )
+    @SchedulerLock(
+            name = "BfmReminderJob_sendDailyReminder",
+            lockAtMostFor = "10m",
+            lockAtLeastFor = "1m"
+    )
+//@Scheduled(
+//        fixedRate = 60000
+//)
+//@SchedulerLock(
+//        name = "BfmReminderJob_sendDailyReminder",
+//        lockAtMostFor = "10m",
+//        lockAtLeastFor = "1m"
+//)
 @Transactional
     public void sendDailyBfmReminder() {
         log.info("BFM reminder job started");
@@ -49,12 +49,12 @@ public class BfmReminderJob {
                 personRepository.findByDeletedAtIsNullAndPersonType_cName("pump_operator");
 
         for (PersonMaster person : pumpOperators) {
-//            boolean sentToday =
-//                    messageRepository.existsBfmReminderSentToday(person.getId());
-//
-//            if (sentToday) {
-//                continue;
-//            }
+            boolean sentToday =
+                    messageRepository.existsBfmReminderSentToday(person.getId());
+
+            if (sentToday) {
+                continue;
+            }
 
             Long receiverId =
                     messageRepository.findLatestReceiverId(person.getId());
