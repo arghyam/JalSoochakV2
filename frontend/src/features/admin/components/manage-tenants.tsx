@@ -124,99 +124,99 @@ export function ManageTenants() {
       </div>
 
       <div className="overflow-hidden rounded-lg bg-white shadow">
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableHeaderCell>Tenant Name</TableHeaderCell>
-              <TableHeaderCell>Code</TableHeaderCell>
-              <TableHeaderCell>Status</TableHeaderCell>
-              <TableHeaderCell>State Admin</TableHeaderCell>
-              <TableHeaderCell>Admin Count</TableHeaderCell>
-              <TableHeaderCell>Water Norm (LPCD)</TableHeaderCell>
-              <TableHeaderCell>Actions</TableHeaderCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {tenants.map((tenant) => (
-              <TableRow key={tenant.id}>
-                <TableCell>
-                  <span className="font-medium">{tenant.name}</span>
-                </TableCell>
-                <TableCell>
-                  <Badge color="gray">{tenant.code}</Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge color={tenant.status === 'active' ? 'green' : 'gray'}>
-                    {tenant.status === 'active' ? 'Active' : 'Inactive'}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <span className="text-gray-700">{tenant.stateAdminName || '-'}</span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-gray-700">{tenant.adminCount}</span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-gray-700">{tenant.defaultConfig.defaultWaterNorm}</span>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleToggleStatus(tenant)}
-                      className={`rounded px-3 py-1 text-xs font-medium transition-colors ${
-                        tenant.status === 'active'
-                          ? 'bg-blue-600 text-white hover:bg-blue-700'
-                          : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
-                      }`}
-                      title={tenant.status === 'active' ? 'Deactivate' : 'Activate'}
-                    >
-                      {tenant.status === 'active' ? 'Active' : 'Inactive'}
-                    </button>
-                    <button
-                      onClick={() => handleEdit(tenant)}
-                      className="rounded p-2 text-blue-600 transition-colors hover:bg-blue-50"
-                      title="Edit"
-                    >
-                      <svg
-                        className="h-4 w-4"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => setDeletingTenant(tenant)}
-                      className="rounded p-2 text-red-600 transition-colors hover:bg-red-50"
-                      title="Delete"
-                    >
-                      <svg
-                        className="h-4 w-4"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-
-        {tenants.length === 0 && (
+        {tenants.length === 0 ? (
           <div className="py-12 text-center text-gray-500">
             No tenants found. Click "Add Tenant" to create one.
           </div>
+        ) : (
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell>Tenant Name</TableHeaderCell>
+                <TableHeaderCell>Code</TableHeaderCell>
+                <TableHeaderCell>Status</TableHeaderCell>
+                <TableHeaderCell>State Admin</TableHeaderCell>
+                <TableHeaderCell>Admin Count</TableHeaderCell>
+                <TableHeaderCell>Water Norm (LPCD)</TableHeaderCell>
+                <TableHeaderCell>Actions</TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {tenants.map((tenant) => (
+                <TableRow key={tenant.id}>
+                  <TableCell>
+                    <span className="font-medium">{tenant.name}</span>
+                  </TableCell>
+                  <TableCell>
+                    <Badge color="gray">{tenant.code}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge color={tenant.status === 'active' ? 'green' : 'gray'}>
+                      {tenant.status === 'active' ? 'Active' : 'Inactive'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-gray-700">{tenant.stateAdminName || '-'}</span>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-gray-700">{tenant.adminCount}</span>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-gray-700">{tenant.defaultConfig.defaultWaterNorm}</span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleToggleStatus(tenant)}
+                        className={`rounded px-3 py-1 text-xs font-medium transition-colors ${
+                          tenant.status === 'active'
+                            ? 'bg-blue-600 text-white hover:bg-blue-700'
+                            : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+                        }`}
+                        title={tenant.status === 'active' ? 'Deactivate' : 'Activate'}
+                      >
+                        {tenant.status === 'active' ? 'Active' : 'Inactive'}
+                      </button>
+                      <button
+                        onClick={() => handleEdit(tenant)}
+                        className="rounded p-2 text-blue-600 transition-colors hover:bg-blue-50"
+                        title="Edit"
+                      >
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => setDeletingTenant(tenant)}
+                        className="rounded p-2 text-red-600 transition-colors hover:bg-red-50"
+                        title="Delete"
+                      >
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         )}
       </div>
 

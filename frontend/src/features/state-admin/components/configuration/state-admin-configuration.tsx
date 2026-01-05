@@ -375,9 +375,9 @@ export function StateAdminConfiguration() {
                   </TableCell>
                   <TableCell>
                     <span className="text-sm">
-                      {message.targetRole === 'all'
+                      {!message.targetRole || message.targetRole === 'all'
                         ? 'All Roles'
-                        : NOTIFY_ROLE_LABELS[message.targetRole as keyof typeof NOTIFY_ROLE_LABELS]}
+                        : NOTIFY_ROLE_LABELS[message.targetRole] || message.targetRole}
                     </span>
                   </TableCell>
                   <TableCell>
