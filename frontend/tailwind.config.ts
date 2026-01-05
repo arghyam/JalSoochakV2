@@ -9,8 +9,6 @@ const config: Config = {
     './node_modules/@tremor/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
-    transparent: 'transparent',
-    current: 'currentColor',
     extend: {
       colors: {
         // Tremor Theme Colors
