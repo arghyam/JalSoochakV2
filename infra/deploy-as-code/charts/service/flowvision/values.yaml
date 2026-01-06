@@ -1,0 +1,56 @@
+# Common Labels
+labels:
+  app: "flowvision"
+  group: "core"
+
+
+ingress:
+  enabled: true
+  context: "flowvision(/|$)(.*)"
+  pathType: "ImplementationSpecific"
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /flowvision/$2
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false" 
+# Init Containers Configs
+
+# Container Configs
+image:
+  repository: "252649026375.dkr.ecr.ap-south-1.amazonaws.com/arghyam/flowvision"
+  tag: "1.0.1"
+replicas: "1"
+httpPort: 8000
+# tracing-enabled: true
+# healthChecks:
+#   enabled: true
+#   livenessProbePath: "/management-service/health"
+#   readinessProbePath: "/management-service/health"
+
+# Additional Container Envs
+env: |
+  - name: FLOWVISION_DB_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: jalsoochak
+        key: username
+  - name: FLOWVISION_DB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: jalsoochak
+        key: password
+  - name: FLOWVISION_DB_HOST
+    valueFrom:
+      secretKeyRef:
+        name: jalsoochak
+        key: host
+  - name: FLOWVISION_DB_PORT
+    valueFrom:
+      secretKeyRef:
+        name: jalsoochak
+        key: port
+  - name: FLOWVISION_DB_NAME
+    valueFrom:
+      secretKeyRef:
+        name: jalsoochak
+        key: database
