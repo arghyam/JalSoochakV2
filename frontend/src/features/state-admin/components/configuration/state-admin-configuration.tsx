@@ -1,13 +1,13 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import {
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  getPaginationRowModel,
-  flexRender,
-  type ColumnDef,
-  type SortingState,
-} from '@tanstack/react-table'
+  Table,
+  TableHead,
+  TableHeaderCell,
+  TableBody,
+  TableRow,
+  TableCell,
+  Badge,
+} from '@tremor/react'
 import { useAuthStore } from '@/app/store'
 import { ToastContainer, ConfirmationDialog } from '@/shared/components/common'
 import { useToast } from '@/shared/hooks/use-toast'
@@ -53,7 +53,6 @@ export function StateAdminConfiguration() {
   const createEscalationRule = useCreateEscalationRule()
   const updateEscalationRule = useUpdateEscalationRule()
   const deleteEscalationRule = useDeleteEscalationRule()
-  const [escalationSorting, setEscalationSorting] = useState<SortingState>([])
   const [isEscalationFormOpen, setIsEscalationFormOpen] = useState(false)
   const [editingEscalationRule, setEditingEscalationRule] = useState<EscalationRule | null>(null)
   const [deletingEscalationRule, setDeletingEscalationRule] = useState<EscalationRule | null>(null)
@@ -64,7 +63,6 @@ export function StateAdminConfiguration() {
   const updateNudgeMessage = useUpdateNudgeMessage()
   const toggleNudgeMessageStatus = useToggleNudgeMessageStatus()
   const deleteNudgeMessage = useDeleteNudgeMessage()
-  const [nudgeSorting, setNudgeSorting] = useState<SortingState>([])
   const [isNudgeFormOpen, setIsNudgeFormOpen] = useState(false)
   const [editingNudgeMessage, setEditingNudgeMessage] = useState<NudgeMessage | null>(null)
   const [deletingNudgeMessage, setDeletingNudgeMessage] = useState<NudgeMessage | null>(null)
@@ -204,239 +202,6 @@ export function StateAdminConfiguration() {
     }
   }
 
-  // Escalation Rules Table Columns
-  const escalationColumns = useMemo<ColumnDef<EscalationRule>[]>(
-    () => [
-      {
-        accessorKey: 'condition.type',
-        header: 'Condition Type',
-        cell: (info) => {
-          const rule = info.row.original
-          return <span className="font-medium">{CONDITION_TYPE_LABELS[rule.condition.type]}</span>
-        },
-      },
-      {
-        id: 'conditionValue',
-        header: 'Condition Value',
-        cell: (info) => {
-          const rule = info.row.original
-          if (rule.condition.durationHours) {
-            return <span>{rule.condition.durationHours} hours</span>
-          }
-          if (rule.condition.threshold) {
-            return <span>{rule.condition.threshold}%</span>
-          }
-          return <span className="text-gray-400">-</span>
-        },
-      },
-      {
-        accessorKey: 'levels',
-        header: 'Escalation Levels',
-        cell: (info) => {
-          const rule = info.row.original
-          return (
-            <div className="space-y-1">
-              {rule.levels.map((level) => (
-                <div key={level.level} className="text-sm">
-                  <span className="font-medium">L{level.level}:</span>{' '}
-                  {NOTIFY_ROLE_LABELS[level.notifyRole]}
-                </div>
-              ))}
-            </div>
-          )
-        },
-      },
-      {
-        id: 'actions',
-        header: 'Actions',
-        cell: (info) => {
-          const rule = info.row.original
-          return (
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => handleEditEscalationRule(rule)}
-                className="rounded p-2 text-blue-600 transition-colors hover:bg-blue-50"
-                title="Edit"
-              >
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-              </button>
-              <button
-                onClick={() => setDeletingEscalationRule(rule)}
-                className="rounded p-2 text-red-600 transition-colors hover:bg-red-50"
-                title="Delete"
-              >
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-              </button>
-            </div>
-          )
-        },
-      },
-    ],
-    []
-  )
-
-  const escalationTable = useReactTable({
-    data: escalationRulesConfig?.rules || [],
-    columns: escalationColumns,
-    state: {
-      sorting: escalationSorting,
-    },
-    onSortingChange: setEscalationSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    initialState: {
-      pagination: {
-        pageSize: 5,
-      },
-    },
-  })
-
-  // Nudge Messages Table Columns
-  const nudgeColumns = useMemo<ColumnDef<NudgeMessage>[]>(
-    () => [
-      {
-        accessorKey: 'title',
-        header: 'Title',
-        cell: (info) => <span className="font-medium">{info.getValue() as string}</span>,
-      },
-      {
-        accessorKey: 'message',
-        header: 'Message',
-        cell: (info) => {
-          const message = info.getValue() as string
-          return (
-            <span className="line-clamp-2 text-sm text-gray-600">
-              {message.length > 60 ? `${message.slice(0, 60)}...` : message}
-            </span>
-          )
-        },
-      },
-      {
-        accessorKey: 'targetRole',
-        header: 'Target Role',
-        cell: (info) => {
-          const role = info.getValue() as string
-          return (
-            <span className="text-sm">
-              {role === 'all'
-                ? 'All Roles'
-                : NOTIFY_ROLE_LABELS[role as keyof typeof NOTIFY_ROLE_LABELS]}
-            </span>
-          )
-        },
-      },
-      {
-        accessorKey: 'frequency',
-        header: 'Frequency',
-        cell: (info) => {
-          const freq = info.getValue() as keyof typeof MESSAGE_FREQUENCY_LABELS
-          return <span className="text-sm">{MESSAGE_FREQUENCY_LABELS[freq]}</span>
-        },
-      },
-      {
-        accessorKey: 'isActive',
-        header: 'Status',
-        cell: (info) => {
-          const message = info.row.original
-          return (
-            <button
-              onClick={() => handleToggleNudgeStatus(message)}
-              className={`rounded px-2 py-1 text-xs font-semibold ${
-                message.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-              }`}
-            >
-              {message.isActive ? 'Active' : 'Inactive'}
-            </button>
-          )
-        },
-      },
-      {
-        id: 'actions',
-        header: 'Actions',
-        cell: (info) => {
-          const message = info.row.original
-          return (
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => handleEditNudgeMessage(message)}
-                className="rounded p-2 text-blue-600 transition-colors hover:bg-blue-50"
-                title="Edit"
-              >
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-              </button>
-              <button
-                onClick={() => setDeletingNudgeMessage(message)}
-                className="rounded p-2 text-red-600 transition-colors hover:bg-red-50"
-                title="Delete"
-              >
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-              </button>
-            </div>
-          )
-        },
-      },
-    ],
-    []
-  )
-
-  const nudgeTable = useReactTable({
-    data: nudgeMessages,
-    columns: nudgeColumns,
-    state: {
-      sorting: nudgeSorting,
-    },
-    onSortingChange: setNudgeSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    initialState: {
-      pagination: {
-        pageSize: 5,
-      },
-    },
-  })
-
   return (
     <div className="space-y-8">
       <ToastContainer toasts={toast.toasts} onRemove={toast.removeToast} />
@@ -490,35 +255,84 @@ export function StateAdminConfiguration() {
         </div>
 
         <div className="overflow-hidden rounded-lg bg-white shadow">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                {escalationTable.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <th
-                        key={header.id}
-                        className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell>Condition Type</TableHeaderCell>
+                <TableHeaderCell>Condition Value</TableHeaderCell>
+                <TableHeaderCell>Escalation Levels</TableHeaderCell>
+                <TableHeaderCell>Actions</TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {(escalationRulesConfig?.rules || []).map((rule) => (
+                <TableRow key={rule.id}>
+                  <TableCell>
+                    <span className="font-medium">
+                      {CONDITION_TYPE_LABELS[rule.condition.type]}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    {rule.condition.durationHours ? (
+                      <span>{rule.condition.durationHours} hours</span>
+                    ) : rule.condition.threshold ? (
+                      <span>{rule.condition.threshold}%</span>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      {rule.levels.map((level) => (
+                        <div key={level.level} className="text-sm">
+                          <span className="font-medium">L{level.level}:</span>{' '}
+                          {NOTIFY_ROLE_LABELS[level.notifyRole]}
+                        </div>
+                      ))}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleEditEscalationRule(rule)}
+                        className="rounded p-2 text-blue-600 transition-colors hover:bg-blue-50"
+                        title="Edit"
                       >
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody className="divide-y divide-gray-200 bg-white">
-                {escalationTable.getRowModel().rows.map((row) => (
-                  <tr key={row.id} className="transition-colors hover:bg-gray-50">
-                    {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className="px-6 py-4 text-sm">
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => setDeletingEscalationRule(rule)}
+                        className="rounded p-2 text-red-600 transition-colors hover:bg-red-50"
+                        title="Delete"
+                      >
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       </section>
 
@@ -535,35 +349,92 @@ export function StateAdminConfiguration() {
         </div>
 
         <div className="overflow-hidden rounded-lg bg-white shadow">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                {nudgeTable.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <th
-                        key={header.id}
-                        className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell>Title</TableHeaderCell>
+                <TableHeaderCell>Message</TableHeaderCell>
+                <TableHeaderCell>Target Role</TableHeaderCell>
+                <TableHeaderCell>Frequency</TableHeaderCell>
+                <TableHeaderCell>Status</TableHeaderCell>
+                <TableHeaderCell>Actions</TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {nudgeMessages.map((message) => (
+                <TableRow key={message.id}>
+                  <TableCell>
+                    <span className="font-medium">{message.title}</span>
+                  </TableCell>
+                  <TableCell>
+                    <span className="line-clamp-2 text-sm text-gray-600">
+                      {message.message.length > 60
+                        ? `${message.message.slice(0, 60)}...`
+                        : message.message}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-sm">
+                      {!message.targetRole || message.targetRole === 'all'
+                        ? 'All Roles'
+                        : NOTIFY_ROLE_LABELS[message.targetRole] || message.targetRole}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-sm">{MESSAGE_FREQUENCY_LABELS[message.frequency]}</span>
+                  </TableCell>
+                  <TableCell>
+                    <button
+                      onClick={() => handleToggleNudgeStatus(message)}
+                      className="inline-block"
+                    >
+                      <Badge color={message.isActive ? 'green' : 'gray'}>
+                        {message.isActive ? 'Active' : 'Inactive'}
+                      </Badge>
+                    </button>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleEditNudgeMessage(message)}
+                        className="rounded p-2 text-blue-600 transition-colors hover:bg-blue-50"
+                        title="Edit"
                       >
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody className="divide-y divide-gray-200 bg-white">
-                {nudgeTable.getRowModel().rows.map((row) => (
-                  <tr key={row.id} className="transition-colors hover:bg-gray-50">
-                    {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className="px-6 py-4 text-sm">
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => setDeletingNudgeMessage(message)}
+                        className="rounded p-2 text-red-600 transition-colors hover:bg-red-50"
+                        title="Delete"
+                      >
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       </section>
 

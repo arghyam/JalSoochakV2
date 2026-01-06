@@ -5,8 +5,7 @@ import { CentralDashboard } from '@/features/dashboard/components/central-dashbo
 import { Admin, ManageTenants, StateAdminManagement, ConfigureSystem } from '@/features/admin'
 import { StateAdminDashboard, StateAdminConfiguration } from '@/features/state-admin'
 import { LoginPage } from '@/features/auth'
-import { ProtectedRoute } from '@/shared/components/routing/ProtectedRoute'
-import { RedirectIfAuthenticated } from '@/shared/components/routing/ProtectedRoute'
+import { ProtectedRoute, RedirectIfAuthenticated } from '@/shared/components/routing/ProtectedRoute'
 import { AUTH_ROLES } from '@/shared/constants/auth'
 import { NotFoundPage } from '@/shared/components/common'
 
