@@ -22,11 +22,11 @@ postgresql:
   enabled: false # Using external DB
 externalDatabase:
   vendor: mysql
-  host: "dummmy"
+  host: "dummy"
   port: "3306"
   user: ""
   database: ""
-  password: "dummmy"
+  password: "dummy"
   existingSecret: "jalsoochak"
   existingSecretHostKey: "host"
   existingSecretPortKey: ""
