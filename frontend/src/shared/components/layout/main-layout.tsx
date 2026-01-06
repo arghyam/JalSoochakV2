@@ -1,29 +1,16 @@
 import type { ReactNode } from 'react'
-import { Header } from './header'
+import { Outlet } from 'react-router-dom'
 import { Sidebar } from './sidebar'
-import { useUIStore } from '@/app/store'
 
 interface MainLayoutProps {
-  children: ReactNode
+  children?: ReactNode
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
-  const sidebarOpen = useUIStore((state) => state.sidebarOpen)
-
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen w-full overflow-hidden bg-background">
       <Sidebar />
-      <div
-        className={`flex flex-1 flex-col transition-all duration-300 ${
-          sidebarOpen ? 'ml-64' : 'ml-0'
-        }`}
-      >
-        <Header />
-        <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
-          {children}
-        </main>
-      </div>
+      <main className="ml-56 flex-1 overflow-y-auto px-12 py-10">{children || <Outlet />}</main>
     </div>
   )
 }
-
