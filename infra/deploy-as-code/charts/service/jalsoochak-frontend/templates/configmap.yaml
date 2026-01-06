@@ -5,5 +5,5 @@ metadata:
 data:
   config.js: |
     window.APP_CONFIG = {
-      API_BASE_URL: 'https://jalsoochak.beehyv.com',
+      API_BASE_URL: 'https://{{ .Values.global.domain }}',
     }

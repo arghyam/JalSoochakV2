@@ -14,8 +14,8 @@ global:
     allowInsecureImages: true
 auth:
   adminUser: admin
-  adminPassword: admin
-  managementPassword: admin
+  existingSecret: "keycloak"
+  passwordSecretKey: "admin-password"
 httpRelativePath: /keycloak/
 hostnameStrict: true
 postgresql:
@@ -58,14 +58,14 @@ extraEnvVars:
         key: password
         name: jalsoochak
   - name: KC_HOSTNAME
-    value: https://jalsoochak.beehyv.com/keycloak/
+    value: https://{{ .Values.global.domain }}/keycloak/
 ingress:
   enabled: true
   ingressClassName: "nginx"
   pathType: Prefix
   apiVersion: ""
   controller: default
-  hostname: jalsoochak.beehyv.com
+  hostname: {{ .Values.global.domain }}
   hostnameStrict: true
   httpEnabled: false
   path: /keycloak/

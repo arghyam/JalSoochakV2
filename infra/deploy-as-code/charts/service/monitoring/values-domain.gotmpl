@@ -1,0 +1,6 @@
+ingress:
+  hosts:
+    - {{ .Values.global.domain }}
+  tls:
+    - hosts:
+      - {{ .Values.global.domain }}
