@@ -5,6 +5,7 @@ import { CentralDashboard } from '@/features/dashboard/components/central-dashbo
 import { Admin, ManageTenants, StateAdminManagement, ConfigureSystem } from '@/features/admin'
 import { StateAdminConfiguration, OverviewPage } from '@/features/state-admin'
 import { LoginPage } from '@/features/auth'
+import { SignupPage } from '@/features/auth/components/signup-page'
 import { ProtectedRoute, RedirectIfAuthenticated } from '@/shared/components/routing/ProtectedRoute'
 import { AUTH_ROLES } from '@/shared/constants/auth'
 import { NotFoundPage } from '@/shared/components/common'
@@ -47,6 +48,16 @@ export const router = createBrowserRouter([
     element: (
       <RedirectIfAuthenticated>
         <LoginPage />
+      </RedirectIfAuthenticated>
+    ),
+  },
+
+  // Auth
+  {
+    path: ROUTES.SIGNUP,
+    element: (
+      <RedirectIfAuthenticated>
+        <SignupPage />
       </RedirectIfAuthenticated>
     ),
   },
