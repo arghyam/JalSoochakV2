@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { Box, Flex, Text, Heading, Grid } from '@chakra-ui/react'
 import { useDashboardData } from '../hooks/use-dashboard-data'
 import { KPICard } from './kpi-card'
 import { IndiaMapChart, DemandSupplyChart, BarChart } from './charts'
@@ -15,35 +16,33 @@ export function CentralDashboard() {
 
   const handleStateHover = (_stateId: string, _stateName: string, _metrics: unknown) => {
     // Hover tooltip is handled by ECharts
-    // This callback can be used for additional hover actions if needed
   }
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center">
+      <Flex h="100vh" align="center" justify="center">
         <LoadingSpinner />
-      </div>
+      </Flex>
     )
   }
 
   if (error) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-red-600">Error loading dashboard</h2>
-          <p className="mt-2 text-gray-600">
+      <Flex h="100vh" align="center" justify="center">
+        <Box textAlign="center">
+          <Heading fontSize="2xl" fontWeight="bold" color="red.600">
+            Error loading dashboard
+          </Heading>
+          <Text mt={2} color="gray.600">
             {error instanceof Error ? error.message : 'Unknown error'}
-          </p>
-        </div>
-      </div>
+          </Text>
+        </Box>
+      </Flex>
     )
   }
 
-  if (!data) {
-    return null
-  }
+  if (!data) return null
 
-  // Guard against incomplete data structure
   if (
     !data.kpis ||
     !data.mapData ||
@@ -54,25 +53,35 @@ export function CentralDashboard() {
     !data.continuityData
   ) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-red-600">Invalid data structure</h2>
-          <p className="mt-2 text-gray-600">Dashboard data is incomplete</p>
-        </div>
-      </div>
+      <Flex h="100vh" align="center" justify="center">
+        <Box textAlign="center">
+          <Heading fontSize="2xl" fontWeight="bold" color="red.600">
+            Invalid data structure
+          </Heading>
+          <Text mt={2} color="gray.600">
+            Dashboard data is incomplete
+          </Text>
+        </Box>
+      </Flex>
     )
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <Box p={6}>
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold">Central Dashboard</h1>
-        <p className="text-muted-foreground">National-level water supply scheme monitoring</p>
-      </div>
+      <Box mb={6}>
+        <Heading fontSize="3xl" fontWeight="bold">
+          Central Dashboard
+        </Heading>
+        <Text color="gray.600">National-level water supply scheme monitoring</Text>
+      </Box>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <Grid
+        templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }}
+        gap={4}
+        mb={6}
+      >
         <KPICard
           title="National Coverage %"
           value={data.kpis.nationalCoverage}
@@ -107,60 +116,60 @@ export function CentralDashboard() {
           value={data.kpis.totalHouseholds}
           description="Households covered"
         />
-      </div>
+      </Grid>
 
       {/* India Map */}
-      <div className="bg-card rounded-lg border p-4">
+      <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} mb={6}>
         <IndiaMapChart
           data={data.mapData}
           onStateClick={handleStateClick}
           onStateHover={handleStateHover}
           height="600px"
         />
-      </div>
+      </Box>
 
       {/* Demand vs Supply Chart */}
-      <div className="bg-card rounded-lg border p-4">
+      <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} mb={6}>
         <DemandSupplyChart data={data.demandSupply} height="400px" />
-      </div>
+      </Box>
 
       {/* Performance Tables */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="bg-card rounded-lg border p-4">
+      <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+        <Box bg="white" borderWidth="1px" borderRadius="lg" p={4}>
           <PerformanceTable
             data={data.topPerformers}
             title="Top 5 Best Performing States"
             isBest={true}
           />
-        </div>
-        <div className="bg-card rounded-lg border p-4">
+        </Box>
+        <Box bg="white" borderWidth="1px" borderRadius="lg" p={4}>
           <PerformanceTable
             data={data.worstPerformers}
             title="Top 5 Worst Performing States"
             isBest={false}
           />
-        </div>
-      </div>
+        </Box>
+      </Grid>
 
       {/* Bar Charts */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="bg-card rounded-lg border p-4">
+      <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6}>
+        <Box bg="white" borderWidth="1px" borderRadius="lg" p={4}>
           <BarChart
             data={data.regularityData}
             metric="regularity"
             title="Regularity by State"
             height="400px"
           />
-        </div>
-        <div className="bg-card rounded-lg border p-4">
+        </Box>
+        <Box bg="white" borderWidth="1px" borderRadius="lg" p={4}>
           <BarChart
             data={data.continuityData}
             metric="continuity"
             title="Continuity by State"
             height="400px"
           />
-        </div>
-      </div>
-    </div>
+        </Box>
+      </Grid>
+    </Box>
   )
 }

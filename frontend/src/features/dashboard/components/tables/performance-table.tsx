@@ -1,14 +1,5 @@
-import {
-  Table,
-  TableHead,
-  TableHeaderCell,
-  TableBody,
-  TableRow,
-  TableCell,
-  Badge,
-} from '@tremor/react'
+import { Box, Text, Table, Thead, Tbody, Tr, Th, Td } from '@chakra-ui/react'
 import type { EntityPerformance } from '../../types'
-import { cn } from '@/shared/utils/cn'
 
 interface PerformanceTableProps {
   data: EntityPerformance[]
@@ -17,56 +8,69 @@ interface PerformanceTableProps {
   className?: string
 }
 
-export function PerformanceTable({ data, title, className }: PerformanceTableProps) {
+export function PerformanceTable({ data, title }: PerformanceTableProps) {
   const getStatusConfig = (status: EntityPerformance['status']) => {
     const statusConfig = {
-      good: { label: 'Good', color: 'green' as const },
-      'needs-attention': { label: 'Needs Attention', color: 'orange' as const },
-      critical: { label: 'Critical', color: 'red' as const },
+      good: { label: 'Good', color: 'success.500', bg: 'success.50' },
+      'needs-attention': { label: 'Needs Attention', color: 'warning.600', bg: 'warning.50' },
+      critical: { label: 'Critical', color: 'error.600', bg: 'error.50' },
     }
     return statusConfig[status]
   }
 
   return (
-    <div className={cn('space-y-4', className)}>
-      <h3 className="text-lg font-semibold">{title}</h3>
-      <div className="rounded-lg border">
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableHeaderCell>Entity</TableHeaderCell>
-              <TableHeaderCell>Coverage %</TableHeaderCell>
-              <TableHeaderCell>Regularity %</TableHeaderCell>
-              <TableHeaderCell>Continuity</TableHeaderCell>
-              <TableHeaderCell>Quantity (LPCD)</TableHeaderCell>
-              <TableHeaderCell>Composite Score</TableHeaderCell>
-              <TableHeaderCell>Status</TableHeaderCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
+    <Box>
+      <Text fontSize="lg" fontWeight="semibold" mb={4}>
+        {title}
+      </Text>
+      <Box borderRadius="lg" borderWidth="1px" borderColor="neutral.100" overflow="hidden">
+        <Table size="sm">
+          <Thead>
+            <Tr>
+              <Th>Entity</Th>
+              <Th>Coverage %</Th>
+              <Th>Regularity %</Th>
+              <Th>Continuity</Th>
+              <Th>Quantity (LPCD)</Th>
+              <Th>Composite Score</Th>
+              <Th>Status</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
             {data.map((entity) => {
               const statusConfig = getStatusConfig(entity.status)
               return (
-                <TableRow key={entity.name}>
-                  <TableCell>
-                    <span className="font-medium">{entity.name}</span>
-                  </TableCell>
-                  <TableCell>{entity.coverage.toFixed(1)}%</TableCell>
-                  <TableCell>{entity.regularity.toFixed(1)}%</TableCell>
-                  <TableCell>{entity.continuity.toFixed(1)}</TableCell>
-                  <TableCell>{entity.quantity}</TableCell>
-                  <TableCell>
-                    <span className="font-semibold">{entity.compositeScore.toFixed(2)}</span>
-                  </TableCell>
-                  <TableCell>
-                    <Badge color={statusConfig.color}>{statusConfig.label}</Badge>
-                  </TableCell>
-                </TableRow>
+                <Tr key={entity.name}>
+                  <Td>
+                    <Text fontWeight="medium">{entity.name}</Text>
+                  </Td>
+                  <Td>{entity.coverage.toFixed(1)}%</Td>
+                  <Td>{entity.regularity.toFixed(1)}%</Td>
+                  <Td>{entity.continuity.toFixed(1)}</Td>
+                  <Td>{entity.quantity}</Td>
+                  <Td>
+                    <Text fontWeight="semibold">{entity.compositeScore.toFixed(2)}</Text>
+                  </Td>
+                  <Td>
+                    <Box
+                      as="span"
+                      px={2}
+                      py={1}
+                      borderRadius="md"
+                      fontSize="xs"
+                      fontWeight="medium"
+                      bg={statusConfig.bg}
+                      color={statusConfig.color}
+                    >
+                      {statusConfig.label}
+                    </Box>
+                  </Td>
+                </Tr>
               )
             })}
-          </TableBody>
+          </Tbody>
         </Table>
-      </div>
-    </div>
+      </Box>
+    </Box>
   )
 }

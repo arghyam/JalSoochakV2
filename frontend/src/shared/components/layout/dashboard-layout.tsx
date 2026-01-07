@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Flex, Box } from '@chakra-ui/react'
 import { Header } from './header'
 
 interface DashboardLayoutProps {
@@ -7,9 +8,12 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
+    <Flex minH="100vh" direction="column" bg="gray.50">
       <Header />
-      <main className="flex-1 overflow-y-auto p-6">{children}</main>
-    </div>
+
+      <Box as="main" flex="1" overflowY="auto" p={6}>
+        {children}
+      </Box>
+    </Flex>
   )
 }

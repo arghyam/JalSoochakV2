@@ -1,4 +1,18 @@
 import { useState } from 'react'
+import {
+  Box,
+  VStack,
+  HStack,
+  Text,
+  FormControl,
+  FormLabel,
+  Input,
+  Select,
+  Button,
+  FormErrorMessage,
+  IconButton,
+} from '@chakra-ui/react'
+import { DeleteIcon } from '@chakra-ui/icons'
 import { Dialog } from '@/shared/components/common'
 import type { EscalationRule, EscalationRuleFormData } from '../../types/escalation-rule'
 import {
@@ -99,9 +113,7 @@ export function EscalationRuleFormDialog({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (validate()) {
-      onSubmit(formData)
-    }
+    if (validate()) onSubmit(formData)
   }
 
   return (
@@ -111,163 +123,161 @@ export function EscalationRuleFormDialog({
       title={rule ? 'Edit Escalation Rule' : 'Add Escalation Rule'}
       maxWidth="lg"
     >
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <VStack as="form" spacing={6} align="stretch" onSubmit={handleSubmit}>
         {/* Condition Section */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-semibold text-gray-900">Condition</h3>
+        <VStack spacing={4} align="stretch">
+          <Text fontSize="sm" fontWeight="semibold" color="gray.900">
+            Condition
+          </Text>
 
-          <div>
-            <label htmlFor="conditionType" className="mb-1 block text-sm font-medium text-gray-700">
-              Condition Type <span className="text-red-500">*</span>
-            </label>
-            <select
-              id="conditionType"
+          <FormControl>
+            <FormLabel>
+              Condition Type{' '}
+              <Text as="span" color="red.500">
+                *
+              </Text>
+            </FormLabel>
+
+            <Select
               value={formData.conditionType}
               onChange={(e) => handleConditionTypeChange(e.target.value as ConditionType)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              disabled={isLoading}
+              isDisabled={isLoading}
             >
               {Object.values(CONDITION_TYPES).map((type) => (
                 <option key={type} value={type}>
                   {CONDITION_TYPE_LABELS[type]}
                 </option>
               ))}
-            </select>
-          </div>
+            </Select>
+          </FormControl>
 
           {formData.conditionType === CONDITION_TYPES.NO_SUBMISSION && (
-            <div>
-              <label
-                htmlFor="durationHours"
-                className="mb-1 block text-sm font-medium text-gray-700"
-              >
-                Duration (Hours) <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="durationHours"
+            <FormControl isInvalid={!!errors.durationHours}>
+              <FormLabel>
+                Duration (Hours){' '}
+                <Text as="span" color="red.500">
+                  *
+                </Text>
+              </FormLabel>
+
+              <Input
                 type="number"
                 value={formData.durationHours || ''}
                 onChange={(e) => {
                   setFormData((prev) => ({ ...prev, durationHours: Number(e.target.value) }))
                   setErrors((prev) => ({ ...prev, durationHours: undefined }))
                 }}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 placeholder="e.g., 24"
-                min="1"
-                disabled={isLoading}
+                min={1}
+                isDisabled={isLoading}
               />
-              {errors.durationHours && (
-                <p className="mt-1 text-sm text-red-600">{errors.durationHours}</p>
-              )}
-            </div>
+
+              {errors.durationHours && <FormErrorMessage>{errors.durationHours}</FormErrorMessage>}
+            </FormControl>
           )}
 
           {formData.conditionType === CONDITION_TYPES.THRESHOLD_BREACH && (
-            <div>
-              <label htmlFor="threshold" className="mb-1 block text-sm font-medium text-gray-700">
-                Threshold (%) <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="threshold"
+            <FormControl isInvalid={!!errors.threshold}>
+              <FormLabel>
+                Threshold (%){' '}
+                <Text as="span" color="red.500">
+                  *
+                </Text>
+              </FormLabel>
+
+              <Input
                 type="number"
                 value={formData.threshold || ''}
                 onChange={(e) => {
                   setFormData((prev) => ({ ...prev, threshold: Number(e.target.value) }))
                   setErrors((prev) => ({ ...prev, threshold: undefined }))
                 }}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 placeholder="e.g., 80"
-                min="1"
-                max="100"
-                disabled={isLoading}
+                min={1}
+                max={100}
+                isDisabled={isLoading}
               />
-              {errors.threshold && <p className="mt-1 text-sm text-red-600">{errors.threshold}</p>}
-            </div>
+
+              {errors.threshold && <FormErrorMessage>{errors.threshold}</FormErrorMessage>}
+            </FormControl>
           )}
-        </div>
+        </VStack>
 
         {/* Escalation Levels Section */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-gray-900">Escalation Levels</h3>
-            <button
-              type="button"
+        <VStack spacing={4} align="stretch">
+          <HStack justify="space-between">
+            <Text fontSize="sm" fontWeight="semibold" color="gray.900">
+              Escalation Levels
+            </Text>
+
+            <Button
+              variant="link"
+              colorScheme="blue"
               onClick={handleAddLevel}
-              disabled={isLoading}
-              className="text-sm font-medium text-blue-600 hover:text-blue-700 disabled:opacity-50"
+              isDisabled={isLoading}
             >
               + Add Level
-            </button>
-          </div>
+            </Button>
+          </HStack>
 
-          <div className="space-y-3">
+          <VStack spacing={3} align="stretch">
             {formData.levels.map((level, index) => (
-              <div
+              <HStack
                 key={index}
-                className="flex items-center gap-3 rounded-md border border-gray-200 p-3"
+                borderWidth="1px"
+                borderRadius="md"
+                p={3}
+                align="center"
+                spacing={3}
               >
-                <div className="flex-1">
-                  <label className="mb-1 block text-xs font-medium text-gray-700">
-                    Level {level.level} - Notify Role
-                  </label>
-                  <select
+                <Box flex="1">
+                  <FormLabel fontSize="xs">Level {level.level} - Notify Role</FormLabel>
+
+                  <Select
                     value={level.notifyRole}
                     onChange={(e) => handleLevelRoleChange(index, e.target.value as NotifyRole)}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    disabled={isLoading}
+                    isDisabled={isLoading}
                   >
                     {Object.values(NOTIFY_ROLES).map((role) => (
                       <option key={role} value={role}>
                         {NOTIFY_ROLE_LABELS[role]}
                       </option>
                     ))}
-                  </select>
-                </div>
-                {formData.levels.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveLevel(index)}
-                    disabled={isLoading}
-                    className="rounded p-2 text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
-                    title="Remove level"
-                  >
-                    <svg
-                      className="h-5 w-5"
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-          {errors.levels && <p className="text-sm text-red-600">{errors.levels}</p>}
-        </div>
+                  </Select>
+                </Box>
 
-        <div className="flex justify-end gap-3 pt-4">
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={isLoading}
-            className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-          >
+                {formData.levels.length > 1 && (
+                  <IconButton
+                    aria-label="Remove level"
+                    icon={<DeleteIcon />}
+                    colorScheme="red"
+                    variant="ghost"
+                    onClick={() => handleRemoveLevel(index)}
+                    isDisabled={isLoading}
+                  />
+                )}
+              </HStack>
+            ))}
+          </VStack>
+
+          {errors.levels && (
+            <Text fontSize="sm" color="red.600">
+              {errors.levels}
+            </Text>
+          )}
+        </VStack>
+
+        {/* Actions */}
+        <HStack justify="flex-end" spacing={3} pt={4}>
+          <Button variant="outline" onClick={onClose} isDisabled={isLoading}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-          >
+          </Button>
+
+          <Button type="submit" colorScheme="blue" isDisabled={isLoading} isLoading={isLoading}>
             {isLoading ? 'Saving...' : rule ? 'Update' : 'Create'}
-          </button>
-        </div>
-      </form>
+          </Button>
+        </HStack>
+      </VStack>
     </Dialog>
   )
 }

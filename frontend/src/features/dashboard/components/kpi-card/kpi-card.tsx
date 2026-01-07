@@ -1,4 +1,4 @@
-import { cn } from '@/shared/utils/cn'
+import { Box, Flex, Text } from '@chakra-ui/react'
 
 interface KPICardProps {
   title: string
@@ -12,34 +12,46 @@ interface KPICardProps {
   className?: string
 }
 
-export function KPICard({ title, value, unit, description, trend, className }: KPICardProps) {
+export function KPICard({ title, value, unit, description, trend }: KPICardProps) {
   return (
-    <div
-      className={cn(
-        'bg-card rounded-lg border p-6 shadow-sm transition-shadow hover:shadow-md',
-        className
-      )}
+    <Box
+      bg="white"
+      borderRadius="lg"
+      borderWidth="1px"
+      borderColor="neutral.100"
+      p={6}
+      boxShadow="sm"
+      transition="box-shadow 0.2s"
+      _hover={{ boxShadow: 'md' }}
     >
-      <div className="space-y-2">
-        <p className="text-muted-foreground text-sm font-medium">{title}</p>
-        <div className="flex items-baseline gap-2">
-          <h3 className="text-3xl font-bold">
+      <Flex direction="column" gap={2}>
+        <Text fontSize="sm" fontWeight="medium" color="gray.600">
+          {title}
+        </Text>
+        <Flex align="baseline" gap={2}>
+          <Text fontSize="3xl" fontWeight="bold" color="neutral.800">
             {typeof value === 'number' ? value.toLocaleString() : value}
-          </h3>
-          {unit && <span className="text-muted-foreground text-lg font-medium">{unit}</span>}
-        </div>
-        {description && <p className="text-muted-foreground text-xs">{description}</p>}
-        {trend && (
-          <div className="flex items-center gap-1 text-sm">
-            <span
-              className={cn('font-medium', trend.isPositive ? 'text-green-600' : 'text-red-600')}
-            >
-              {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
-            </span>
-            <span className="text-muted-foreground">vs last period</span>
-          </div>
+          </Text>
+          {unit && (
+            <Text fontSize="lg" fontWeight="medium" color="gray.600">
+              {unit}
+            </Text>
+          )}
+        </Flex>
+        {description && (
+          <Text fontSize="xs" color="gray.600">
+            {description}
+          </Text>
         )}
-      </div>
-    </div>
+        {trend && (
+          <Flex align="center" gap={1} fontSize="sm">
+            <Text fontWeight="medium" color={trend.isPositive ? 'green.600' : 'red.600'}>
+              {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
+            </Text>
+            <Text color="gray.600">vs last period</Text>
+          </Flex>
+        )}
+      </Flex>
+    </Box>
   )
 }

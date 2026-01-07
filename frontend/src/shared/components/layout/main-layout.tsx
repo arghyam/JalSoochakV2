@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Outlet } from 'react-router-dom'
+import { Box, Flex } from '@chakra-ui/react'
 import { Sidebar } from './sidebar'
 
 interface MainLayoutProps {
@@ -8,9 +9,11 @@ interface MainLayoutProps {
 
 export function MainLayout({ children }: MainLayoutProps) {
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-background">
+    <Flex h="100vh" w="full" overflow="hidden" bg="neutral.25">
       <Sidebar />
-      <main className="ml-56 flex-1 overflow-y-auto px-12 py-10">{children || <Outlet />}</main>
-    </div>
+      <Box as="main" ml="224px" flex={1} overflowY="auto" px={12} py={10}>
+        {children || <Outlet />}
+      </Box>
+    </Flex>
   )
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { VStack, FormControl, FormLabel, Input, Text, Button, HStack } from '@chakra-ui/react'
 import { Dialog } from '@/shared/components/common'
 import type { WaterNorm } from '../../types/water-norm'
 import { WATER_NORM_CATEGORY_LABELS } from '@/shared/constants/state-admin'
@@ -38,12 +39,16 @@ export function WaterNormEditDialog({
       onClose={onClose}
       title={`Edit ${WATER_NORM_CATEGORY_LABELS[waterNorm.category]} Water Norm`}
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="lpcd" className="mb-1 block text-sm font-medium text-gray-700">
-            LPCD (Litres Per Capita Per Day) <span className="text-red-500">*</span>
-          </label>
-          <input
+      <VStack as="form" spacing={4} align="stretch" onSubmit={handleSubmit}>
+        <FormControl>
+          <FormLabel>
+            LPCD (Litres Per Capita Per Day){' '}
+            <Text as="span" color="red.500">
+              *
+            </Text>
+          </FormLabel>
+
+          <Input
             id="lpcd"
             type="number"
             value={lpcd}
@@ -51,33 +56,29 @@ export function WaterNormEditDialog({
               setLpcd(Number(e.target.value))
               setError('')
             }}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
             placeholder="e.g., 55"
-            min="1"
-            step="1"
-            disabled={isLoading}
+            min={1}
+            step={1}
+            isDisabled={isLoading}
           />
-          {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-        </div>
 
-        <div className="flex justify-end gap-3 pt-4">
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={isLoading}
-            className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-          >
+          {error && (
+            <Text mt={1} fontSize="sm" color="red.600">
+              {error}
+            </Text>
+          )}
+        </FormControl>
+
+        <HStack justify="flex-end" spacing={3} pt={4}>
+          <Button variant="outline" onClick={onClose} isDisabled={isLoading}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-          >
+          </Button>
+
+          <Button type="submit" colorScheme="blue" isDisabled={isLoading} isLoading={isLoading}>
             {isLoading ? 'Saving...' : 'Save'}
-          </button>
-        </div>
-      </form>
+          </Button>
+        </HStack>
+      </VStack>
     </Dialog>
   )
 }

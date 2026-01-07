@@ -1,13 +1,26 @@
+import { Box, Flex, Heading, Text } from '@chakra-ui/react'
+
 export function ForbiddenPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <div className="max-w-md rounded-lg border bg-white p-8 text-center shadow-sm">
-        <h1 className="text-3xl font-bold text-red-600">403 - Unauthorized</h1>
-        <p className="mt-3 text-sm text-gray-600">
+    <Flex minH="100vh" align="center" justify="center" bg="gray.50">
+      <Box
+        maxW="md"
+        rounded="lg"
+        borderWidth="1px"
+        bg="white"
+        p={8}
+        textAlign="center"
+        boxShadow="sm"
+      >
+        <Heading fontSize="3xl" fontWeight="bold" color="red.600">
+          403 - Unauthorized
+        </Heading>
+
+        <Text mt={3} fontSize="sm" color="gray.600">
           You do not have permission to access this page. If you believe this is a mistake, please
           contact your system administrator.
-        </p>
-      </div>
-    </div>
+        </Text>
+      </Box>
+    </Flex>
   )
 }
