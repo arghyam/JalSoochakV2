@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Box, Flex, Grid, Text, Icon } from '@chakra-ui/react'
+import { Box, Flex, Grid, Text, Icon, InputGroup, Input, InputLeftElement } from '@chakra-ui/react'
 import {
   CheckCircleIcon,
   WarningIcon,
   InfoIcon,
   AttachmentIcon,
   SettingsIcon,
+  SearchIcon,
 } from '@chakra-ui/icons'
 import { useAuthStore } from '@/app/store'
 import { getMockOverviewData } from '../../services/mock-data'
@@ -75,14 +76,44 @@ export function OverviewPage() {
   return (
     <Box w="full">
       {/* Page Header */}
-      <Box mb={6}>
-        <Text fontSize="2xl" fontWeight="semibold" color="neutral.800">
+      <Box mb={5}>
+        <Text fontSize="2xl" fontWeight="semibold" color="neutral.950">
           Overview of {user?.tenantId || 'State'}
         </Text>
       </Box>
 
+      {/* Search Bar */}
+      <Box
+        bg="white"
+        borderWidth="1px"
+        borderColor="neutral.100"
+        borderRadius="lg"
+        boxShadow="default"
+        mb={5}
+        px={4}
+        py={3}
+      >
+        <InputGroup maxW="340px">
+          <InputLeftElement pointerEvents="none" height="32px">
+            <SearchIcon color="neutral.400" boxSize={4} />
+          </InputLeftElement>
+          <Input
+            placeholder="Search"
+            fontSize="sm"
+            width="340px"
+            height="32px"
+            borderColor="#D1D1D6"
+            borderWidth="1px"
+            _focus={{
+              borderColor: 'blue.500',
+              boxShadow: 'none',
+            }}
+          />
+        </InputGroup>
+      </Box>
+
       {/* Stats Cards */}
-      <Grid templateColumns="repeat(5, 1fr)" gap={4} mb={6}>
+      <Grid templateColumns="repeat(5, 1fr)" gap={4} mb={5}>
         {statsCards.map((stat) => {
           const StatIcon = stat.icon
           return (
@@ -110,7 +141,7 @@ export function OverviewPage() {
                   <Text fontSize="xs" color="neutral.600" mb={1}>
                     {stat.title}
                   </Text>
-                  <Text fontSize="2xl" fontWeight="semibold" color="neutral.800" mb={0.5}>
+                  <Text fontSize="2xl" fontWeight="semibold" color="neutral.950" mb={0.5}>
                     {stat.value}
                   </Text>
                   <Text fontSize="xs" color="neutral.500">
@@ -130,17 +161,17 @@ export function OverviewPage() {
         borderColor="neutral.100"
         borderRadius="lg"
         boxShadow="default"
-        mb={6}
+        mb={5}
         p={6}
       >
-        <Text fontSize="lg" fontWeight="semibold" color="neutral.800" mb={4}>
+        <Text fontSize="lg" fontWeight="semibold" color="neutral.950" mb={4}>
           Demand vs Supply
         </Text>
         <LineChart
           data={data.demandSupplyData}
           xKey="period"
           yKeys={['demand', 'supply']}
-          colors={['#3291D1', '#D92D20']}
+          colors={['#3291D1', '#ADD3EB']}
           height="288px"
         />
       </Box>
@@ -155,7 +186,7 @@ export function OverviewPage() {
         p={6}
       >
         <Flex align="center" justify="space-between" mb={4}>
-          <Text fontSize="lg" fontWeight="semibold" color="neutral.800">
+          <Text fontSize="lg" fontWeight="semibold" color="neutral.950">
             Daily Ingestion Monitor
           </Text>
           <Box
