@@ -1,13 +1,18 @@
 import { useState } from 'react'
 import {
+  Box,
+  Flex,
+  Text,
   Table,
-  TableHead,
-  TableHeaderCell,
-  TableBody,
-  TableRow,
-  TableCell,
-  Badge,
-} from '@tremor/react'
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  Button,
+  IconButton,
+} from '@chakra-ui/react'
+import { EditIcon, DeleteIcon } from '@chakra-ui/icons'
 import { ConfirmationDialog, ToastContainer } from '@/shared/components/common'
 import { useToast } from '@/shared/hooks/use-toast'
 import {
@@ -100,125 +105,127 @@ export function ManageTenants() {
 
   if (isLoading) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="text-gray-600">Loading tenants...</div>
-      </div>
+      <Flex h="64" align="center" justify="center">
+        <Text color="gray.600">Loading tenants...</Text>
+      </Flex>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <Box>
       <ToastContainer toasts={toast.toasts} onRemove={toast.removeToast} />
 
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Manage Tenants</h1>
-          <p className="mt-1 text-gray-600">Manage all state and union territory tenants</p>
-        </div>
-        <button
-          onClick={handleCreate}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-        >
+      <Flex align="center" justify="space-between" mb={6}>
+        <Box>
+          <Text fontSize="3xl" fontWeight="bold">
+            Manage Tenants
+          </Text>
+          <Text mt={1} color="gray.600">
+            Manage all state and union territory tenants
+          </Text>
+        </Box>
+        <Button onClick={handleCreate} colorScheme="blue" size="sm">
           + Add Tenant
-        </button>
-      </div>
+        </Button>
+      </Flex>
 
-      <div className="overflow-hidden rounded-lg bg-white shadow">
+      <Box overflow="hidden" borderRadius="lg" bg="white" boxShadow="sm">
         {tenants.length === 0 ? (
-          <div className="py-12 text-center text-gray-500">
-            No tenants found. Click "Add Tenant" to create one.
-          </div>
+          <Flex py={12} justify="center">
+            <Text color="gray.500">No tenants found. Click "Add Tenant" to create one.</Text>
+          </Flex>
         ) : (
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableHeaderCell>Tenant Name</TableHeaderCell>
-                <TableHeaderCell>Code</TableHeaderCell>
-                <TableHeaderCell>Status</TableHeaderCell>
-                <TableHeaderCell>State Admin</TableHeaderCell>
-                <TableHeaderCell>Admin Count</TableHeaderCell>
-                <TableHeaderCell>Water Norm (LPCD)</TableHeaderCell>
-                <TableHeaderCell>Actions</TableHeaderCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
+          <Table size="sm">
+            <Thead>
+              <Tr>
+                <Th>Tenant Name</Th>
+                <Th>Code</Th>
+                <Th>Status</Th>
+                <Th>State Admin</Th>
+                <Th>Admin Count</Th>
+                <Th>Water Norm (LPCD)</Th>
+                <Th>Actions</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
               {tenants.map((tenant) => (
-                <TableRow key={tenant.id}>
-                  <TableCell>
-                    <span className="font-medium">{tenant.name}</span>
-                  </TableCell>
-                  <TableCell>
-                    <Badge color="gray">{tenant.code}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge color={tenant.status === 'active' ? 'green' : 'gray'}>
+                <Tr key={tenant.id}>
+                  <Td>
+                    <Text fontWeight="medium">{tenant.name}</Text>
+                  </Td>
+                  <Td>
+                    <Box
+                      as="span"
+                      px={2}
+                      py={1}
+                      borderRadius="md"
+                      fontSize="xs"
+                      fontWeight="medium"
+                      bg="gray.100"
+                      color="gray.700"
+                    >
+                      {tenant.code}
+                    </Box>
+                  </Td>
+                  <Td>
+                    <Box
+                      as="span"
+                      px={2}
+                      py={1}
+                      borderRadius="md"
+                      fontSize="xs"
+                      fontWeight="medium"
+                      bg={tenant.status === 'active' ? 'success.50' : 'gray.100'}
+                      color={tenant.status === 'active' ? 'success.600' : 'gray.700'}
+                    >
                       {tenant.status === 'active' ? 'Active' : 'Inactive'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-gray-700">{tenant.stateAdminName || '-'}</span>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-gray-700">{tenant.adminCount}</span>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-gray-700">{tenant.defaultConfig.defaultWaterNorm}</span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <button
+                    </Box>
+                  </Td>
+                  <Td>
+                    <Text color="gray.700">{tenant.stateAdminName || '-'}</Text>
+                  </Td>
+                  <Td>
+                    <Text color="gray.700">{tenant.adminCount}</Text>
+                  </Td>
+                  <Td>
+                    <Text color="gray.700">{tenant.defaultConfig.defaultWaterNorm}</Text>
+                  </Td>
+                  <Td>
+                    <Flex align="center" gap={2}>
+                      <Button
                         onClick={() => handleToggleStatus(tenant)}
-                        className={`rounded px-3 py-1 text-xs font-medium transition-colors ${
-                          tenant.status === 'active'
-                            ? 'bg-blue-600 text-white hover:bg-blue-700'
-                            : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
-                        }`}
+                        size="xs"
+                        colorScheme={tenant.status === 'active' ? 'blue' : 'gray'}
                         title={tenant.status === 'active' ? 'Deactivate' : 'Activate'}
                       >
                         {tenant.status === 'active' ? 'Active' : 'Inactive'}
-                      </button>
-                      <button
+                      </Button>
+                      <IconButton
+                        aria-label="Edit tenant"
+                        size="sm"
+                        variant="ghost"
+                        colorScheme="blue"
                         onClick={() => handleEdit(tenant)}
-                        className="rounded p-2 text-blue-600 transition-colors hover:bg-blue-50"
-                        title="Edit"
                       >
-                        <svg
-                          className="h-4 w-4"
-                          fill="none"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                      </button>
-                      <button
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        aria-label="Delete tenant"
+                        size="sm"
+                        variant="ghost"
+                        colorScheme="red"
                         onClick={() => setDeletingTenant(tenant)}
-                        className="rounded p-2 text-red-600 transition-colors hover:bg-red-50"
-                        title="Delete"
                       >
-                        <svg
-                          className="h-4 w-4"
-                          fill="none"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                        <DeleteIcon />
+                      </IconButton>
+                    </Flex>
+                  </Td>
+                </Tr>
               ))}
-            </TableBody>
+            </Tbody>
           </Table>
         )}
-      </div>
+      </Box>
 
       <TenantFormDialog
         key={editingTenant?.id || 'new'}
@@ -241,6 +248,6 @@ export function ManageTenants() {
         confirmLabel="Delete"
         isLoading={deleteTenant.isPending}
       />
-    </div>
+    </Box>
   )
 }

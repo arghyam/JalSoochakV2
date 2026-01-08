@@ -1,4 +1,18 @@
 import { useState } from 'react'
+import {
+  Box,
+  Flex,
+  Text,
+  Heading,
+  VStack,
+  Grid,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  Input,
+  Select,
+  Button,
+} from '@chakra-ui/react'
 import { ToastContainer } from '@/shared/components/common'
 import { useToast } from '@/shared/hooks/use-toast'
 import { useTenants } from '../hooks/use-tenants'
@@ -25,41 +39,25 @@ export function StateAdminManagement() {
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof StateAdminFormData, string>> = {}
 
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = 'First name is required'
-    }
+    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required'
+    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required'
 
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = 'Last name is required'
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required'
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    if (!formData.email.trim()) newErrors.email = 'Email is required'
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
       newErrors.email = 'Please enter a valid email address'
-    }
 
-    if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required'
-    } else if (!/^\d{10}$/.test(formData.phone)) {
-      newErrors.phone = 'Phone must be 10 digits'
-    }
+    if (!formData.phone.trim()) newErrors.phone = 'Phone number is required'
+    else if (!/^\d{10}$/.test(formData.phone)) newErrors.phone = 'Phone must be 10 digits'
 
-    if (!formData.tenantId) {
-      newErrors.tenantId = 'Please select a state/UT'
-    }
+    if (!formData.tenantId) newErrors.tenantId = 'Please select a state/UT'
 
-    if (!formData.password) {
-      newErrors.password = 'Password is required'
-    } else if (formData.password.length < 6) {
+    if (!formData.password) newErrors.password = 'Password is required'
+    else if (formData.password.length < 6)
       newErrors.password = 'Password must be at least 6 characters'
-    }
 
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password'
-    } else if (formData.password !== formData.confirmPassword) {
+    if (!formData.confirmPassword) newErrors.confirmPassword = 'Please confirm your password'
+    else if (formData.password !== formData.confirmPassword)
       newErrors.confirmPassword = 'Passwords do not match'
-    }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -67,17 +65,13 @@ export function StateAdminManagement() {
 
   const handleChange = (field: keyof StateAdminFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: undefined }))
-    }
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!validate()) {
-      return
-    }
+    if (!validate()) return
 
     try {
       await createStateAdmin.mutateAsync({
@@ -91,7 +85,6 @@ export function StateAdminManagement() {
 
       toast.success('State admin account created successfully')
 
-      // Reset form
       setFormData({
         firstName: '',
         lastName: '',
@@ -107,106 +100,119 @@ export function StateAdminManagement() {
     }
   }
 
-  // Filter only active tenants for selection
-  const activeTenants = tenants.filter((tenant) => tenant.status === 'active')
+  const activeTenants = tenants.filter((t) => t.status === 'active')
 
   if (tenantsLoading) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
-      </div>
+      <Flex h="64" align="center" justify="center">
+        <Text color="gray.600">Loading...</Text>
+      </Flex>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <VStack spacing={6} align="stretch">
       <ToastContainer toasts={toast.toasts} onRemove={toast.removeToast} />
 
-      <div>
-        <h1 className="text-3xl font-bold">State Admin Management</h1>
-        <p className="mt-1 text-gray-600">Create a new state system administrator account</p>
-      </div>
+      <Box>
+        <Heading fontSize="3xl" fontWeight="bold">
+          State Admin Management
+        </Heading>
+        <Text mt={1} color="gray.600">
+          Create a new state system administrator account
+        </Text>
+      </Box>
 
-      <div className="max-w-2xl rounded-lg bg-white p-6 shadow">
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="firstName" className="mb-1 block text-sm font-medium text-gray-700">
-                First Name <span className="text-red-500">*</span>
-              </label>
-              <input
+      <Box maxW="2xl" rounded="lg" bg="white" p={6} boxShadow="sm">
+        <VStack as="form" onSubmit={handleSubmit} spacing={5} align="stretch">
+          <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+            <FormControl isInvalid={!!errors.firstName}>
+              <FormLabel>
+                First Name{' '}
+                <Text as="span" color="red.500">
+                  *
+                </Text>
+              </FormLabel>
+              <Input
                 id="firstName"
-                type="text"
                 value={formData.firstName}
                 onChange={(e) => handleChange('firstName', e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 placeholder="Enter first name"
-                disabled={createStateAdmin.isPending}
+                isDisabled={createStateAdmin.isPending}
               />
-              {errors.firstName && <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>}
-            </div>
+              {errors.firstName && <FormErrorMessage>{errors.firstName}</FormErrorMessage>}
+            </FormControl>
 
-            <div>
-              <label htmlFor="lastName" className="mb-1 block text-sm font-medium text-gray-700">
-                Last Name <span className="text-red-500">*</span>
-              </label>
-              <input
+            <FormControl isInvalid={!!errors.lastName}>
+              <FormLabel>
+                Last Name{' '}
+                <Text as="span" color="red.500">
+                  *
+                </Text>
+              </FormLabel>
+              <Input
                 id="lastName"
-                type="text"
                 value={formData.lastName}
                 onChange={(e) => handleChange('lastName', e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 placeholder="Enter last name"
-                disabled={createStateAdmin.isPending}
+                isDisabled={createStateAdmin.isPending}
               />
-              {errors.lastName && <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>}
-            </div>
-          </div>
+              {errors.lastName && <FormErrorMessage>{errors.lastName}</FormErrorMessage>}
+            </FormControl>
+          </Grid>
 
-          <div>
-            <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
-              Email <span className="text-red-500">*</span>
-            </label>
-            <input
+          <FormControl isInvalid={!!errors.email}>
+            <FormLabel>
+              Email{' '}
+              <Text as="span" color="red.500">
+                *
+              </Text>
+            </FormLabel>
+            <Input
               id="email"
               type="email"
               value={formData.email}
               onChange={(e) => handleChange('email', e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               placeholder="admin@example.gov.in"
-              disabled={createStateAdmin.isPending}
+              isDisabled={createStateAdmin.isPending}
             />
-            {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
-          </div>
+            {errors.email && <FormErrorMessage>{errors.email}</FormErrorMessage>}
+          </FormControl>
 
-          <div>
-            <label htmlFor="phone" className="mb-1 block text-sm font-medium text-gray-700">
-              Phone Number <span className="text-red-500">*</span>
-            </label>
-            <input
+          <FormControl isInvalid={!!errors.phone}>
+            <FormLabel>
+              Phone Number{' '}
+              <Text as="span" color="red.500">
+                *
+              </Text>
+            </FormLabel>
+            <Input
               id="phone"
               type="tel"
               value={formData.phone}
-              onChange={(e) => handleChange('phone', e.target.value.replace(/\D/g, ''))}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              placeholder="9876543210"
               maxLength={10}
-              disabled={createStateAdmin.isPending}
+              onChange={(e) => handleChange('phone', e.target.value.replace(/\D/g, ''))}
+              placeholder="9876543210"
+              isDisabled={createStateAdmin.isPending}
             />
-            {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
-            <p className="mt-1 text-xs text-gray-500">Enter 10-digit phone number</p>
-          </div>
+            {errors.phone && <FormErrorMessage>{errors.phone}</FormErrorMessage>}
+            <Text mt={1} fontSize="xs" color="gray.500">
+              Enter 10-digit phone number
+            </Text>
+          </FormControl>
 
-          <div>
-            <label htmlFor="tenantId" className="mb-1 block text-sm font-medium text-gray-700">
-              State/Union Territory <span className="text-red-500">*</span>
-            </label>
-            <select
+          <FormControl isInvalid={!!errors.tenantId}>
+            <FormLabel>
+              State/Union Territory{' '}
+              <Text as="span" color="red.500">
+                *
+              </Text>
+            </FormLabel>
+            <Select
               id="tenantId"
               value={formData.tenantId}
               onChange={(e) => handleChange('tenantId', e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              disabled={createStateAdmin.isPending}
+              isDisabled={createStateAdmin.isPending}
             >
               <option value="">Select a state/UT</option>
               {activeTenants.map((tenant) => (
@@ -214,59 +220,64 @@ export function StateAdminManagement() {
                   {tenant.name} ({tenant.code})
                 </option>
               ))}
-            </select>
-            {errors.tenantId && <p className="mt-1 text-sm text-red-600">{errors.tenantId}</p>}
-          </div>
+            </Select>
+            {errors.tenantId && <FormErrorMessage>{errors.tenantId}</FormErrorMessage>}
+          </FormControl>
 
-          <div>
-            <label htmlFor="password" className="mb-1 block text-sm font-medium text-gray-700">
-              Password <span className="text-red-500">*</span>
-            </label>
-            <input
+          <FormControl isInvalid={!!errors.password}>
+            <FormLabel>
+              Password{' '}
+              <Text as="span" color="red.500">
+                *
+              </Text>
+            </FormLabel>
+            <Input
               id="password"
               type="password"
               value={formData.password}
               onChange={(e) => handleChange('password', e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               placeholder="Enter password"
-              disabled={createStateAdmin.isPending}
+              isDisabled={createStateAdmin.isPending}
             />
-            {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
-            <p className="mt-1 text-xs text-gray-500">Minimum 6 characters</p>
-          </div>
+            {errors.password && <FormErrorMessage>{errors.password}</FormErrorMessage>}
+            <Text mt={1} fontSize="xs" color="gray.500">
+              Minimum 6 characters
+            </Text>
+          </FormControl>
 
-          <div>
-            <label
-              htmlFor="confirmPassword"
-              className="mb-1 block text-sm font-medium text-gray-700"
-            >
-              Confirm Password <span className="text-red-500">*</span>
-            </label>
-            <input
+          <FormControl isInvalid={!!errors.confirmPassword}>
+            <FormLabel>
+              Confirm Password{' '}
+              <Text as="span" color="red.500">
+                *
+              </Text>
+            </FormLabel>
+            <Input
               id="confirmPassword"
               type="password"
               value={formData.confirmPassword}
               onChange={(e) => handleChange('confirmPassword', e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               placeholder="Re-enter password"
-              disabled={createStateAdmin.isPending}
+              isDisabled={createStateAdmin.isPending}
             />
             {errors.confirmPassword && (
-              <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+              <FormErrorMessage>{errors.confirmPassword}</FormErrorMessage>
             )}
-          </div>
+          </FormControl>
 
-          <div className="flex justify-end pt-4">
-            <button
+          <Flex justify="flex-end" pt={4}>
+            <Button
               type="submit"
-              disabled={createStateAdmin.isPending}
-              className="rounded-md bg-blue-600 px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              colorScheme="blue"
+              px={6}
+              isDisabled={createStateAdmin.isPending}
+              isLoading={createStateAdmin.isPending}
             >
               {createStateAdmin.isPending ? 'Creating Account...' : 'Create Account'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+            </Button>
+          </Flex>
+        </VStack>
+      </Box>
+    </VStack>
   )
 }

@@ -1,5 +1,6 @@
 import { type FormEvent, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Box, Flex, Text, Button, Input, FormControl, FormLabel } from '@chakra-ui/react'
 import { useAuthStore } from '@/app/store'
 
 export function LoginPage() {
@@ -32,47 +33,68 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md rounded-lg border bg-white p-8 shadow-sm">
-        <h1 className="text-2xl font-bold">Login</h1>
+    <Flex minH="100vh" align="center" justify="center" bg="gray.50">
+      <Box w="full" maxW="md" borderRadius="lg" borderWidth="1px" bg="white" p={8} boxShadow="sm">
+        <Text fontSize="2xl" fontWeight="bold">
+          Login
+        </Text>
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Phone Number</label>
-            <input
-              type="tel"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
-              className="mt-1 w-full rounded-md border px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              placeholder="9876543210"
-              maxLength={10}
-              required
-            />
-          </div>
+        <Box as="form" onSubmit={handleSubmit} mt={6}>
+          <Flex direction="column" gap={4}>
+            <FormControl>
+              <FormLabel fontSize="sm" fontWeight="medium" color="gray.700">
+                Phone Number
+              </FormLabel>
+              <Input
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
+                placeholder="9876543210"
+                maxLength={10}
+                required
+                mt={1}
+                fontSize="sm"
+                focusBorderColor="blue.500"
+              />
+            </FormControl>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full rounded-md border px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              placeholder="••••••••"
-              required
-            />
-          </div>
+            <FormControl>
+              <FormLabel fontSize="sm" fontWeight="medium" color="gray.700">
+                Password
+              </FormLabel>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                mt={1}
+                fontSize="sm"
+                focusBorderColor="blue.500"
+              />
+            </FormControl>
 
-          {(localError || error) && <p className="text-sm text-red-600">{localError || error}</p>}
+            {(localError || error) && (
+              <Text fontSize="sm" color="red.600">
+                {localError || error}
+              </Text>
+            )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="mt-2 w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            {loading ? 'Signing in...' : 'Sign in'}
-          </button>
-        </form>
-      </div>
-    </div>
+            <Button
+              type="submit"
+              isLoading={loading}
+              loadingText="Signing in..."
+              colorScheme="blue"
+              mt={2}
+              w="full"
+              fontSize="sm"
+              fontWeight="medium"
+            >
+              Sign in
+            </Button>
+          </Flex>
+        </Box>
+      </Box>
+    </Flex>
   )
 }

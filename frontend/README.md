@@ -2,11 +2,10 @@
 
 - **Framework**: React 18.3 + TypeScript
 - **Build Tool**: Vite
-- **Styling**: Tailwind CSS v3.4 + Tremor React
+- **Styling**: Chakra UI v2
 - **State Management**: Zustand (client state) + TanStack Query (server state)
 - **Routing**: React Router DOM v7
-- **Tables**: Tremor Tables
-- **Charts & Maps**: ECharts (echarts-for-react) + Tremor Charts
+- **Charts & Maps**: ECharts (echarts-for-react)
 - **HTTP Client**: Axios
 - **Code Quality**: ESLint + Prettier + Husky
 
@@ -56,13 +55,8 @@ frontend/
 │   │   ├── providers/          # React context providers
 │   │   ├── router/            # Route configuration
 │   │   └── store/              # Zustand stores
-│   ├── design-system/          # Design system & tokens
-│   │   ├── tokens/            # Design tokens (colors, typography, etc.)
-│   │   └── components/        # Tremor component exports
 │   ├── features/               # Feature-based modules
 │   │   ├── dashboard/         # Dashboard feature
-│   │   ├── schemes/           # Schemes management
-│   │   ├── readings/          # BFM readings
 │   │   ├── admin/             # Super System Admin
 │   │   └── state-admin/       # State Admin
 │   ├── shared/                 # Shared components & utilities
@@ -101,18 +95,6 @@ The project uses path aliases for cleaner imports:
 ### Git Hooks
 
 Husky is configured to run lint-staged on commits. Only files in the `frontend/` folder will be checked.
-
-### Using Tremor Components
-
-Import Tremor components from the design system:
-
-```typescript
-import { Button, Card, Text, Title } from '@/design-system'
-```
-
-All Tremor components are re-exported through `@/design-system/components` for easier imports.
-
-For detailed component documentation, visit [Tremor Docs](https://www.tremor.so/docs/getting-started/installation).
 
 ### API Configuration
 

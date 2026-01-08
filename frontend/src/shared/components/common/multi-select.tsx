@@ -1,21 +1,15 @@
 import { useState, useRef, useEffect } from 'react'
-import { cn } from '@/shared/utils/cn'
+import { Box, Flex, Text, IconButton } from '@chakra-ui/react'
+import { CloseIcon } from '@chakra-ui/icons'
 
 interface MultiSelectProps {
   options: string[]
   value: string[]
   onChange: (value: string[]) => void
   placeholder?: string
-  className?: string
 }
 
-export function MultiSelect({
-  options,
-  value,
-  onChange,
-  placeholder,
-  className,
-}: MultiSelectProps) {
+export function MultiSelect({ options, value, onChange, placeholder }: MultiSelectProps) {
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -48,62 +42,83 @@ export function MultiSelect({
   }
 
   return (
-    <div ref={containerRef} className={cn('relative', className)}>
-      <div
+    <Box ref={containerRef} position="relative">
+      <Box
+        minH="42px"
+        w="full"
+        borderRadius="md"
+        borderWidth="1px"
+        borderColor={isOpen ? 'primary.500' : 'gray.300'}
+        bg="white"
+        px={3}
+        py={2}
+        cursor="pointer"
+        transition="border-color 0.2s"
+        _hover={{ borderColor: 'gray.400' }}
         onClick={() => setIsOpen(!isOpen)}
-        className={cn(
-          'min-h-[42px] w-full rounded-md border border-gray-300 bg-white px-3 py-2',
-          'cursor-pointer transition-colors',
-          'focus:border-primary-500 focus:ring-primary-500 hover:border-gray-400 focus:ring-1 focus:outline-none',
-          isOpen && 'border-primary-500 ring-primary-500 ring-1'
-        )}
       >
         {value.length === 0 ? (
-          <span className="text-gray-400">{placeholder || 'Select options...'}</span>
+          <Text color="gray.400">{placeholder || 'Select options...'}</Text>
         ) : (
-          <div className="flex flex-wrap gap-1">
+          <Flex flexWrap="wrap" gap={1}>
             {value.map((option) => (
-              <span
+              <Flex
                 key={option}
-                className="bg-primary-100 text-primary-700 inline-flex items-center gap-1 rounded px-2 py-0.5 text-sm"
+                align="center"
+                gap={1}
+                bg="primary.100"
+                color="primary.700"
+                borderRadius="md"
+                px={2}
+                py={1}
+                fontSize="sm"
               >
-                {option}
-                <button
-                  type="button"
+                <Text>{option}</Text>
+                <IconButton
+                  aria-label={`Remove ${option}`}
+                  size="xs"
+                  variant="ghost"
+                  color="primary.600"
                   onClick={(e) => {
                     e.stopPropagation()
                     removeOption(option)
                   }}
-                  className="text-primary-600 hover:text-primary-800 transition-colors"
+                  _hover={{ color: 'primary.800' }}
                 >
-                  <svg
-                    className="h-3 w-3"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </span>
+                  <CloseIcon boxSize={2} />
+                </IconButton>
+              </Flex>
             ))}
-          </div>
+          </Flex>
         )}
-      </div>
+      </Box>
 
       {isOpen && (
-        <div className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-gray-300 bg-white shadow-lg">
+        <Box
+          position="absolute"
+          zIndex={10}
+          mt={1}
+          maxH="60"
+          w="full"
+          overflowY="auto"
+          borderRadius="md"
+          borderWidth="1px"
+          borderColor="gray.300"
+          bg="white"
+          boxShadow="lg"
+        >
           {options.map((option) => (
-            <div
+            <Flex
               key={option}
+              align="center"
+              gap={2}
+              px={3}
+              py={2}
+              cursor="pointer"
+              transition="background 0.2s"
+              bg={value.includes(option) ? 'primary.50' : 'transparent'}
+              _hover={{ bg: value.includes(option) ? 'primary.100' : 'gray.100' }}
               onClick={() => toggleOption(option)}
-              className={cn(
-                'flex cursor-pointer items-center gap-2 px-3 py-2 transition-colors hover:bg-gray-100',
-                value.includes(option) && 'bg-primary-50 hover:bg-primary-100'
-              )}
             >
               <input
                 type="checkbox"
@@ -112,17 +127,24 @@ export function MultiSelect({
                   e.stopPropagation()
                   toggleOption(option)
                 }}
-                className="text-primary-600 focus:ring-primary-500 h-4 w-4 rounded border-gray-300"
+                style={{
+                  height: '16px',
+                  width: '16px',
+                  borderRadius: '4px',
+                  borderColor: '#D1D5DB',
+                }}
               />
-              <span
-                className={cn('text-sm', value.includes(option) && 'text-primary-700 font-medium')}
+              <Text
+                fontSize="sm"
+                fontWeight={value.includes(option) ? 'medium' : 'normal'}
+                color={value.includes(option) ? 'primary.700' : 'inherit'}
               >
                 {option}
-              </span>
-            </div>
+              </Text>
+            </Flex>
           ))}
-        </div>
+        </Box>
       )}
-    </div>
+    </Box>
   )
 }

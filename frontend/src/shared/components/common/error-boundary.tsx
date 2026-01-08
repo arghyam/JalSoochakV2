@@ -1,4 +1,5 @@
 import { Component, type ReactNode } from 'react'
+import { Flex, Box, Heading, Text } from '@chakra-ui/react'
 
 interface Props {
   children: ReactNode
@@ -27,17 +28,17 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         this.props.fallback || (
-          <div className="flex h-screen items-center justify-center">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-red-600">
+          <Flex h="100vh" align="center" justify="center">
+            <Box textAlign="center">
+              <Heading fontSize="2xl" fontWeight="bold" color="red.600">
                 Something went wrong
-              </h2>
-              <p className="mt-2 text-gray-600">
-                Please refresh the page or contact support if the problem
-                persists.
-              </p>
-            </div>
-          </div>
+              </Heading>
+
+              <Text mt={2} color="gray.600">
+                Please refresh the page or contact support if the problem persists.
+              </Text>
+            </Box>
+          </Flex>
         )
       )
     }
@@ -45,4 +46,3 @@ export class ErrorBoundary extends Component<Props, State> {
     return this.props.children
   }
 }
-

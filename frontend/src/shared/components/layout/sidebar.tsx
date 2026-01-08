@@ -1,4 +1,5 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link as RouterLink, useLocation } from 'react-router-dom'
+import { Box, Flex, Stack, Text, Icon } from '@chakra-ui/react'
 import {
   MdDashboard,
   MdLanguage,
@@ -17,7 +18,6 @@ import {
 import { useAuthStore } from '@/app/store'
 import { ROUTES } from '@/shared/constants/routes'
 import { AUTH_ROLES } from '@/shared/constants/auth'
-import { cn } from '@/shared/utils/cn'
 
 interface NavItem {
   path: string
@@ -109,12 +109,6 @@ const NAV_ITEMS: NavItem[] = [
     roles: [AUTH_ROLES.STATE_ADMIN],
     icon: MdHistory,
   },
-  {
-    path: ROUTES.STATE_ADMIN_CONFIG,
-    label: 'Configuration',
-    roles: [AUTH_ROLES.STATE_ADMIN],
-    icon: MdSettings,
-  },
 ]
 
 export function Sidebar() {
@@ -133,48 +127,85 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="fixed left-0 top-0 z-40 flex h-screen w-56 flex-col border-r border-border bg-white">
-      {/* Brand Section */}
-      <div className="flex h-20 items-center gap-2 border-b border-border px-6 pt-2">
-        <MdWaterDrop className="h-6 w-6 text-primary" />
-        <h1 className="text-lg font-semibold text-primary">JalSoochak</h1>
-      </div>
+    <Box position="fixed" left={0} top={0} zIndex={40} h="100vh" w="224px">
+      <Flex
+        direction="column"
+        h="100vh"
+        w="224px"
+        bg="white"
+        borderRight="1px"
+        borderColor="neutral.100"
+      >
+        {/* Brand Section */}
+        <Flex
+          h="80px"
+          align="center"
+          gap={2}
+          borderBottom="1px"
+          borderColor="neutral.100"
+          px={6}
+          pt={2}
+        >
+          <Icon as={MdWaterDrop} boxSize={6} color="primary.500" />
+          <Text fontSize="lg" fontWeight="semibold" color="primary.500">
+            JalSoochak
+          </Text>
+        </Flex>
 
-      {/* Menu Section */}
-      <nav className="flex-1 space-y-2 overflow-y-auto px-6 py-4">
-        {visibleNavItems.map((item) => {
-          const isActive = location.pathname === item.path
-          const Icon = item.icon
+        {/* Menu Section */}
+        <Stack flex={1} gap={2} overflowY="auto" px={6} py={4}>
+          {visibleNavItems.map((item) => {
+            const isActive = location.pathname === item.path
+            const ItemIcon = item.icon
 
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-background-secondary text-primary-dark'
-                  : 'text-text-secondary hover:bg-background-tertiary'
-              )}
-            >
-              {Icon && <Icon className="h-5 w-5 flex-shrink-0" />}
-              <span className="truncate">{item.label}</span>
-            </Link>
-          )
-        })}
-      </nav>
+            return (
+              <RouterLink key={item.path} to={item.path} style={{ textDecoration: 'none' }}>
+                <Flex
+                  alignItems="center"
+                  gap={3}
+                  borderRadius="lg"
+                  px={3}
+                  py={2}
+                  fontSize="sm"
+                  fontWeight="medium"
+                  transition="all 0.2s"
+                  bg={isActive ? 'primary.50' : 'transparent'}
+                  color={isActive ? 'primary.700' : 'neutral.600'}
+                  _hover={{
+                    bg: isActive ? 'primary.50' : 'neutral.50',
+                  }}
+                >
+                  {ItemIcon && <Icon as={ItemIcon} boxSize={5} flexShrink={0} />}
+                  <Text isTruncated>{item.label}</Text>
+                </Flex>
+              </RouterLink>
+            )
+          })}
+        </Stack>
 
-      {/* Profile Section */}
-      <div className="flex items-center gap-3 border-t border-border px-6 py-4">
-        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary text-white">
-          <span className="text-sm font-semibold">{user ? getInitials(user.name) : 'U'}</span>
-        </div>
-        <div className="flex min-w-0 flex-col">
-          <span className="truncate text-sm font-medium text-text-primary">
-            {user?.name || 'User'}
-          </span>
-        </div>
-      </div>
-    </aside>
+        {/* Profile Section */}
+        <Flex align="center" gap={3} borderTop="1px" borderColor="neutral.100" px={6} py={4}>
+          <Flex
+            h="40px"
+            w="40px"
+            flexShrink={0}
+            align="center"
+            justify="center"
+            borderRadius="full"
+            bg="primary.500"
+            color="white"
+          >
+            <Text fontSize="sm" fontWeight="semibold">
+              {user ? getInitials(user.name) : 'U'}
+            </Text>
+          </Flex>
+          <Flex direction="column" minW={0}>
+            <Text fontSize="sm" fontWeight="medium" color="neutral.800" isTruncated>
+              {user?.name || 'User'}
+            </Text>
+          </Flex>
+        </Flex>
+      </Flex>
+    </Box>
   )
 }
