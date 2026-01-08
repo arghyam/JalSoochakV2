@@ -19,48 +19,48 @@ const theme = extendTheme({
   colors: {
     // Primary Brand Color
     primary: {
-      25: '#F5FAFF',
-      50: '#EBF4FA',
-      100: '#D6E9F5',
-      200: '#ADD3EB',
-      300: '#85BCE0',
-      400: '#5CA6D6',
+      25: '#EBF4FA',
+      50: '#D6E9F6',
+      100: '#C2DEF1',
+      200: '#ADD3ED',
+      300: '#84BDE3',
+      400: '#5BA7DA',
       500: '#3291D1', // Main brand color
       600: '#2874A7',
       700: '#1E577D',
-      800: '#143954',
-      900: '#0A1C2A',
-      950: '#050E15',
+      800: '#143A54',
+      900: '#0F2C3F',
+      950: '#050F15',
     },
     // Secondary Color
     secondary: {
-      25: '#FFFCF5',
-      50: '#FFF9EB',
-      100: '#FFF2D6',
-      200: '#FFE5AD',
-      300: '#FFD885',
-      400: '#FFCB5C',
+      25: '#FFF6E6',
+      50: '#FFECCC',
+      100: '#FFE3B3',
+      200: '#FFD999',
+      300: '#FFC766',
+      400: '#FFB433',
       500: '#FFA100', // Main secondary color
       600: '#CC8100',
       700: '#996100',
       800: '#664000',
-      900: '#332000',
-      950: '#1A1000',
+      900: '#4D3000',
+      950: '#332000',
     },
     // Neutral Colors
     neutral: {
-      25: '#FAFAFA',
-      50: '#F5F5F5',
-      100: '#E4E4E7',
-      200: '#D4D4D8',
-      300: '#A1A1AA',
-      400: '#71717A',
-      500: '#52525B',
-      600: '#3F3F46',
-      700: '#27272A',
-      800: '#1C1C1C',
-      900: '#18181B',
-      950: '#09090B',
+      25: '#FFFFFF',
+      50: '#FAFAFA',
+      100: '#F4F4F5',
+      200: '#E4E4E7',
+      300: '#D1D1D6',
+      400: '#A0A0AB',
+      500: '#70707B',
+      600: '#51525C',
+      700: '#3F3F46',
+      800: '#26272B',
+      900: '#1A1A1E',
+      950: '#1C1C1C',
     },
     // System Colors
     success: {
@@ -89,11 +89,98 @@ const theme = extendTheme({
     default: '0px 1px 2px 0px rgba(16, 24, 40, 0.05)',
     active: '0px 0px 0px 4px rgba(50, 145, 209, 0.12)',
   },
+  components: {
+    Button: {
+      baseStyle: {
+        fontWeight: 'medium',
+        fontFamily: 'Geist, sans-serif',
+        _focus: {
+          boxShadow: 'none',
+        },
+      },
+      sizes: {
+        sm: {
+          fontSize: '18px',
+          h: '32px',
+          minW: '32px',
+          px: '12px',
+          borderRadius: '4px',
+        },
+        md: {
+          fontSize: '18px',
+          h: '40px',
+          minW: '40px',
+          px: '16px',
+          borderRadius: '6px',
+        },
+        lg: {
+          fontSize: '18px',
+          h: '44px',
+          minW: '44px',
+          px: '24px',
+          borderRadius: '8px',
+        },
+      },
+      variants: {
+        primary: {
+          bg: 'primary.500',
+          color: 'white',
+          _hover: {
+            bg: 'primary.600',
+            _disabled: {
+              bg: 'neutral.200',
+            },
+          },
+          _active: {
+            bg: 'primary.700',
+          },
+          _disabled: {
+            bg: 'neutral.200',
+            color: 'neutral.400',
+            opacity: 1,
+            cursor: 'not-allowed',
+          },
+        },
+        secondary: {
+          bg: 'transparent',
+          color: 'primary.500',
+          borderWidth: '1px',
+          borderColor: 'primary.500',
+          _hover: {
+            bg: 'primary.50',
+            borderColor: 'primary.600',
+            color: 'primary.600',
+            _disabled: {
+              bg: 'transparent',
+              borderColor: 'neutral.200',
+              color: 'neutral.400',
+            },
+          },
+          _active: {
+            bg: 'primary.100',
+            borderColor: 'primary.700',
+            color: 'primary.700',
+          },
+          _disabled: {
+            bg: 'transparent',
+            borderColor: 'neutral.200',
+            color: 'neutral.400',
+            opacity: 1,
+            cursor: 'not-allowed',
+          },
+        },
+      },
+      defaultProps: {
+        size: 'md',
+        variant: 'primary',
+      },
+    },
+  },
   styles: {
     global: {
       body: {
-        bg: 'neutral.25',
-        color: 'neutral.800',
+        bg: 'neutral.50',
+        color: 'neutral.950',
         fontSize: '16px',
         lineHeight: '24px',
         fontFamily: 'Geist, sans-serif',

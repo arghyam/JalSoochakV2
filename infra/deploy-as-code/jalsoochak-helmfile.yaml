@@ -112,6 +112,20 @@ releases:
     version: 0.1.0
     values:
       - ./charts/service/jalsoochak-frontend/values.yaml
+  
+  - name: messaging-orchestrator-service
+    chart: ./charts/service/messaging-orchestrator-service
+    installed: true
+    version: 0.1.0
+    values:
+      - ./charts/service/messaging-orchestrator-service/values.yaml
+ 
+  - name: water-supply-calculation-service
+    chart: ./charts/service/water-supply-calculation-service
+    installed: true
+    version: 0.1.0
+    values:
+      - ./charts/service/water-supply-calculation-service/values.yaml
  
   # - name: mysql
   #   chart: groundhog2k/mysql

@@ -34,6 +34,15 @@ export function AreaChart<T extends object>({
       type: 'category',
       data: data.map((item) => item[xKey]),
       boundaryGap: false,
+      axisLine: {
+        lineStyle: {
+          color: '#E5E7EB',
+          width: 1,
+        },
+      },
+      axisTick: {
+        show: false,
+      },
     },
     yAxis: {
       type: 'value',
@@ -45,6 +54,8 @@ export function AreaChart<T extends object>({
         data: data.map((item) => item[yKey]),
         smooth: true,
         color: color,
+        symbol: 'none',
+        showSymbol: false,
         areaStyle: {
           color: {
             type: 'linear',

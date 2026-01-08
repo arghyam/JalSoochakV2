@@ -170,9 +170,9 @@ export function Sidebar() {
                   fontWeight="medium"
                   transition="all 0.2s"
                   bg={isActive ? 'primary.50' : 'transparent'}
-                  color={isActive ? 'primary.700' : 'neutral.600'}
+                  color={isActive ? 'primary.700' : 'neutral.900'}
                   _hover={{
-                    bg: isActive ? 'primary.50' : 'neutral.50',
+                    bg: isActive ? 'primary.50' : 'neutral.100',
                   }}
                 >
                   {ItemIcon && <Icon as={ItemIcon} boxSize={5} flexShrink={0} />}
@@ -200,7 +200,7 @@ export function Sidebar() {
             </Text>
           </Flex>
           <Flex direction="column" minW={0}>
-            <Text fontSize="sm" fontWeight="medium" color="neutral.800" isTruncated>
+            <Text fontSize="sm" fontWeight="medium" color="neutral.950" isTruncated>
               {user?.name || 'User'}
             </Text>
           </Flex>

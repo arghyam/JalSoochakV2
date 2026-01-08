@@ -9,7 +9,7 @@ interface MainLayoutProps {
 
 export function MainLayout({ children }: MainLayoutProps) {
   return (
-    <Flex h="100vh" w="full" overflow="hidden" bg="neutral.25">
+    <Flex h="100vh" w="full" overflow="hidden" bg="neutral.50">
       <Sidebar />
       <Box as="main" ml="224px" flex={1} overflowY="auto" px={12} py={10}>
         {children || <Outlet />}
