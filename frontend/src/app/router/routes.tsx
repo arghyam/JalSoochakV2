@@ -3,11 +3,13 @@ import { ROUTES } from '@/shared/constants/routes'
 import { MainLayout, DashboardLayout } from '@/shared/components/layout'
 import { CentralDashboard } from '@/features/dashboard/components/central-dashboard'
 import { Admin, ManageTenants, StateAdminManagement, ConfigureSystem } from '@/features/admin'
-import { StateAdminConfiguration, OverviewPage } from '@/features/state-admin'
+import { OverviewPage } from '@/features/state-admin'
 import { LoginPage } from '@/features/auth'
 import { ProtectedRoute, RedirectIfAuthenticated } from '@/shared/components/routing/ProtectedRoute'
 import { AUTH_ROLES } from '@/shared/constants/auth'
 import { NotFoundPage } from '@/shared/components/common'
+
+import { Box, Heading, Text } from '@chakra-ui/react'
 
 export const router = createBrowserRouter([
   // Public dashboards
@@ -23,10 +25,12 @@ export const router = createBrowserRouter([
     path: '/states/:stateId',
     element: (
       <DashboardLayout>
-        <div className="p-6">
-          <h1 className="text-2xl font-bold">State Dashboard</h1>
-          <p className="text-muted-foreground">State dashboard coming soon...</p>
-        </div>
+        <Box p={6}>
+          <Heading fontSize="2xl" fontWeight="bold">
+            State Dashboard
+          </Heading>
+          <Text color="gray.600">State dashboard coming soon...</Text>
+        </Box>
       </DashboardLayout>
     ),
   },
@@ -34,13 +38,16 @@ export const router = createBrowserRouter([
     path: '/zones/:zoneId',
     element: (
       <DashboardLayout>
-        <div className="p-6">
-          <h1 className="text-2xl font-bold">Zone Dashboard</h1>
-          <p className="text-muted-foreground">Zone dashboard coming soon...</p>
-        </div>
+        <Box p={6}>
+          <Heading fontSize="2xl" fontWeight="bold">
+            Zone Dashboard
+          </Heading>
+          <Text color="gray.600">Zone dashboard coming soon...</Text>
+        </Box>
       </DashboardLayout>
     ),
   },
+
   // Auth
   {
     path: ROUTES.LOGIN,
@@ -50,6 +57,7 @@ export const router = createBrowserRouter([
       </RedirectIfAuthenticated>
     ),
   },
+
   // Protected routes
   {
     path: ROUTES.ADMIN,
@@ -91,6 +99,7 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
+
   {
     path: ROUTES.STATE_ADMIN,
     element: (
@@ -103,93 +112,109 @@ export const router = createBrowserRouter([
         index: true,
         element: <OverviewPage />,
       },
+
       {
         path: ROUTES.STATE_ADMIN_LANGUAGE,
         element: (
-          <div className="p-6">
-            <h1 className="text-2xl font-bold">Language Configuration</h1>
-            <p className="text-gray-600">Coming soon...</p>
-          </div>
+          <Box p={6}>
+            <Heading fontSize="2xl" fontWeight="bold">
+              Language Configuration
+            </Heading>
+            <Text color="gray.600">Coming soon...</Text>
+          </Box>
         ),
       },
       {
         path: ROUTES.STATE_ADMIN_WATER_NORMS,
         element: (
-          <div className="p-6">
-            <h1 className="text-2xl font-bold">Water Norms</h1>
-            <p className="text-gray-600">Coming soon...</p>
-          </div>
+          <Box p={6}>
+            <Heading fontSize="2xl" fontWeight="bold">
+              Water Norms
+            </Heading>
+            <Text color="gray.600">Coming soon...</Text>
+          </Box>
         ),
       },
       {
         path: ROUTES.STATE_ADMIN_INTEGRATION,
         element: (
-          <div className="p-6">
-            <h1 className="text-2xl font-bold">Integration</h1>
-            <p className="text-gray-600">Coming soon...</p>
-          </div>
+          <Box p={6}>
+            <Heading fontSize="2xl" fontWeight="bold">
+              Integration
+            </Heading>
+            <Text color="gray.600">Coming soon...</Text>
+          </Box>
         ),
       },
       {
         path: ROUTES.STATE_ADMIN_ESCALATIONS,
         element: (
-          <div className="p-6">
-            <h1 className="text-2xl font-bold">Escalations</h1>
-            <p className="text-gray-600">Coming soon...</p>
-          </div>
+          <Box p={6}>
+            <Heading fontSize="2xl" fontWeight="bold">
+              Escalations
+            </Heading>
+            <Text color="gray.600">Coming soon...</Text>
+          </Box>
         ),
       },
       {
         path: ROUTES.STATE_ADMIN_THRESHOLDS,
         element: (
-          <div className="p-6">
-            <h1 className="text-2xl font-bold">Thresholds</h1>
-            <p className="text-gray-600">Coming soon...</p>
-          </div>
+          <Box p={6}>
+            <Heading fontSize="2xl" fontWeight="bold">
+              Thresholds
+            </Heading>
+            <Text color="gray.600">Coming soon...</Text>
+          </Box>
         ),
       },
       {
         path: ROUTES.STATE_ADMIN_NUDGES,
         element: (
-          <div className="p-6">
-            <h1 className="text-2xl font-bold">Nudges Template</h1>
-            <p className="text-gray-600">Coming soon...</p>
-          </div>
+          <Box p={6}>
+            <Heading fontSize="2xl" fontWeight="bold">
+              Nudges Template
+            </Heading>
+            <Text color="gray.600">Coming soon...</Text>
+          </Box>
         ),
       },
       {
         path: ROUTES.STATE_ADMIN_API_INGESTION,
         element: (
-          <div className="p-6">
-            <h1 className="text-2xl font-bold">API Ingestion</h1>
-            <p className="text-gray-600">Coming soon...</p>
-          </div>
+          <Box p={6}>
+            <Heading fontSize="2xl" fontWeight="bold">
+              API Ingestion
+            </Heading>
+            <Text color="gray.600">Coming soon...</Text>
+          </Box>
         ),
       },
       {
         path: ROUTES.STATE_ADMIN_OPERATOR_SYNC,
         element: (
-          <div className="p-6">
-            <h1 className="text-2xl font-bold">Operator Sync</h1>
-            <p className="text-gray-600">Coming soon...</p>
-          </div>
+          <Box p={6}>
+            <Heading fontSize="2xl" fontWeight="bold">
+              Operator Sync
+            </Heading>
+            <Text color="gray.600">Coming soon...</Text>
+          </Box>
         ),
       },
       {
         path: ROUTES.STATE_ADMIN_ACTIVITY,
         element: (
-          <div className="p-6">
-            <h1 className="text-2xl font-bold">Activity</h1>
-            <p className="text-gray-600">Coming soon...</p>
-          </div>
+          <Box p={6}>
+            <Heading fontSize="2xl" fontWeight="bold">
+              Activity
+            </Heading>
+            <Text color="gray.600">Coming soon...</Text>
+          </Box>
         ),
-      },
-      {
-        path: ROUTES.STATE_ADMIN_CONFIG,
-        element: <StateAdminConfiguration />,
       },
     ],
   },
+
   {
     path: '*',
     element: <NotFoundPage />,

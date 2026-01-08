@@ -1,3 +1,4 @@
+import { Box, Stack } from '@chakra-ui/react'
 import { Toast, type ToastType } from './toast'
 
 export interface ToastItem {
@@ -13,16 +14,18 @@ interface ToastContainerProps {
 
 export function ToastContainer({ toasts, onRemove }: ToastContainerProps) {
   return (
-    <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
-      {toasts.map((toast) => (
-        <Toast
-          key={toast.id}
-          id={toast.id}
-          message={toast.message}
-          type={toast.type}
-          onClose={onRemove}
-        />
-      ))}
-    </div>
+    <Box position="fixed" top={4} right={4} zIndex={50}>
+      <Stack spacing={2}>
+        {toasts.map((toast) => (
+          <Toast
+            key={toast.id}
+            id={toast.id}
+            message={toast.message}
+            type={toast.type}
+            onClose={onRemove}
+          />
+        ))}
+      </Stack>
+    </Box>
   )
 }

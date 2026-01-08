@@ -1,8 +1,16 @@
+import { Flex, Spinner } from '@chakra-ui/react'
+
 export function LoadingSpinner() {
   return (
-    <div className="flex items-center justify-center p-8">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
-    </div>
+    <Flex align="center" justify="center" p={8}>
+      <Spinner
+        thickness="4px"
+        speed="0.65s"
+        emptyColor="gray.300"
+        color="blue.600"
+        size="md"
+        label="Loading..."
+      />
+    </Flex>
   )
 }
-

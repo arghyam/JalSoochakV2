@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react'
-import { Card, LineChart, AreaChart } from '@tremor/react'
+import { Box, Flex, Grid, Text, Icon } from '@chakra-ui/react'
 import {
-  MdPeople,
-  MdCheckCircle,
-  MdCloudUpload,
-  MdWarning,
-  MdIntegrationInstructions,
-} from 'react-icons/md'
+  CheckCircleIcon,
+  WarningIcon,
+  InfoIcon,
+  AttachmentIcon,
+  SettingsIcon,
+} from '@chakra-ui/icons'
 import { useAuthStore } from '@/app/store'
 import { getMockOverviewData } from '../../services/mock-data'
+import { LineChart } from '@/shared/components/charts/line-chart'
+import { AreaChart } from '@/shared/components/charts/area-chart'
 import type { OverviewData } from '../../types/overview'
 
 export function OverviewPage() {
@@ -21,9 +23,9 @@ export function OverviewPage() {
 
   if (!data) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="text-text-secondary">Loading...</div>
-      </div>
+      <Flex h="64" align="center" justify="center">
+        <Text color="neutral.600">Loading...</Text>
+      </Flex>
     )
   }
 
@@ -32,118 +34,153 @@ export function OverviewPage() {
       title: 'Pump Operators Synced',
       value: data.stats.pumpOperatorsSynced.toLocaleString(),
       subtitle: 'Out of 30',
-      icon: MdPeople,
-      iconBg: 'bg-blue-100',
-      iconColor: 'text-blue-600',
+      icon: InfoIcon,
+      iconBg: 'blue.100',
+      iconColor: 'blue.600',
     },
     {
       title: 'Configuration Status',
       value: data.stats.configurationStatus,
       subtitle: 'All modules configured',
-      icon: MdCheckCircle,
-      iconBg: 'bg-green-100',
-      iconColor: 'text-green-600',
+      icon: CheckCircleIcon,
+      iconBg: 'green.100',
+      iconColor: 'green.600',
     },
     {
       title: "Today's API Ingestion",
       value: data.stats.todayApiIngestion,
       subtitle: 'Successfully ingested',
-      icon: MdCloudUpload,
-      iconBg: 'bg-blue-100',
-      iconColor: 'text-blue-600',
+      icon: AttachmentIcon,
+      iconBg: 'blue.100',
+      iconColor: 'blue.600',
     },
     {
       title: 'Pending Data Sync',
       value: data.stats.pendingDataSync.toLocaleString(),
       subtitle: 'Requires Attention',
-      icon: MdWarning,
-      iconBg: 'bg-red-100',
-      iconColor: 'text-red-600',
+      icon: WarningIcon,
+      iconBg: 'red.100',
+      iconColor: 'red.600',
     },
     {
       title: 'Active Integrations',
       value: data.stats.activeIntegrations.toLocaleString(),
       subtitle: 'WhatsApp, Glyphic',
-      icon: MdIntegrationInstructions,
-      iconBg: 'bg-purple-100',
-      iconColor: 'text-purple-600',
+      icon: SettingsIcon,
+      iconBg: 'purple.100',
+      iconColor: 'purple.600',
     },
   ]
 
   return (
-    <div className="w-full space-y-6">
+    <Box w="full">
       {/* Page Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-text-primary">
+      <Box mb={6}>
+        <Text fontSize="2xl" fontWeight="semibold" color="neutral.800">
           Overview of {user?.tenantId || 'State'}
-        </h1>
-      </div>
+        </Text>
+      </Box>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-5 gap-4">
+      <Grid templateColumns="repeat(5, 1fr)" gap={4} mb={6}>
         {statsCards.map((stat) => {
-          const Icon = stat.icon
+          const StatIcon = stat.icon
           return (
-            <Card key={stat.title} className="border border-border bg-white p-4 shadow-sm">
-              <div className="flex flex-col space-y-3">
-                <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-lg ${stat.iconBg}`}
+            <Box
+              key={stat.title}
+              bg="white"
+              borderWidth="1px"
+              borderColor="neutral.100"
+              borderRadius="lg"
+              boxShadow="default"
+              p={4}
+            >
+              <Flex direction="column" gap={3}>
+                <Flex
+                  h="40px"
+                  w="40px"
+                  align="center"
+                  justify="center"
+                  borderRadius="lg"
+                  bg={stat.iconBg}
                 >
-                  <Icon className={`h-5 w-5 ${stat.iconColor}`} />
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-text-secondary">{stat.title}</p>
-                  <p className="text-2xl font-semibold text-text-primary">{stat.value}</p>
-                  <p className="text-xs text-text-tertiary">{stat.subtitle}</p>
-                </div>
-              </div>
-            </Card>
+                  <Icon as={StatIcon} boxSize={5} color={stat.iconColor} />
+                </Flex>
+                <Box>
+                  <Text fontSize="xs" color="neutral.600" mb={1}>
+                    {stat.title}
+                  </Text>
+                  <Text fontSize="2xl" fontWeight="semibold" color="neutral.800" mb={0.5}>
+                    {stat.value}
+                  </Text>
+                  <Text fontSize="xs" color="neutral.500">
+                    {stat.subtitle}
+                  </Text>
+                </Box>
+              </Flex>
+            </Box>
           )
         })}
-      </div>
+      </Grid>
 
       {/* Demand vs Supply Chart */}
-      <Card className="border border-border p-6 shadow-sm">
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-text-primary">Demand vs Supply</h2>
-          <LineChart
-            className="h-72"
-            data={data.demandSupplyData}
-            index="period"
-            categories={['demand', 'supply']}
-            colors={['blue', 'red']}
-            connectNulls={true}
-            yAxisWidth={50}
-            showLegend={true}
-            showGridLines={true}
-            showAnimation={true}
-          />
-        </div>
-      </Card>
+      <Box
+        bg="white"
+        borderWidth="1px"
+        borderColor="neutral.100"
+        borderRadius="lg"
+        boxShadow="default"
+        mb={6}
+        p={6}
+      >
+        <Text fontSize="lg" fontWeight="semibold" color="neutral.800" mb={4}>
+          Demand vs Supply
+        </Text>
+        <LineChart
+          data={data.demandSupplyData}
+          xKey="period"
+          yKeys={['demand', 'supply']}
+          colors={['#3291D1', '#D92D20']}
+          height="288px"
+        />
+      </Box>
 
       {/* Daily Ingestion Monitor */}
-      <Card className="border border-border bg-white p-6 shadow-sm">
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-text-primary">Daily Ingestion Monitor</h2>
-            <select className="rounded border border-border bg-white px-3 py-1 text-sm text-text-secondary">
-              <option>December</option>
-            </select>
-          </div>
-          <AreaChart
-            className="h-72"
-            data={data.dailyIngestionData}
-            index="day"
-            categories={['count']}
-            colors={['amber']}
-            valueFormatter={(value) => value.toLocaleString()}
-            yAxisWidth={50}
-            showLegend={false}
-            showGridLines={true}
-            showAnimation={true}
-          />
-        </div>
-      </Card>
-    </div>
+      <Box
+        bg="white"
+        borderWidth="1px"
+        borderColor="neutral.100"
+        borderRadius="lg"
+        boxShadow="default"
+        p={6}
+      >
+        <Flex align="center" justify="space-between" mb={4}>
+          <Text fontSize="lg" fontWeight="semibold" color="neutral.800">
+            Daily Ingestion Monitor
+          </Text>
+          <Box
+            as="select"
+            w="auto"
+            fontSize="sm"
+            borderRadius="md"
+            borderWidth="1px"
+            borderColor="neutral.100"
+            bg="white"
+            px={3}
+            py={1}
+            color="neutral.600"
+          >
+            <option>December</option>
+          </Box>
+        </Flex>
+        <AreaChart
+          data={data.dailyIngestionData}
+          xKey="day"
+          yKey="count"
+          color="#FFA100"
+          height="288px"
+        />
+      </Box>
+    </Box>
   )
 }
