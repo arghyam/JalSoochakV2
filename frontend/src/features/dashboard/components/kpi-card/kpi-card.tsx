@@ -29,7 +29,7 @@ export function KPICard({ title, value, unit, description, trend }: KPICardProps
           {title}
         </Text>
         <Flex align="baseline" gap={2}>
-          <Text fontSize="3xl" fontWeight="bold" color="neutral.800">
+          <Text fontSize="3xl" fontWeight="bold" color="neutral.950">
             {typeof value === 'number' ? value.toLocaleString() : value}
           </Text>
           {unit && (
