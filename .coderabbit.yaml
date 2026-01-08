@@ -1,0 +1,105 @@
+# CodeRabbit Configuration for JalSoochakV2
+# Visit https://docs.coderabbit.ai for more information
+
+language: en-US
+early_access: false
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: true
+  review_status: true
+  collapse_walkthrough: false
+  auto_review:
+    enabled: true
+    drafts: false
+  tools:
+    shellcheck:
+      enabled: true
+    yamllint:
+      enabled: true
+    markdownlint:
+      enabled: true
+    hadolint:
+      enabled: true
+    eslint:
+      enabled: true
+    biome:
+      enabled: true
+    ruff:
+      enabled: true
+    phpstan:
+      enabled: true
+    golangci-lint:
+      enabled: true
+
+chat:
+  auto_reply: true
+
+# Path-based instructions for different parts of the codebase
+path_instructions:
+  - path: "**/*.java"
+    instructions: |
+      - Follow Java best practices and Spring Boot conventions
+      - Ensure proper exception handling
+      - Check for null safety
+      - Verify proper use of dependency injection
+      - Review test coverage for new code
+  
+  - path: "**/*.yaml"
+    instructions: |
+      - Validate YAML syntax
+      - Check for proper indentation
+      - Verify Kubernetes/Helm chart best practices
+      - Ensure secrets are not hardcoded
+  
+  - path: "**/*.yml"
+    instructions: |
+      - Validate YAML syntax
+      - Check for proper indentation
+      - Verify Kubernetes/Helm chart best practices
+      - Ensure secrets are not hardcoded
+  
+  - path: "**/Dockerfile"
+    instructions: |
+      - Check for security best practices
+      - Verify multi-stage builds where appropriate
+      - Ensure minimal base images
+      - Check for proper layer caching
+  
+  - path: "**/docker-compose*.yaml"
+    instructions: |
+      - Verify service dependencies
+      - Check volume mounts and networking
+      - Ensure environment variables are properly configured
+  
+  - path: "infra/**"
+    instructions: |
+      - Review infrastructure as code best practices
+      - Verify security configurations
+      - Check for proper secret management
+      - Ensure environment-specific configurations are correct
+  
+  - path: "**/test/**"
+    instructions: |
+      - Verify test coverage
+      - Check for proper test assertions
+      - Ensure tests are isolated and repeatable
+      - Review test naming conventions
+
+# Files and directories to ignore during reviews
+ignore:
+  - "**/*.log"
+  - "**/*.lock"
+  - "**/node_modules/**"
+  - "**/target/**"
+  - "**/build/**"
+  - "**/dist/**"
+  - "**/.gradle/**"
+  - "**/.idea/**"
+  - "**/.vscode/**"
+  - "**/coverage/**"
+  - "**/__pycache__/**"
+  - "**/*.pyc"
+  - "**/vendor/**"
+  - "**/.git/**"
