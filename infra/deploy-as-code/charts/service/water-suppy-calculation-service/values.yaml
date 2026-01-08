@@ -1,0 +1,70 @@
+# Common Labels
+labels:
+  app: "water-suppy-calculation-service"
+  group: "core"
+
+
+ingress:
+  enabled: true
+  context: "api(/|$)(.*)"
+# Init Containers Configs
+
+# Container Configs
+image:
+  repository: "252649026375.dkr.ecr.ap-south-1.amazonaws.com/water-suppy-calculation-service"
+  tag: "3c05336b3262bcc649765a06fa5aaf081b182320"
+replicas: "1"
+# tracing-enabled: true
+# healthChecks:
+#   enabled: true
+#   livenessProbePath: "/water-suppy-calculation-service/health"
+#   readinessProbePath: "/water-suppy-calculation-service/health"
+
+# Additional Container Envs
+env: |
+  - name: SERVER_PORT
+    value: "8080"
+  - name: MINIO_ENDPOINT
+    valueFrom:
+      secretKeyRef:
+        key: endpoint
+        name: minio
+  - name: MINIO_BUCKET
+    valueFrom:
+      secretKeyRef:
+        key: bucket
+        name: minio
+  - name: MINIO_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        key: accessKey
+        name: minio
+  - name: MINIO_SECRET_KEY
+    valueFrom:
+      secretKeyRef:
+        key: secretKey
+        name: minio
+  - name: MINIO_REGION
+    valueFrom:
+      secretKeyRef:
+        key: region
+        name: minio
+  - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+    value: "http://servicediscovery:8761/eureka"
+  - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+    value: "kafka-kraft-controller-headless:9092"
+  - name: SPRING_DATASOURCE_URL
+    valueFrom:
+      secretKeyRef:
+        key: db-url
+        name: jalsoochak
+  - name: SPRING_DATASOURCE_USERNAME
+    valueFrom:
+      secretKeyRef:
+        key: username
+        name: jalsoochak
+  - name: SPRING_DATASOURCE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        key: password
+        name: jalsoochak
