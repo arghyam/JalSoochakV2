@@ -3,10 +3,12 @@ package com.jalsoochak.water_supply_calculation_service.services;
 import com.jalsoochak.water_supply_calculation_service.models.app.requests.GlificWebhookRequest;
 import com.jalsoochak.water_supply_calculation_service.models.app.responses.AnomalyResult;
 import com.jalsoochak.water_supply_calculation_service.models.app.responses.ImageAnalysisResponse;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 
+@Service
 public class GlificWebhookService {
     private final MinioService minioService;
     private final AnomalyService anomalyService;
