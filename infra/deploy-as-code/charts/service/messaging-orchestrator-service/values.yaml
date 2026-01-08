@@ -12,7 +12,7 @@ ingress:
 # Container Configs
 image:
   repository: "252649026375.dkr.ecr.ap-south-1.amazonaws.com/messaging-orchestrator-service"
-  tag: "3c05336b3262bcc649765a06fa5aaf081b182320"
+  tag: "2fac1942beae9f25677b806217007f2acb6b66e4"
 replicas: "1"
 # tracing-enabled: true
 # healthChecks:
@@ -24,31 +24,6 @@ replicas: "1"
 env: |
   - name: SERVER_PORT
     value: "8080"
-  - name: MINIO_ENDPOINT
-    valueFrom:
-      secretKeyRef:
-        key: endpoint
-        name: minio
-  - name: MINIO_BUCKET
-    valueFrom:
-      secretKeyRef:
-        key: bucket
-        name: minio
-  - name: MINIO_ACCESS_KEY
-    valueFrom:
-      secretKeyRef:
-        key: accessKey
-        name: minio
-  - name: MINIO_SECRET_KEY
-    valueFrom:
-      secretKeyRef:
-        key: secretKey
-        name: minio
-  - name: MINIO_REGION
-    valueFrom:
-      secretKeyRef:
-        key: region
-        name: minio
   - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
     value: "http://servicediscovery:8761/eureka"
   - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
@@ -68,3 +43,18 @@ env: |
       secretKeyRef:
         key: password
         name: jalsoochak
+  - name: GLIFIC_USERNAME
+    valueFrom:
+      secretKeyRef:
+        key: glific-username
+        name: glific
+  - name: GLIFIC_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        key: glific-password
+        name: glific
+  - name: GLIFIC_WELCOME_TEMPLATE_ID
+    valueFrom:
+      secretKeyRef:
+        key: glific-welcome-template-id
+        name: glific
