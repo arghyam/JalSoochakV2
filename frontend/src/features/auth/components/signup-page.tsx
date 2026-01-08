@@ -19,6 +19,8 @@ import jalImage from '@/assets/media/jal.jpg'
 
 export function SignupPage() {
   const [showPassword, setShowPassword] = useState(false)
+  const [userId, setUserId] = useState('')
+  const [password, setPassword] = useState('')
 
   return (
     <Flex minH="100vh" w="full" direction={{ base: 'column', md: 'row' }}>
@@ -37,19 +39,25 @@ export function SignupPage() {
 
           <Flex flex="1" align="center" justify="center">
             <Box w="360px" h="360px">
-              <Text fontSize="2xl" fontWeight="bold" mb={3} color="neutral.800">
+              <Text fontSize="2xl" fontWeight="bold" mb={3} color="neutral.950">
                 Welcome
               </Text>
-              <Text color="gray.500" fontSize="sm" mb={8}>
+              <Text color="neutral.500" fontSize="sm" mb={8}>
                 Please enter your details.
               </Text>
 
               <FormControl>
-                <FormLabel fontSize="sm" fontWeight="medium" color="neutral.800" mb={0}>
-                  User ID
+                <FormLabel fontSize="sm" fontWeight="medium" color="neutral.950" mb={0}>
+                  User ID{' '}
+                  <Text as="span" color="red.500">
+                    *
+                  </Text>
                 </FormLabel>
                 <Input
                   placeholder="Enter your user ID"
+                  autoComplete="off"
+                  value={userId}
+                  onChange={(e) => setUserId(e.target.value)}
                   h="36px"
                   px="12px"
                   borderRadius="4px"
@@ -60,13 +68,19 @@ export function SignupPage() {
               </FormControl>
 
               <FormControl mt={6}>
-                <FormLabel fontSize="sm" fontWeight="medium" color="gray.700" mb={0}>
-                  Password sent via email
+                <FormLabel fontSize="sm" fontWeight="medium" color="neutral.950" mb={0}>
+                  Password sent via email{' '}
+                  <Text as="span" color="red.500">
+                    *
+                  </Text>
                 </FormLabel>
                 <InputGroup>
                   <Input
                     type={showPassword ? 'text' : 'password'}
                     placeholder="Enter your password"
+                    autoComplete="new-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     h="36px"
                     px="12px"
                     borderRadius="4px"
@@ -79,6 +93,7 @@ export function SignupPage() {
                     <Button
                       variant="ghost"
                       size="sm"
+                      color="neutral.400"
                       onClick={() => setShowPassword((prev) => !prev)}
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
@@ -89,13 +104,22 @@ export function SignupPage() {
               </FormControl>
 
               <Flex align="center" justify="space-between" mt={8}>
-                <Checkbox size="sm">Remember me</Checkbox>
-                <Link fontSize="sm" color="blue.500">
+                <Checkbox size="sm" color="neutral.950">
+                  Remember me
+                </Checkbox>
+                <Link fontSize="sm" color="primary.500">
                   Forgot password
                 </Link>
               </Flex>
 
-              <Button colorScheme="blue" w="full" mt={8} fontSize="sm" fontWeight="medium">
+              <Button
+                colorScheme="blue"
+                w="full"
+                mt={8}
+                fontSize="sm"
+                fontWeight="medium"
+                isDisabled={!userId || !password}
+              >
                 Log in
               </Button>
             </Box>

@@ -135,8 +135,8 @@ const theme = extendTheme({
             bg: 'primary.700',
           },
           _disabled: {
-            bg: 'neutral.200',
-            color: 'neutral.400',
+            bg: 'neutral.300',
+            color: 'neutral.25',
             opacity: 1,
             cursor: 'not-allowed',
           },
