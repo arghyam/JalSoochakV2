@@ -6,8 +6,6 @@ import App from './App.tsx'
 import indiaGeoJsonRaw from '@/assets/data/geojson/india.geojson?raw'
 import { isIndiaMapRegistered, registerIndiaMap } from '@/features/dashboard/utils/map-registry'
 
-const theme = extendTheme({})
-
 if (!isIndiaMapRegistered()) {
   const indiaGeoJson = JSON.parse(indiaGeoJsonRaw) as unknown
   registerIndiaMap(indiaGeoJson)

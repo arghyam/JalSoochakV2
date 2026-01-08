@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   Box,
   Button,
@@ -5,17 +6,20 @@ import {
   Flex,
   FormControl,
   FormLabel,
-  Heading,
   Image,
   Input,
+  InputGroup,
+  InputRightElement,
   Link,
   Text,
-  VStack,
 } from '@chakra-ui/react'
+import { AiOutlineEyeInvisible } from 'react-icons/ai'
 import jalsoochakLogo from '@/assets/media/jalsoochak-logo.svg'
 import jalImage from '@/assets/media/jal.jpg'
 
 export function SignupPage() {
+  const [showPassword, setShowPassword] = useState(false)
+
   return (
     <Flex minH="100vh" w="full" direction={{ base: 'column', md: 'row' }}>
       <Flex
@@ -32,36 +36,68 @@ export function SignupPage() {
           </Box>
 
           <Flex flex="1" align="center" justify="center">
-            <Box w="full" maxW="420px">
-              <Heading size="md" mb={2}>
+            <Box w="360px" h="360px">
+              <Text fontSize="2xl" fontWeight="bold" mb={3} color="neutral.800">
                 Welcome
-              </Heading>
+              </Text>
               <Text color="gray.500" fontSize="sm" mb={8}>
                 Please enter your details.
               </Text>
 
-              <VStack spacing={4} align="stretch">
-                <FormControl>
-                  <FormLabel fontSize="sm">User ID</FormLabel>
-                  <Input placeholder="Enter your user ID" />
-                </FormControl>
+              <FormControl>
+                <FormLabel fontSize="sm" fontWeight="medium" color="neutral.800" mb={0}>
+                  User ID
+                </FormLabel>
+                <Input
+                  placeholder="Enter your user ID"
+                  h="36px"
+                  px="12px"
+                  borderRadius="4px"
+                  borderColor="gray.300"
+                  fontSize="sm"
+                  focusBorderColor="blue.500"
+                />
+              </FormControl>
 
-                <FormControl>
-                  <FormLabel fontSize="sm">Password sent via email</FormLabel>
-                  <Input type="password" placeholder="Enter your password" />
-                </FormControl>
+              <FormControl mt={6}>
+                <FormLabel fontSize="sm" fontWeight="medium" color="gray.700" mb={0}>
+                  Password sent via email
+                </FormLabel>
+                <InputGroup>
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Enter your password"
+                    h="36px"
+                    px="12px"
+                    borderRadius="4px"
+                    borderColor="gray.300"
+                    fontSize="sm"
+                    focusBorderColor="blue.500"
+                    pr="36px"
+                  />
+                  <InputRightElement h="36px">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      <AiOutlineEyeInvisible size={24} />
+                    </Button>
+                  </InputRightElement>
+                </InputGroup>
+              </FormControl>
 
-                <Flex align="center" justify="space-between">
-                  <Checkbox size="sm">Remember me</Checkbox>
-                  <Link fontSize="sm" color="blue.500">
-                    Forgot password
-                  </Link>
-                </Flex>
+              <Flex align="center" justify="space-between" mt={8}>
+                <Checkbox size="sm">Remember me</Checkbox>
+                <Link fontSize="sm" color="blue.500">
+                  Forgot password
+                </Link>
+              </Flex>
 
-                <Button colorScheme="blue" w="full">
-                  Log in
-                </Button>
-              </VStack>
+              <Button colorScheme="blue" w="full" mt={8} fontSize="sm" fontWeight="medium">
+                Log in
+              </Button>
             </Box>
           </Flex>
         </Flex>
