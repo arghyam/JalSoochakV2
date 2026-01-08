@@ -1,4 +1,6 @@
 import type { OverviewData } from '../types/overview'
+import type { ActivityLog } from '../types/activity'
+import type { LanguageConfiguration } from '../types/language'
 
 export const mockOverviewData: OverviewData = {
   stats: {
@@ -37,5 +39,108 @@ export const getMockOverviewData = (): Promise<OverviewData> => {
     setTimeout(() => {
       resolve(mockOverviewData)
     }, 300)
+  })
+}
+
+export const mockActivityData: ActivityLog[] = [
+  {
+    id: '1',
+    timestamp: new Date('2025-09-08T15:00:00'),
+    action: 'Reload State Configuration',
+    status: 'Success',
+  },
+  {
+    id: '2',
+    timestamp: new Date('2025-11-02T09:30:00'),
+    action: 'Clear Cache',
+    status: 'Failed',
+  },
+  {
+    id: '3',
+    timestamp: new Date('2025-08-22T13:30:00'),
+    action: 'Test Integrations',
+    status: 'Success',
+  },
+  {
+    id: '4',
+    timestamp: new Date('2025-02-16T18:00:00'),
+    action: 'Reload State Configuration',
+    status: 'Success',
+  },
+  {
+    id: '5',
+    timestamp: new Date('2025-04-29T11:00:00'),
+    action: 'Reload State Configuration',
+    status: 'Success',
+  },
+  {
+    id: '6',
+    timestamp: new Date('2025-12-04T16:30:00'),
+    action: 'Test Integrations',
+    status: 'Success',
+  },
+  {
+    id: '7',
+    timestamp: new Date('2025-07-19T19:00:00'),
+    action: 'Reload State Configuration',
+    status: 'Failed',
+  },
+  {
+    id: '8',
+    timestamp: new Date('2025-03-06T14:00:00'),
+    action: 'Clear Cache',
+    status: 'Success',
+  },
+  {
+    id: '9',
+    timestamp: new Date('2025-05-14T12:30:00'),
+    action: 'Test Integrations',
+    status: 'Success',
+  },
+  {
+    id: '10',
+    timestamp: new Date('2025-01-15T08:45:00'),
+    action: 'Reload State Configuration',
+    status: 'Success',
+  },
+]
+
+export const getMockActivityData = (): Promise<ActivityLog[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(mockActivityData)
+    }, 300)
+  })
+}
+
+// Language Configuration Mock Data
+export const mockLanguageConfiguration: LanguageConfiguration = {
+  id: '',
+  primaryLanguage: '',
+  secondaryLanguage: '',
+  isConfigured: false,
+}
+
+export const getMockLanguageConfiguration = (): Promise<LanguageConfiguration> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(mockLanguageConfiguration)
+    }, 300)
+  })
+}
+
+export const saveMockLanguageConfiguration = (
+  config: Omit<LanguageConfiguration, 'id'>
+): Promise<LanguageConfiguration> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const savedConfig: LanguageConfiguration = {
+        id: '1',
+        primaryLanguage: config.primaryLanguage as string,
+        secondaryLanguage: config.secondaryLanguage as string | undefined,
+        isConfigured: true,
+      }
+      resolve(savedConfig)
+    }, 500)
   })
 }
