@@ -87,12 +87,12 @@ export function IntegrationPage() {
     }
   }
 
-  const hasChanges = config
-    ? whatsappBusinessAccountName !== config.whatsappBusinessAccountName ||
+  const hasChanges =
+    config &&
+    (whatsappBusinessAccountName !== config.whatsappBusinessAccountName ||
       senderPhoneNumber !== config.senderPhoneNumber ||
       whatsappBusinessAccountId !== config.whatsappBusinessAccountId ||
-      apiAccessToken !== config.apiAccessToken
-    : true
+      apiAccessToken !== config.apiAccessToken)
 
   if (isLoading) {
     return (

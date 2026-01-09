@@ -74,6 +74,12 @@ export function SearchableSelect({
       <Flex
         as="button"
         type="button"
+        role="combobox"
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+        aria-controls="searchable-select-listbox"
+        aria-disabled={disabled}
+        disabled={disabled}
         w="full"
         h="36px"
         px="12px"
@@ -89,6 +95,11 @@ export function SearchableSelect({
         onClick={handleToggle}
         _hover={!disabled ? { borderColor: 'neutral.400' } : undefined}
         _focus={{ borderColor: 'primary.500', outline: 'none' }}
+        _disabled={{
+          cursor: 'not-allowed',
+          opacity: 0.6,
+          pointerEvents: 'none',
+        }}
       >
         <Text fontSize="md" color={selectedOption ? 'neutral.950' : 'neutral.500'} noOfLines={1}>
           {selectedOption ? selectedOption.label : placeholder}
@@ -139,6 +150,8 @@ export function SearchableSelect({
 
           {/* Options List */}
           <VStack
+            id="searchable-select-listbox"
+            role="listbox"
             align="stretch"
             spacing={0}
             maxH="233px"
@@ -160,6 +173,8 @@ export function SearchableSelect({
               filteredOptions.map((option) => (
                 <Box
                   key={option.value}
+                  role="option"
+                  aria-selected={value === option.value}
                   px="12px"
                   py="10px"
                   cursor="pointer"
@@ -177,7 +192,7 @@ export function SearchableSelect({
                 </Box>
               ))
             ) : (
-              <Box px="12px" py="10px">
+              <Box px="12px" py="10px" role="status">
                 <Text fontSize="sm" color="neutral.500">
                   No results found
                 </Text>
