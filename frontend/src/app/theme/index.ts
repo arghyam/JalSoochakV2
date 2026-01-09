@@ -16,6 +16,49 @@ const theme = extendTheme({
     heading: 'Geist, sans-serif',
     body: 'Geist, sans-serif',
   },
+
+  //Titles-Headlines
+  textStyles: {
+    h5: {
+      fontSize: '32px',
+      lineHeight: '48px',
+      fontWeight: 'semibold',
+      color: 'neutral.950',
+    },
+    h6: {
+      fontSize: '24px',
+      lineHeight: '36px',
+      fontWeight: 'semibold',
+      color: 'neutral.950',
+    },
+    h7: {
+      fontSize: '20px',
+      lineHeight: '30px',
+      fontWeight: 'semibold',
+      color: 'neutral.950',
+    },
+
+    //Body text
+    bodyText4: {
+      fontStyle: 'Regular',
+      fontSize: '16px',
+      lineHeight: '24px',
+      color: 'neutral.500',
+    },
+    bodyText5: {
+      fontStyle: 'Regular',
+      fontSize: '14px',
+      lineHeight: '21px',
+      color: 'neutral.500',
+    },
+    bodyText6: {
+      fontStyle: 'Medium',
+      fontSize: '14px',
+      lineHeight: '21px',
+      color: 'neutral.950',
+    },
+  },
+
   colors: {
     // Primary Brand Color
     primary: {
@@ -90,6 +133,16 @@ const theme = extendTheme({
     active: '0px 0px 0px 4px rgba(50, 145, 209, 0.12)',
   },
   components: {
+    Input: {
+      baseStyle: {
+        field: {
+          _focus: {
+            borderColor: 'primary.500',
+            boxShadow: '0 0 0 1px var(--chakra-colors-primary-500)',
+          },
+        },
+      },
+    },
     Button: {
       baseStyle: {
         fontWeight: 'medium',

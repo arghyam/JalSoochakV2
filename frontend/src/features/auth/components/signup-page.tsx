@@ -39,15 +39,15 @@ export function SignupPage() {
 
           <Flex flex="1" align="center" justify="center">
             <Box w="360px" h="360px">
-              <Text fontSize="2xl" fontWeight="bold" mb={3} color="neutral.950">
+              <Text textStyle="h5" mb={3}>
                 Welcome
               </Text>
-              <Text color="neutral.500" fontSize="sm" mb={8}>
+              <Text textStyle="bodyText5" mb="3rem">
                 Please enter your details.
               </Text>
 
               <FormControl>
-                <FormLabel fontSize="sm" fontWeight="medium" color="neutral.950" mb={0}>
+                <FormLabel textStyle="bodyText6" mb={0} fontSize="16px">
                   User ID{' '}
                   <Text as="span" color="red.500">
                     *
@@ -67,8 +67,8 @@ export function SignupPage() {
                 />
               </FormControl>
 
-              <FormControl mt={6}>
-                <FormLabel fontSize="sm" fontWeight="medium" color="neutral.950" mb={0}>
+              <FormControl mt="1.5rem">
+                <FormLabel textStyle="bodyText6" mb={0}>
                   Password sent via email{' '}
                   <Text as="span" color="red.500">
                     *
@@ -103,19 +103,33 @@ export function SignupPage() {
                 </InputGroup>
               </FormControl>
 
-              <Flex align="center" justify="space-between" mt={8}>
-                <Checkbox size="sm" color="neutral.950">
+              <Flex align="center" justify="space-between" mt="2rem">
+                <Checkbox
+                  size="sm"
+                  colorScheme="primary"
+                  fontSize="16px"
+                  color="neutral.950"
+                  sx={{
+                    _control: {
+                      borderWidth: '1px',
+                      _checked: {
+                        bg: 'primary.500',
+                        borderColor: 'primary.500',
+                      },
+                    },
+                  }}
+                >
                   Remember me
                 </Checkbox>
+
                 <Link fontSize="sm" color="primary.500">
                   Forgot password
                 </Link>
               </Flex>
 
               <Button
-                colorScheme="blue"
                 w="full"
-                mt={8}
+                mt="2rem"
                 fontSize="sm"
                 fontWeight="medium"
                 isDisabled={!userId || !password}
@@ -132,8 +146,8 @@ export function SignupPage() {
         position="relative"
         overflow="hidden"
         display={{ base: 'none', md: 'block' }}
-        borderTopLeftRadius={{ md: '80px' }}
-        borderBottomLeftRadius={{ md: '80px' }}
+        borderTopLeftRadius="60px"
+        borderBottomLeftRadius="60px"
       >
         <Image
           src={jalImage}
