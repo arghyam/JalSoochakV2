@@ -13,7 +13,7 @@ import {
   Link,
   Text,
 } from '@chakra-ui/react'
-import { AiOutlineEyeInvisible } from 'react-icons/ai'
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 import jalsoochakLogo from '@/assets/media/jalsoochak-logo.svg'
 import jalImage from '@/assets/media/jal.jpg'
 
@@ -61,9 +61,10 @@ export function SignupPage() {
                   h="36px"
                   px="12px"
                   borderRadius="4px"
-                  borderColor="gray.300"
+                  borderColor="neutral.300"
+                  _placeholder={{ color: 'neutral.300' }}
                   fontSize="sm"
-                  focusBorderColor="blue.500"
+                  focusBorderColor="primary.500"
                 />
               </FormControl>
 
@@ -84,20 +85,27 @@ export function SignupPage() {
                     h="36px"
                     px="12px"
                     borderRadius="4px"
-                    borderColor="gray.300"
+                    borderColor="neutral.300"
                     fontSize="sm"
-                    focusBorderColor="blue.500"
+                    _placeholder={{ color: 'neutral.300' }}
+                    focusBorderColor="primary.500"
                     pr="36px"
                   />
                   <InputRightElement h="36px">
                     <Button
-                      variant="ghost"
+                      variant="unstyled"
                       size="sm"
                       color="neutral.400"
                       onClick={() => setShowPassword((prev) => !prev)}
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      _hover={{ bg: 'transparent' }}
+                      _active={{ bg: 'transparent' }}
                     >
-                      <AiOutlineEyeInvisible size={24} />
+                      {showPassword ? (
+                        <AiOutlineEye size={24} />
+                      ) : (
+                        <AiOutlineEyeInvisible size={24} />
+                      )}
                     </Button>
                   </InputRightElement>
                 </InputGroup>
@@ -105,16 +113,16 @@ export function SignupPage() {
 
               <Flex align="center" justify="space-between" mt="2rem">
                 <Checkbox
-                  size="sm"
                   colorScheme="primary"
                   fontSize="16px"
                   color="neutral.950"
                   sx={{
                     _control: {
-                      borderWidth: '1px',
+                      borderWidth: '2px',
+                      borderColor: 'neutral.400',
                       _checked: {
                         bg: 'primary.500',
-                        borderColor: 'primary.500',
+                        borderColor: 'neutral.400',
                       },
                     },
                   }}
