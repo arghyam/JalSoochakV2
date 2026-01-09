@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Box, Flex, Text, IconButton } from '@chakra-ui/react'
+import { Box, Flex, Text } from '@chakra-ui/react'
 import { CheckIcon, CloseIcon, InfoIcon, WarningIcon } from '@chakra-ui/icons'
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning'
@@ -41,32 +41,24 @@ export function Toast({ id, message, type, onClose, duration = 3000 }: ToastProp
   return (
     <Flex
       align="center"
-      gap={3}
-      maxW="500px"
-      minW="300px"
+      gap="8px"
+      w="200px"
+      h="36px"
       bg={styles.bg}
       color={styles.color}
-      borderRadius="lg"
-      px={4}
-      py={3}
+      borderRadius="4px"
+      pt="8px"
+      pr="12px"
+      pb="8px"
+      pl="12px"
       boxShadow="lg"
     >
       <Box flexShrink={0}>
-        <IconComponent />
+        <IconComponent boxSize={4} />
       </Box>
-      <Text flex={1} fontSize="sm" fontWeight="medium">
+      <Text flex={1} fontSize="sm" fontWeight="medium" noOfLines={1}>
         {message}
       </Text>
-      <IconButton
-        aria-label="Close toast"
-        size="xs"
-        variant="ghost"
-        color={styles.color}
-        onClick={() => onClose(id)}
-        _hover={{ opacity: 0.75 }}
-      >
-        <CloseIcon boxSize={3} />
-      </IconButton>
     </Flex>
   )
 }
