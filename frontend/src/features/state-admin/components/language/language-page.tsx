@@ -8,6 +8,7 @@ import {
 import type { LanguageConfiguration } from '../../types/language'
 import { AVAILABLE_LANGUAGES } from '../../types/language'
 import { useToast } from '@/shared/hooks/use-toast'
+import { ToastContainer } from '@/shared/components/common'
 
 export function LanguagePage() {
   const [config, setConfig] = useState<LanguageConfiguration | null>(null)
@@ -16,7 +17,7 @@ export function LanguagePage() {
   const [isSaving, setIsSaving] = useState(false)
   const [primaryLanguage, setPrimaryLanguage] = useState('')
   const [secondaryLanguage, setSecondaryLanguage] = useState('')
-  const { addToast } = useToast()
+  const toast = useToast()
 
   useEffect(() => {
     const fetchConfig = async () => {
@@ -62,10 +63,10 @@ export function LanguagePage() {
       })
       setConfig(savedConfig)
       setIsEditing(false)
-      addToast('Changes saved', 'success')
+      toast.addToast('Changes saved', 'success')
     } catch (error) {
       console.error('Failed to save language configuration:', error)
-      addToast('Failed to save changes', 'error')
+      toast.addToast('Failed to save changes', 'error')
     } finally {
       setIsSaving(false)
     }
@@ -156,8 +157,8 @@ export function LanguagePage() {
           </Box>
         ) : (
           /* Edit Mode */
-          <Box w="full" h="full">
-            <Flex gap={6} mb={6} justify="space-between">
+          <Flex direction="column" w="full" h="full" justify="space-between">
+            <Flex gap={6} justify="space-between">
               <Box>
                 <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={2}>
                   Primary Language*
@@ -204,7 +205,7 @@ export function LanguagePage() {
               </Box>
             </Flex>
 
-            {/* Action Buttons */}
+            {/* Action Buttons*/}
             <HStack spacing={3} justify="flex-end">
               {config?.isConfigured && (
                 <Button variant="secondary" size="sm" onClick={handleCancel} isDisabled={isSaving}>
@@ -221,9 +222,12 @@ export function LanguagePage() {
                 {config?.isConfigured ? 'Save Changes' : 'Save'}
               </Button>
             </HStack>
-          </Box>
+          </Flex>
         )}
       </Box>
+
+      {/* Toast Container */}
+      <ToastContainer toasts={toast.toasts} onRemove={toast.removeToast} />
     </Box>
   )
 }
