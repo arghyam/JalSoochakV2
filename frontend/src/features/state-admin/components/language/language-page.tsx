@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Box, Text, Button, Flex, Select, HStack } from '@chakra-ui/react'
+import { Box, Text, Button, Flex, HStack } from '@chakra-ui/react'
 import { EditIcon } from '@chakra-ui/icons'
 import {
   getMockLanguageConfiguration,
@@ -8,7 +8,7 @@ import {
 import type { LanguageConfiguration } from '../../types/language'
 import { AVAILABLE_LANGUAGES } from '../../types/language'
 import { useToast } from '@/shared/hooks/use-toast'
-import { ToastContainer } from '@/shared/components/common'
+import { ToastContainer, SearchableSelect } from '@/shared/components/common'
 
 export function LanguagePage() {
   const [config, setConfig] = useState<LanguageConfiguration | null>(null)
@@ -163,45 +163,25 @@ export function LanguagePage() {
                 <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={2}>
                   Primary Language*
                 </Text>
-                <Select
+                <SearchableSelect
+                  options={AVAILABLE_LANGUAGES}
                   value={primaryLanguage}
-                  onChange={(e) => setPrimaryLanguage(e.target.value)}
+                  onChange={setPrimaryLanguage}
                   placeholder="Select"
-                  size="md"
-                  w="486px"
-                  h="36px"
-                  borderColor="neutral.300"
-                  _hover={{ borderColor: 'neutral.400' }}
-                  _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
-                >
-                  {AVAILABLE_LANGUAGES.map((lang) => (
-                    <option key={lang.value} value={lang.value}>
-                      {lang.label}
-                    </option>
-                  ))}
-                </Select>
+                  width="486px"
+                />
               </Box>
               <Box>
                 <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={2}>
                   Secondary Language (optional)
                 </Text>
-                <Select
+                <SearchableSelect
+                  options={AVAILABLE_LANGUAGES}
                   value={secondaryLanguage}
-                  onChange={(e) => setSecondaryLanguage(e.target.value)}
+                  onChange={setSecondaryLanguage}
                   placeholder="Select"
-                  size="md"
-                  w="486px"
-                  h="36px"
-                  borderColor="neutral.300"
-                  _hover={{ borderColor: 'neutral.400' }}
-                  _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
-                >
-                  {AVAILABLE_LANGUAGES.map((lang) => (
-                    <option key={lang.value} value={lang.value}>
-                      {lang.label}
-                    </option>
-                  ))}
-                </Select>
+                  width="486px"
+                />
               </Box>
             </Flex>
 
