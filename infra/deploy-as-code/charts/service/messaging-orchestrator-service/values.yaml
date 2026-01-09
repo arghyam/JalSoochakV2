@@ -58,3 +58,8 @@ env: |
       secretKeyRef:
         key: glific-welcome-template-id
         name: glific
+  - name: GLIFIC_BFM_REMINDER_TEMPLATE_ID
+    valueFrom:
+      secretKeyRef:
+        key: glific-bfm-reminder-template-id
+        name: glific
