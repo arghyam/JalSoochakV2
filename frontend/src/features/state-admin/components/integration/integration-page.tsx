@@ -48,7 +48,7 @@ export function IntegrationPage() {
     }
 
     fetchConfig()
-  })
+  }, [])
 
   const handleCancel = () => {
     if (config) {
