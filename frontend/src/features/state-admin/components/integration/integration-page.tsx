@@ -41,13 +41,14 @@ export function IntegrationPage() {
         setApiAccessToken(data.apiAccessToken)
       } catch (error) {
         console.error('Failed to fetch integration configuration:', error)
+        toast.addToast('Failed to load configuration', 'error')
       } finally {
         setIsLoading(false)
       }
     }
 
     fetchConfig()
-  }, [])
+  }, [toast])
 
   const handleCancel = () => {
     if (config) {

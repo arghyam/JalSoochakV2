@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useId } from 'react'
 import {
   Box,
   Input,
@@ -36,6 +36,7 @@ export function SearchableSelect({
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const containerRef = useRef<HTMLDivElement>(null)
+  const listboxId = useId()
 
   useOutsideClick({
     ref: containerRef,
@@ -77,7 +78,7 @@ export function SearchableSelect({
         role="combobox"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
-        aria-controls="searchable-select-listbox"
+        aria-controls={listboxId}
         aria-disabled={disabled}
         disabled={disabled}
         w="full"
@@ -150,7 +151,7 @@ export function SearchableSelect({
 
           {/* Options List */}
           <VStack
-            id="searchable-select-listbox"
+            id={listboxId}
             role="listbox"
             align="stretch"
             spacing={0}
