@@ -3,7 +3,7 @@ import { ROUTES } from '@/shared/constants/routes'
 import { MainLayout, DashboardLayout } from '@/shared/components/layout'
 import { CentralDashboard } from '@/features/dashboard/components/central-dashboard'
 import { Admin, ManageTenants, StateAdminManagement, ConfigureSystem } from '@/features/admin'
-import { OverviewPage, ActivityPage, LanguagePage } from '@/features/state-admin'
+import { OverviewPage, ActivityPage, LanguagePage, IntegrationPage } from '@/features/state-admin'
 import { LoginPage } from '@/features/auth'
 import { ProtectedRoute, RedirectIfAuthenticated } from '@/shared/components/routing/ProtectedRoute'
 import { AUTH_ROLES } from '@/shared/constants/auth'
@@ -130,14 +130,7 @@ export const router = createBrowserRouter([
       },
       {
         path: ROUTES.STATE_ADMIN_INTEGRATION,
-        element: (
-          <Box p={6}>
-            <Heading fontSize="2xl" fontWeight="bold">
-              Integration
-            </Heading>
-            <Text color="gray.600">Coming soon...</Text>
-          </Box>
-        ),
+        element: <IntegrationPage />,
       },
       {
         path: ROUTES.STATE_ADMIN_ESCALATIONS,

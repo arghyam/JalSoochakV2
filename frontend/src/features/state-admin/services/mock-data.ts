@@ -1,6 +1,7 @@
 import type { OverviewData } from '../types/overview'
 import type { ActivityLog } from '../types/activity'
 import type { LanguageConfiguration } from '../types/language'
+import type { IntegrationConfiguration } from '../types/integration'
 
 export const mockOverviewData: OverviewData = {
   stats: {
@@ -138,6 +139,42 @@ export const saveMockLanguageConfiguration = (
         id: '1',
         primaryLanguage: config.primaryLanguage as string,
         secondaryLanguage: config.secondaryLanguage as string | undefined,
+        isConfigured: true,
+      }
+      resolve(savedConfig)
+    }, 500)
+  })
+}
+
+// Integration Configuration Mock Data
+export const mockIntegrationConfiguration: IntegrationConfiguration = {
+  id: '',
+  whatsappBusinessAccountName: '',
+  senderPhoneNumber: '',
+  whatsappBusinessAccountId: '',
+  apiAccessToken: '',
+  isConfigured: false,
+}
+
+export const getMockIntegrationConfiguration = (): Promise<IntegrationConfiguration> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(mockIntegrationConfiguration)
+    }, 300)
+  })
+}
+
+export const saveMockIntegrationConfiguration = (
+  config: Omit<IntegrationConfiguration, 'id' | 'isConfigured'>
+): Promise<IntegrationConfiguration> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const savedConfig: IntegrationConfiguration = {
+        id: '1',
+        whatsappBusinessAccountName: config.whatsappBusinessAccountName as string,
+        senderPhoneNumber: config.senderPhoneNumber as string,
+        whatsappBusinessAccountId: config.whatsappBusinessAccountId as string,
+        apiAccessToken: config.apiAccessToken as string,
         isConfigured: true,
       }
       resolve(savedConfig)
