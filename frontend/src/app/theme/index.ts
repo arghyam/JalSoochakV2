@@ -40,19 +40,17 @@ const theme = extendTheme({
 
     //Body text
     bodyText4: {
-      fontStyle: 'Regular',
       fontSize: '16px',
       lineHeight: '24px',
       color: 'neutral.500',
     },
     bodyText5: {
-      fontStyle: 'Regular',
       fontSize: '14px',
       lineHeight: '21px',
       color: 'neutral.500',
     },
     bodyText6: {
-      fontStyle: 'Medium',
+      fontWeight: 'medium',
       fontSize: '14px',
       lineHeight: '21px',
       color: 'neutral.950',
