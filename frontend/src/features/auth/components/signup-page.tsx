@@ -29,7 +29,7 @@ export function SignupPage() {
         align="stretch"
         justify="flex-start"
         bg="white"
-        px={{ base: 6, md: 12 }}
+        px={{ base: 10, md: 8 }}
         py={{ base: 10, md: 8 }}
       >
         <Flex w="full" direction="column">
@@ -47,7 +47,7 @@ export function SignupPage() {
               </Text>
 
               <FormControl>
-                <FormLabel textStyle="bodyText6" mb={0} fontSize="16px">
+                <FormLabel textStyle="bodyText6" mb="4px" fontSize="16px">
                   User ID{' '}
                   <Text as="span" color="red.500">
                     *
@@ -60,6 +60,7 @@ export function SignupPage() {
                   onChange={(e) => setUserId(e.target.value)}
                   h="36px"
                   px="12px"
+                  py="8px"
                   borderRadius="4px"
                   borderColor="neutral.300"
                   _placeholder={{ color: 'neutral.300' }}
@@ -69,7 +70,7 @@ export function SignupPage() {
               </FormControl>
 
               <FormControl mt="1.5rem">
-                <FormLabel textStyle="bodyText6" mb={0}>
+                <FormLabel textStyle="bodyText6" mb="4px">
                   Password sent via email{' '}
                   <Text as="span" color="red.500">
                     *
@@ -84,6 +85,7 @@ export function SignupPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     h="36px"
                     px="12px"
+                    py="8px"
                     borderRadius="4px"
                     borderColor="neutral.300"
                     fontSize="sm"
@@ -96,15 +98,18 @@ export function SignupPage() {
                       variant="unstyled"
                       size="sm"
                       color="neutral.400"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
                       onClick={() => setShowPassword((prev) => !prev)}
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
                       _hover={{ bg: 'transparent' }}
                       _active={{ bg: 'transparent' }}
                     >
                       {showPassword ? (
-                        <AiOutlineEye size={24} />
+                        <AiOutlineEye size="16px" />
                       ) : (
-                        <AiOutlineEyeInvisible size={24} />
+                        <AiOutlineEyeInvisible size="16px" />
                       )}
                     </Button>
                   </InputRightElement>
@@ -113,24 +118,21 @@ export function SignupPage() {
 
               <Flex align="center" justify="space-between" mt="2rem">
                 <Checkbox
-                  colorScheme="primary"
-                  fontSize="16px"
-                  color="neutral.950"
+                  fontSize="14px"
                   sx={{
-                    _control: {
-                      borderWidth: '2px',
+                    '.chakra-checkbox__control': {
+                      borderWidth: '1px',
+                      borderStyle: 'solid',
                       borderColor: 'neutral.400',
-                      _checked: {
-                        bg: 'primary.500',
-                        borderColor: 'neutral.400',
-                      },
+                      borderRadius: '4px',
+                      overflow: 'hidden',
                     },
                   }}
                 >
                   Remember me
                 </Checkbox>
 
-                <Link fontSize="sm" color="primary.500">
+                <Link fontSize="14px" fontWeight="600" color="primary.500">
                   Forgot password
                 </Link>
               </Flex>
@@ -138,8 +140,8 @@ export function SignupPage() {
               <Button
                 w="full"
                 mt="2rem"
-                fontSize="sm"
-                fontWeight="medium"
+                fontSize="16px"
+                fontWeight="600"
                 isDisabled={!userId || !password}
               >
                 Log in
