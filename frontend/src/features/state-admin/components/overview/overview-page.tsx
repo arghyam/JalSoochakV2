@@ -7,6 +7,7 @@ import { AreaChart } from '@/shared/components/charts/area-chart'
 import type { OverviewData } from '../../types/overview'
 import { BsCheck2Circle, BsPerson } from 'react-icons/bs'
 import { AiOutlineApi, AiOutlineWarning } from 'react-icons/ai'
+import { BiMessageDetail } from 'react-icons/bi'
 
 export function OverviewPage() {
   const user = useAuthStore((state) => state.user)
@@ -61,7 +62,7 @@ export function OverviewPage() {
       title: 'Active Integrations',
       value: data.stats.activeIntegrations.toLocaleString(),
       subtitle: 'WhatsApp, Glyphic',
-      icon: AiOutlineWarning,
+      icon: BiMessageDetail,
       iconBg: '#FBEAFF',
       iconColor: '#DC72F2',
     },
