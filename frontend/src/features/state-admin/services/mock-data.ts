@@ -184,7 +184,7 @@ export const saveMockIntegrationConfiguration = (
 }
 
 // Water Norms Configuration Mock Data
-export const mockWaterNormsConfiguration: WaterNormsConfiguration = {
+let mockWaterNormsConfiguration: WaterNormsConfiguration = {
   id: '',
   stateQuantity: 0,
   districtOverrides: [],
@@ -194,7 +194,7 @@ export const mockWaterNormsConfiguration: WaterNormsConfiguration = {
 export const getMockWaterNormsConfiguration = (): Promise<WaterNormsConfiguration> => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(mockWaterNormsConfiguration)
+      resolve({ ...mockWaterNormsConfiguration })
     }, 300)
   })
 }
@@ -210,6 +210,7 @@ export const saveMockWaterNormsConfiguration = (
         districtOverrides: Array.isArray(config.districtOverrides) ? config.districtOverrides : [],
         isConfigured: true,
       }
+      mockWaterNormsConfiguration = savedConfig
       resolve(savedConfig)
     }, 500)
   })

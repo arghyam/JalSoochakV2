@@ -13,6 +13,7 @@ import { ToastContainer, SearchableSelect } from '@/shared/components/common'
 export function WaterNormsPage() {
   const [config, setConfig] = useState<WaterNormsConfiguration | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [fetchError, setFetchError] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [stateQuantity, setStateQuantity] = useState('')
@@ -29,6 +30,8 @@ export function WaterNormsPage() {
         setIsEditing(!data.isConfigured)
       } catch (error) {
         console.error('Failed to fetch water norms configuration:', error)
+        setFetchError(true)
+        toast.addToast('Failed to load configuration', 'error')
       } finally {
         setIsLoading(false)
       }
@@ -127,6 +130,15 @@ export function WaterNormsPage() {
     )
   }
 
+  if (fetchError) {
+    return (
+      <Box w="full">
+        <Text textStyle="h5">Water Norms</Text>
+        <Text color="error.500">Failed to load configuration. Please try again later.</Text>
+      </Box>
+    )
+  }
+
   return (
     <Box w="full">
       {/* Page Header */}
@@ -159,6 +171,7 @@ export function WaterNormsPage() {
                 onClick={handleEdit}
                 color="neutral.500"
                 _hover={{ bg: 'primary.50', color: 'primary.500' }}
+                aria-label="Edit water norms configuration"
               />
             )}
           </Flex>

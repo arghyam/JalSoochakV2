@@ -99,11 +99,11 @@ export function OverviewPage() {
                 >
                   <Icon as={StatIcon} boxSize={5} color={stat.iconColor} />
                 </Flex>
-                <Box gap={1}>
+                <Flex direction="column" gap={1}>
                   <Text color="neutral.600">{stat.title}</Text>
                   <Text textStyle="h9">{stat.value}</Text>
                   <Text color="neutral.600">{stat.subtitle}</Text>
-                </Box>
+                </Flex>
               </Flex>
             </Box>
           )

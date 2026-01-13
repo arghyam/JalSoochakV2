@@ -126,6 +126,7 @@ export function LanguagePage() {
                 onClick={handleEdit}
                 color="neutral.500"
                 _hover={{ bg: 'primary.50', color: 'primary.500' }}
+                aria-label="Edit language configuration"
               />
             )}
           </Flex>
