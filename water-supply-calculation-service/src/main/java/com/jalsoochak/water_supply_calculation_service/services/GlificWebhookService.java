@@ -2,9 +2,7 @@ package com.jalsoochak.water_supply_calculation_service.services;
 
 import com.jalsoochak.water_supply_calculation_service.models.app.requests.CreateReadingRequest;
 import com.jalsoochak.water_supply_calculation_service.models.app.requests.GlificWebhookRequest;
-import com.jalsoochak.water_supply_calculation_service.models.app.responses.AnomalyResult;
 import com.jalsoochak.water_supply_calculation_service.models.app.responses.CreateReadingResponse;
-import com.jalsoochak.water_supply_calculation_service.models.app.responses.ImageAnalysisResponse;
 import com.jalsoochak.water_supply_calculation_service.models.entities.PersonMaster;
 import com.jalsoochak.water_supply_calculation_service.models.entities.PersonSchemeMapping;
 import com.jalsoochak.water_supply_calculation_service.repositories.PersonRepository;
@@ -35,7 +33,7 @@ public class GlificWebhookService {
     private static final String GLIFIC_API_TOKEN = "<YOUR_GLIFIC_API_TOKEN>";
 
     public GlificWebhookService(MinioService minioService,
-                                AnomalyService anomalyService, PersonSchemeRepository personSchemeRepository,
+                                PersonSchemeRepository personSchemeRepository,
                                 RestTemplate restTemplate, PersonRepository personRepository, BfmReadingService bfmReadingService) {
         this.minioService = minioService;
         this.personSchemeRepository = personSchemeRepository;

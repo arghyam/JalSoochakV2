@@ -27,6 +27,7 @@ public class FlowVisionService {
     public FlowVisionResult extractReading(String readingUrl) {
 
         try {
+
             Map<String, String> payload = new HashMap<>();
             payload.put("imageURL", readingUrl);
 
@@ -43,47 +44,58 @@ public class FlowVisionService {
                     Map.class
             );
 
-            if (responseEntity.getStatusCode() != HttpStatus.OK) {
-                log.warn("FlowVision returned status {}", responseEntity.getStatusCode());
+
+            if (!responseEntity.getStatusCode().is2xxSuccessful()) {
+                log.error("FlowVision HTTP error: {}", responseEntity.getStatusCode());
                 return null;
             }
 
             Map<String, Object> responseBody = responseEntity.getBody();
+            log.info("Raw FlowVision response: {}", responseBody);
+
             if (responseBody == null || !responseBody.containsKey("result")) {
-                log.warn("FlowVision response missing 'result': {}", responseBody);
+                log.error("FlowVision response missing 'result'");
                 return null;
             }
 
             Map<String, Object> resultMap =
                     (Map<String, Object>) responseBody.get("result");
 
+            if (resultMap == null || !"SUCCESS".equals(resultMap.get("status"))) {
+                log.warn("FlowVision OCR not successful: {}", resultMap);
+                return null;
+            }
+
+            if (!resultMap.containsKey("data")) {
+                log.error("FlowVision result missing 'data'");
+                return null;
+            }
+
+            Map<String, Object> dataMap =
+                    (Map<String, Object>) resultMap.get("data");
+
             BigDecimal adjustedReading = null;
-            Object meterReadingObj = resultMap.get("meterReading");
+            Object meterReadingObj = dataMap.get("meterReading");
 
             if (meterReadingObj != null) {
-                try {
-                    adjustedReading = new BigDecimal(meterReadingObj.toString());
-                } catch (NumberFormatException ex) {
-                    log.warn("Invalid meterReading from FlowVision: {}", meterReadingObj);
-                }
+                adjustedReading = new BigDecimal(meterReadingObj.toString());
             }
 
             String qualityStatus =
-                    resultMap.getOrDefault("qualityStatus", "unknown").toString();
+                    dataMap.getOrDefault("qualityStatus", "unknown").toString();
 
             BigDecimal qualityConfidence = null;
-            Object confidenceObj = resultMap.get("qualityConfidence");
+            Object confidenceObj = dataMap.get("qualityConfidence");
+
             if (confidenceObj != null) {
-                try {
-                    qualityConfidence = new BigDecimal(confidenceObj.toString());
-                } catch (NumberFormatException ex) {
-                    log.warn("Invalid qualityConfidence from FlowVision: {}", confidenceObj);
-                }
+                qualityConfidence = new BigDecimal(confidenceObj.toString());
             }
 
-
             String correlationId =
-                    resultMap.getOrDefault("correlationId", UUID.randomUUID().toString()).toString();
+                    resultMap.getOrDefault(
+                            "correlationId",
+                            UUID.randomUUID().toString()
+                    ).toString();
 
             return FlowVisionResult.builder()
                     .adjustedReading(adjustedReading)
@@ -97,4 +109,5 @@ public class FlowVisionService {
             return null;
         }
     }
+
 }
