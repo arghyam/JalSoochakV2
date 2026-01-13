@@ -13,4 +13,7 @@ public class CreateReadingResponse {
     private String qualityStatus;
     private BigDecimal qualityConfidence;
     private BigDecimal lastConfirmedReading;
+
+    private boolean success;
+    private String message;
 }
