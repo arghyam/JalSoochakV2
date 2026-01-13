@@ -2,7 +2,6 @@ import { useState } from 'react'
 import {
   Box,
   Button,
-  Checkbox,
   Flex,
   FormControl,
   FormLabel,
@@ -10,12 +9,11 @@ import {
   Input,
   InputGroup,
   InputRightElement,
-  Link,
   Text,
 } from '@chakra-ui/react'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 import jalsoochakLogo from '@/assets/media/jalsoochak-logo.svg'
-import jalImage from '@/assets/media/jal.jpg'
+import jalImage from '@/assets/media/jalmain.jpg'
 
 export function SignupPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -116,27 +114,6 @@ export function SignupPage() {
                 </InputGroup>
               </FormControl>
 
-              <Flex align="center" justify="space-between" mt="2rem">
-                <Checkbox
-                  fontSize="14px"
-                  sx={{
-                    '.chakra-checkbox__control': {
-                      borderWidth: '1px',
-                      borderStyle: 'solid',
-                      borderColor: 'neutral.400',
-                      borderRadius: '4px',
-                      overflow: 'hidden',
-                    },
-                  }}
-                >
-                  Remember me
-                </Checkbox>
-
-                <Link fontSize="14px" fontWeight="600" color="primary.500">
-                  Forgot password
-                </Link>
-              </Flex>
-
               <Button
                 w="full"
                 mt="2rem"
@@ -144,7 +121,7 @@ export function SignupPage() {
                 fontWeight="600"
                 isDisabled={!userId || !password}
               >
-                Log in
+                Sign up
               </Button>
             </Box>
           </Flex>
@@ -153,6 +130,7 @@ export function SignupPage() {
 
       <Box
         w={{ base: '100%', md: '50%' }}
+        h={{ base: '260px', md: '100vh' }}
         position="relative"
         overflow="hidden"
         display={{ base: 'none', md: 'block' }}
@@ -162,9 +140,10 @@ export function SignupPage() {
         <Image
           src={jalImage}
           alt="Water tap"
-          w="full"
-          h={{ base: '260px', md: '100vh' }}
+          w="100%"
+          h="100%"
           objectFit="cover"
+          objectPosition="center right"
         />
       </Box>
     </Flex>
