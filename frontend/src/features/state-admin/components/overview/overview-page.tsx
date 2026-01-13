@@ -1,18 +1,13 @@
 import { useEffect, useState } from 'react'
-import { Box, Flex, Grid, Text, Icon, InputGroup, Input, InputLeftElement } from '@chakra-ui/react'
-import {
-  CheckCircleIcon,
-  WarningIcon,
-  InfoIcon,
-  AttachmentIcon,
-  SettingsIcon,
-  SearchIcon,
-} from '@chakra-ui/icons'
+import { Box, Flex, Grid, Text, Icon } from '@chakra-ui/react'
 import { useAuthStore } from '@/app/store'
 import { getMockOverviewData } from '../../services/mock-data'
 import { LineChart } from '@/shared/components/charts/line-chart'
 import { AreaChart } from '@/shared/components/charts/area-chart'
 import type { OverviewData } from '../../types/overview'
+import { BsCheck2Circle, BsPerson } from 'react-icons/bs'
+import { AiOutlineApi, AiOutlineWarning } from 'react-icons/ai'
+import { BiMessageDetail } from 'react-icons/bi'
 
 export function OverviewPage() {
   const user = useAuthStore((state) => state.user)
@@ -35,41 +30,41 @@ export function OverviewPage() {
       title: 'Pump Operators Synced',
       value: data.stats.pumpOperatorsSynced.toLocaleString(),
       subtitle: 'Out of 30',
-      icon: InfoIcon,
-      iconBg: 'blue.100',
-      iconColor: 'blue.600',
+      icon: BsPerson,
+      iconBg: '#F1EEFF',
+      iconColor: '#584C93',
     },
     {
       title: 'Configuration Status',
       value: data.stats.configurationStatus,
       subtitle: 'All modules configured',
-      icon: CheckCircleIcon,
-      iconBg: 'green.100',
-      iconColor: 'green.600',
+      icon: BsCheck2Circle,
+      iconBg: '#E1FFEA',
+      iconColor: '#079455',
     },
     {
       title: "Today's API Ingestion",
       value: data.stats.todayApiIngestion,
       subtitle: 'Successfully ingested',
-      icon: AttachmentIcon,
-      iconBg: 'blue.100',
-      iconColor: 'blue.600',
+      icon: AiOutlineApi,
+      iconBg: '#EBF4FA',
+      iconColor: '#3291D1',
     },
     {
       title: 'Pending Data Sync',
       value: data.stats.pendingDataSync.toLocaleString(),
       subtitle: 'Requires Attention',
-      icon: WarningIcon,
-      iconBg: 'red.100',
-      iconColor: 'red.600',
+      icon: AiOutlineWarning,
+      iconBg: '#FFFBD7',
+      iconColor: '#CA8A04',
     },
     {
       title: 'Active Integrations',
       value: data.stats.activeIntegrations.toLocaleString(),
       subtitle: 'WhatsApp, Glyphic',
-      icon: SettingsIcon,
-      iconBg: 'purple.100',
-      iconColor: 'purple.600',
+      icon: BiMessageDetail,
+      iconBg: '#FBEAFF',
+      iconColor: '#DC72F2',
     },
   ]
 
@@ -77,39 +72,7 @@ export function OverviewPage() {
     <Box w="full">
       {/* Page Header */}
       <Box mb={5}>
-        <Text fontSize="2xl" fontWeight="semibold" color="neutral.950">
-          Overview of {user?.tenantId || 'State'}
-        </Text>
-      </Box>
-
-      {/* Search Bar */}
-      <Box
-        bg="white"
-        borderWidth="1px"
-        borderColor="neutral.100"
-        borderRadius="lg"
-        boxShadow="default"
-        mb={5}
-        px={4}
-        py={3}
-      >
-        <InputGroup maxW="340px">
-          <InputLeftElement pointerEvents="none" height="32px">
-            <SearchIcon color="neutral.400" boxSize={4} />
-          </InputLeftElement>
-          <Input
-            placeholder="Search"
-            fontSize="sm"
-            width="340px"
-            height="32px"
-            borderColor="#D1D1D6"
-            borderWidth="1px"
-            _focus={{
-              borderColor: 'blue.500',
-              boxShadow: 'none',
-            }}
-          />
-        </InputGroup>
+        <Text textStyle="h5">Overview of {user?.tenantId || 'State'}</Text>
       </Box>
 
       {/* Stats Cards */}
@@ -137,17 +100,11 @@ export function OverviewPage() {
                 >
                   <Icon as={StatIcon} boxSize={5} color={stat.iconColor} />
                 </Flex>
-                <Box>
-                  <Text fontSize="xs" color="neutral.600" mb={1}>
-                    {stat.title}
-                  </Text>
-                  <Text fontSize="2xl" fontWeight="semibold" color="neutral.950" mb={0.5}>
-                    {stat.value}
-                  </Text>
-                  <Text fontSize="xs" color="neutral.500">
-                    {stat.subtitle}
-                  </Text>
-                </Box>
+                <Flex direction="column" gap={1}>
+                  <Text color="neutral.600">{stat.title}</Text>
+                  <Text textStyle="h9">{stat.value}</Text>
+                  <Text color="neutral.600">{stat.subtitle}</Text>
+                </Flex>
               </Flex>
             </Box>
           )

@@ -110,9 +110,7 @@ export function IntegrationPage() {
     <Box w="full">
       {/* Page Header */}
       <Box mb={6}>
-        <Text fontSize="2xl" fontWeight="semibold" color="neutral.950">
-          Integrations
-        </Text>
+        <Text textStyle="h5">Integrations</Text>
       </Box>
 
       {/* Integration Configuration Card */}
@@ -131,8 +129,8 @@ export function IntegrationPage() {
         <Flex direction="column" w="full" h="full" justify="space-between">
           {/* Form Fields */}
           <VStack align="stretch" spacing={4} flex={1}>
-            <FormControl isRequired>
-              <FormLabel fontSize="sm" fontWeight="medium" color="neutral.950" mb={2}>
+            <FormControl isRequired gap={1}>
+              <FormLabel fontSize="sm" fontWeight="medium" color="neutral.950" mb={0}>
                 Whatsapp Business Account Name
               </FormLabel>
               <Input
@@ -141,6 +139,7 @@ export function IntegrationPage() {
                 onChange={(e) => setWhatsappBusinessAccountName(e.target.value)}
                 size="md"
                 h="36px"
+                maxW="486px"
                 borderColor="neutral.300"
                 borderRadius="6px"
                 _hover={{ borderColor: 'neutral.400' }}
@@ -148,8 +147,8 @@ export function IntegrationPage() {
               />
             </FormControl>
 
-            <FormControl isRequired>
-              <FormLabel fontSize="sm" fontWeight="medium" color="neutral.950" mb={2}>
+            <FormControl isRequired gap={1}>
+              <FormLabel fontSize="sm" fontWeight="medium" color="neutral.950" mb={0}>
                 Sender Phone Number
               </FormLabel>
               <Input
@@ -158,6 +157,7 @@ export function IntegrationPage() {
                 onChange={(e) => setSenderPhoneNumber(e.target.value)}
                 size="md"
                 h="36px"
+                maxW="486px"
                 borderColor="neutral.300"
                 borderRadius="6px"
                 _hover={{ borderColor: 'neutral.400' }}
@@ -165,8 +165,8 @@ export function IntegrationPage() {
               />
             </FormControl>
 
-            <FormControl isRequired>
-              <FormLabel fontSize="sm" fontWeight="medium" color="neutral.950" mb={2}>
+            <FormControl isRequired gap={1}>
+              <FormLabel fontSize="sm" fontWeight="medium" color="neutral.950" mb={0}>
                 Whatsapp Business Account ID
               </FormLabel>
               <Input
@@ -175,6 +175,7 @@ export function IntegrationPage() {
                 onChange={(e) => setWhatsappBusinessAccountId(e.target.value)}
                 size="md"
                 h="36px"
+                maxW="486px"
                 borderColor="neutral.300"
                 borderRadius="6px"
                 _hover={{ borderColor: 'neutral.400' }}
@@ -182,8 +183,8 @@ export function IntegrationPage() {
               />
             </FormControl>
 
-            <FormControl isRequired>
-              <FormLabel fontSize="sm" fontWeight="medium" color="neutral.950" mb={2}>
+            <FormControl isRequired gap={1}>
+              <FormLabel fontSize="sm" fontWeight="medium" color="neutral.950" mb={0}>
                 API Access Token/ API Key
               </FormLabel>
               <Input
@@ -193,6 +194,7 @@ export function IntegrationPage() {
                 onChange={(e) => setApiAccessToken(e.target.value)}
                 size="md"
                 h="36px"
+                maxW="486px"
                 borderColor="neutral.300"
                 borderRadius="6px"
                 _hover={{ borderColor: 'neutral.400' }}
