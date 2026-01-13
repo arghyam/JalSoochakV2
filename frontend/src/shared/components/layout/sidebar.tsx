@@ -2,19 +2,16 @@ import { Link as RouterLink, useLocation } from 'react-router-dom'
 import { Box, Flex, Stack, Text, Icon } from '@chakra-ui/react'
 import {
   MdDashboard,
-  MdLanguage,
+  MdOutlineMoving,
   MdWaterDrop,
-  MdIntegrationInstructions,
-  MdWarning,
-  MdSpeed,
-  MdNotifications,
-  MdApi,
-  MdSync,
-  MdHistory,
   MdPeople,
   MdPersonAdd,
   MdSettings,
 } from 'react-icons/md'
+import { AiOutlineEye, AiOutlineSetting, AiOutlineWarning, AiOutlineApi } from 'react-icons/ai'
+import { IoLanguageOutline, IoWaterOutline } from 'react-icons/io5'
+import { HiOutlineTemplate } from 'react-icons/hi'
+import { BsPerson, BsListUl } from 'react-icons/bs'
 import { useAuthStore } from '@/app/store'
 import { ROUTES } from '@/shared/constants/routes'
 import { AUTH_ROLES } from '@/shared/constants/auth'
@@ -53,61 +50,61 @@ const NAV_ITEMS: NavItem[] = [
     path: ROUTES.STATE_ADMIN_OVERVIEW,
     label: 'Overview',
     roles: [AUTH_ROLES.STATE_ADMIN],
-    icon: MdDashboard,
+    icon: AiOutlineEye,
   },
   {
     path: ROUTES.STATE_ADMIN_LANGUAGE,
     label: 'Language',
     roles: [AUTH_ROLES.STATE_ADMIN],
-    icon: MdLanguage,
+    icon: IoLanguageOutline,
   },
   {
     path: ROUTES.STATE_ADMIN_WATER_NORMS,
     label: 'Water Norms',
     roles: [AUTH_ROLES.STATE_ADMIN],
-    icon: MdWaterDrop,
+    icon: IoWaterOutline,
   },
   {
     path: ROUTES.STATE_ADMIN_INTEGRATION,
     label: 'Integration',
     roles: [AUTH_ROLES.STATE_ADMIN],
-    icon: MdIntegrationInstructions,
+    icon: AiOutlineSetting,
   },
   {
     path: ROUTES.STATE_ADMIN_ESCALATIONS,
     label: 'Escalations',
     roles: [AUTH_ROLES.STATE_ADMIN],
-    icon: MdWarning,
+    icon: MdOutlineMoving,
   },
   {
     path: ROUTES.STATE_ADMIN_THRESHOLDS,
     label: 'Thresholds',
     roles: [AUTH_ROLES.STATE_ADMIN],
-    icon: MdSpeed,
+    icon: AiOutlineWarning,
   },
   {
     path: ROUTES.STATE_ADMIN_NUDGES,
     label: 'Nudges Template',
     roles: [AUTH_ROLES.STATE_ADMIN],
-    icon: MdNotifications,
+    icon: HiOutlineTemplate,
   },
   {
     path: ROUTES.STATE_ADMIN_API_INGESTION,
     label: 'API Ingestion',
     roles: [AUTH_ROLES.STATE_ADMIN],
-    icon: MdApi,
+    icon: AiOutlineApi,
   },
   {
     path: ROUTES.STATE_ADMIN_OPERATOR_SYNC,
     label: 'Operator Sync',
     roles: [AUTH_ROLES.STATE_ADMIN],
-    icon: MdSync,
+    icon: BsPerson,
   },
   {
     path: ROUTES.STATE_ADMIN_ACTIVITY,
     label: 'Activity',
     roles: [AUTH_ROLES.STATE_ADMIN],
-    icon: MdHistory,
+    icon: BsListUl,
   },
 ]
 

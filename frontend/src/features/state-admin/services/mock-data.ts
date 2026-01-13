@@ -2,6 +2,7 @@ import type { OverviewData } from '../types/overview'
 import type { ActivityLog } from '../types/activity'
 import type { LanguageConfiguration } from '../types/language'
 import type { IntegrationConfiguration } from '../types/integration'
+import type { WaterNormsConfiguration } from '../types/water-norms'
 
 export const mockOverviewData: OverviewData = {
   stats: {
@@ -175,6 +176,38 @@ export const saveMockIntegrationConfiguration = (
         senderPhoneNumber: config.senderPhoneNumber as string,
         whatsappBusinessAccountId: config.whatsappBusinessAccountId as string,
         apiAccessToken: config.apiAccessToken as string,
+        isConfigured: true,
+      }
+      resolve(savedConfig)
+    }, 500)
+  })
+}
+
+// Water Norms Configuration Mock Data
+export const mockWaterNormsConfiguration: WaterNormsConfiguration = {
+  id: '',
+  stateQuantity: 0,
+  districtOverrides: [],
+  isConfigured: false,
+}
+
+export const getMockWaterNormsConfiguration = (): Promise<WaterNormsConfiguration> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(mockWaterNormsConfiguration)
+    }, 300)
+  })
+}
+
+export const saveMockWaterNormsConfiguration = (
+  config: Omit<WaterNormsConfiguration, 'id'>
+): Promise<WaterNormsConfiguration> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const savedConfig: WaterNormsConfiguration = {
+        id: '1',
+        stateQuantity: Number(config.stateQuantity),
+        districtOverrides: Array.isArray(config.districtOverrides) ? config.districtOverrides : [],
         isConfigured: true,
       }
       resolve(savedConfig)

@@ -85,9 +85,7 @@ export function ActivityPage() {
     <Box w="full">
       {/* Page Header */}
       <Box mb={6}>
-        <Text fontSize="2xl" fontWeight="semibold" color="neutral.950">
-          Activity
-        </Text>
+        <Text textStyle="h5">Activity</Text>
       </Box>
 
       {/* Activity Table */}
