@@ -7,6 +7,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -24,7 +25,13 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "person_scheme_mapping")
+@Table(
+        name = "person_scheme_mapping",
+        indexes = {
+                @Index(name = "idx_psm_person_id", columnList = "person_id"),
+                @Index(name = "idx_psm_scheme_id", columnList = "scheme_id")
+        }
+)
 public class PersonSchemeMapping {
 
     @Id

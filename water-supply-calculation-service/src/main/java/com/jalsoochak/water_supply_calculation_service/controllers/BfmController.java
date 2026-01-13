@@ -31,4 +31,5 @@ public class BfmController {
                 .status(HttpStatus.CREATED)
                 .body(bfmReadingService.createReading(request));
     }
+
 }

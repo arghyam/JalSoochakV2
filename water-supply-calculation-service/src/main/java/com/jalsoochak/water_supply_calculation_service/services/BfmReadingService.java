@@ -33,39 +33,76 @@ public class BfmReadingService {
     private final PersonRepository personRepository;
     private final PersonSchemeRepository personSchemeRepository;
     private final BfmReadingRepository bfmReadingRepository;
+    private final FlowVisionService flowVisionService;
 
     public CreateReadingResponse createReading(CreateReadingRequest request) {
+
         String tenantId = TenantContext.getTenantId();
 
         SchemeMaster scheme = schemeRepository
                 .findByIdAndTenantId(request.getSchemeId(), tenantId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "State scheme not found"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "State scheme not found")
+                );
 
         PersonMaster operator = personRepository
                 .findByIdAndTenantId(request.getOperatorId(), tenantId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Operator not found"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Operator not found")
+                );
 
-        boolean personBelongsToScheme = personSchemeRepository
-                .findByPerson_IdAndScheme_Id(operator.getId(), scheme.getId())
+        boolean belongsToScheme = personSchemeRepository
+                .findByPerson_IdAndScheme_Id(request.getOperatorId(), request.getSchemeId())
                 .isPresent();
 
-        if (!personBelongsToScheme) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Operator does not belong to the specified scheme");
+        if (!belongsToScheme) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Operator does not belong to the specified scheme"
+            );
         }
 
         FlowVisionResult ocrResult = null;
         BigDecimal finalReading = request.getReadingValue();
+        String message = "Reading created successfully";
 
-        if (request.getReadingValue() != null && request.getReadingValue().compareTo(BigDecimal.ZERO) <= 0) {
+        if (finalReading == null) {
+
             if (request.getReadingUrl() == null || request.getReadingUrl().isBlank()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Either readingValue or readingUrl must be provided");
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Either readingValue or readingUrl must be provided"
+                );
             }
-            // I will call flowvision here just need the complete url
 
-            // ocrResult = flowVisionService.extractReading(request.getReadingUrl());
-            // if (ocrResult != null && ocrResult.getAdjustedReading() != null) {
-            //     finalReading = ocrResult.getAdjustedReading();
-            // }
+            try {
+                ocrResult = flowVisionService.extractReading(request.getReadingUrl());
+                log.info("ocr result: {}", ocrResult);
+                if (ocrResult == null || ocrResult.getAdjustedReading() == null) {
+                    message = "Image processed but meter reading could not be detected clearly";
+                } else {
+                    finalReading = ocrResult.getAdjustedReading();
+                }
+
+            } catch (Exception ex) {
+                log.error("FlowVision OCR failed for URL: {}", request.getReadingUrl(), ex);
+
+                message = "Image could not be processed. Please upload a clearer image.";
+
+                return CreateReadingResponse.builder()
+                        .success(false)
+                        .message(message)
+                        .correlationId(UUID.randomUUID().toString())
+                        .build();
+            }
+        }
+
+        if (finalReading == null) {
+            return CreateReadingResponse.builder()
+                    .success(false)
+                    .message("Meter reading could not be determined. Please retry.")
+                    .correlationId(UUID.randomUUID().toString())
+                    .build();
         }
 
         BfmReading reading = BfmReading.builder()
@@ -74,22 +111,32 @@ public class BfmReadingService {
                 .readingUrl(request.getReadingUrl())
                 .extractedReading(finalReading)
                 .confirmedReading(request.getReadingValue())
-                .readingDateTime(Optional.ofNullable(request.getReadingTime()).orElse(LocalDateTime.now()))
-                .correlationId(Optional.ofNullable(ocrResult)
-                        .map(FlowVisionResult::getCorrelationId)
-                        .orElse(UUID.randomUUID().toString()))
+                .readingDateTime(
+                        Optional.ofNullable(request.getReadingTime())
+                                .orElse(LocalDateTime.now())
+                )
+                .correlationId(
+                        Optional.ofNullable(ocrResult)
+                                .map(FlowVisionResult::getCorrelationId)
+                                .orElse(UUID.randomUUID().toString())
+                )
                 .tenantId(tenantId)
                 .build();
 
         bfmReadingRepository.save(reading);
 
         return CreateReadingResponse.builder()
+                .success(true)
+                .message(message)
                 .correlationId(reading.getCorrelationId())
                 .meterReading(finalReading)
                 .qualityStatus(ocrResult != null ? ocrResult.getQualityStatus() : null)
                 .qualityConfidence(ocrResult != null ? ocrResult.getQualityConfidence() : null)
                 .lastConfirmedReading(
-                        bfmReadingRepository.findTopByScheme_IdAndTenantIdOrderByReadingDateTimeDesc(scheme.getId(), tenantId)
+                        bfmReadingRepository
+                                .findTopByScheme_IdAndTenantIdOrderByReadingDateTimeDesc(
+                                        scheme.getId(), tenantId
+                                )
                                 .map(BfmReading::getConfirmedReading)
                                 .orElse(null)
                 )
