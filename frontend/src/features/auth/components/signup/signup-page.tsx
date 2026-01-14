@@ -19,6 +19,7 @@ export function SignupPage({ onSuccess }: SignupPageProps) {
   const [userId, setUserId] = useState('')
   const [password, setPassword] = useState('')
   const [authError, setAuthError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Temporary hardcoded credentials until signup API is available.
   const HARD_CODED_USER = {
@@ -37,7 +38,8 @@ export function SignupPage({ onSuccess }: SignupPageProps) {
       return
     }
 
-    onSuccess()
+    setIsSubmitting(true)
+    setTimeout(() => onSuccess(), 400)
   }
 
   return (
@@ -126,7 +128,11 @@ export function SignupPage({ onSuccess }: SignupPageProps) {
         mt="2rem"
         fontSize="16px"
         fontWeight="600"
-        isDisabled={!userId || !password}
+        isDisabled={!userId || !password || isSubmitting}
+        isLoading={isSubmitting}
+        loadingText="Signing up..."
+        spinnerProps={{ thickness: '1px' }}
+        _loading={{ bg: 'primary.500', color: 'white' }}
         onClick={handleSignup}
       >
         Sign up

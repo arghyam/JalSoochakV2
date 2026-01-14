@@ -17,12 +17,17 @@ type CreatePasswordPageProps = {
 
 export function CreatePasswordPage({ onNext }: CreatePasswordPageProps) {
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const hasMinLength = password.length >= 8
+  const isPasswordValid = hasMinLength
   const isPasswordMatch = password === confirmPassword
-  const canSubmit = password.length > 0 && confirmPassword.length > 0 && isPasswordMatch
+  const canSubmit =
+    password.length > 0 && confirmPassword.length > 0 && isPasswordValid && isPasswordMatch
 
   return (
     <>
@@ -85,7 +90,7 @@ export function CreatePasswordPage({ onNext }: CreatePasswordPageProps) {
         </FormLabel>
         <InputGroup>
           <Input
-            type={showPassword ? 'text' : 'password'}
+            type={showConfirmPassword ? 'text' : 'password'}
             placeholder="Enter your password"
             autoComplete="new-password"
             value={confirmPassword}
@@ -108,12 +113,16 @@ export function CreatePasswordPage({ onNext }: CreatePasswordPageProps) {
               display="flex"
               alignItems="center"
               justifyContent="center"
-              onClick={() => setShowPassword((prev) => !prev)}
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              onClick={() => setShowConfirmPassword((prev) => !prev)}
+              aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
               _hover={{ bg: 'transparent' }}
               _active={{ bg: 'transparent' }}
             >
-              {showPassword ? <AiOutlineEye size="16px" /> : <AiOutlineEyeInvisible size="16px" />}
+              {showConfirmPassword ? (
+                <AiOutlineEye size="16px" />
+              ) : (
+                <AiOutlineEyeInvisible size="16px" />
+              )}
             </Button>
           </InputRightElement>
         </InputGroup>
@@ -123,6 +132,12 @@ export function CreatePasswordPage({ onNext }: CreatePasswordPageProps) {
           </Text>
         ) : null}
       </FormControl>
+
+      {!isPasswordValid && password ? (
+        <Text mt="10px" fontSize="sm" color="red.500">
+          Password must be at least 8 characters.
+        </Text>
+      ) : null}
 
       <Checkbox
         mt="1.25rem"
@@ -159,8 +174,15 @@ export function CreatePasswordPage({ onNext }: CreatePasswordPageProps) {
         mt="1.25rem"
         fontSize="16px"
         fontWeight="600"
-        isDisabled={!canSubmit}
-        onClick={onNext}
+        isDisabled={!canSubmit || isSubmitting}
+        isLoading={isSubmitting}
+        loadingText="Saving..."
+        spinnerProps={{ thickness: '1px' }}
+        _loading={{ bg: 'primary.500', color: 'white' }}
+        onClick={() => {
+          setIsSubmitting(true)
+          setTimeout(() => onNext(), 400)
+        }}
       >
         Next
       </Button>

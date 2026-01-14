@@ -1,11 +1,15 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button, Flex, FormControl, FormLabel, Input, Text } from '@chakra-ui/react'
+import { ROUTES } from '@/shared/constants/routes'
 
 export function CredentialsPage() {
+  const navigate = useNavigate()
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
   const isPhoneValid = /^\d{10}$/.test(phoneNumber)
@@ -126,7 +130,21 @@ export function CredentialsPage() {
         ) : null}
       </FormControl>
 
-      <Button w="full" mt="2rem" fontSize="16px" fontWeight="600" isDisabled={!canSubmit}>
+      <Button
+        w="full"
+        mt="2rem"
+        fontSize="16px"
+        fontWeight="600"
+        isDisabled={!canSubmit || isSubmitting}
+        isLoading={isSubmitting}
+        loadingText="Signing up..."
+        spinnerProps={{ thickness: '1px' }}
+        _loading={{ bg: 'primary.500', color: 'white' }}
+        onClick={() => {
+          setIsSubmitting(true)
+          setTimeout(() => navigate(ROUTES.LOGIN), 400)
+        }}
+      >
         Sign up
       </Button>
     </>
