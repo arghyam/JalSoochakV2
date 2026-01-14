@@ -13,7 +13,16 @@ import java.io.IOException;
 @Slf4j
 @Component
 public class TenantFilter extends OncePerRequestFilter {
+
     private static final String TENANT_HEADER = "X-Tenant-Id";
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return path.startsWith("/v3/api-docs")
+                || path.startsWith("/swagger-ui")
+                || path.startsWith("/swagger-ui.html");
+    }
 
     @Override
     protected void doFilterInternal(
@@ -39,6 +48,4 @@ public class TenantFilter extends OncePerRequestFilter {
             TenantContext.clear();
         }
     }
-
-
 }
