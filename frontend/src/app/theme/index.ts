@@ -38,6 +38,20 @@ const theme = extendTheme({
       color: 'neutral.950',
     },
 
+    h8: {
+      fontSize: '20px',
+      lineHeight: '30px',
+      fontWeight: '400',
+      color: 'neutral.950',
+    },
+
+    h9: {
+      fontSize: '24px',
+      lineHeight: '36px',
+      fontWeight: '400',
+      color: 'neutral.950',
+    },
+
     //Body text
     bodyText4: {
       fontSize: '16px',

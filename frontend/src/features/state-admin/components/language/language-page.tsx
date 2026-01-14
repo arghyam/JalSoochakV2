@@ -98,9 +98,7 @@ export function LanguagePage() {
     <Box w="full">
       {/* Page Header */}
       <Box mb={6}>
-        <Text fontSize="2xl" fontWeight="semibold" color="neutral.950">
-          Language
-        </Text>
+        <Text textStyle="h5">Language</Text>
       </Box>
 
       {/* Language Configuration Card */}
@@ -116,94 +114,100 @@ export function LanguagePage() {
         pb="24px"
         pl="24px"
       >
-        {/* Card Header */}
-        <Flex justify="space-between" align="center" mb={6}>
-          <Text fontSize="lg" color="neutral.950">
-            Language Configuration
-          </Text>
-          {config?.isConfigured && !isEditing && (
-            <Button
-              variant="ghost"
-              size="sm"
-              leftIcon={<EditIcon />}
-              onClick={handleEdit}
-              color="primary.500"
-              _hover={{ bg: 'primary.50' }}
-            />
+        <Flex direction="column" w="full" h="full" justify="space-between">
+          {/* Card Header */}
+          <Flex justify="space-between" align="center" mb={6}>
+            <Text textStyle="h8">Language Configuration</Text>
+            {config?.isConfigured && !isEditing && (
+              <Button
+                variant="ghost"
+                size="sm"
+                leftIcon={<EditIcon />}
+                onClick={handleEdit}
+                color="neutral.500"
+                _hover={{ bg: 'primary.50', color: 'primary.500' }}
+                aria-label="Edit language configuration"
+              />
+            )}
+          </Flex>
+
+          {/* View Mode */}
+          {!isEditing && config?.isConfigured ? (
+            <Box w="full" h="full">
+              <Flex gap={6} mb={4} justify="space-between">
+                <Box w="486px" h="36px" gap={1}>
+                  <Text fontSize="sm" fontWeight="medium" color="neutral.700">
+                    Primary Language
+                  </Text>
+                  <Text fontSize="md" color="neutral.950">
+                    {getPrimaryLanguageLabel()}
+                  </Text>
+                </Box>
+                <Box w="486px" h="36px" gap={1}>
+                  <Text fontSize="sm" fontWeight="medium" color="neutral.700">
+                    Secondary Language (optional)
+                  </Text>
+                  <Text fontSize="md" color="neutral.950">
+                    {getSecondaryLanguageLabel() || '-'}
+                  </Text>
+                </Box>
+              </Flex>
+            </Box>
+          ) : (
+            /* Edit Mode */
+            <Flex direction="column" w="full" h="full" justify="space-between">
+              <Flex gap={6} justify="space-between">
+                <Box w="486px" gap={1}>
+                  <Text fontSize="sm" fontWeight="medium" color="neutral.950">
+                    Primary Language*
+                  </Text>
+                  <SearchableSelect
+                    options={AVAILABLE_LANGUAGES}
+                    value={primaryLanguage}
+                    onChange={setPrimaryLanguage}
+                    placeholder="Select"
+                    width="486px"
+                  />
+                </Box>
+                <Box w="486px" gap={1}>
+                  <Text fontSize="sm" fontWeight="medium" color="neutral.950">
+                    Secondary Language (optional)
+                  </Text>
+                  <SearchableSelect
+                    options={AVAILABLE_LANGUAGES}
+                    value={secondaryLanguage}
+                    onChange={setSecondaryLanguage}
+                    placeholder="Select"
+                    width="486px"
+                  />
+                </Box>
+              </Flex>
+
+              {/* Action Buttons*/}
+              <HStack spacing={3} justify="flex-end">
+                {config?.isConfigured && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={handleCancel}
+                    isDisabled={isSaving}
+                  >
+                    Cancel
+                  </Button>
+                )}
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={handleSave}
+                  isLoading={isSaving}
+                  isDisabled={!primaryLanguage}
+                >
+                  {config?.isConfigured ? 'Save Changes' : 'Save'}
+                </Button>
+              </HStack>
+            </Flex>
           )}
         </Flex>
-
-        {/* View Mode */}
-        {!isEditing && config?.isConfigured ? (
-          <Box w="full" h="full">
-            <Flex gap={6} mb={4} justify="space-between">
-              <Box w="486px" h="36px">
-                <Text fontSize="sm" fontWeight="medium" color="neutral.700" mb={2}>
-                  Primary Language
-                </Text>
-                <Text fontSize="md" color="neutral.950">
-                  {getPrimaryLanguageLabel()}
-                </Text>
-              </Box>
-              <Box w="486px" h="36px">
-                <Text fontSize="sm" fontWeight="medium" color="neutral.700" mb={2}>
-                  Secondary Language (optional)
-                </Text>
-                <Text fontSize="md" color="neutral.950">
-                  {getSecondaryLanguageLabel() || '-'}
-                </Text>
-              </Box>
-            </Flex>
-          </Box>
-        ) : (
-          /* Edit Mode */
-          <Flex direction="column" w="full" h="full" justify="space-between">
-            <Flex gap={6} justify="space-between">
-              <Box>
-                <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={2}>
-                  Primary Language*
-                </Text>
-                <SearchableSelect
-                  options={AVAILABLE_LANGUAGES}
-                  value={primaryLanguage}
-                  onChange={setPrimaryLanguage}
-                  placeholder="Select"
-                  width="486px"
-                />
-              </Box>
-              <Box>
-                <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={2}>
-                  Secondary Language (optional)
-                </Text>
-                <SearchableSelect
-                  options={AVAILABLE_LANGUAGES}
-                  value={secondaryLanguage}
-                  onChange={setSecondaryLanguage}
-                  placeholder="Select"
-                  width="486px"
-                />
-              </Box>
-            </Flex>
-
-            {/* Action Buttons*/}
-            <HStack spacing={3} justify="flex-end">
-              {config?.isConfigured && (
-                <Button variant="secondary" size="sm" onClick={handleCancel} isDisabled={isSaving}>
-                  Cancel
-                </Button>
-              )}
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={handleSave}
-                isLoading={isSaving}
-                isDisabled={!primaryLanguage}
-              >
-                {config?.isConfigured ? 'Save Changes' : 'Save'}
-              </Button>
-            </HStack>
-          </Flex>
-        )}
       </Box>
 
       {/* Toast Container */}

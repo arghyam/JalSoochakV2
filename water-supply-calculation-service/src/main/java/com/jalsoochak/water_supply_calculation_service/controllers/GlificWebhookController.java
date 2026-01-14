@@ -1,0 +1,47 @@
+package com.jalsoochak.water_supply_calculation_service.controllers;
+
+import com.jalsoochak.water_supply_calculation_service.models.app.requests.GlificWebhookRequest;
+import com.jalsoochak.water_supply_calculation_service.models.app.responses.CreateReadingResponse;
+import com.jalsoochak.water_supply_calculation_service.models.app.responses.ImageAnalysisResponse;
+import com.jalsoochak.water_supply_calculation_service.services.GlificWebhookService;
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/v2/webhook")
+public class GlificWebhookController {
+
+    private static final Logger log = LoggerFactory.getLogger(GlificWebhookController.class);
+    private final GlificWebhookService glificWebhookService;
+
+    public GlificWebhookController(GlificWebhookService glificWebhookService) {
+        this.glificWebhookService = glificWebhookService;
+    }
+
+    @PostMapping("/glific")
+    public ResponseEntity<CreateReadingResponse> receive(@RequestBody GlificWebhookRequest glificWebhookRequest) {
+        System.out.println("Payload received: " + glificWebhookRequest);
+        try {
+            CreateReadingResponse response = glificWebhookService.processImage(glificWebhookRequest);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Error processing webhook for contactId {}: {}",
+                    glificWebhookRequest.getContactId(), e.getMessage(), e);
+
+            CreateReadingResponse errorResponse = CreateReadingResponse.builder()
+                    .correlationId(glificWebhookRequest.getContactId())
+                    .meterReading(null)
+                    .qualityStatus("REJECTED")
+                    .qualityConfidence(null)
+                    .lastConfirmedReading(null)
+                    .build();
+
+            return ResponseEntity.internalServerError().body(errorResponse);
+        }
+
+    }
+
+}

@@ -6,6 +6,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -25,7 +26,13 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "scheme_master")
+@Table(
+        name = "scheme_master",
+        indexes = {
+                @Index(name = "idx_scheme_tenant_id", columnList = "tenant_id"),
+                @Index(name = "idx_scheme_state_id", columnList = "state_scheme_id")
+        }
+)
 public class SchemeMaster {
 
     @Id
