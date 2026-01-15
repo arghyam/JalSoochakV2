@@ -139,10 +139,10 @@ export function DataTable<T extends Record<string, unknown>>({
                 userSelect="none"
                 _hover={column.sortable ? { bg: 'neutral.50' } : undefined}
                 bg="transparent"
-                borderBottom="1px"
-                borderColor="neutral.200"
+                h={10}
+                textTransform="none"
               >
-                <Flex align="center" gap={2}>
+                <Flex align="center" gap={2} textStyle="h10" px={5} py={3}>
                   <Text>{column.header}</Text>
                   {column.sortable && (
                     <Box>
@@ -168,7 +168,15 @@ export function DataTable<T extends Record<string, unknown>>({
           {sortedData.map((row) => (
             <Tr key={getRowKey(row)} _hover={{ bg: 'neutral.25' }}>
               {columns.map((column) => (
-                <Td key={column.key} borderBottom="1px" borderColor="neutral.200">
+                <Td
+                  key={column.key}
+                  borderTop="1px"
+                  borderBottom="none"
+                  borderColor="neutral.200"
+                  px={5}
+                  py={3}
+                  h={12}
+                >
                   {column.render ? column.render(row) : String(row[column.key as keyof T] ?? '')}
                 </Td>
               ))}

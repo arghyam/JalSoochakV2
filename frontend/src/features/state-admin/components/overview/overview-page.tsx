@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Box, Flex, Grid, Text, Icon } from '@chakra-ui/react'
+import { Box, Flex, Grid, Text, Icon, Stack, Select } from '@chakra-ui/react'
 import { useAuthStore } from '@/app/store'
 import { getMockOverviewData } from '../../services/mock-data'
 import { LineChart } from '@/shared/components/charts/line-chart'
@@ -75,100 +75,108 @@ export function OverviewPage() {
         <Text textStyle="h5">Overview of {user?.tenantId || 'State'}</Text>
       </Box>
 
-      {/* Stats Cards */}
-      <Grid templateColumns="repeat(5, 1fr)" gap={4} mb={5}>
-        {statsCards.map((stat) => {
-          const StatIcon = stat.icon
-          return (
-            <Box
-              key={stat.title}
-              bg="white"
-              borderWidth="1px"
-              borderColor="neutral.100"
-              borderRadius="lg"
-              boxShadow="default"
-              p={4}
-            >
-              <Flex direction="column" gap={3}>
-                <Flex
-                  h="40px"
-                  w="40px"
-                  align="center"
-                  justify="center"
-                  borderRadius="lg"
-                  bg={stat.iconBg}
-                >
-                  <Icon as={StatIcon} boxSize={5} color={stat.iconColor} />
+      <Stack gap={6}>
+        {/* Stats Cards */}
+        <Grid templateColumns="repeat(5, 1fr)" gap={7}>
+          {statsCards.map((stat) => {
+            const StatIcon = stat.icon
+            return (
+              <Box
+                key={stat.title}
+                bg="white"
+                borderWidth="1px"
+                borderColor="neutral.100"
+                borderRadius="lg"
+                boxShadow="default"
+                p={4}
+              >
+                <Flex direction="column" gap={3}>
+                  <Flex
+                    h="40px"
+                    w="40px"
+                    align="center"
+                    justify="center"
+                    borderRadius="lg"
+                    bg={stat.iconBg}
+                  >
+                    <Icon as={StatIcon} boxSize={5} color={stat.iconColor} />
+                  </Flex>
+                  <Flex direction="column" gap={1}>
+                    <Text color="neutral.600">{stat.title}</Text>
+                    <Text textStyle="h9">{stat.value}</Text>
+                    <Text color="neutral.600">{stat.subtitle}</Text>
+                  </Flex>
                 </Flex>
-                <Flex direction="column" gap={1}>
-                  <Text color="neutral.600">{stat.title}</Text>
-                  <Text textStyle="h9">{stat.value}</Text>
-                  <Text color="neutral.600">{stat.subtitle}</Text>
-                </Flex>
-              </Flex>
-            </Box>
-          )
-        })}
-      </Grid>
+              </Box>
+            )
+          })}
+        </Grid>
 
-      {/* Demand vs Supply Chart */}
-      <Box
-        bg="white"
-        borderWidth="1px"
-        borderColor="neutral.100"
-        borderRadius="lg"
-        boxShadow="default"
-        mb={5}
-        p={6}
-      >
-        <Text fontSize="lg" fontWeight="semibold" color="neutral.950" mb={4}>
-          Demand vs Supply
-        </Text>
-        <LineChart
-          data={data.demandSupplyData}
-          xKey="period"
-          yKeys={['demand', 'supply']}
-          colors={['#3291D1', '#ADD3EB']}
-          height="288px"
-        />
-      </Box>
-
-      {/* Daily Ingestion Monitor */}
-      <Box
-        bg="white"
-        borderWidth="1px"
-        borderColor="neutral.100"
-        borderRadius="lg"
-        boxShadow="default"
-        p={6}
-      >
-        <Flex align="center" justify="space-between" mb={4}>
-          <Text fontSize="lg" fontWeight="semibold" color="neutral.950">
-            Daily Ingestion Monitor
+        {/* Demand vs Supply Chart */}
+        <Box
+          bg="white"
+          borderWidth="1px"
+          borderColor="neutral.100"
+          borderRadius="lg"
+          boxShadow="default"
+          py={6}
+          px={4}
+        >
+          <Text textStyle="h8" mb={4}>
+            Demand vs Supply
           </Text>
-          <Box
-            as="select"
-            w="auto"
-            fontSize="sm"
-            borderRadius="md"
-            borderWidth="1px"
-            borderColor="neutral.100"
-            bg="white"
-            px={3}
-            py={1}
-            color="neutral.600"
-          >
-            <option>December</option>
-          </Box>
-        </Flex>
-        <AreaChart
-          data={data.dailyIngestionData}
-          xKey="day"
-          yKey="count"
-          color="#FFA100"
-          height="288px"
-        />
-      </Box>
+          <LineChart
+            data={data.demandSupplyData}
+            xKey="period"
+            yKeys={['demand', 'supply']}
+            colors={['#3291D1', '#ADD3EB']}
+            height="440px"
+            xAxisLabel="Year"
+            yAxisLabel="Quantity (units)"
+          />
+        </Box>
+
+        {/* Daily Ingestion Monitor */}
+        <Box
+          bg="white"
+          borderWidth="1px"
+          borderColor="neutral.100"
+          borderRadius="lg"
+          boxShadow="default"
+          py={6}
+          px={4}
+        >
+          <Flex align="center" justify="space-between" mb={4}>
+            <Text textStyle="h8">Daily Ingestion Monitor</Text>
+            <Select
+              h="32px"
+              maxW="162px"
+              fontSize="14px"
+              fontWeight="600"
+              borderRadius="4px"
+              borderColor="primary.500"
+              borderWidth="1px"
+              bg="white"
+              color="primary.500"
+              appearance="none"
+              _focus={{
+                borderColor: 'primary.500',
+                boxShadow: 'none',
+              }}
+            >
+              <option value="december">December</option>
+            </Select>
+          </Flex>
+          <AreaChart
+            data={data.dailyIngestionData}
+            xKey="day"
+            yKey="count"
+            color="#FFA100"
+            height="326px"
+            legendLabel="Success Rate"
+          />
+        </Box>
+      </Stack>
     </Box>
   )
 }

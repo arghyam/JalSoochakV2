@@ -177,7 +177,6 @@ export function CreatePasswordPage({ onNext }: CreatePasswordPageProps) {
         isDisabled={!canSubmit || isSubmitting}
         isLoading={isSubmitting}
         loadingText="Saving..."
-        spinnerProps={{ thickness: '1px' }}
         _loading={{ bg: 'primary.500', color: 'white' }}
         onClick={() => {
           setIsSubmitting(true)

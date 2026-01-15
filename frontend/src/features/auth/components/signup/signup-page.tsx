@@ -131,7 +131,6 @@ export function SignupPage({ onSuccess }: SignupPageProps) {
         isDisabled={!userId || !password || isSubmitting}
         isLoading={isSubmitting}
         loadingText="Signing up..."
-        spinnerProps={{ thickness: '1px' }}
         _loading={{ bg: 'primary.500', color: 'white' }}
         onClick={handleSignup}
       >

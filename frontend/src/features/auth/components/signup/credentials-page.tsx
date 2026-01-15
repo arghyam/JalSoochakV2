@@ -138,7 +138,6 @@ export function CredentialsPage() {
         isDisabled={!canSubmit || isSubmitting}
         isLoading={isSubmitting}
         loadingText="Signing up..."
-        spinnerProps={{ thickness: '1px' }}
         _loading={{ bg: 'primary.500', color: 'white' }}
         onClick={() => {
           setIsSubmitting(true)

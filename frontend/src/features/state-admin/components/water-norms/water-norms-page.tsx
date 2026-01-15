@@ -38,6 +38,7 @@ export function WaterNormsPage() {
     }
 
     fetchConfig()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleEdit = () => {
@@ -142,7 +143,7 @@ export function WaterNormsPage() {
   return (
     <Box w="full">
       {/* Page Header */}
-      <Box mb={6}>
+      <Box mb={5}>
         <Text textStyle="h5">Water Norms</Text>
       </Box>
 
@@ -154,25 +155,28 @@ export function WaterNormsPage() {
         borderRadius="12px"
         w="full"
         h="600px"
-        pt="24px"
-        pr="24px"
-        pb="24px"
-        pl="24px"
+        py="24px"
+        px="16px"
       >
         <Flex direction="column" w="full" h="full" justify="space-between">
           {/* Card Header */}
-          <Flex justify="space-between" align="center" mb={6}>
+          <Flex justify="space-between" align="center" mb={4}>
             <Text textStyle="h8">State/UT Water Norms</Text>
             {config?.isConfigured && !isEditing && (
               <Button
                 variant="ghost"
-                size="sm"
-                leftIcon={<EditIcon />}
+                h={6}
+                w={6}
+                minW={6}
+                pl="2px"
+                pr="2px"
                 onClick={handleEdit}
                 color="neutral.500"
                 _hover={{ bg: 'primary.50', color: 'primary.500' }}
                 aria-label="Edit water norms configuration"
-              />
+              >
+                <EditIcon h={5} w={5} />
+              </Button>
             )}
           </Flex>
 
@@ -180,8 +184,8 @@ export function WaterNormsPage() {
           {!isEditing && config?.isConfigured ? (
             <Box w="full" h="full">
               {/* State Quantity */}
-              <Box mb={6} gap={1}>
-                <Text fontSize="sm" fontWeight="medium" color="neutral.700">
+              <Box mb={7}>
+                <Text fontSize="sm" fontWeight="medium" color="neutral.700" mb={1}>
                   Current quantity (LPCD)*
                 </Text>
                 <Text fontSize="md" color="neutral.950">
@@ -191,22 +195,22 @@ export function WaterNormsPage() {
 
               {/* District-Level Overrides */}
               {districtOverrides.length > 0 && (
-                <Box mt={8}>
+                <Box>
                   <Text textStyle="h8" mb={4}>
                     District-Level Overrides
                   </Text>
                   {districtOverrides.map((override) => (
                     <Flex key={override.id} gap={6} mb={4} align="center">
-                      <Box w="486px" gap={1}>
-                        <Text fontSize="sm" fontWeight="medium" color="neutral.700">
+                      <Box w="486px">
+                        <Text fontSize="sm" fontWeight="medium" color="neutral.700" mb={1}>
                           District Name
                         </Text>
                         <Text fontSize="md" color="neutral.950">
                           {getDistrictLabel(override.districtName)}
                         </Text>
                       </Box>
-                      <Box w="486px" gap={1}>
-                        <Text fontSize="sm" fontWeight="medium" color="neutral.700">
+                      <Box w="486px">
+                        <Text fontSize="sm" fontWeight="medium" color="neutral.700" mb={1}>
                           Quantity (LPCD)
                         </Text>
                         <Text fontSize="md" color="neutral.950">
@@ -223,8 +227,8 @@ export function WaterNormsPage() {
             <Flex direction="column" w="full" h="full" justify="space-between">
               <Box>
                 {/* State Quantity Input */}
-                <Box mb={6} gap={1}>
-                  <Text fontSize="sm" fontWeight="medium" color="neutral.950">
+                <Box mb={6}>
+                  <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
                     Current quantity (LPCD)*
                   </Text>
                   <Input
@@ -242,15 +246,15 @@ export function WaterNormsPage() {
                 </Box>
 
                 {/* District-Level Overrides */}
-                <Box mt={6}>
+                <Box>
                   <Text textStyle="h8" mb={4}>
                     District-Level Overrides
                   </Text>
 
                   {districtOverrides.map((override) => (
-                    <Flex key={override.id} gap={6} mb={4} align="flex-end">
-                      <Box w="486px" gap={1}>
-                        <Text fontSize="sm" fontWeight="medium" color="neutral.950">
+                    <Flex key={override.id} gap={6} mb={3} align="flex-end">
+                      <Box w="486px">
+                        <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
                           District Name
                         </Text>
                         <SearchableSelect
@@ -273,8 +277,8 @@ export function WaterNormsPage() {
                           width="486px"
                         />
                       </Box>
-                      <Box w="486px" gap={1}>
-                        <Text fontSize="sm" fontWeight="medium" color="neutral.950">
+                      <Box w="486px">
+                        <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
                           Quantity (LPCD)
                         </Text>
                         <Input
@@ -294,10 +298,10 @@ export function WaterNormsPage() {
                       </Box>
                       <IconButton
                         aria-label="Delete district"
-                        icon={<DeleteIcon />}
+                        icon={<DeleteIcon h={5} w={5} />}
                         variant="ghost"
                         size="sm"
-                        color="neutral.500"
+                        color="neutral.400"
                         onClick={() => handleRemoveDistrict(override.id)}
                         h="36px"
                         _hover={{ bg: 'error.50', color: 'error.500' }}
@@ -316,7 +320,8 @@ export function WaterNormsPage() {
                 {config?.isConfigured && (
                   <Button
                     variant="secondary"
-                    size="sm"
+                    size="md"
+                    width="174px"
                     onClick={handleCancel}
                     isDisabled={isSaving}
                   >
@@ -325,7 +330,8 @@ export function WaterNormsPage() {
                 )}
                 <Button
                   variant="primary"
-                  size="sm"
+                  size="md"
+                  width="174px"
                   onClick={handleSave}
                   isLoading={isSaving}
                   isDisabled={!stateQuantity}

@@ -1,0 +1,17 @@
+# Summary
+
+* [Introduction](introduction.md)
+* [Users and Tenancy Model](users-tenancy.md)
+* [Functional Overview](functional-overview.md)
+* [Technical Architecture](technical-architecture.md)
+  * [Architectural Style](technical-architecture.md#architectural-style)
+  * [Key Backend Services](technical-architecture.md#key-backend-services)
+  * [Data Flow Examples](technical-architecture.md#data-flow-examples)
+* [Deployment Architecture](deployment-architecture.md)
+* [Technology Stack](technology-stack.md)
+* [Architectural Decision Records](adrs.md)
+* [API Specifications](api-specifications.md)
+  * [OpenAPI Specification](openapi.yaml)
+* [Database Design](database-design.md)
+* [Non-functional Requirements](nfrs.md)
+* [Future Work](future-work.md)
