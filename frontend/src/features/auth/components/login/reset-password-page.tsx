@@ -26,8 +26,12 @@ export function ResetPasswordPage() {
   const [rememberMe, setRememberMe] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const isPasswordMatch = newPassword === confirmPassword
   const canSubmit =
-    emailPassword.trim().length > 0 && newPassword.trim().length > 0 && confirmPassword.length > 0
+    emailPassword.trim().length > 0 &&
+    newPassword.trim().length > 0 &&
+    confirmPassword.trim().length > 0 &&
+    isPasswordMatch
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault()
@@ -198,6 +202,12 @@ export function ResetPasswordPage() {
                     </InputGroup>
                   </FormControl>
 
+                  {!isPasswordMatch && confirmPassword ? (
+                    <Text mt="-8px" fontSize="sm" color="red.500">
+                      Passwords do not match.
+                    </Text>
+                  ) : null}
+
                   <Checkbox
                     fontSize="14px"
                     isChecked={rememberMe}
@@ -237,7 +247,7 @@ export function ResetPasswordPage() {
                     loadingText="Logging in..."
                     _loading={{ bg: 'primary.500', color: 'white' }}
                   >
-                    Log in
+                    Reset Password
                   </Button>
                 </Flex>
               </Box>
