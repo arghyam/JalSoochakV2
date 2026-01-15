@@ -137,7 +137,6 @@ export function IntegrationPage() {
                   placeholder="Example: State Water Authority"
                   fontSize="14px"
                   fontWeight="400"
-                  fontStyle="regular"
                   value={whatsappBusinessAccountName}
                   onChange={(e) => setWhatsappBusinessAccountName(e.target.value)}
                   size="md"
@@ -160,7 +159,6 @@ export function IntegrationPage() {
                   placeholder="+91"
                   fontSize="14px"
                   fontWeight="400"
-                  fontStyle="regular"
                   value={senderPhoneNumber}
                   onChange={(e) => setSenderPhoneNumber(e.target.value)}
                   size="md"
@@ -183,7 +181,6 @@ export function IntegrationPage() {
                   placeholder="Enter"
                   fontSize="14px"
                   fontWeight="400"
-                  fontStyle="regular"
                   value={whatsappBusinessAccountId}
                   onChange={(e) => setWhatsappBusinessAccountId(e.target.value)}
                   size="md"
@@ -206,7 +203,6 @@ export function IntegrationPage() {
                   placeholder="Enter"
                   fontSize="14px"
                   fontWeight="400"
-                  fontStyle="regular"
                   type="password"
                   value={apiAccessToken}
                   onChange={(e) => setApiAccessToken(e.target.value)}
@@ -226,7 +222,13 @@ export function IntegrationPage() {
 
           {/* Action Buttons */}
           <HStack spacing={3} justify="flex-end" mt={4}>
-            <Button variant="secondary" size="md" width="174px" onClick={handleCancel}>
+            <Button
+              variant="secondary"
+              size="md"
+              width="174px"
+              onClick={handleCancel}
+              isDisabled={isSaving}
+            >
               Cancel
             </Button>
             <Button

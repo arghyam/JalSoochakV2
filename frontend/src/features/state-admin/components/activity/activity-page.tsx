@@ -44,7 +44,7 @@ export function ActivityPage() {
       header: 'Timestamp',
       sortable: true,
       render: (row) => (
-        <Text textStyle="h10" fontWeight="400" fontStyle="regular">
+        <Text textStyle="h10" fontWeight="400">
           {formatTimestamp(row.timestamp)}
         </Text>
       ),
@@ -54,7 +54,7 @@ export function ActivityPage() {
       header: 'Action',
       sortable: true,
       render: (row) => (
-        <Text textStyle="h10" fontWeight="400" fontStyle="regular">
+        <Text textStyle="h10" fontWeight="400">
           {row.action}
         </Text>
       ),

@@ -56,7 +56,6 @@ const theme = extendTheme({
       fontSize: '14px',
       lineHeight: '20px',
       fontWeight: '500',
-      fontStyle: 'medium',
       color: 'neutral.950',
     },
 
