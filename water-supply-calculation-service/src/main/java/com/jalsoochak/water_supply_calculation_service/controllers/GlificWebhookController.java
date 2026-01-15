@@ -21,8 +21,13 @@ public class GlificWebhookController {
         this.glificWebhookService = glificWebhookService;
     }
 
-    @PostMapping("/glific")
-    public ResponseEntity<CreateReadingResponse> receive(@RequestBody GlificWebhookRequest glificWebhookRequest) {
+    @PostMapping(
+            value = "/glific",
+            consumes = "application/json",
+            produces = "application/json"
+    )
+    public ResponseEntity<CreateReadingResponse> receive(@RequestBody GlificWebhookRequest glificWebhookRequest,
+                                                          @RequestHeader(value = "X-Tenant-ID", required = false) String tenantId) {
         System.out.println("Payload received: " + glificWebhookRequest);
         try {
             CreateReadingResponse response = glificWebhookService.processImage(glificWebhookRequest);
@@ -39,7 +44,7 @@ public class GlificWebhookController {
                     .lastConfirmedReading(null)
                     .build();
 
-            return ResponseEntity.internalServerError().body(errorResponse);
+            return ResponseEntity.ok(errorResponse);
         }
 
     }
