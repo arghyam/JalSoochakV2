@@ -20,7 +20,7 @@
 	</properties>
 
 	<dependencies>
-		<!-- Use reactive gateway instead of MVC -->
+
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-gateway</artifactId>
