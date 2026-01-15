@@ -7,6 +7,7 @@ interface AreaChartProps<T extends object> {
   yKey: keyof T
   color?: string
   height?: string
+  legendLabel?: string
 }
 
 export function AreaChart<T extends object>({
@@ -15,6 +16,7 @@ export function AreaChart<T extends object>({
   yKey,
   color = '#FFA100',
   height = '300px',
+  legendLabel,
 }: AreaChartProps<T>) {
   const option = {
     tooltip: {
@@ -23,10 +25,21 @@ export function AreaChart<T extends object>({
         type: 'cross',
       },
     },
+    legend: legendLabel
+      ? {
+          data: [legendLabel],
+          bottom: 0,
+          icon: 'square',
+          textStyle: {
+            fontSize: 12,
+            color: '#1C1C1C',
+          },
+        }
+      : undefined,
     grid: {
       left: '3%',
       right: '4%',
-      bottom: '3%',
+      bottom: legendLabel ? '15%' : '3%',
       top: '10%',
       containLabel: true,
     },
@@ -43,13 +56,21 @@ export function AreaChart<T extends object>({
       axisTick: {
         show: false,
       },
+      axisLabel: {
+        fontSize: 12,
+        color: '#1C1C1C',
+      },
     },
     yAxis: {
       type: 'value',
+      axisLabel: {
+        fontSize: 12,
+        color: '#1C1C1C',
+      },
     },
     series: [
       {
-        name: String(yKey),
+        name: legendLabel || String(yKey),
         type: 'line',
         data: data.map((item) => item[yKey]),
         smooth: true,

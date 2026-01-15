@@ -7,6 +7,8 @@ interface LineChartProps<T extends object> {
   yKeys: (keyof T)[]
   colors?: string[]
   height?: string
+  xAxisLabel?: string
+  yAxisLabel?: string
 }
 
 export function LineChart<T extends object>({
@@ -15,6 +17,8 @@ export function LineChart<T extends object>({
   yKeys,
   colors = ['#3291D1', '#D92D20'],
   height = '300px',
+  xAxisLabel,
+  yAxisLabel,
 }: LineChartProps<T>) {
   const option = {
     tooltip: {
@@ -27,6 +31,10 @@ export function LineChart<T extends object>({
       data: yKeys.map(String),
       bottom: 0,
       icon: 'square',
+      textStyle: {
+        fontSize: 12,
+        color: '#1C1C1C',
+      },
     },
     grid: {
       left: '3%',
@@ -48,9 +56,31 @@ export function LineChart<T extends object>({
       axisTick: {
         show: false,
       },
+      axisLabel: {
+        fontSize: 12,
+        color: '#1C1C1C',
+      },
+      name: xAxisLabel,
+      nameLocation: 'middle',
+      nameGap: 30,
+      nameTextStyle: {
+        fontSize: 12,
+        color: '#1C1C1C',
+      },
     },
     yAxis: {
       type: 'value',
+      axisLabel: {
+        fontSize: 12,
+        color: '#1C1C1C',
+      },
+      name: yAxisLabel,
+      nameLocation: 'middle',
+      nameGap: 50,
+      nameTextStyle: {
+        fontSize: 12,
+        color: '#1C1C1C',
+      },
     },
     series: yKeys.map((key, index) => ({
       name: String(key),
