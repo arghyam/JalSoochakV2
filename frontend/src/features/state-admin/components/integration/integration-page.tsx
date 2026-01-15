@@ -109,7 +109,7 @@ export function IntegrationPage() {
   return (
     <Box w="full">
       {/* Page Header */}
-      <Box mb={6}>
+      <Box mb={5}>
         <Text textStyle="h5">Integrations</Text>
       </Box>
 
@@ -121,101 +121,118 @@ export function IntegrationPage() {
         borderRadius="12px"
         w="full"
         h="600px"
-        pt="24px"
-        pr="24px"
-        pb="24px"
-        pl="24px"
+        py={6}
+        px={4}
       >
         <Flex direction="column" w="full" h="full" justify="space-between">
-          {/* Form Fields */}
-          <VStack align="stretch" spacing={4} flex={1}>
-            <FormControl isRequired gap={1}>
-              <FormLabel fontSize="sm" fontWeight="medium" color="neutral.950" mb={0}>
-                Whatsapp Business Account Name
-              </FormLabel>
-              <Input
-                placeholder="Example: State Water Authority"
-                value={whatsappBusinessAccountName}
-                onChange={(e) => setWhatsappBusinessAccountName(e.target.value)}
-                size="md"
-                h="36px"
-                maxW="486px"
-                borderColor="neutral.300"
-                borderRadius="6px"
-                _hover={{ borderColor: 'neutral.400' }}
-                _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
-              />
-            </FormControl>
+          <Flex direction="column" gap={4}>
+            <Text textStyle="h8">Whatsapp Details</Text>
+            {/* Form Fields */}
+            <VStack align="stretch" spacing={3} flex={1}>
+              <FormControl isRequired gap={1}>
+                <FormLabel textStyle="h10" mb={0}>
+                  Whatsapp Business Account Name
+                </FormLabel>
+                <Input
+                  placeholder="Example: State Water Authority"
+                  fontSize="14px"
+                  fontWeight="400"
+                  fontStyle="regular"
+                  value={whatsappBusinessAccountName}
+                  onChange={(e) => setWhatsappBusinessAccountName(e.target.value)}
+                  size="md"
+                  h="36px"
+                  maxW="486px"
+                  px={3}
+                  py={2}
+                  borderColor="neutral.300"
+                  borderRadius="4px"
+                  _hover={{ borderColor: 'neutral.400' }}
+                  _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
+                />
+              </FormControl>
 
-            <FormControl isRequired gap={1}>
-              <FormLabel fontSize="sm" fontWeight="medium" color="neutral.950" mb={0}>
-                Sender Phone Number
-              </FormLabel>
-              <Input
-                placeholder="+91"
-                value={senderPhoneNumber}
-                onChange={(e) => setSenderPhoneNumber(e.target.value)}
-                size="md"
-                h="36px"
-                maxW="486px"
-                borderColor="neutral.300"
-                borderRadius="6px"
-                _hover={{ borderColor: 'neutral.400' }}
-                _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
-              />
-            </FormControl>
+              <FormControl isRequired gap={1}>
+                <FormLabel textStyle="h10" mb={0}>
+                  Sender Phone Number
+                </FormLabel>
+                <Input
+                  placeholder="+91"
+                  fontSize="14px"
+                  fontWeight="400"
+                  fontStyle="regular"
+                  value={senderPhoneNumber}
+                  onChange={(e) => setSenderPhoneNumber(e.target.value)}
+                  size="md"
+                  h="36px"
+                  maxW="486px"
+                  px={3}
+                  py={2}
+                  borderColor="neutral.300"
+                  borderRadius="4px"
+                  _hover={{ borderColor: 'neutral.400' }}
+                  _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
+                />
+              </FormControl>
 
-            <FormControl isRequired gap={1}>
-              <FormLabel fontSize="sm" fontWeight="medium" color="neutral.950" mb={0}>
-                Whatsapp Business Account ID
-              </FormLabel>
-              <Input
-                placeholder="Enter"
-                value={whatsappBusinessAccountId}
-                onChange={(e) => setWhatsappBusinessAccountId(e.target.value)}
-                size="md"
-                h="36px"
-                maxW="486px"
-                borderColor="neutral.300"
-                borderRadius="6px"
-                _hover={{ borderColor: 'neutral.400' }}
-                _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
-              />
-            </FormControl>
+              <FormControl isRequired gap={1}>
+                <FormLabel textStyle="h10" mb={0}>
+                  Whatsapp Business Account ID
+                </FormLabel>
+                <Input
+                  placeholder="Enter"
+                  fontSize="14px"
+                  fontWeight="400"
+                  fontStyle="regular"
+                  value={whatsappBusinessAccountId}
+                  onChange={(e) => setWhatsappBusinessAccountId(e.target.value)}
+                  size="md"
+                  h="36px"
+                  maxW="486px"
+                  px={3}
+                  py={2}
+                  borderColor="neutral.300"
+                  borderRadius="4px"
+                  _hover={{ borderColor: 'neutral.400' }}
+                  _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
+                />
+              </FormControl>
 
-            <FormControl isRequired gap={1}>
-              <FormLabel fontSize="sm" fontWeight="medium" color="neutral.950" mb={0}>
-                API Access Token/ API Key
-              </FormLabel>
-              <Input
-                placeholder="Enter"
-                type="password"
-                value={apiAccessToken}
-                onChange={(e) => setApiAccessToken(e.target.value)}
-                size="md"
-                h="36px"
-                maxW="486px"
-                borderColor="neutral.300"
-                borderRadius="6px"
-                _hover={{ borderColor: 'neutral.400' }}
-                _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
-              />
-            </FormControl>
-          </VStack>
+              <FormControl isRequired gap={1}>
+                <FormLabel textStyle="h10" mb={0}>
+                  API Access Token/ API Key
+                </FormLabel>
+                <Input
+                  placeholder="Enter"
+                  fontSize="14px"
+                  fontWeight="400"
+                  fontStyle="regular"
+                  type="password"
+                  value={apiAccessToken}
+                  onChange={(e) => setApiAccessToken(e.target.value)}
+                  size="md"
+                  h="36px"
+                  maxW="486px"
+                  px={3}
+                  py={2}
+                  borderColor="neutral.300"
+                  borderRadius="4px"
+                  _hover={{ borderColor: 'neutral.400' }}
+                  _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
+                />
+              </FormControl>
+            </VStack>
+          </Flex>
 
           {/* Action Buttons */}
           <HStack spacing={3} justify="flex-end" mt={4}>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={handleCancel}
-              isDisabled={isSaving || !hasChanges}
-            >
+            <Button variant="secondary" size="md" width="174px" onClick={handleCancel}>
               Cancel
             </Button>
             <Button
               variant="primary"
-              size="sm"
+              size="md"
+              width="174px"
               onClick={handleSave}
               isLoading={isSaving}
               isDisabled={

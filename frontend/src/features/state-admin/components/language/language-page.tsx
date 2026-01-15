@@ -97,7 +97,7 @@ export function LanguagePage() {
   return (
     <Box w="full">
       {/* Page Header */}
-      <Box mb={6}>
+      <Box mb={5}>
         <Text textStyle="h5">Language</Text>
       </Box>
 
@@ -109,25 +109,28 @@ export function LanguagePage() {
         borderRadius="12px"
         w="full"
         h="600px"
-        pt="24px"
-        pr="24px"
-        pb="24px"
-        pl="24px"
+        py={6}
+        px={4}
       >
         <Flex direction="column" w="full" h="full" justify="space-between">
           {/* Card Header */}
-          <Flex justify="space-between" align="center" mb={6}>
+          <Flex justify="space-between" align="center" mb={4}>
             <Text textStyle="h8">Language Configuration</Text>
             {config?.isConfigured && !isEditing && (
               <Button
                 variant="ghost"
-                size="sm"
-                leftIcon={<EditIcon />}
+                h={6}
+                w={6}
+                minW={6}
+                pl="2px"
+                pr="2px"
                 onClick={handleEdit}
-                color="neutral.500"
+                color="neutral.950"
                 _hover={{ bg: 'primary.50', color: 'primary.500' }}
                 aria-label="Edit language configuration"
-              />
+              >
+                <EditIcon h={5} w={5} />
+              </Button>
             )}
           </Flex>
 
@@ -135,16 +138,16 @@ export function LanguagePage() {
           {!isEditing && config?.isConfigured ? (
             <Box w="full" h="full">
               <Flex gap={6} mb={4} justify="space-between">
-                <Box w="486px" h="36px" gap={1}>
-                  <Text fontSize="sm" fontWeight="medium" color="neutral.700">
+                <Box w="486px" h="36px">
+                  <Text fontSize="sm" fontWeight="medium" color="neutral.700" mb={1}>
                     Primary Language
                   </Text>
                   <Text fontSize="md" color="neutral.950">
                     {getPrimaryLanguageLabel()}
                   </Text>
                 </Box>
-                <Box w="486px" h="36px" gap={1}>
-                  <Text fontSize="sm" fontWeight="medium" color="neutral.700">
+                <Box w="486px" h="36px">
+                  <Text fontSize="sm" fontWeight="medium" color="neutral.700" mb={1}>
                     Secondary Language (optional)
                   </Text>
                   <Text fontSize="md" color="neutral.950">
@@ -157,8 +160,8 @@ export function LanguagePage() {
             /* Edit Mode */
             <Flex direction="column" w="full" h="full" justify="space-between">
               <Flex gap={6} justify="space-between">
-                <Box w="486px" gap={1}>
-                  <Text fontSize="sm" fontWeight="medium" color="neutral.950">
+                <Box w="486px">
+                  <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
                     Primary Language*
                   </Text>
                   <SearchableSelect
@@ -169,8 +172,8 @@ export function LanguagePage() {
                     width="486px"
                   />
                 </Box>
-                <Box w="486px" gap={1}>
-                  <Text fontSize="sm" fontWeight="medium" color="neutral.950">
+                <Box w="486px">
+                  <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
                     Secondary Language (optional)
                   </Text>
                   <SearchableSelect
@@ -188,7 +191,8 @@ export function LanguagePage() {
                 {config?.isConfigured && (
                   <Button
                     variant="secondary"
-                    size="sm"
+                    size="md"
+                    width="174px"
                     onClick={handleCancel}
                     isDisabled={isSaving}
                   >
@@ -197,7 +201,8 @@ export function LanguagePage() {
                 )}
                 <Button
                   variant="primary"
-                  size="sm"
+                  size="md"
+                  width="174px"
                   onClick={handleSave}
                   isLoading={isSaving}
                   isDisabled={!primaryLanguage}

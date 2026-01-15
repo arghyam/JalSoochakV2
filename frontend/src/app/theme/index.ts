@@ -52,6 +52,14 @@ const theme = extendTheme({
       color: 'neutral.950',
     },
 
+    h10: {
+      fontSize: '14px',
+      lineHeight: '20px',
+      fontWeight: '500',
+      fontStyle: 'medium',
+      color: 'neutral.950',
+    },
+
     //Body text
     bodyText4: {
       fontSize: '16px',
@@ -119,7 +127,7 @@ const theme = extendTheme({
     },
     // System Colors
     success: {
-      50: '#ECFDF3',
+      50: '#E6FFF4',
       100: '#D1FADF',
       500: '#079455',
       600: '#067647',
@@ -133,7 +141,7 @@ const theme = extendTheme({
       700: '#B54708',
     },
     error: {
-      50: '#FEF3F2',
+      50: '#FFEDED',
       100: '#FEE4E2',
       500: '#D92D20',
       600: '#B42318',
@@ -165,14 +173,14 @@ const theme = extendTheme({
       },
       sizes: {
         sm: {
-          fontSize: '18px',
+          fontSize: '14px',
           h: '32px',
           minW: '32px',
           px: '12px',
           borderRadius: '4px',
         },
         md: {
-          fontSize: '18px',
+          fontSize: '16px',
           h: '40px',
           minW: '40px',
           px: '16px',

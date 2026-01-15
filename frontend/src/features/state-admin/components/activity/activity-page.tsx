@@ -44,7 +44,7 @@ export function ActivityPage() {
       header: 'Timestamp',
       sortable: true,
       render: (row) => (
-        <Text fontSize="sm" color="neutral.800">
+        <Text textStyle="h10" fontWeight="400" fontStyle="regular">
           {formatTimestamp(row.timestamp)}
         </Text>
       ),
@@ -54,7 +54,7 @@ export function ActivityPage() {
       header: 'Action',
       sortable: true,
       render: (row) => (
-        <Text fontSize="sm" color="neutral.800">
+        <Text textStyle="h10" fontWeight="400" fontStyle="regular">
           {row.action}
         </Text>
       ),
@@ -68,12 +68,14 @@ export function ActivityPage() {
           as="span"
           display="inline-block"
           px={2}
-          py={1}
-          borderRadius="md"
-          fontSize="xs"
-          fontWeight="medium"
+          py={0.5}
+          borderRadius="16px"
+          h={6}
+          maxW="96px"
+          textStyle="h10"
+          fontWeight="400"
           bg={row.status === 'Success' ? 'success.50' : 'error.50'}
-          color={row.status === 'Success' ? 'success.600' : 'error.600'}
+          color={row.status === 'Success' ? 'success.500' : 'error.500'}
         >
           {row.status}
         </Box>
@@ -84,7 +86,7 @@ export function ActivityPage() {
   return (
     <Box w="full">
       {/* Page Header */}
-      <Box mb={6}>
+      <Box mb={5}>
         <Text textStyle="h5">Activity</Text>
       </Box>
 

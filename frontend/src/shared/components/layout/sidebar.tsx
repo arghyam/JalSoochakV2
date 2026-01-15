@@ -1,17 +1,11 @@
 import { Link as RouterLink, useLocation } from 'react-router-dom'
-import { Box, Flex, Stack, Text, Icon } from '@chakra-ui/react'
-import {
-  MdDashboard,
-  MdOutlineMoving,
-  MdWaterDrop,
-  MdPeople,
-  MdPersonAdd,
-  MdSettings,
-} from 'react-icons/md'
+import { Box, Flex, Stack, Text, Icon, Image } from '@chakra-ui/react'
+import { MdDashboard, MdOutlineMoving, MdPeople, MdPersonAdd, MdSettings } from 'react-icons/md'
 import { AiOutlineEye, AiOutlineSetting, AiOutlineWarning, AiOutlineApi } from 'react-icons/ai'
 import { IoLanguageOutline, IoWaterOutline } from 'react-icons/io5'
 import { HiOutlineTemplate } from 'react-icons/hi'
 import { BsPerson, BsListUl } from 'react-icons/bs'
+import jalsoochakLogo from '@/assets/media/jalsoochak-logo.svg'
 import { useAuthStore } from '@/app/store'
 import { ROUTES } from '@/shared/constants/routes'
 import { AUTH_ROLES } from '@/shared/constants/auth'
@@ -137,20 +131,18 @@ export function Sidebar() {
         <Flex
           h="80px"
           align="center"
+          justify="center"
           gap={2}
           borderBottom="1px"
           borderColor="neutral.100"
-          px={6}
+          px={7}
           pt={2}
         >
-          <Icon as={MdWaterDrop} boxSize={6} color="primary.500" />
-          <Text fontSize="lg" fontWeight="semibold" color="primary.500">
-            JalSoochak
-          </Text>
+          <Image src={jalsoochakLogo} alt="JalSoochak logo" />
         </Flex>
 
         {/* Menu Section */}
-        <Stack flex={1} gap={2} overflowY="auto" px={6} py={4}>
+        <Stack flex={1} gap={4} overflowY="auto" px={7} py={4}>
           {visibleNavItems.map((item) => {
             const isActive = location.pathname === item.path
             const ItemIcon = item.icon
@@ -159,17 +151,17 @@ export function Sidebar() {
               <RouterLink key={item.path} to={item.path} style={{ textDecoration: 'none' }}>
                 <Flex
                   alignItems="center"
-                  gap={3}
+                  gap={2}
                   borderRadius="lg"
                   px={3}
                   py={2}
                   fontSize="sm"
                   fontWeight="medium"
                   transition="all 0.2s"
-                  bg={isActive ? 'primary.50' : 'transparent'}
-                  color={isActive ? 'primary.700' : 'neutral.900'}
+                  bg={isActive ? 'primary.25' : 'transparent'}
+                  color={isActive ? 'primary.700' : 'neutral.950'}
                   _hover={{
-                    bg: isActive ? 'primary.50' : 'neutral.100',
+                    bg: isActive ? 'primary.25' : 'neutral.100',
                   }}
                 >
                   {ItemIcon && <Icon as={ItemIcon} boxSize={5} flexShrink={0} />}
@@ -181,7 +173,7 @@ export function Sidebar() {
         </Stack>
 
         {/* Profile Section */}
-        <Flex align="center" gap={3} borderTop="1px" borderColor="neutral.100" px={6} py={4}>
+        <Flex align="center" gap={3} borderTop="1px" borderColor="neutral.100" px={7} py={4}>
           <Flex
             h="40px"
             w="40px"
