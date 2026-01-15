@@ -244,7 +244,7 @@ export function ResetPasswordPage() {
                     fontWeight="600"
                     isDisabled={!canSubmit || isSubmitting}
                     isLoading={isSubmitting}
-                    loadingText="Logging in..."
+                    loadingText="Resetting..."
                     _loading={{ bg: 'primary.500', color: 'white' }}
                   >
                     Reset Password
