@@ -129,8 +129,8 @@ export function IntegrationPage() {
             <Text textStyle="h8">Whatsapp Details</Text>
             {/* Form Fields */}
             <VStack align="stretch" spacing={3} flex={1}>
-              <FormControl isRequired gap={1}>
-                <FormLabel textStyle="h10" mb={0}>
+              <FormControl isRequired>
+                <FormLabel textStyle="h10" mb={1}>
                   Whatsapp Business Account Name
                 </FormLabel>
                 <Input
@@ -151,8 +151,8 @@ export function IntegrationPage() {
                 />
               </FormControl>
 
-              <FormControl isRequired gap={1}>
-                <FormLabel textStyle="h10" mb={0}>
+              <FormControl isRequired>
+                <FormLabel textStyle="h10" mb={1}>
                   Sender Phone Number
                 </FormLabel>
                 <Input
@@ -173,8 +173,8 @@ export function IntegrationPage() {
                 />
               </FormControl>
 
-              <FormControl isRequired gap={1}>
-                <FormLabel textStyle="h10" mb={0}>
+              <FormControl isRequired>
+                <FormLabel textStyle="h10" mb={1}>
                   Whatsapp Business Account ID
                 </FormLabel>
                 <Input
@@ -195,8 +195,8 @@ export function IntegrationPage() {
                 />
               </FormControl>
 
-              <FormControl isRequired gap={1}>
-                <FormLabel textStyle="h10" mb={0}>
+              <FormControl isRequired>
+                <FormLabel textStyle="h10" mb={1}>
                   API Access Token/ API Key
                 </FormLabel>
                 <Input
