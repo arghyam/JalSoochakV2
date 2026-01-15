@@ -19,4 +19,5 @@ export const ROUTES = {
   LOGIN: '/login',
   LOGOUT: '/logout',
   SIGNUP: '/signup',
+  RESET_PASSWORD: '/resetpassword',
 } as const

@@ -10,7 +10,7 @@ import {
   IntegrationPage,
   WaterNormsPage,
 } from '@/features/state-admin'
-import { LoginPage } from '@/features/auth'
+import { LoginPage, ResetPasswordPage } from '@/features/auth'
 import { SignupFlowPage } from '@/features/auth/components/signup/signup-flow-page'
 import { ProtectedRoute, RedirectIfAuthenticated } from '@/shared/components/routing/ProtectedRoute'
 import { AUTH_ROLES } from '@/shared/constants/auth'
@@ -71,6 +71,14 @@ export const router = createBrowserRouter([
     element: (
       <RedirectIfAuthenticated>
         <SignupFlowPage />
+      </RedirectIfAuthenticated>
+    ),
+  },
+  {
+    path: ROUTES.RESET_PASSWORD,
+    element: (
+      <RedirectIfAuthenticated>
+        <ResetPasswordPage />
       </RedirectIfAuthenticated>
     ),
   },
