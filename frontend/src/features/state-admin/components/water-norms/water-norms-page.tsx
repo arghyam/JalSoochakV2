@@ -154,7 +154,7 @@ export function WaterNormsPage() {
         borderColor="neutral.100"
         borderRadius="12px"
         w="full"
-        h="600px"
+        minH="calc(100vh - 148px)"
         py="24px"
         px="16px"
       >
@@ -182,7 +182,7 @@ export function WaterNormsPage() {
 
           {/* View Mode */}
           {!isEditing && config?.isConfigured ? (
-            <Box w="full" h="full">
+            <Box w="full" h="full" minH="calc(100vh - 250px)">
               {/* State Quantity */}
               <Box mb={7}>
                 <Text fontSize="sm" fontWeight="medium" color="neutral.700" mb={1}>
@@ -202,7 +202,7 @@ export function WaterNormsPage() {
                   {districtOverrides.map((override) => (
                     <Flex key={override.id} gap={6} mb={4} align="center">
                       <Box w="486px">
-                        <Text fontSize="sm" fontWeight="medium" color="neutral.700" mb={1}>
+                        <Text fontSize="sm" fontWeight="medium" mb={1}>
                           District Name
                         </Text>
                         <Text fontSize="md" color="neutral.950">
@@ -210,7 +210,7 @@ export function WaterNormsPage() {
                         </Text>
                       </Box>
                       <Box w="486px">
-                        <Text fontSize="sm" fontWeight="medium" color="neutral.700" mb={1}>
+                        <Text fontSize="sm" fontWeight="medium" mb={1}>
                           Quantity (LPCD)
                         </Text>
                         <Text fontSize="md" color="neutral.950">
@@ -224,7 +224,13 @@ export function WaterNormsPage() {
             </Box>
           ) : (
             /* Edit Mode */
-            <Flex direction="column" w="full" h="full" justify="space-between">
+            <Flex
+              direction="column"
+              w="full"
+              h="full"
+              justify="space-between"
+              minH="calc(100vh - 250px)"
+            >
               <Box>
                 {/* State Quantity Input */}
                 <Box mb={6}>
