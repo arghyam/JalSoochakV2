@@ -14,9 +14,9 @@ import org.springframework.context.annotation.Configuration;
 //                bearerFormat = "JWT")
 //})
 @OpenAPIDefinition(
-        info = @Info(title = "Water Supply Calculation Service API", version = "v1"),
+        info = @Info(title = "Water Supply Calculation Service API", version = "v2"),
         servers = {
-                @Server(url = "http://localhost:9100/", description = "Local Server")
+                @Server(url = "http://localhost:9100/api/v2/", description = "Local Server")
         }
 )
 public class SwaggerConfig {
