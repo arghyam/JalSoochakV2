@@ -1,0 +1,1281 @@
+openapi: 3.0.3
+info:
+  title: JalSoochak V2 API
+  description: API specifications for JalSoochak V2, a Digital Public Good for water supply monitoring.
+  version: 1.0.0
+  contact:
+    name: JalSoochak Team
+servers:
+  - url: https://api.jalsoochak.org/v1
+    description: Production server
+  - url: https://staging-api.jalsoochak.org/v1
+    description: Staging server
+  - url: http://localhost:8080/v1
+    description: Local development server
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/tenants:
+    get:
+      summary: List tenants
+      description: Retrieves a list of all tenants (states). Requires Super User role.
+      operationId: listTenants
+      tags:
+        - Tenant Admin
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of tenants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TenantResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+    post:
+      summary: Create a new tenant (state)
+      description: Creates a new tenant (state) in the system. Requires Super User role.
+      operationId: createTenant
+      tags:
+        - Tenant Admin
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTenantRequest'
+      responses:
+        '201':
+          description: Tenant created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+  /api/tenants/{tenantId}:
+    get:
+      summary: Get tenant details
+      description: Retrieves details of a specific tenant.
+      operationId: getTenant
+      tags:
+        - Tenant Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The tenant ID
+      responses:
+        '200':
+          description: Tenant details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Tenant not found
+    put:
+      summary: Update tenant
+      description: Updates a tenant's details. Requires Super User role.
+      operationId: updateTenant
+      tags:
+        - Tenant Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The tenant ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTenantRequest'
+      responses:
+        '200':
+          description: Tenant updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Tenant not found
+    delete:
+      summary: Delete tenant
+      description: Deletes a tenant. Requires Super User role.
+      operationId: deleteTenant
+      tags:
+        - Tenant Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The tenant ID
+      responses:
+        '204':
+          description: Tenant deleted
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Tenant not found
+
+  /api/tenants/{tenantId}/config:
+    get:
+      summary: Get tenant configuration
+      description: Retrieves the current configuration for a tenant.
+      operationId: getTenantConfig
+      tags:
+        - State Config
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The tenant ID
+      responses:
+        '200':
+          description: Tenant configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantConfigResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Tenant not found
+  /api/tenants/{tenantId}/config/water-norms:
+    put:
+      summary: Update water norms for a tenant
+      description: Updates the water norms configuration for a specific tenant.
+      operationId: updateWaterNorms
+      tags:
+        - State Config
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The tenant ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WaterNormsRequest'
+      responses:
+        '200':
+          description: Water norms updated
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Tenant not found
+  /api/tenants/{tenantId}/config/languages:
+    put:
+      summary: Update languages for a tenant
+      description: Updates the supported languages for a specific tenant.
+      operationId: updateLanguages
+      tags:
+        - State Config
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The tenant ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LanguagesRequest'
+      responses:
+        '200':
+          description: Languages updated
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Tenant not found
+  /api/tenants/{tenantId}/config/thresholds:
+    put:
+      summary: Update thresholds for a tenant
+      description: Updates anomaly detection thresholds for a specific tenant.
+      operationId: updateThresholds
+      tags:
+        - State Config
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The tenant ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThresholdsRequest'
+      responses:
+        '200':
+          description: Thresholds updated
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Tenant not found
+  /api/tenants/{tenantId}/config/escalation-rules:
+    put:
+      summary: Update escalation rules for a tenant
+      description: Updates the escalation rules configuration for a specific tenant.
+      operationId: updateEscalationRules
+      tags:
+        - State Config
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The tenant ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EscalationRulesRequest'
+      responses:
+        '200':
+          description: Escalation rules updated
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Tenant not found
+
+  /api/glific/webhook/inbound:
+    post:
+      summary: Inbound webhook from Glific
+      description: Receives inbound messages from Glific for processing submissions.
+      operationId: glificInboundWebhook
+      tags:
+        - Messaging Orchestrator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GlificWebhookRequest'
+      responses:
+        '200':
+          description: Message accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+        '400':
+          description: Bad request
+
+  /api/tenants/{tenantId}/schemes:
+    get:
+      summary: List schemes for a tenant
+      description: Retrieves a list of schemes for a specific tenant.
+      operationId: listSchemes
+      tags:
+        - Field Operations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The tenant ID
+        - name: geoId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Filter by geo unit ID
+      responses:
+        '200':
+          description: List of schemes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SchemeResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+  /api/tenants/{tenantId}/operators:
+    get:
+      summary: List pump operators for a tenant
+      description: Retrieves a list of pump operators for a specific tenant.
+      operationId: listOperators
+      tags:
+        - Field Operations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The tenant ID
+        - name: schemeId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Filter by scheme ID
+      responses:
+        '200':
+          description: List of operators
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OperatorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+  /api/tenants/{tenantId}/bfm-readings:
+    get:
+      summary: List BFM readings
+      description: Retrieves BFM readings for a tenant, with optional filters.
+      operationId: listBfmReadings
+      tags:
+        - Field Operations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The tenant ID
+        - name: schemeId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Filter by scheme ID
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Start date
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: End date
+      responses:
+        '200':
+          description: List of readings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BfmReadingResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+    post:
+      summary: Submit BFM reading
+      description: Submits a BFM (Bulk Flow Meter) reading for a scheme.
+      operationId: submitBfmReading
+      tags:
+        - Field Operations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The tenant ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BfmReadingRequest'
+      responses:
+        '201':
+          description: Reading submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BfmReadingResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+
+  /api/tenants/{tenantId}/section-officer/dashboard:
+    get:
+      summary: Get section officer dashboard
+      description: Retrieves dashboard data for a section officer.
+      operationId: getSectionOfficerDashboard
+      tags:
+        - Field Operations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The tenant ID
+        - name: officerId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The officer ID
+        - name: range
+          in: query
+          required: false
+          schema:
+            type: integer
+            enum: [7, 15, 30]
+            default: 7
+          description: Time range in days
+      responses:
+        '200':
+          description: Dashboard data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SectionOfficerDashboardResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+
+  /api/tenants/{tenantId}/sync/users:
+    post:
+      summary: Sync users from state IT system
+      description: Syncs user data from external state IT systems.
+      operationId: syncUsers
+      tags:
+        - Integration
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The tenant ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncUsersRequest'
+      responses:
+        '202':
+          description: Sync initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+  /api/tenants/{tenantId}/sync/schemes:
+    post:
+      summary: Sync schemes from state IT system
+      description: Syncs scheme data from external state IT systems.
+      operationId: syncSchemes
+      tags:
+        - Integration
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The tenant ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncSchemesRequest'
+      responses:
+        '202':
+          description: Sync initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+  /api/tenants/{tenantId}/sync/status/{importId}:
+    get:
+      summary: Get sync status
+      description: Retrieves the status of a sync operation.
+      operationId: getSyncStatus
+      tags:
+        - Integration
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The tenant ID
+        - name: importId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The import ID
+      responses:
+        '200':
+          description: Sync status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncStatusResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Import not found
+
+  /api/tenants/{tenantId}/dashboard/geo-summary:
+    get:
+      summary: Get geo summary for dashboard
+      description: Retrieves geographical summary data for public dashboards.
+      operationId: getGeoSummary
+      tags:
+        - Dashboard
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The tenant ID
+        - name: level
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [state, district, block, gp, village]
+          description: Geographical level
+        - name: parentId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Parent geo unit ID
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Date for the summary
+      responses:
+        '200':
+          description: Geo summary data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeoSummaryResponse'
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+  /api/tenants/{tenantId}/dashboard/dept-summary:
+    get:
+      summary: Get departmental summary for dashboard
+      description: Retrieves departmental hierarchy summary data for public dashboards.
+      operationId: getDeptSummary
+      tags:
+        - Dashboard
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The tenant ID
+        - name: level
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [zone, circle, division, sub_division]
+          description: Departmental level
+        - name: parentId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: Parent dept unit ID
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Date for the summary
+      responses:
+        '200':
+          description: Dept summary data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeptSummaryResponse'
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+  /api/country/dashboard/summary:
+    get:
+      summary: Get country-level dashboard summary
+      description: Retrieves aggregated dashboard summary across all tenants.
+      operationId: getCountrySummary
+      tags:
+        - Dashboard
+      parameters:
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Date for the summary
+      responses:
+        '200':
+          description: Country summary data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountrySummaryResponse'
+        '400':
+          description: Bad request
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    CreateTenantRequest:
+      type: object
+      required:
+        - code
+        - name
+        - country
+      properties:
+        code:
+          type: string
+          example: "AP"
+        name:
+          type: string
+          example: "Andhra Pradesh"
+        country:
+          type: string
+          example: "IN"
+        defaultLanguages:
+          type: array
+          items:
+            type: string
+          example: ["te", "en"]
+        defaultConfig:
+          type: object
+          properties:
+            defaultWaterNormLpcd:
+              type: integer
+              example: 55
+
+    UpdateTenantRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Andhra Pradesh Updated"
+        defaultLanguages:
+          type: array
+          items:
+            type: string
+          example: ["te", "en", "hi"]
+
+    TenantResponse:
+      type: object
+      properties:
+        tenantId:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        country:
+          type: string
+        defaultLanguages:
+          type: array
+          items:
+            type: string
+
+    TenantConfigResponse:
+      type: object
+      properties:
+        waterNorms:
+          $ref: '#/components/schemas/WaterNormsRequest'
+        languages:
+          type: array
+          items:
+            type: string
+        thresholds:
+          $ref: '#/components/schemas/ThresholdsRequest'
+        escalationRules:
+          $ref: '#/components/schemas/EscalationRulesRequest'
+
+    WaterNormsRequest:
+      type: object
+      required:
+        - norms
+      properties:
+        norms:
+          type: array
+          items:
+            type: object
+            properties:
+              category:
+                type: string
+                example: "rural"
+              lpcd:
+                type: integer
+                example: 55
+
+    LanguagesRequest:
+      type: object
+      required:
+        - languages
+      properties:
+        languages:
+          type: array
+          items:
+            type: string
+          example: ["te", "en", "hi"]
+
+    ThresholdsRequest:
+      type: object
+      required:
+        - thresholds
+      properties:
+        thresholds:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                example: "low_quantity"
+              value:
+                type: number
+                example: 50.0
+
+    EscalationRulesRequest:
+      type: object
+      required:
+        - rules
+      properties:
+        rules:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - condition
+              - levels
+            properties:
+              id:
+                type: string
+                example: "no-submission-24-hours"
+              condition:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: "no_submission"
+                  durationHours:
+                    type: integer
+                    example: 24
+              levels:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    level:
+                      type: integer
+                      example: 1
+                    notifyRole:
+                      type: string
+                      example: "SectionOfficer"
+
+    GlificWebhookRequest:
+      type: object
+      required:
+        - from
+        - message
+        - timestamp
+      properties:
+        from:
+          type: string
+          example: "9198xxxxxxx"
+        message:
+          type: string
+          example: "BFM 235"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2025-12-01T05:00:00Z"
+        providerMetadata:
+          type: object
+          additionalProperties: true
+
+    WebhookResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "accepted"
+
+    SchemeResponse:
+      type: object
+      properties:
+        schemeId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        geoId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [FUNCTIONAL, NON_FUNCTIONAL]
+
+    OperatorResponse:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        phone:
+          type: string
+        businessRole:
+          type: string
+          example: "PumpOperator"
+        schemeId:
+          type: string
+          format: uuid
+
+    BfmReadingRequest:
+      type: object
+      required:
+        - schemeId
+        - operatorId
+        - readingValue
+        - readingTime
+      properties:
+        schemeId:
+          type: string
+          format: uuid
+        operatorId:
+          type: string
+          format: uuid
+        readingValue:
+          type: number
+          format: float
+          example: 235.0
+        readingTime:
+          type: string
+          format: date-time
+          example: "2025-12-01T05:00:00Z"
+
+    BfmReadingResponse:
+      type: object
+      properties:
+        readingId:
+          type: string
+          format: uuid
+        submissionId:
+          type: string
+          format: uuid
+        computedQuantityLitre:
+          type: number
+          format: float
+          example: 1200.0
+        readingValue:
+          type: number
+          format: float
+        readingTime:
+          type: string
+          format: date-time
+
+    SectionOfficerDashboardResponse:
+      type: object
+      description: Complex response with various dashboard metrics and data structures for ECharts.
+
+    SyncUsersRequest:
+      type: object
+      required:
+        - sourceSystem
+        - users
+      properties:
+        sourceSystem:
+          type: string
+          example: "state_it_system_name"
+        users:
+          type: array
+          items:
+            type: object
+            required:
+              - externalId
+              - name
+              - phone
+              - role
+            properties:
+              externalId:
+                type: string
+                example: "IT_123"
+              name:
+                type: string
+                example: "Pump Operator 1"
+              phone:
+                type: string
+                example: "91xxxxxxxxxx"
+              role:
+                type: string
+                example: "PumpOperator"
+              location:
+                type: object
+                properties:
+                  district:
+                    type: string
+                    example: "X"
+                  block:
+                    type: string
+                    example: "Y"
+                  gp:
+                    type: string
+                    example: "Z"
+                  village:
+                    type: string
+                    example: "V1"
+
+    SyncSchemesRequest:
+      type: object
+      required:
+        - sourceSystem
+        - schemes
+      properties:
+        sourceSystem:
+          type: string
+          example: "state_it_system_name"
+        schemes:
+          type: array
+          items:
+            type: object
+            required:
+              - externalId
+              - name
+            properties:
+              externalId:
+                type: string
+                example: "SCH_123"
+              name:
+                type: string
+                example: "Scheme A"
+              location:
+                type: object
+                properties:
+                  district:
+                    type: string
+                    example: "X"
+                  block:
+                    type: string
+                    example: "Y"
+                  gp:
+                    type: string
+                    example: "Z"
+                  village:
+                    type: string
+                    example: "V1"
+
+    SyncResponse:
+      type: object
+      properties:
+        importId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          example: "in_progress"
+
+    SyncStatusResponse:
+      type: object
+      properties:
+        importId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [IN_PROGRESS, COMPLETED, FAILED, PARTIAL]
+        startedAt:
+          type: string
+          format: date-time
+        finishedAt:
+          type: string
+          format: date-time
+        errorSummary:
+          type: string
+
+    GeoSummaryResponse:
+      type: object
+      required:
+        - level
+        - items
+      properties:
+        level:
+          type: string
+          example: "district"
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+                example: "district-01"
+              name:
+                type: string
+                example: "District A"
+              status:
+                type: string
+                enum: [GREEN, LIGHT_GREEN, ORANGE, RED, DARK_RED]
+                example: "GREEN"
+              dailySubmissionPercent:
+                type: number
+                format: float
+                example: 92.5
+              noWaterDays:
+                type: integer
+                example: 0
+              activeOperators:
+                type: integer
+                example: 120
+              inactiveOperators:
+                type: integer
+                example: 5
+
+    DeptSummaryResponse:
+      type: object
+      required:
+        - level
+        - items
+      properties:
+        level:
+          type: string
+          example: "division"
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+                example: "division-01"
+              name:
+                type: string
+                example: "Division A"
+              status:
+                type: string
+                enum: [GREEN, LIGHT_GREEN, ORANGE, RED, DARK_RED]
+                example: "GREEN"
+              dailySubmissionPercent:
+                type: number
+                format: float
+                example: 92.5
+              noWaterDays:
+                type: integer
+                example: 0
+              activeOperators:
+                type: integer
+                example: 120
+              inactiveOperators:
+                type: integer
+                example: 5
+
+    CountrySummaryResponse:
+      type: object
+      required:
+        - country
+        - date
+        - states
+      properties:
+        country:
+          type: string
+          example: "IN"
+        date:
+          type: string
+          format: date
+          example: "2025-12-01"
+        states:
+          type: array
+          items:
+            type: object
+            properties:
+              tenantCode:
+                type: string
+                example: "AP"
+              name:
+                type: string
+                example: "Andhra Pradesh"
+              status:
+                type: string
+                enum: [GREEN, LIGHT_GREEN, ORANGE, RED, DARK_RED]
+                example: "ORANGE"
+              dailySubmissionPercent:
+                type: number
+                format: float
+                example: 78.3
