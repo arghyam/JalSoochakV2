@@ -13,15 +13,18 @@ import {
   FormLabel,
   Checkbox,
   Link,
+  useDisclosure,
 } from '@chakra-ui/react'
 import { AuthSideImage } from '@/features/auth/components/signup/auth-side-image'
 import jalsoochakLogo from '@/assets/media/jalsoochak-logo.svg'
 import { useAuthStore } from '@/app/store'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
+import { ForgotPasswordModal } from '@/features/auth/components/login/forgot-password-modal'
 
 export function LoginPage() {
   const navigate = useNavigate()
   const { login, loading, error } = useAuthStore()
+  const { isOpen: isForgotPasswordOpen, onOpen, onClose } = useDisclosure()
   const [showPassword, setShowPassword] = useState(false)
   const [phoneNumber, setPhoneNumber] = useState('')
   const [password, setPassword] = useState('')
@@ -171,7 +174,14 @@ export function LoginPage() {
                       Remember me
                     </Checkbox>
 
-                    <Link fontSize="14px" fontWeight="600" color="primary.500">
+                    <Link
+                      as="button"
+                      type="button"
+                      fontSize="14px"
+                      fontWeight="600"
+                      color="primary.500"
+                      onClick={onOpen}
+                    >
                       Forgot password
                     </Link>
                   </Flex>
@@ -195,6 +205,7 @@ export function LoginPage() {
       </Flex>
 
       <AuthSideImage />
+      <ForgotPasswordModal isOpen={isForgotPasswordOpen} onClose={onClose} />
     </Flex>
   )
 }
