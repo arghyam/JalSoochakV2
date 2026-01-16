@@ -109,8 +109,14 @@ public class BfmReadingService {
                 .scheme(scheme)
                 .person(operator)
                 .readingUrl(request.getReadingUrl())
-                .extractedReading(finalReading)
-                .confirmedReading(request.getReadingValue())
+                .extractedReading(
+                        ocrResult != null ? ocrResult.getAdjustedReading() : null
+                )
+                .confirmedReading(
+                        request.getReadingValue() != null
+                                ? request.getReadingValue()
+                                : finalReading
+                )
                 .readingDateTime(
                         Optional.ofNullable(request.getReadingTime())
                                 .orElse(LocalDateTime.now())
@@ -142,4 +148,47 @@ public class BfmReadingService {
                 )
                 .build();
     }
+
+    @Transactional
+    public CreateReadingResponse updateConfirmedReading(
+            String correlationId,
+            BigDecimal confirmedReading
+    ) {
+        String tenantId = TenantContext.getTenantId();
+
+        if (correlationId == null || correlationId.isBlank()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "correlationId must be provided"
+            );
+        }
+
+        if (confirmedReading == null || confirmedReading.compareTo(BigDecimal.ZERO) < 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "confirmedReading must be a non-negative number"
+            );
+        }
+
+        BfmReading reading = bfmReadingRepository
+                .findByCorrelationIdAndTenantId(correlationId, tenantId)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Reading not found"
+                        )
+                );
+
+        reading.setConfirmedReading(confirmedReading);
+        bfmReadingRepository.save(reading);
+
+        return CreateReadingResponse.builder()
+                .success(true)
+                .message("Reading updated successfully")
+                .correlationId(reading.getCorrelationId())
+                .meterReading(confirmedReading)
+                .qualityStatus("CONFIRMED")
+                .build();
+    }
+
 }

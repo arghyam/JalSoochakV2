@@ -25,5 +25,7 @@ public class GlificWebhookRequest {
 
     private String mediaUrl;
 
-    private Instant timestamp;
+    private String confirmedReading;
+
+    private String correlationId;
 }

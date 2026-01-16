@@ -18,6 +18,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 @Slf4j
 @Service
@@ -44,6 +45,14 @@ public class GlificWebhookService {
 
     public CreateReadingResponse processImage(GlificWebhookRequest glificWebhookRequest) {
         try {
+            if (glificWebhookRequest.getConfirmedReading() != null &&
+                    glificWebhookRequest.getCorrelationId() != null) {
+
+                return bfmReadingService.updateConfirmedReading(
+                        glificWebhookRequest.getCorrelationId(),
+                        new BigDecimal(glificWebhookRequest.getConfirmedReading())
+                );
+            }
             log.info("request in: {}", glificWebhookRequest);
             byte[] imageBytes;
 
@@ -94,6 +103,37 @@ public class GlificWebhookService {
             throw new RuntimeException("Failed to process image", e);
 
         }
+    }
+
+    private CreateReadingResponse handleManualReadings(GlificWebhookRequest glificWebhookRequest){
+        PersonMaster operator = personRepository
+                .findByPhoneNumber(glificWebhookRequest.getContactId())
+                .orElseThrow(() ->
+                                new IllegalStateException("Operator not found")
+                        );
+
+        PersonSchemeMapping mapping = personSchemeRepository
+                .findFirstByPerson_Id(operator.getId())
+                .orElseThrow(() ->
+                        new IllegalStateException("Operator not mapped to scheme")
+                );
+
+        BigDecimal manualReading;
+        try {
+            manualReading = new BigDecimal(glificWebhookRequest.getConfirmedReading());
+        } catch(NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid reading value");
+        }
+
+        CreateReadingRequest createRequest = CreateReadingRequest.builder()
+                .schemeId(mapping.getScheme().getId())
+                .operatorId(operator.getId())
+                .readingValue(manualReading)
+                .readingUrl(null)
+                .readingTime(null)
+                .build();
+
+        return bfmReadingService.createReading(createRequest);
     }
 
     private byte[] downloadImageFromGlific(String mediaId) throws IOException {
