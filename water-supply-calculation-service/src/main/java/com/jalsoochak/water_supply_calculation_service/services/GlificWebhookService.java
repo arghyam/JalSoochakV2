@@ -46,8 +46,12 @@ public class GlificWebhookService {
     public CreateReadingResponse processImage(GlificWebhookRequest glificWebhookRequest) {
         try {
             if (glificWebhookRequest.getConfirmedReading() != null &&
-            !glificWebhookRequest.getConfirmedReading().isBlank()){
-                return handleManualReadings(glificWebhookRequest);
+                    glificWebhookRequest.getCorrelationId() != null) {
+
+                return bfmReadingService.updateConfirmedReading(
+                        glificWebhookRequest.getCorrelationId(),
+                        new BigDecimal(glificWebhookRequest.getConfirmedReading())
+                );
             }
             log.info("request in: {}", glificWebhookRequest);
             byte[] imageBytes;

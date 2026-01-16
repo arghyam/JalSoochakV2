@@ -148,4 +148,33 @@ public class BfmReadingService {
                 )
                 .build();
     }
+
+    @Transactional
+    public CreateReadingResponse updateConfirmedReading(
+            String correlationId,
+            BigDecimal confirmedReading
+    ) {
+        String tenantId = TenantContext.getTenantId();
+
+        BfmReading reading = bfmReadingRepository
+                .findByCorrelationIdAndTenantId(correlationId, tenantId)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Reading not found"
+                        )
+                );
+
+        reading.setConfirmedReading(confirmedReading);
+        bfmReadingRepository.save(reading);
+
+        return CreateReadingResponse.builder()
+                .success(true)
+                .message("Reading updated successfully")
+                .correlationId(reading.getCorrelationId())
+                .meterReading(confirmedReading)
+                .qualityStatus("CONFIRMED")
+                .build();
+    }
+
 }

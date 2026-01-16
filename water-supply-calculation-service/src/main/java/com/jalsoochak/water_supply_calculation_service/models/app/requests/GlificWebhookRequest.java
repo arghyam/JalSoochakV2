@@ -26,4 +26,6 @@ public class GlificWebhookRequest {
     private String mediaUrl;
 
     private String confirmedReading;
+
+    private String correlationId;
 }

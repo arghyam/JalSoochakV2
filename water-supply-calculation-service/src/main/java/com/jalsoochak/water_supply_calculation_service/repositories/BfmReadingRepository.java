@@ -7,4 +7,8 @@ import java.util.Optional;
 
 public interface BfmReadingRepository extends JpaRepository<BfmReading, Long> {
     Optional<BfmReading> findTopByScheme_IdAndTenantIdOrderByReadingDateTimeDesc(Long schemeId, String tenantId);
+    Optional<BfmReading> findByCorrelationIdAndTenantId(
+            String correlationId,
+            String tenantId
+    );
 }
