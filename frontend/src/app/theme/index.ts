@@ -60,6 +60,13 @@ const theme = extendTheme({
     },
 
     //Body text
+    bodyText3: {
+      fontSize: '20px',
+      lineHeight: '30px',
+      fontWeight: '400',
+      letterSpacing: '0%',
+      color: 'neutral.950',
+    },
     bodyText4: {
       fontSize: '16px',
       lineHeight: '24px',
