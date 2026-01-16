@@ -156,6 +156,20 @@ public class BfmReadingService {
     ) {
         String tenantId = TenantContext.getTenantId();
 
+        if (correlationId == null || correlationId.isBlank()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "correlationId must be provided"
+            );
+        }
+
+        if (confirmedReading == null || confirmedReading.compareTo(BigDecimal.ZERO) < 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "confirmedReading must be a non-negative number"
+            );
+        }
+
         BfmReading reading = bfmReadingRepository
                 .findByCorrelationIdAndTenantId(correlationId, tenantId)
                 .orElseThrow(() ->
