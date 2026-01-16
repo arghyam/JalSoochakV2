@@ -141,9 +141,12 @@ export function EscalationsPage() {
     }
   }
 
+  let levelIdCounter = 0
+  const generateLevelId = () => `level-${++levelIdCounter}`
+
   const handleAddLevel = () => {
     const newLevel: EscalationLevel = {
-      id: `level-${Date.now()}`,
+      id: generateLevelId(),
       levelNumber: levels.length + 1,
       targetRole: '',
       escalateAfterHours: 0,

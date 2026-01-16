@@ -122,9 +122,9 @@ export const router = createBrowserRouter([
   {
     path: ROUTES.STATE_ADMIN,
     element: (
-      // <ProtectedRoute allowedRoles={[AUTH_ROLES.STATE_ADMIN]}>
-      <MainLayout />
-      // </ProtectedRoute>
+      <ProtectedRoute allowedRoles={[AUTH_ROLES.STATE_ADMIN]}>
+        <MainLayout />
+      </ProtectedRoute>
     ),
     children: [
       {

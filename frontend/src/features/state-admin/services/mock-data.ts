@@ -448,8 +448,8 @@ let mockNudgeTemplates: NudgeTemplate[] = [
     type: 'low-quantity-alert',
     language: 'english',
     message:
-      'Dear {operator_name},\nWater Quantity at {village_name} is currently {days} LPCD, which is below the threshold. Please check the supply and system functionality.\n\nJalSoochak',
-    availableVariables: ['{operator_name}', '{village_name}', '{days}'],
+      'Dear {operator_name},\nWater Quantity at {village_name} is currently {LPCD} LPCD, which is below the threshold. Please check the supply and system functionality.\n\nJalSoochak',
+    availableVariables: ['{operator_name}', '{village_name}', '{LPCD}'],
   },
   {
     id: '3',
@@ -483,7 +483,7 @@ export const updateMockNudgeTemplate = (
   id: string,
   updates: { language: string; message: string }
 ): Promise<NudgeTemplate> => {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     setTimeout(() => {
       const template = mockNudgeTemplates.find((t) => t.id === id)
       if (template) {
@@ -495,7 +495,7 @@ export const updateMockNudgeTemplate = (
         mockNudgeTemplates = mockNudgeTemplates.map((t) => (t.id === id ? updatedTemplate : t))
         resolve(updatedTemplate)
       } else {
-        throw new Error('Template not found')
+        reject(new Error('Template not found'))
       }
     }, 500)
   })

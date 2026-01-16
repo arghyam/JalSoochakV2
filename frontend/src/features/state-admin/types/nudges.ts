@@ -39,6 +39,6 @@ export const AVAILABLE_LANGUAGES: LanguageOption[] = [
 // Available variables by alert type
 export const ALERT_VARIABLES: Record<string, string[]> = {
   'no-water-alert': ['{operator_name}', '{village_name}', '{days}'],
-  'low-quantity-alert': ['{operator_name}', '{village_name}', '{days}'],
+  'low-quantity-alert': ['{operator_name}', '{village_name}', '{LPCD}'],
   'operator-inactivity': ['{operator_name}', '{village_name}', '{days}', '{last_report_day}'],
 }

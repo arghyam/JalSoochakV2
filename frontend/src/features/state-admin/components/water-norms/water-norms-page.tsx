@@ -185,7 +185,7 @@ export function WaterNormsPage() {
             <Box w="full" h="full" minH="calc(100vh - 250px)">
               {/* State Quantity */}
               <Box mb={7}>
-                <Text fontSize="sm" fontWeight="medium" color="neutral.700" mb={1}>
+                <Text fontSize="sm" fontWeight="medium" mb={1}>
                   Current quantity (LPCD)*
                 </Text>
                 <Text fontSize="md" color="neutral.950">

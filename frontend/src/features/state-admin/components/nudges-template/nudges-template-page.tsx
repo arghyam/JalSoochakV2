@@ -72,6 +72,7 @@ export function NudgesTemplatePage() {
   }
 
   const handleTestSend = () => {
+    // TODO: Implement actual test-send functionality when api is ready
     toast.addToast('Test message sent successfully', 'success')
   }
 
