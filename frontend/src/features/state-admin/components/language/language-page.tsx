@@ -108,7 +108,7 @@ export function LanguagePage() {
         borderColor="neutral.100"
         borderRadius="12px"
         w="full"
-        h="600px"
+        minH="calc(100vh - 148px)"
         py={6}
         px={4}
       >
@@ -136,7 +136,7 @@ export function LanguagePage() {
 
           {/* View Mode */}
           {!isEditing && config?.isConfigured ? (
-            <Box w="full" h="full">
+            <Box w="full" h="full" minH="calc(100vh - 250px)">
               <Flex gap={6} mb={4} justify="space-between">
                 <Box w="486px" h="36px">
                   <Text fontSize="sm" fontWeight="medium" color="neutral.700" mb={1}>
@@ -158,7 +158,13 @@ export function LanguagePage() {
             </Box>
           ) : (
             /* Edit Mode */
-            <Flex direction="column" w="full" h="full" justify="space-between">
+            <Flex
+              direction="column"
+              w="full"
+              h="full"
+              justify="space-between"
+              minH="calc(100vh - 250px)"
+            >
               <Flex gap={6} justify="space-between">
                 <Box w="486px">
                   <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>

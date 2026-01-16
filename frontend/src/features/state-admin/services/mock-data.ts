@@ -3,6 +3,9 @@ import type { ActivityLog } from '../types/activity'
 import type { LanguageConfiguration } from '../types/language'
 import type { IntegrationConfiguration } from '../types/integration'
 import type { WaterNormsConfiguration } from '../types/water-norms'
+import type { Escalation } from '../types/escalations'
+import type { ThresholdConfiguration } from '../types/thresholds'
+import type { NudgeTemplate } from '../types/nudges'
 
 export const mockOverviewData: OverviewData = {
   stats: {
@@ -212,6 +215,293 @@ export const saveMockWaterNormsConfiguration = (
       }
       mockWaterNormsConfiguration = savedConfig
       resolve(savedConfig)
+    }, 500)
+  })
+}
+
+// Escalations Mock Data
+let mockEscalations: Escalation[] = [
+  {
+    id: '1',
+    name: 'Water Quantity Alert',
+    alertType: 'water-quantity-alert',
+    levels: [
+      {
+        id: 'level-1-1',
+        levelNumber: 1,
+        targetRole: 'operator',
+        escalateAfterHours: 12,
+      },
+      {
+        id: 'level-1-2',
+        levelNumber: 2,
+        targetRole: 'gram-panchayat',
+        escalateAfterHours: 20,
+      },
+    ],
+  },
+  {
+    id: '2',
+    name: 'Operator Inactivity Alert',
+    alertType: 'operator-inactivity-alert',
+    levels: [
+      {
+        id: 'level-2-1',
+        levelNumber: 1,
+        targetRole: 'operator',
+        escalateAfterHours: 12,
+      },
+      {
+        id: 'level-2-2',
+        levelNumber: 2,
+        targetRole: 'gram-panchayat',
+        escalateAfterHours: 20,
+      },
+      {
+        id: 'level-2-3',
+        levelNumber: 3,
+        targetRole: 'district',
+        escalateAfterHours: 48,
+      },
+    ],
+  },
+  {
+    id: '3',
+    name: 'Repeated Non-Compliance Escalation',
+    alertType: 'repeated-non-compliance',
+    levels: [
+      {
+        id: 'level-3-1',
+        levelNumber: 1,
+        targetRole: 'operator',
+        escalateAfterHours: 12,
+      },
+      {
+        id: 'level-3-2',
+        levelNumber: 2,
+        targetRole: 'gram-panchayat',
+        escalateAfterHours: 20,
+      },
+    ],
+  },
+  {
+    id: '4',
+    name: 'Delayed Submission Escalation',
+    alertType: 'delayed-submission',
+    levels: [
+      {
+        id: 'level-4-1',
+        levelNumber: 1,
+        targetRole: 'operator',
+        escalateAfterHours: 12,
+      },
+      {
+        id: 'level-4-2',
+        levelNumber: 2,
+        targetRole: 'gram-panchayat',
+        escalateAfterHours: 20,
+      },
+      {
+        id: 'level-4-3',
+        levelNumber: 3,
+        targetRole: 'district',
+        escalateAfterHours: 48,
+      },
+    ],
+  },
+]
+
+export const getMockEscalations = (): Promise<Escalation[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([...mockEscalations])
+    }, 300)
+  })
+}
+
+export const getMockEscalationById = (id: string): Promise<Escalation | null> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const escalation = mockEscalations.find((e) => e.id === id)
+      resolve(escalation || null)
+    }, 300)
+  })
+}
+
+export const saveMockEscalation = (
+  escalation: Omit<Escalation, 'id' | 'name'>
+): Promise<Escalation> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const alertTypeLabels: Record<string, string> = {
+        'water-quantity-alert': 'Water Quantity Alert',
+        'operator-inactivity-alert': 'Operator Inactivity Alert',
+        'repeated-non-compliance': 'Repeated Non-Compliance Escalation',
+        'delayed-submission': 'Delayed Submission Escalation',
+      }
+
+      const savedEscalation: Escalation = {
+        id: `escalation-${Date.now()}`,
+        name: alertTypeLabels[escalation.alertType] || escalation.alertType,
+        alertType: escalation.alertType,
+        levels: escalation.levels.map((level, index) => ({
+          ...level,
+          id: level.id || `level-${Date.now()}-${index}`,
+          levelNumber: index + 1,
+        })),
+      }
+      mockEscalations = [...mockEscalations, savedEscalation]
+      resolve(savedEscalation)
+    }, 500)
+  })
+}
+
+export const updateMockEscalation = (
+  id: string,
+  escalation: Omit<Escalation, 'id' | 'name'>
+): Promise<Escalation> => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const existing = mockEscalations.find((e) => e.id === id)
+      if (!existing) {
+        reject(new Error('Escalation not found'))
+        return
+      }
+      const alertTypeLabels: Record<string, string> = {
+        'water-quantity-alert': 'Water Quantity Alert',
+        'operator-inactivity-alert': 'Operator Inactivity Alert',
+        'repeated-non-compliance': 'Repeated Non-Compliance Escalation',
+        'delayed-submission': 'Delayed Submission Escalation',
+      }
+
+      const updatedEscalation: Escalation = {
+        id,
+        name: alertTypeLabels[escalation.alertType] || escalation.alertType,
+        alertType: escalation.alertType,
+        levels: escalation.levels.map((level, index) => ({
+          ...level,
+          id: level.id || `level-${Date.now()}-${index}`,
+          levelNumber: index + 1,
+        })),
+      }
+      mockEscalations = mockEscalations.map((e) => (e.id === id ? updatedEscalation : e))
+      resolve(updatedEscalation)
+    }, 500)
+  })
+}
+
+export const deleteMockEscalation = (id: string): Promise<void> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      mockEscalations = mockEscalations.filter((e) => e.id !== id)
+      resolve()
+    }, 300)
+  })
+}
+
+// Thresholds Configuration Mock Data
+let mockThresholdConfiguration: ThresholdConfiguration = {
+  id: '',
+  coverage: '',
+  continuity: '',
+  quantity: '',
+  regularity: '',
+  isConfigured: false,
+}
+
+export const getMockThresholdConfiguration = (): Promise<ThresholdConfiguration> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({ ...mockThresholdConfiguration })
+    }, 300)
+  })
+}
+
+export const saveMockThresholdConfiguration = (
+  config: Omit<ThresholdConfiguration, 'id'>
+): Promise<ThresholdConfiguration> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const savedConfig: ThresholdConfiguration = {
+        id: '1',
+        coverage: config.coverage,
+        continuity: config.continuity,
+        quantity: config.quantity,
+        regularity: config.regularity,
+        isConfigured: true,
+      }
+      mockThresholdConfiguration = savedConfig
+      resolve(savedConfig)
+    }, 500)
+  })
+}
+
+// Nudges Template Mock Data
+let mockNudgeTemplates: NudgeTemplate[] = [
+  {
+    id: '1',
+    name: 'No-Water Alert',
+    type: 'no-water-alert',
+    language: 'english',
+    message:
+      'Dear {operator_name},\nThis is an urgent alert regarding the water point in {village_name}. It has been reported no water for {days} consecutive days. Please investigate and fix the issues immediately.\n\nJalSoochak',
+    availableVariables: ['{operator_name}', '{village_name}', '{days}'],
+  },
+  {
+    id: '2',
+    name: 'Low Quantity Alert',
+    type: 'low-quantity-alert',
+    language: 'english',
+    message:
+      'Dear {operator_name},\nWater Quantity at {village_name} is currently {LPCD} LPCD, which is below the threshold. Please check the supply and system functionality.\n\nJalSoochak',
+    availableVariables: ['{operator_name}', '{village_name}', '{LPCD}'],
+  },
+  {
+    id: '3',
+    name: 'Operator Inactivity',
+    type: 'operator-inactivity',
+    language: 'english',
+    message:
+      'Dear {operator_name},\nWe have noticed that data has not been reported for {village_name} for the last {days} days. Please ensure regular updates.\n\nJalSoochak',
+    availableVariables: ['{operator_name}', '{village_name}', '{days}', '{last_report_day}'],
+  },
+]
+
+export const getMockNudgeTemplates = (): Promise<NudgeTemplate[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([...mockNudgeTemplates])
+    }, 300)
+  })
+}
+
+export const getMockNudgeTemplateById = (id: string): Promise<NudgeTemplate | null> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const template = mockNudgeTemplates.find((t) => t.id === id)
+      resolve(template || null)
+    }, 300)
+  })
+}
+
+export const updateMockNudgeTemplate = (
+  id: string,
+  updates: { language: string; message: string }
+): Promise<NudgeTemplate> => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const template = mockNudgeTemplates.find((t) => t.id === id)
+      if (template) {
+        const updatedTemplate = {
+          ...template,
+          language: updates.language,
+          message: updates.message,
+        }
+        mockNudgeTemplates = mockNudgeTemplates.map((t) => (t.id === id ? updatedTemplate : t))
+        resolve(updatedTemplate)
+      } else {
+        reject(new Error('Template not found'))
+      }
     }, 500)
   })
 }

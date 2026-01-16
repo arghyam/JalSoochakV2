@@ -9,6 +9,9 @@ import {
   LanguagePage,
   IntegrationPage,
   WaterNormsPage,
+  EscalationsPage,
+  ThresholdsPage,
+  NudgesTemplatePage,
 } from '@/features/state-admin'
 import { LoginPage, ResetPasswordPage } from '@/features/auth'
 import { SignupFlowPage } from '@/features/auth/components/signup/signup-flow-page'
@@ -151,36 +154,15 @@ export const router = createBrowserRouter([
       },
       {
         path: ROUTES.STATE_ADMIN_ESCALATIONS,
-        element: (
-          <Box p={6}>
-            <Heading fontSize="2xl" fontWeight="bold">
-              Escalations
-            </Heading>
-            <Text color="gray.600">Coming soon...</Text>
-          </Box>
-        ),
+        element: <EscalationsPage />,
       },
       {
         path: ROUTES.STATE_ADMIN_THRESHOLDS,
-        element: (
-          <Box p={6}>
-            <Heading fontSize="2xl" fontWeight="bold">
-              Thresholds
-            </Heading>
-            <Text color="gray.600">Coming soon...</Text>
-          </Box>
-        ),
+        element: <ThresholdsPage />,
       },
       {
         path: ROUTES.STATE_ADMIN_NUDGES,
-        element: (
-          <Box p={6}>
-            <Heading fontSize="2xl" fontWeight="bold">
-              Nudges Template
-            </Heading>
-            <Text color="gray.600">Coming soon...</Text>
-          </Box>
-        ),
+        element: <NudgesTemplatePage />,
       },
       {
         path: ROUTES.STATE_ADMIN_API_INGESTION,

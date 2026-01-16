@@ -120,11 +120,17 @@ export function IntegrationPage() {
         borderColor="neutral.100"
         borderRadius="12px"
         w="full"
-        h="600px"
+        minH="calc(100vh - 148px)"
         py={6}
         px={4}
       >
-        <Flex direction="column" w="full" h="full" justify="space-between">
+        <Flex
+          direction="column"
+          w="full"
+          h="full"
+          justify="space-between"
+          minH="calc(100vh - 200px)"
+        >
           <Flex direction="column" gap={4}>
             <Text textStyle="h8">Whatsapp Details</Text>
             {/* Form Fields */}
