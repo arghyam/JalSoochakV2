@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Box, Text, Button, Flex, Grid, IconButton, HStack, VStack } from '@chakra-ui/react'
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons'
 import {
@@ -16,6 +16,8 @@ import { ToastContainer, SearchableSelect } from '@/shared/components/common'
 type ViewMode = 'list' | 'add' | 'edit'
 
 export function EscalationsPage() {
+  const levelIdCounterRef = useRef(0)
+  const generateLevelId = () => `level-${Date.now()}-${++levelIdCounterRef.current}`
   const [viewMode, setViewMode] = useState<ViewMode>('list')
   const [escalations, setEscalations] = useState<Escalation[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -140,9 +142,6 @@ export function EscalationsPage() {
       setIsSaving(false)
     }
   }
-
-  let levelIdCounter = 0
-  const generateLevelId = () => `level-${++levelIdCounter}`
 
   const handleAddLevel = () => {
     const newLevel: EscalationLevel = {

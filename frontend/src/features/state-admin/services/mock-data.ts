@@ -360,8 +360,13 @@ export const updateMockEscalation = (
   id: string,
   escalation: Omit<Escalation, 'id' | 'name'>
 ): Promise<Escalation> => {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     setTimeout(() => {
+      const existing = mockEscalations.find((e) => e.id === id)
+      if (!existing) {
+        reject(new Error('Escalation not found'))
+        return
+      }
       const alertTypeLabels: Record<string, string> = {
         'water-quantity-alert': 'Water Quantity Alert',
         'operator-inactivity-alert': 'Operator Inactivity Alert',
