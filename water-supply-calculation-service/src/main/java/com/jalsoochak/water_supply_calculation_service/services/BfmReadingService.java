@@ -109,8 +109,14 @@ public class BfmReadingService {
                 .scheme(scheme)
                 .person(operator)
                 .readingUrl(request.getReadingUrl())
-                .extractedReading(finalReading)
-                .confirmedReading(request.getReadingValue())
+                .extractedReading(
+                        ocrResult != null ? ocrResult.getAdjustedReading() : null
+                )
+                .confirmedReading(
+                        request.getReadingValue() != null
+                                ? request.getReadingValue()
+                                : finalReading
+                )
                 .readingDateTime(
                         Optional.ofNullable(request.getReadingTime())
                                 .orElse(LocalDateTime.now())
