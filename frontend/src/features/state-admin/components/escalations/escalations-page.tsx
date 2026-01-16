@@ -75,6 +75,8 @@ export function EscalationsPage() {
         setAlertType(escalation.alertType)
         setLevels(escalation.levels)
         setViewMode('edit')
+      } else {
+        toast.addToast('Escalation not found', 'error')
       }
     } catch (error) {
       console.error('Failed to fetch escalation:', error)
