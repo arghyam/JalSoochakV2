@@ -1,20 +1,27 @@
 package com.jalsoochak.ManagementService.services.impl;
 
 import com.jalsoochak.ManagementService.config.KeycloakProvider;
+import com.jalsoochak.ManagementService.models.app.request.InviteRequest;
 import com.jalsoochak.ManagementService.models.app.request.LoginRequest;
 import com.jalsoochak.ManagementService.models.app.request.RegisterRequest;
 import com.jalsoochak.ManagementService.models.entity.PersonMaster;
 import com.jalsoochak.ManagementService.models.entity.PersonTypeMaster;
 import com.jalsoochak.ManagementService.models.entity.TenantMaster;
+import com.jalsoochak.ManagementService.models.enums.KeycloakRole;
 import com.jalsoochak.ManagementService.repositories.PersonMasterRepository;
 import com.jalsoochak.ManagementService.repositories.PersonTypeMasterRepository;
 import com.jalsoochak.ManagementService.repositories.TenantMasterRepository;
+import jakarta.ws.rs.BadRequestException;
+import org.keycloak.TokenVerifier;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.common.VerificationException;
+import org.keycloak.representations.AccessToken;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.resource.UsersResource;
-import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -32,15 +39,16 @@ import java.security.KeyFactory;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
 @Slf4j
 @Service
-public class KeycloakAdminClientService {
+public class PersonService {
     @Value("${keycloak.realm}")
     public String realm;
 
@@ -71,8 +79,8 @@ public class KeycloakAdminClientService {
 
     private static final String SUPER_ADMIN_ROLE = "super_admin";
 
-    public KeycloakAdminClientService(KeycloakProvider keycloakProvider, PersonTypeMasterRepository personTypeMasterRepository,
-                                      PersonMasterRepository personMasterRepository, TenantMasterRepository tenantMasterRepository) {
+    public PersonService(KeycloakProvider keycloakProvider, PersonTypeMasterRepository personTypeMasterRepository,
+                         PersonMasterRepository personMasterRepository, TenantMasterRepository tenantMasterRepository) {
         this.keycloakProvider = keycloakProvider;
         this.personTypeMasterRepository = personTypeMasterRepository;
         this.personMasterRepository = personMasterRepository;
@@ -80,51 +88,88 @@ public class KeycloakAdminClientService {
         this.restTemplate = new RestTemplate();
     }
 
-    public Response createKeycloakUser(RegisterRequest user, Long creatorId) {
-        UsersResource usersResource = keycloakProvider.getAdminInstance()
+    public void inviteUser(InviteRequest inviteRequest){
+
+        Optional<PersonMaster> personMaster = personMasterRepository
+                .findByEmail(inviteRequest.getEmail());
+
+        if (personMaster.isPresent()){
+            throw new BadRequestException("Invitation already sent to this user");
+        }
+
+        UsersResource users = keycloakProvider.getAdminInstance()
                 .realm(realm)
                 .users();
 
-        if (personMasterRepository.existsByPhoneNumber(user.getPhoneNumber())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Phone number already exists: " + user.getPhoneNumber());
-        }
+        UserRepresentation user = new UserRepresentation();
+        user.setEmail(inviteRequest.getEmail());
+        user.setEnabled(true);
+        user.setEmailVerified(false);
 
-        TenantMaster tenant = tenantMasterRepository.findByTenantName(user.getTenantId().toLowerCase())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Invalid tenant_id: " + user.getTenantId()));
+        user.setRequiredActions(List.of(
+                "UPDATE_PASSWORD",
+                "VERIFY_EMAIL"
+        ));
 
-        CredentialRepresentation credentialRepresentation = createPasswordCredentials(user.getPassword());
-
-        UserRepresentation keycloakUser = new UserRepresentation();
-        keycloakUser.setUsername(user.getPhoneNumber());
-        keycloakUser.setCredentials(Collections.singletonList(credentialRepresentation));
-        keycloakUser.setFirstName(user.getFirstName());
-        keycloakUser.setLastName(user.getLastName());
-        keycloakUser.setEmail(user.getEmail());
-        keycloakUser.setEnabled(true);
-        keycloakUser.setEmailVerified(false);
-
-        Response response = usersResource.create(keycloakUser);
+        Response response = users.create(user);
         log.info("Keycloak create user response status: {}", response);
-        if (response.getStatus() == 201) {
-            PersonTypeMaster personType = personTypeMasterRepository.findBycName(user.getPersonType())
-                    .orElseThrow(() -> new RuntimeException("PersonType not found: " + user.getPersonType()));
 
-            log.info("TenantId: {}", user.getTenantId());
-            PersonMaster person = PersonMaster.builder()
-                    .firstName(user.getFirstName())
-                    .lastName(user.getLastName())
-                    .fullName(user.getFirstName() + " " + user.getLastName())
-                    .phoneNumber(user.getPhoneNumber())
-                    .personType(personType)
-                    .tenantId(tenant.getTenantName())
-                    .createdBy(creatorId)
-                    .build();
-
-            personMasterRepository.save(person);
+        if (response.getStatus() != 201) {
+            throw new RuntimeException("Failed to create new user");
         }
-        return response;
+
+        String userId = response.getLocation().getPath()
+                .replaceAll(".*/", "");
+
+
+        users.get(userId).executeActionsEmail(List.of("UPDATE_PASSWORD", "VERIFY_EMAIL"));
+
+        PersonMaster person = PersonMaster.builder()
+                .email(inviteRequest.getEmail())
+                .build();
+
+        personMasterRepository.save(person);
+    }
+
+    public void completeProfile(RegisterRequest registerRequest,
+                                 String token) throws VerificationException {
+        String email = extractEmailFromToken(token);
+
+        PersonMaster person = personMasterRepository
+                .findByEmail(email).orElseThrow(() -> new BadRequestException("User with email not found"));
+
+        if (person.isProfileCompleted()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Profile already completed"
+            );
+        }
+
+        if (personMasterRepository.existsByPhoneNumber(registerRequest.getPhoneNumber())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Phone number already exists: " + registerRequest.getPhoneNumber());
+        }
+
+        TenantMaster tenant = tenantMasterRepository.findByTenantName(registerRequest.getTenantId().toLowerCase())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Invalid tenant_id: " + registerRequest.getTenantId()));
+
+        PersonTypeMaster personType = personTypeMasterRepository
+                .findBycName(registerRequest.getPersonType())
+                .orElseThrow(() -> new BadRequestException("Invalid person type"));
+
+        person.setFirstName(registerRequest.getFirstName());
+        person.setLastName(registerRequest.getLastName());
+        person.setFullName(registerRequest.getFirstName() + " " + registerRequest.getLastName());
+        person.setPhoneNumber(registerRequest.getPhoneNumber());
+        person.setPersonType(personType);
+        person.setTenantId(tenant.getTenantName());
+
+        person.setProfileCompleted(true);
+        personMasterRepository.save(person);
+
+        String userId = getKeycloakUserIdByEmail(email);
+        assignRoleToUser(userId, KeycloakRole.STATE_ADMIN.getRoleName());
     }
 
     public ResponseEntity<?> login(LoginRequest loginRequest) {
@@ -259,14 +304,6 @@ public class KeycloakAdminClientService {
                 .generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(publicKeyPem)));
     }
 
-    private static CredentialRepresentation createPasswordCredentials(String password) {
-        CredentialRepresentation passwordCredentials = new CredentialRepresentation();
-        passwordCredentials.setTemporary(false);
-        passwordCredentials.setType(CredentialRepresentation.PASSWORD);
-        passwordCredentials.setValue(password);
-        return passwordCredentials;
-    }
-
     public boolean isSuperAdmin(String token) {
         try {
             String userInfoUrl = authServerUrl + "/realms/" + realm + "/protocol/openid-connect/userinfo";
@@ -276,7 +313,6 @@ public class KeycloakAdminClientService {
 
             HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-            @SuppressWarnings("unchecked")
             ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                     userInfoUrl,
                     org.springframework.http.HttpMethod.GET,
@@ -317,22 +353,42 @@ public class KeycloakAdminClientService {
         return false;
     }
 
-    public Long getPersonIdFromToken(String token) {
-        try {
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(getPublicKey())
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-
-            String username = claims.get("preferred_username", String.class);
-            PersonMaster person = personMasterRepository.findByPhoneNumber(username)
-                    .orElseThrow(() -> new RuntimeException("User not found in person_master"));
-            return person.getId();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get person ID from token", e);
-        }
+    private String extractEmailFromToken(String token) throws VerificationException {
+        AccessToken accessToken = TokenVerifier.create(token, AccessToken.class)
+                .getToken();
+        return accessToken.getEmail();
     }
 
+    private void assignRoleToUser(String userId, String roleName){
+        RealmResource realmResource =
+                keycloakProvider.getAdminInstance()
+                        .realm(realm);
+
+        RoleRepresentation role =
+                realmResource.roles().get(roleName).toRepresentation();
+
+        realmResource
+                .users()
+                .get(userId)
+                .roles()
+                .realmLevel()
+                .add(List.of(role));
+
+        log.debug("Assigned role '{}' to Keycloak user with id '{}'", roleName, userId);
+    }
+
+    private String getKeycloakUserIdByEmail(String email) {
+        UsersResource users = keycloakProvider.getAdminInstance()
+                .realm(realm)
+                .users();
+
+        List<UserRepresentation> results = users.search(email, true);
+
+        if (results.isEmpty()) {
+            throw new RuntimeException("Keycloak user not found for email: " + email);
+        }
+
+        return results.get(0).getId();
+    }
 
 }

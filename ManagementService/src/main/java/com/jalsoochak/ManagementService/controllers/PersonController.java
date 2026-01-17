@@ -1,10 +1,13 @@
 package com.jalsoochak.ManagementService.controllers;
 
+import com.jalsoochak.ManagementService.models.app.request.InviteRequest;
 import com.jalsoochak.ManagementService.models.app.request.LoginRequest;
 import com.jalsoochak.ManagementService.models.app.request.RegisterRequest;
 import com.jalsoochak.ManagementService.models.app.request.TokenRequest;
-import com.jalsoochak.ManagementService.services.impl.KeycloakAdminClientService;
+import com.jalsoochak.ManagementService.services.impl.PersonService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.keycloak.common.VerificationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,49 +17,75 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v2/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class PersonController {
-    private final KeycloakAdminClientService keycloakAdminClientService;
+    private final PersonService personService;
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request,
-                                      @RequestHeader("Authorization") String authorizationHeader) {
-        if (authorizationHeader == null || !authorizationHeader.toLowerCase().startsWith("bearer ")) {
+    @PostMapping("/invite/user")
+    public ResponseEntity<?> inviteUser(@RequestBody InviteRequest inviteRequest,
+                                        @RequestHeader("Authorization") String authHeader){
+
+        log.debug("Invite Request in: {}", inviteRequest);
+
+        if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Missing or invalid Authorization header");
         }
 
-        String token = authorizationHeader.substring(7).trim();
+        String token = authHeader.substring(7);
+
         if (token.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Authorization token is empty");
         }
 
-        if (!keycloakAdminClientService.isSuperAdmin(token)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Only Super Admin can register new users");
+//        if(!personService.isSuperAdmin(token)){
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+//                    .body("Only super admin can invite user");
+//        }
+
+        personService.inviteUser(inviteRequest);
+        return ResponseEntity.ok("Invitation sent");
+    }
+
+    @PostMapping("/complete/profile")
+    public ResponseEntity<?> completeProfile(@RequestBody RegisterRequest registerRequest,
+                                          @RequestHeader("Authorization") String authHeader) throws VerificationException {
+        log.debug("Registration Request sent: {}", registerRequest);
+
+        if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Missing or invalid Authorization header");
         }
 
-        Long creatorId = keycloakAdminClientService.getPersonIdFromToken(token);
+        String token = authHeader.substring(7);
 
-        keycloakAdminClientService.createKeycloakUser(request, creatorId);
+        if (token.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Authorization token is empty");
+        }
+
+        personService.completeProfile(registerRequest, token);
+
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
+
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        return  keycloakAdminClientService.login(loginRequest);
+        return  personService.login(loginRequest);
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@RequestBody TokenRequest request) {
-        return keycloakAdminClientService.refreshToken(request.getRefreshToken());
+        return personService.refreshToken(request.getRefreshToken());
     }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestBody TokenRequest request) {
-        return keycloakAdminClientService.logout(request.getRefreshToken());
+        return personService.logout(request.getRefreshToken());
     }
 
 }

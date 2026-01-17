@@ -53,11 +53,14 @@ public class PersonMaster {
     @Column(name = "phone_number", unique = true)
     private String phoneNumber;
 
+    @Column(unique = true)
+    private String email;
+
     @Column(name = "tenant_id", length = 50)
     private String tenantId;
 
-    @Column(name = "welcome_sent")
-    private boolean welcomeSent = false;
+    @Column(nullable = false)
+    private boolean profileCompleted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "person_type_id")
