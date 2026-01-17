@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface PersonMasterRepository extends JpaRepository<PersonMaster, Long> {
     boolean existsByPhoneNumber(String phoneNumber);
     Optional<PersonMaster> findByPhoneNumber(String phoneNumber);
+    Optional<PersonMaster> findByEmail(String email);
 }
