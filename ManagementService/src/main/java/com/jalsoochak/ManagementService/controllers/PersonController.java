@@ -4,6 +4,7 @@ import com.jalsoochak.ManagementService.models.app.request.InviteRequest;
 import com.jalsoochak.ManagementService.models.app.request.LoginRequest;
 import com.jalsoochak.ManagementService.models.app.request.RegisterRequest;
 import com.jalsoochak.ManagementService.models.app.request.TokenRequest;
+import com.jalsoochak.ManagementService.models.app.response.TokenResponse;
 import com.jalsoochak.ManagementService.services.impl.PersonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -74,18 +76,22 @@ public class PersonController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        return  personService.login(loginRequest);
+    public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest request) {
+        TokenResponse response = personService.login(request);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(@RequestBody TokenRequest request) {
-        return personService.refreshToken(request.getRefreshToken());
+    public ResponseEntity<TokenResponse> refresh(@RequestParam String refreshToken) {
+        TokenResponse response = personService.refreshToken(refreshToken);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestBody TokenRequest request) {
-        return personService.logout(request.getRefreshToken());
+    public ResponseEntity<String> logout(@RequestParam String refreshToken) {
+        boolean success = personService.logout(refreshToken);
+        return success ? ResponseEntity.ok("Logged out") :
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Logout failed");
     }
 
 }

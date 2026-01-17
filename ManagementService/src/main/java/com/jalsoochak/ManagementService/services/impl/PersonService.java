@@ -1,9 +1,11 @@
 package com.jalsoochak.ManagementService.services.impl;
 
+import com.jalsoochak.ManagementService.clients.KeycloakClient;
 import com.jalsoochak.ManagementService.config.KeycloakProvider;
 import com.jalsoochak.ManagementService.models.app.request.InviteRequest;
 import com.jalsoochak.ManagementService.models.app.request.LoginRequest;
 import com.jalsoochak.ManagementService.models.app.request.RegisterRequest;
+import com.jalsoochak.ManagementService.models.app.response.TokenResponse;
 import com.jalsoochak.ManagementService.models.entity.PersonMaster;
 import com.jalsoochak.ManagementService.models.entity.PersonTypeMaster;
 import com.jalsoochak.ManagementService.models.entity.TenantMaster;
@@ -17,34 +19,18 @@ import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.common.VerificationException;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.idm.RoleRepresentation;
-import org.springframework.http.MediaType;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import jakarta.ws.rs.core.Response;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-
-import java.security.KeyFactory;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 
 @Slf4j
 @Service
@@ -76,15 +62,17 @@ public class PersonService {
     private final PersonTypeMasterRepository personTypeMasterRepository;
     private final PersonMasterRepository personMasterRepository;
     private final TenantMasterRepository tenantMasterRepository;
+    private final KeycloakClient keycloakClient;
 
     private static final String SUPER_ADMIN_ROLE = "super_admin";
 
     public PersonService(KeycloakProvider keycloakProvider, PersonTypeMasterRepository personTypeMasterRepository,
-                         PersonMasterRepository personMasterRepository, TenantMasterRepository tenantMasterRepository) {
+                         PersonMasterRepository personMasterRepository, TenantMasterRepository tenantMasterRepository, KeycloakClient keycloakClient) {
         this.keycloakProvider = keycloakProvider;
         this.personTypeMasterRepository = personTypeMasterRepository;
         this.personMasterRepository = personMasterRepository;
         this.tenantMasterRepository = tenantMasterRepository;
+        this.keycloakClient = keycloakClient;
         this.restTemplate = new RestTemplate();
     }
 
@@ -172,186 +160,78 @@ public class PersonService {
         assignRoleToUser(userId, KeycloakRole.STATE_ADMIN.getRoleName());
     }
 
-    public ResponseEntity<?> login(LoginRequest loginRequest) {
+    public TokenResponse login(LoginRequest loginRequest) {
+        Map<String, Object> tokenMap = keycloakClient.obtainToken(
+                loginRequest.getUsername(), loginRequest.getPassword()
+        );
+
+        PersonMaster person = personMasterRepository.findByPhoneNumber(loginRequest.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        log.debug("User '{}' logged in with tenant '{}'", person.getPhoneNumber(), person.getTenantId());
+
+        TokenResponse tokenResponse = new TokenResponse();
+        tokenResponse.setAccessToken((String) tokenMap.get("access_token"));
+        tokenResponse.setRefreshToken((String) tokenMap.get("refresh_token"));
+        tokenResponse.setExpiresIn((Integer) tokenMap.get("expires_in"));
+        tokenResponse.setRefreshExpiresIn((Integer) tokenMap.get("refresh_expires_in"));
+        tokenResponse.setTokenType((String) tokenMap.get("token_type"));
+        tokenResponse.setIdToken((String) tokenMap.get("id_token"));
+        tokenResponse.setSessionState((String) tokenMap.get("session_state"));
+        tokenResponse.setScope((String) tokenMap.get("scope"));
+
+        return tokenResponse;
+    }
+
+    public TokenResponse refreshToken(String refreshToken) {
+        Map<String, Object> tokenMap = keycloakClient.refreshToken(refreshToken);
+
+        String username = (String) tokenMap.get("preferred_username");
+        PersonMaster person = personMasterRepository.findByPhoneNumber(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        log.debug("User '{}' logged in with tenant '{}'", person.getPhoneNumber(), person.getTenantId());
+
+        TokenResponse tokenResponse = new TokenResponse();
+        tokenResponse.setAccessToken((String) tokenMap.get("access_token"));
+        tokenResponse.setRefreshToken((String) tokenMap.get("refresh_token"));
+        tokenResponse.setExpiresIn((Integer) tokenMap.get("expires_in"));
+        tokenResponse.setRefreshExpiresIn((Integer) tokenMap.get("refresh_expires_in"));
+        tokenResponse.setTokenType((String) tokenMap.get("token_type"));
+        tokenResponse.setIdToken((String) tokenMap.get("id_token"));
+        tokenResponse.setSessionState((String) tokenMap.get("session_state"));
+        tokenResponse.setScope((String) tokenMap.get("scope"));
+
+        return tokenResponse;
+    }
+
+
+    public boolean logout(String refreshToken) {
+        return keycloakClient.logout(refreshToken);
+    }
+
+    public boolean isSuperAdmin(String accessToken) {
         try {
-            String tokenUrl = authServerUrl + "/realms/" + realm + "/protocol/openid-connect/token";
+            Map<String, Object> userInfo = keycloakClient.getUserInfo(accessToken);
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-            headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-
-            MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
-            requestBody.add("client_id", clientId);
-            requestBody.add("client_secret", clientSecret);
-            requestBody.add("username", loginRequest.getUsername());
-            requestBody.add("password", loginRequest.getPassword());
-            requestBody.add("grant_type", "password");
-            requestBody.add("scope", "openid");
-
-            HttpEntity<MultiValueMap<String, String>> requestEntity =
-                    new HttpEntity<>(requestBody, headers);
-
-            ResponseEntity<String> response = restTemplate.postForEntity(
-                    tokenUrl,
-                    requestEntity,
-                    String.class
-            );
-
-            if (response.getStatusCode() == HttpStatus.OK) {
-
-                PersonMaster person = personMasterRepository.findByPhoneNumber(loginRequest.getUsername())
-                        .orElseThrow(() -> new RuntimeException("User not found in person_master"));
-
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> tokenResponse = objectMapper.readValue(
-                        response.getBody(), Map.class
-                );
-
-                tokenResponse.put("tenant_id", person.getTenantId());
-                tokenResponse.put("person_type", person.getPersonType().getCName());
-
-                return ResponseEntity.ok(tokenResponse);
-            } else {
-                return ResponseEntity.status(response.getStatusCode())
-                        .body("Login failed: " + response.getBody());
+            String username = (String) userInfo.get("preferred_username");
+            if (username == null || username.isBlank()) {
+                log.warn("preferred_username claim is missing or empty");
+                return false;
             }
 
+            PersonMaster person = personMasterRepository.findByPhoneNumber(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            return person.getPersonType() != null
+                    && SUPER_ADMIN_ROLE.equals(person.getPersonType().getCName());
+
         } catch (Exception e) {
-            log.error("Login error: ", e);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Invalid credentials or server error");
+            log.error("Error verifying super admin", e);
+            return false;
         }
     }
 
-    public ResponseEntity<?> refreshToken(String refreshToken) {
-        try {
-            String tokenUrl = authServerUrl + "/realms/" + realm + "/protocol/openid-connect/token";
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-            headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-
-            MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
-            requestBody.add("client_id", clientId);
-            requestBody.add("client_secret", clientSecret);
-            requestBody.add("refresh_token", refreshToken);
-            requestBody.add("grant_type", "refresh_token");
-
-            HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
-            ResponseEntity<String> response = restTemplate.postForEntity(tokenUrl, requestEntity, String.class);
-
-            if (response.getStatusCode() == HttpStatus.OK) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> tokenResponse = objectMapper.readValue(response.getBody(), Map.class);
-
-                String accessToken = (String) tokenResponse.get("access_token");
-
-                Claims claims = Jwts.parserBuilder()
-                        .setSigningKey(getPublicKey())
-                        .build()
-                        .parseClaimsJws(accessToken)
-                        .getBody();
-
-                String username = claims.get("preferred_username", String.class);
-                PersonMaster person = personMasterRepository.findByPhoneNumber(username)
-                        .orElseThrow(() -> new RuntimeException("User not found in person_master"));
-
-                tokenResponse.put("tenant_id", person.getTenantId());
-                tokenResponse.put("person_type", person.getPersonType().getCName());
-
-                return ResponseEntity.ok(tokenResponse);
-            }
-
-            return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
-        } catch (Exception e) {
-            log.error("Token refresh error: ", e);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token refresh failed");
-        }
-    }
-
-    public ResponseEntity<?> logout(String refreshToken) {
-        try {
-            String logoutUrl = authServerUrl + "/realms/" + realm + "/protocol/openid-connect/logout";
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-            MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
-            requestBody.add("client_id", clientId);
-            requestBody.add("client_secret", clientSecret);
-            requestBody.add("refresh_token", refreshToken);
-
-            HttpEntity<MultiValueMap<String, String>> requestEntity =
-                    new HttpEntity<>(requestBody, headers);
-
-            ResponseEntity<String> response = restTemplate.postForEntity(
-                    logoutUrl,
-                    requestEntity,
-                    String.class
-            );
-
-            return ResponseEntity.status(response.getStatusCode()).body("Logged out successfully");
-
-        } catch (Exception e) {
-            log.error("Logout error: ", e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Logout failed");
-        }
-    }
-
-    public RSAPublicKey getPublicKey() throws Exception {
-        return (RSAPublicKey) KeyFactory.getInstance("RSA")
-                .generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(publicKeyPem)));
-    }
-
-    public boolean isSuperAdmin(String token) {
-        try {
-            String userInfoUrl = authServerUrl + "/realms/" + realm + "/protocol/openid-connect/userinfo";
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(token);
-
-            HttpEntity<Void> entity = new HttpEntity<>(headers);
-
-            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
-                    userInfoUrl,
-                    org.springframework.http.HttpMethod.GET,
-                    entity,
-                    (Class<Map<String, Object>>) (Class<?>) Map.class
-            );
-
-            log.debug("Userinfo response status: {}", response.getStatusCode());
-
-            if (response.getStatusCode().is2xxSuccessful()) {
-                Map<String, Object> userInfo = response.getBody();
-                if (userInfo == null) {
-                    log.warn("Userinfo response body is null");
-                    return false;
-                }
-
-                String username = (String) userInfo.get("preferred_username");
-                if (username == null || username.isBlank()) {
-                    log.warn("preferred_username claim is missing or empty");
-                    return false;
-                }
-
-                PersonMaster person = personMasterRepository.findByPhoneNumber(username)
-                        .orElseThrow(() -> new RuntimeException("User not found in person_master"));
-
-                return person.getPersonType() != null
-                        && SUPER_ADMIN_ROLE.equals(person.getPersonType().getCName());
-            }
-
-        } catch (org.springframework.web.client.HttpClientErrorException e) {
-            log.debug("Token validation failed: {}", e.getStatusCode());
-        } catch (RuntimeException e) {
-            log.debug("Expected error verifying super admin: {}", e.getMessage());
-        } catch (Exception e) {
-            log.error("Unexpected error verifying super admin", e);
-        }
-
-        return false;
-    }
 
     private String extractEmailFromToken(String token) throws VerificationException {
         AccessToken accessToken = TokenVerifier.create(token, AccessToken.class)
