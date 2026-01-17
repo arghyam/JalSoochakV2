@@ -26,11 +26,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import jakarta.ws.rs.core.Response;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.security.KeyFactory;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -76,12 +81,8 @@ public class PersonService {
         this.restTemplate = new RestTemplate();
     }
 
-    public void inviteUser(InviteRequest inviteRequest){
-
-        Optional<PersonMaster> personMaster = personMasterRepository
-                .findByEmail(inviteRequest.getEmail());
-
-        if (personMaster.isPresent()){
+    public void inviteUser(InviteRequest inviteRequest) {
+        if (personMasterRepository.findByEmail(inviteRequest.getEmail()).isPresent()) {
             throw new BadRequestException("Invitation already sent to this user");
         }
 
@@ -89,48 +90,57 @@ public class PersonService {
                 .realm(realm)
                 .users();
 
+        List<UserRepresentation> existingUsers = users.search(inviteRequest.getEmail(), true);
+        if (!existingUsers.isEmpty()) {
+            throw new BadRequestException("User already exists in Keycloak");
+        }
+
         UserRepresentation user = new UserRepresentation();
         user.setEmail(inviteRequest.getEmail());
         user.setEnabled(true);
         user.setEmailVerified(false);
-
-        user.setRequiredActions(List.of(
-                "UPDATE_PASSWORD",
-                "VERIFY_EMAIL"
-        ));
+        user.setRequiredActions(List.of("UPDATE_PASSWORD", "VERIFY_EMAIL"));
 
         Response response = users.create(user);
         log.info("Keycloak create user response status: {}", response);
 
         if (response.getStatus() != 201) {
-            throw new RuntimeException("Failed to create new user");
+            throw new RuntimeException("Failed to create new user in Keycloak");
         }
 
-        String userId = response.getLocation().getPath()
-                .replaceAll(".*/", "");
+        String userId = response.getLocation().getPath().replaceAll(".*/", "");
 
+        try {
+            users.get(userId).executeActionsEmail(List.of("UPDATE_PASSWORD", "VERIFY_EMAIL"));
 
-        users.get(userId).executeActionsEmail(List.of("UPDATE_PASSWORD", "VERIFY_EMAIL"));
+            PersonMaster person = PersonMaster.builder()
+                    .email(inviteRequest.getEmail())
+                    .build();
 
-        PersonMaster person = PersonMaster.builder()
-                .email(inviteRequest.getEmail())
-                .build();
+            personMasterRepository.save(person);
 
-        personMasterRepository.save(person);
+        } catch (Exception e) {
+            log.error("Failed to complete user creation, rolling back Keycloak user", e);
+            try {
+                users.get(userId).remove();
+            } catch (Exception ex) {
+                log.error("Failed to rollback Keycloak user after error", ex);
+            }
+            throw new RuntimeException("Failed to invite user: " + e.getMessage(), e);
+        }
     }
 
-    public void completeProfile(RegisterRequest registerRequest,
-                                 String token) throws VerificationException {
+
+    @Transactional
+    public void completeProfile(RegisterRequest registerRequest, String token) throws VerificationException {
         String email = extractEmailFromToken(token);
 
         PersonMaster person = personMasterRepository
-                .findByEmail(email).orElseThrow(() -> new BadRequestException("User with email not found"));
+                .findByEmail(email)
+                .orElseThrow(() -> new BadRequestException("User with email not found"));
 
         if (person.isProfileCompleted()) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Profile already completed"
-            );
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile already completed");
         }
 
         if (personMasterRepository.existsByPhoneNumber(registerRequest.getPhoneNumber())) {
@@ -152,12 +162,17 @@ public class PersonService {
         person.setPhoneNumber(registerRequest.getPhoneNumber());
         person.setPersonType(personType);
         person.setTenantId(tenant.getTenantName());
-
         person.setProfileCompleted(true);
+
         personMasterRepository.save(person);
 
         String userId = getKeycloakUserIdByEmail(email);
-        assignRoleToUser(userId, KeycloakRole.STATE_ADMIN.getRoleName());
+        try {
+            assignRoleToUser(userId, KeycloakRole.STATE_ADMIN.getRoleName());
+        } catch (Exception e) {
+            log.error("Failed to assign Keycloak role, rolling back DB profile", e);
+            throw new RuntimeException("Role assignment failed, profile update rolled back", e);
+        }
     }
 
     public TokenResponse login(LoginRequest loginRequest) {
@@ -186,14 +201,21 @@ public class PersonService {
     public TokenResponse refreshToken(String refreshToken) {
         Map<String, Object> tokenMap = keycloakClient.refreshToken(refreshToken);
 
-        String username = (String) tokenMap.get("preferred_username");
+        String accessToken = (String) tokenMap.get("access_token");
+        Map<String, Object> userInfo = keycloakClient.getUserInfo(accessToken);
+
+        String username = (String) userInfo.get("preferred_username");
+        if (username == null || username.isBlank()) {
+            throw new RuntimeException("Unable to extract username from token");
+        }
+
         PersonMaster person = personMasterRepository.findByPhoneNumber(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         log.debug("User '{}' logged in with tenant '{}'", person.getPhoneNumber(), person.getTenantId());
 
         TokenResponse tokenResponse = new TokenResponse();
-        tokenResponse.setAccessToken((String) tokenMap.get("access_token"));
+        tokenResponse.setAccessToken(accessToken);
         tokenResponse.setRefreshToken((String) tokenMap.get("refresh_token"));
         tokenResponse.setExpiresIn((Integer) tokenMap.get("expires_in"));
         tokenResponse.setRefreshExpiresIn((Integer) tokenMap.get("refresh_expires_in"));
@@ -234,8 +256,27 @@ public class PersonService {
 
 
     private String extractEmailFromToken(String token) throws VerificationException {
+        String publicKeyPemClean = publicKeyPem
+                .replace("-----BEGIN PUBLIC KEY-----", "")
+                .replace("-----END PUBLIC KEY-----", "")
+                .replaceAll("\\s+", "");
+
+        byte[] decoded = Base64.getDecoder().decode(publicKeyPemClean);
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decoded);
+        RSAPublicKey publicKey;
+        try {
+            KeyFactory kf = KeyFactory.getInstance("RSA");
+            publicKey = (RSAPublicKey) kf.generatePublic(keySpec);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse Keycloak public key", e);
+        }
+
         AccessToken accessToken = TokenVerifier.create(token, AccessToken.class)
+                .publicKey(publicKey)
+                .withDefaultChecks()
+                .verify()
                 .getToken();
+
         return accessToken.getEmail();
     }
 

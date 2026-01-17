@@ -6,6 +6,7 @@ import com.jalsoochak.ManagementService.models.app.request.RegisterRequest;
 import com.jalsoochak.ManagementService.models.app.request.TokenRequest;
 import com.jalsoochak.ManagementService.models.app.response.TokenResponse;
 import com.jalsoochak.ManagementService.services.impl.PersonService;
+import jakarta.ws.rs.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.common.VerificationException;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/v2/auth")
@@ -28,8 +30,6 @@ public class PersonController {
     @PostMapping("/invite/user")
     public ResponseEntity<?> inviteUser(@RequestBody InviteRequest inviteRequest,
                                         @RequestHeader("Authorization") String authHeader){
-
-        log.debug("Invite Request in: {}", inviteRequest);
 
         if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -43,36 +43,53 @@ public class PersonController {
                     .body("Authorization token is empty");
         }
 
-//        if(!personService.isSuperAdmin(token)){
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-//                    .body("Only super admin can invite user");
-//        }
+        if(!personService.isSuperAdmin(token)){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Only super admin can invite user");
+        }
 
         personService.inviteUser(inviteRequest);
         return ResponseEntity.ok("Invitation sent");
     }
 
     @PostMapping("/complete/profile")
-    public ResponseEntity<?> completeProfile(@RequestBody RegisterRequest registerRequest,
-                                          @RequestHeader("Authorization") String authHeader) throws VerificationException {
-        log.debug("Registration Request sent: {}", registerRequest);
+    public ResponseEntity<?> completeProfile(
+            @RequestBody RegisterRequest registerRequest,
+            @RequestHeader("Authorization") String authHeader) {
 
-        if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")){
+        if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Missing or invalid Authorization header");
         }
 
-        String token = authHeader.substring(7);
+        String token = authHeader.substring(7).trim();
 
         if (token.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Authorization token is empty");
         }
 
-        personService.completeProfile(registerRequest, token);
+        try {
+            personService.completeProfile(registerRequest, token);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body("User registered successfully");
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
+        } catch (VerificationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Invalid or expired token");
 
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode())
+                    .body(e.getReason());
+
+        } catch (BadRequestException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Unexpected error: " + e.getMessage());
+        }
     }
 
     @PostMapping("/login")
@@ -82,8 +99,12 @@ public class PersonController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refresh(@RequestParam String refreshToken) {
-        TokenResponse response = personService.refreshToken(refreshToken);
+    public ResponseEntity<TokenResponse> refresh(@RequestBody TokenRequest tokenRequest) {
+        if (tokenRequest.getRefreshToken() == null || tokenRequest.getRefreshToken().isBlank()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(null);
+        }
+        TokenResponse response = personService.refreshToken(tokenRequest.getRefreshToken());
         return ResponseEntity.ok(response);
     }
 
