@@ -5,6 +5,7 @@ import { KPICard } from './kpi-card'
 import { IndiaMapChart, DemandSupplyChart, BarChart } from './charts'
 import { PerformanceTable } from './tables'
 import { LoadingSpinner } from '@/shared/components/common'
+import { SearchLayout } from '@/shared/components/layout'
 
 export function CentralDashboard() {
   const navigate = useNavigate()
@@ -67,9 +68,10 @@ export function CentralDashboard() {
   }
 
   return (
-    <Box p={6}>
+    <Box>
+      <SearchLayout />
       {/* Header */}
-      <Box mb={6}>
+      <Box mt="24px" mb="24px">
         <Heading fontSize="3xl" fontWeight="bold">
           Central Dashboard
         </Heading>

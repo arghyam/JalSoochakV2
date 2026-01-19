@@ -3,7 +3,7 @@ import jalsoochakLogo from '@/assets/media/jalsoochak-logo.svg'
 
 export function Header() {
   return (
-    <Flex as="header" borderBottomWidth="1px" bg="white" boxShadow="sm">
+    <Flex as="header" borderBottomWidth="1px" bg="white" boxShadow="sm" mb="32px">
       <Flex w="full" maxW="100%" align="center" px="80px" py="12px" height="92.55px">
         <Flex align="center" flexShrink={0}>
           <Image src={jalsoochakLogo} alt="JalSoochak logo" w="117.61px" h="68.55px" />
