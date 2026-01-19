@@ -23,6 +23,9 @@ export interface SearchableSelectProps {
   placeholder?: string
   disabled?: boolean
   width?: string
+  fontSize?: string
+  textColor?: string
+  height?: string
 }
 
 export function SearchableSelect({
@@ -32,6 +35,9 @@ export function SearchableSelect({
   placeholder = 'Select',
   disabled = false,
   width = '486px',
+  fontSize = 'md',
+  textColor,
+  height = '36px',
 }: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -82,7 +88,7 @@ export function SearchableSelect({
         aria-disabled={disabled}
         disabled={disabled}
         w="full"
-        h="36px"
+        h={height}
         px="12px"
         py="6px"
         bg="white"
@@ -102,7 +108,11 @@ export function SearchableSelect({
           pointerEvents: 'none',
         }}
       >
-        <Text fontSize="md" color={selectedOption ? 'neutral.950' : 'neutral.500'} noOfLines={1}>
+        <Text
+          fontSize={fontSize}
+          color={textColor || (selectedOption ? 'neutral.950' : 'neutral.500')}
+          noOfLines={1}
+        >
           {selectedOption ? selectedOption.label : placeholder}
         </Text>
         <ChevronDownIcon

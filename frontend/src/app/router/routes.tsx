@@ -2,7 +2,13 @@ import { createBrowserRouter } from 'react-router-dom'
 import { ROUTES } from '@/shared/constants/routes'
 import { MainLayout, DashboardLayout } from '@/shared/components/layout'
 import { CentralDashboard } from '@/features/dashboard/components/central-dashboard'
-import { Admin, ManageTenants, StateAdminManagement, ConfigureSystem } from '@/features/admin'
+import {
+  OverviewPage as SuperAdminOverviewPage,
+  SystemRulesPage,
+  StatesUTsPage,
+  ApiCredentialsPage,
+  IngestionMonitorPage,
+} from '@/features/super-admin'
 import {
   OverviewPage,
   ActivityPage,
@@ -85,48 +91,39 @@ export const router = createBrowserRouter([
       </RedirectIfAuthenticated>
     ),
   },
-  // Protected routes
+  // Super Admin routes
   {
-    path: ROUTES.ADMIN,
+    path: ROUTES.SUPER_ADMIN,
     element: (
       <ProtectedRoute allowedRoles={[AUTH_ROLES.SUPER_ADMIN]}>
-        <MainLayout>
-          <Admin />
-        </MainLayout>
+        <MainLayout />
       </ProtectedRoute>
     ),
-  },
-  {
-    path: ROUTES.ADD_STATE_ADMIN,
-    element: (
-      <ProtectedRoute allowedRoles={[AUTH_ROLES.SUPER_ADMIN]}>
-        <MainLayout>
-          <StateAdminManagement />
-        </MainLayout>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: ROUTES.CONFIGURE_SYSTEM,
-    element: (
-      <ProtectedRoute allowedRoles={[AUTH_ROLES.SUPER_ADMIN]}>
-        <MainLayout>
-          <ConfigureSystem />
-        </MainLayout>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: ROUTES.MANAGE_TENANTS,
-    element: (
-      <ProtectedRoute allowedRoles={[AUTH_ROLES.SUPER_ADMIN]}>
-        <MainLayout>
-          <ManageTenants />
-        </MainLayout>
-      </ProtectedRoute>
-    ),
+    children: [
+      {
+        index: true,
+        element: <SuperAdminOverviewPage />,
+      },
+      {
+        path: ROUTES.SUPER_ADMIN_SYSTEM_RULES,
+        element: <SystemRulesPage />,
+      },
+      {
+        path: ROUTES.SUPER_ADMIN_STATES_UTS,
+        element: <StatesUTsPage />,
+      },
+      {
+        path: ROUTES.SUPER_ADMIN_API_CREDENTIALS,
+        element: <ApiCredentialsPage />,
+      },
+      {
+        path: ROUTES.SUPER_ADMIN_INGESTION_MONITOR,
+        element: <IngestionMonitorPage />,
+      },
+    ],
   },
 
+  // State Admin routes
   {
     path: ROUTES.STATE_ADMIN,
     element: (
