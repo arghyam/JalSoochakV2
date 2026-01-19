@@ -117,7 +117,7 @@ export const mockIngestionMonitorData: IngestionMonitorData = {
       description: 'Records processed: 12,345',
       batchId: '5f7c3d1e-8a9b-4c0d-9e2f',
       sourceSystem: 'State Data Hub',
-      processingTime: '150mm',
+      processingTime: '150ms',
       recordsProcessed: 12345,
       status: 'successful',
       timestamp: new Date('2025-11-20T10:30:00'),
@@ -129,7 +129,7 @@ export const mockIngestionMonitorData: IngestionMonitorData = {
         "Issue: Data validation for 50 out of 1000 records due to missing 'district_id'. Review schema compliance for future submissions.",
       batchId: '5f7c3d1e-8a9b-4c0d-9e2f',
       sourceSystem: 'State Data Hub',
-      processingTime: '150mm',
+      processingTime: '150ms',
       status: 'warning',
       timestamp: new Date('2025-11-20T10:30:00'),
       issueDetails:
@@ -142,7 +142,7 @@ export const mockIngestionMonitorData: IngestionMonitorData = {
         'Error: DB_CONNECT_TIMEOUT Service Status: Database service appears offline. Data ingestion from this district is paused.',
       batchId: '5f7c3d1e-8a9b-4c0d-9e2f',
       sourceSystem: 'State Data Hub',
-      processingTime: '150mm',
+      processingTime: '150ms',
       status: 'failed',
       timestamp: new Date('2025-11-20T10:30:00'),
       errorDetails:

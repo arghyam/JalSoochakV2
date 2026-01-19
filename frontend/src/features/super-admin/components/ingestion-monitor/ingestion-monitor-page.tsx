@@ -288,7 +288,7 @@ export function IngestionMonitorPage() {
                       {log.status === 'successful' && log.recordsProcessed && (
                         <Text as="span" fontWeight="400">
                           {' '}
-                          Records processes: {log.recordsProcessed.toLocaleString()}
+                          Records Processed: {log.recordsProcessed.toLocaleString()}
                         </Text>
                       )}
                     </Text>

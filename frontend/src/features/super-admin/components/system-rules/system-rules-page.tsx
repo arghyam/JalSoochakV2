@@ -144,7 +144,8 @@ export function SystemRulesPage() {
                   Coverage
                 </Text>
                 <Text fontSize="14px" mb={4}>
-                  AAAA
+                  Minimum percentage of households that must have Functional Household Tap
+                  Connections (FHTC) to avoid a coverage alert.
                 </Text>
                 <SearchableSelect
                   options={COVERAGE_OPTIONS}
