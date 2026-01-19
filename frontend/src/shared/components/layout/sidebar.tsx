@@ -1,7 +1,8 @@
 import { Link as RouterLink, useLocation } from 'react-router-dom'
 import { Box, Flex, Stack, Text, Icon, Image } from '@chakra-ui/react'
-import { MdDashboard, MdOutlineMoving, MdPeople, MdPersonAdd, MdSettings } from 'react-icons/md'
+import { MdOutlineMoving, MdOutlinePlace } from 'react-icons/md'
 import { AiOutlineEye, AiOutlineSetting, AiOutlineWarning, AiOutlineApi } from 'react-icons/ai'
+import { BiKey } from 'react-icons/bi'
 import { IoLanguageOutline, IoWaterOutline } from 'react-icons/io5'
 import { HiOutlineTemplate } from 'react-icons/hi'
 import { BsPerson, BsListUl } from 'react-icons/bs'
@@ -19,24 +20,35 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   // Super Admin navigation
-  { path: ROUTES.ADMIN, label: 'Dashboard', roles: [AUTH_ROLES.SUPER_ADMIN], icon: MdDashboard },
   {
-    path: ROUTES.MANAGE_TENANTS,
-    label: 'Manage Tenants',
+    path: ROUTES.SUPER_ADMIN_OVERVIEW,
+    label: 'Overview',
     roles: [AUTH_ROLES.SUPER_ADMIN],
-    icon: MdPeople,
+    icon: AiOutlineEye,
   },
   {
-    path: ROUTES.ADD_STATE_ADMIN,
-    label: 'Add State Admin',
+    path: ROUTES.SUPER_ADMIN_SYSTEM_RULES,
+    label: 'System Rules',
     roles: [AUTH_ROLES.SUPER_ADMIN],
-    icon: MdPersonAdd,
+    icon: AiOutlineSetting,
   },
   {
-    path: ROUTES.CONFIGURE_SYSTEM,
-    label: 'Configure System',
+    path: ROUTES.SUPER_ADMIN_STATES_UTS,
+    label: 'States/UTs',
     roles: [AUTH_ROLES.SUPER_ADMIN],
-    icon: MdSettings,
+    icon: MdOutlinePlace,
+  },
+  {
+    path: ROUTES.SUPER_ADMIN_API_CREDENTIALS,
+    label: 'API Credentials',
+    roles: [AUTH_ROLES.SUPER_ADMIN],
+    icon: BiKey,
+  },
+  {
+    path: ROUTES.SUPER_ADMIN_INGESTION_MONITOR,
+    label: 'Ingestion Monitor',
+    roles: [AUTH_ROLES.SUPER_ADMIN],
+    icon: AiOutlineApi,
   },
 
   // State Admin navigation

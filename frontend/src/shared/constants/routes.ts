@@ -1,9 +1,13 @@
 export const ROUTES = {
   DASHBOARD: '/',
-  ADMIN: '/admin',
-  MANAGE_TENANTS: '/admin/manage-tenants',
-  ADD_STATE_ADMIN: '/admin/add-state-admin',
-  CONFIGURE_SYSTEM: '/admin/configure-system',
+  // Super Admin routes
+  SUPER_ADMIN: '/super-admin',
+  SUPER_ADMIN_OVERVIEW: '/super-admin',
+  SUPER_ADMIN_SYSTEM_RULES: '/super-admin/system-rules',
+  SUPER_ADMIN_STATES_UTS: '/super-admin/states-uts',
+  SUPER_ADMIN_API_CREDENTIALS: '/super-admin/api-credentials',
+  SUPER_ADMIN_INGESTION_MONITOR: '/super-admin/ingestion-monitor',
+  // State Admin routes
   STATE_ADMIN: '/state-admin',
   STATE_ADMIN_OVERVIEW: '/state-admin',
   STATE_ADMIN_LANGUAGE: '/state-admin/language',
