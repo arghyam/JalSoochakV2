@@ -42,7 +42,7 @@ export function RedirectIfAuthenticated({ children }: { children: ReactNode }) {
   }
 
   if (user.role === AUTH_ROLES.SUPER_ADMIN) {
-    return <Navigate to={ROUTES.ADMIN} replace />
+    return <Navigate to={ROUTES.SUPER_ADMIN} replace />
   }
 
   if (user.role === AUTH_ROLES.STATE_ADMIN) {
