@@ -136,7 +136,7 @@ export function SearchableSelect({
           borderRadius="8px"
           boxShadow="0px 4px 6px -2px rgba(10, 13, 18, 0.03)"
           w={width}
-          maxH="281px"
+          maxH="240px"
           overflow="hidden"
         >
           {/* Search Input */}

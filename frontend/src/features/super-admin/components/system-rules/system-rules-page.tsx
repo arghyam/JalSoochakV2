@@ -247,7 +247,7 @@ export function SystemRulesPage() {
               width="174px"
               onClick={handleSave}
               isLoading={isSaving}
-              isDisabled={!isFormValid}
+              isDisabled={!isFormValid || !hasChanges}
             >
               Save
             </Button>

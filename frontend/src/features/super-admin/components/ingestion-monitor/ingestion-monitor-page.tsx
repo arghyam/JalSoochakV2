@@ -16,13 +16,43 @@ import { BsCheck2Circle } from 'react-icons/bs'
 
 export function IngestionMonitorPage() {
   const [data, setData] = useState<IngestionMonitorData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [stateFilter, setStateFilter] = useState('all')
   const [timeFilter, setTimeFilter] = useState('7')
   const [statusFilter, setStatusFilter] = useState('all')
 
   useEffect(() => {
-    getMockIngestionMonitorData().then(setData)
-  }, [])
+    let isMounted = true
+
+    const fetchData = async () => {
+      setIsLoading(true)
+      setError(null)
+      try {
+        // When switching to real API, filters will be passed here:
+        const result = await getMockIngestionMonitorData()
+        if (isMounted) {
+          setData(result)
+        }
+      } catch (err) {
+        if (isMounted) {
+          console.error('Failed to fetch ingestion monitor data:', err)
+          setError('Failed to load ingestion data. Please try again.')
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    fetchData()
+
+    return () => {
+      isMounted = false
+    }
+    // Re-fetch when filters change
+  }, [stateFilter, timeFilter])
 
   const formatTimestamp = (date: Date): string => {
     let hours = date.getHours()
@@ -82,10 +112,36 @@ export function IngestionMonitorPage() {
       return true
     }) || []
 
-  if (!data) {
+  if (isLoading) {
     return (
       <Flex h="64" align="center" justify="center">
         <Text color="neutral.600">Loading...</Text>
+      </Flex>
+    )
+  }
+
+  if (error) {
+    return (
+      <Flex h="64" align="center" justify="center" direction="column" gap={4}>
+        <Text color="red.500">{error}</Text>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => {
+            setStateFilter('all')
+            setTimeFilter('7')
+          }}
+        >
+          Retry
+        </Button>
+      </Flex>
+    )
+  }
+
+  if (!data) {
+    return (
+      <Flex h="64" align="center" justify="center">
+        <Text color="neutral.600">No data available</Text>
       </Flex>
     )
   }
