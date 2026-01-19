@@ -1,9 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
   Box,
   Flex,
-  Heading,
   Button,
   Text,
   Avatar,
@@ -11,9 +10,11 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  Image,
 } from '@chakra-ui/react'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { useAuthStore } from '@/app/store'
+import jalsoochakLogo from '@/assets/media/jalsoochak-logo.svg'
 
 export function Header() {
   const { user, isAuthenticated, logout } = useAuthStore()
@@ -51,54 +52,55 @@ export function Header() {
   }, [isMenuOpen])
 
   return (
-    <Flex
-      as="header"
-      h="16"
-      align="center"
-      justify="space-between"
-      borderBottomWidth="1px"
-      bg="white"
-      px={6}
-      boxShadow="sm"
-    >
-      <Heading as="h1" fontSize="xl" fontWeight="semibold">
-        JalSoochak
-      </Heading>
+    <Flex as="header" borderBottomWidth="1px" bg="white" boxShadow="sm">
+      <Flex
+        w="full"
+        maxW="100%"
+        align="center"
+        justify="space-between"
+        px="80px"
+        py="12px"
+        height="92.55px"
+      >
+        <Flex align="center">
+          <Image src={jalsoochakLogo} alt="JalSoochak logo" w="117.61px" h="68.55px" />
+        </Flex>
 
-      <Flex align="center" gap={4}>
-        {isAuthenticated && user ? (
-          <Box ref={menuRef}>
-            <Menu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)}>
-              <MenuButton
-                as={Button}
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                variant="ghost"
-                px={3}
-                py={2}
-                borderRadius="lg"
-                _hover={{ bg: 'gray.100' }}
-                rightIcon={<ChevronDownIcon />}
-              >
-                <Flex align="center" gap={2}>
-                  <Avatar size="sm" bg="blue.600" color="white" name={user.name}>
-                    {getInitials(user.name)}
-                  </Avatar>
-                  <Text fontSize="sm" fontWeight="medium">
-                    {user.name}
-                  </Text>
-                </Flex>
-              </MenuButton>
+        <Text textStyle="h6" color="primary.500">
+          JalSoochak Dashboard
+        </Text>
 
-              <MenuList>
-                <MenuItem onClick={handleLogout}>Logout</MenuItem>
-              </MenuList>
-            </Menu>
-          </Box>
-        ) : (
-          <Button as={Link} to="/login" colorScheme="blue" size="sm">
-            Login
-          </Button>
-        )}
+        <Flex align="center" gap={4} justify="flex-end">
+          {isAuthenticated && user ? (
+            <Box ref={menuRef}>
+              <Menu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)}>
+                <MenuButton
+                  as={Button}
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  variant="ghost"
+                  px={3}
+                  py={2}
+                  borderRadius="lg"
+                  _hover={{ bg: 'gray.100' }}
+                  rightIcon={<ChevronDownIcon />}
+                >
+                  <Flex align="center" gap={2}>
+                    <Avatar size="sm" bg="blue.600" color="white" name={user.name}>
+                      {getInitials(user.name)}
+                    </Avatar>
+                    <Text fontSize="sm" fontWeight="medium">
+                      {user.name}
+                    </Text>
+                  </Flex>
+                </MenuButton>
+
+                <MenuList>
+                  <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                </MenuList>
+              </Menu>
+            </Box>
+          ) : null}
+        </Flex>
       </Flex>
     </Flex>
   )
