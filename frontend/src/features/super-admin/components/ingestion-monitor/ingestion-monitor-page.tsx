@@ -21,6 +21,7 @@ export function IngestionMonitorPage() {
   const [stateFilter, setStateFilter] = useState('all')
   const [timeFilter, setTimeFilter] = useState('7')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [retryKey, setRetryKey] = useState(0)
 
   useEffect(() => {
     let isMounted = true
@@ -52,7 +53,7 @@ export function IngestionMonitorPage() {
       isMounted = false
     }
     // Re-fetch when filters change
-  }, [stateFilter, timeFilter])
+  }, [stateFilter, timeFilter, retryKey])
 
   const formatTimestamp = (date: Date): string => {
     let hours = date.getHours()
@@ -130,6 +131,7 @@ export function IngestionMonitorPage() {
           onClick={() => {
             setStateFilter('all')
             setTimeFilter('7')
+            setRetryKey((prev) => prev + 1)
           }}
         >
           Retry
