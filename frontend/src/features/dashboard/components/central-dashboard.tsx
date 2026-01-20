@@ -6,19 +6,48 @@ import { KPICard } from './kpi-card'
 import { IndiaMapChart, DemandSupplyChart, BarChart } from './charts'
 import { PerformanceTable } from './tables'
 import { LoadingSpinner, SearchableSelect } from '@/shared/components/common'
+import type { SearchableSelectOption } from '@/shared/components/common'
 import { SearchLayout, FilterLayout } from '@/shared/components/layout'
-import { mockFilterStates, mockFilterDistricts } from '../services/mock/dashboard-mock'
+import {
+  mockFilterStates,
+  mockFilterDistricts,
+  mockFilterBlocks,
+  mockFilterGramPanchayats,
+  mockFilterVillages,
+  mockFilterDuration,
+  mockFilterSchemes,
+} from '../services/mock/dashboard-mock'
 
 export function CentralDashboard() {
   const navigate = useNavigate()
   const { data, isLoading, error } = useDashboardData('central')
   const [selectedState, setSelectedState] = useState('')
   const [selectedDistrict, setSelectedDistrict] = useState('')
+  const [selectedBlock, setSelectedBlock] = useState('')
+  const [selectedGramPanchayat, setSelectedGramPanchayat] = useState('')
+  const [selectedVillage, setSelectedVillage] = useState('')
+  const [selectedDuration, setSelectedDuration] = useState('')
+  const [selectedScheme, setSelectedScheme] = useState('')
+  const [filterTabIndex, setFilterTabIndex] = useState(0)
 
-  const emptyOptions: { value: string; label: string }[] = []
+  const emptyOptions: SearchableSelectOption[] = []
+  const isAdvancedEnabled = Boolean(selectedState && selectedDistrict)
+  const districtOptions = selectedState ? (mockFilterDistricts[selectedState] ?? []) : emptyOptions
+  const blockOptions = selectedDistrict ? (mockFilterBlocks[selectedDistrict] ?? []) : emptyOptions
+  const gramPanchayatOptions = selectedBlock
+    ? (mockFilterGramPanchayats[selectedBlock] ?? [])
+    : emptyOptions
+  const villageOptions = selectedGramPanchayat
+    ? (mockFilterVillages[selectedGramPanchayat] ?? [])
+    : emptyOptions
   const handleClearFilters = () => {
     setSelectedState('')
     setSelectedDistrict('')
+    setSelectedBlock('')
+    setSelectedGramPanchayat('')
+    setSelectedVillage('')
+    setSelectedDuration('')
+    setSelectedScheme('')
   }
 
   const handleStateClick = (stateId: string, _stateName: string) => {
@@ -80,91 +109,172 @@ export function CentralDashboard() {
   return (
     <Box>
       <SearchLayout />
-      <FilterLayout onClear={handleClearFilters}>
-        <SearchableSelect
-          options={mockFilterStates}
-          value={selectedState}
-          onChange={setSelectedState}
-          placeholder="States/UTs"
-          width="162px"
-          height="32px"
-          borderRadius="4px"
-          fontSize="sm"
-          textColor="neutral.400"
-          borderColor="neutral.400"
-        />
-        <SearchableSelect
-          options={mockFilterDistricts}
-          value={selectedDistrict}
-          onChange={setSelectedDistrict}
-          placeholder="District"
-          width="162px"
-          height="32px"
-          borderRadius="4px"
-          fontSize="sm"
-          textColor="neutral.400"
-          borderColor="neutral.400"
-        />
-        <SearchableSelect
-          options={emptyOptions}
-          value=""
-          onChange={() => {}}
-          placeholder="Block"
-          width="162px"
-          height="32px"
-          borderRadius="4px"
-          fontSize="sm"
-          textColor="neutral.300"
-          disabled
-        />
-        <SearchableSelect
-          options={emptyOptions}
-          value=""
-          onChange={() => {}}
-          placeholder="Gram Panchayat"
-          width="162px"
-          height="32px"
-          borderRadius="4px"
-          fontSize="sm"
-          textColor="neutral.300"
-          disabled
-        />
-        <SearchableSelect
-          options={emptyOptions}
-          value=""
-          onChange={() => {}}
-          placeholder="Village"
-          width="162px"
-          height="32px"
-          borderRadius="4px"
-          fontSize="sm"
-          textColor="neutral.300"
-          disabled
-        />
-        <SearchableSelect
-          options={emptyOptions}
-          value=""
-          onChange={() => {}}
-          placeholder="Duration"
-          width="162px"
-          height="32px"
-          borderRadius="4px"
-          fontSize="sm"
-          textColor="neutral.300"
-          disabled
-        />
-        <SearchableSelect
-          options={emptyOptions}
-          value=""
-          onChange={() => {}}
-          placeholder="Scheme"
-          width="162px"
-          height="32px"
-          borderRadius="4px"
-          fontSize="sm"
-          textColor="neutral.300"
-          disabled
-        />
+      <FilterLayout
+        onClear={handleClearFilters}
+        activeTab={filterTabIndex}
+        onTabChange={setFilterTabIndex}
+      >
+        {filterTabIndex === 0 ? (
+          <>
+            <SearchableSelect
+              options={mockFilterStates}
+              value={selectedState}
+              onChange={setSelectedState}
+              placeholder="States/UTs"
+              width="162px"
+              height="32px"
+              borderRadius="4px"
+              fontSize="sm"
+              textColor="neutral.400"
+              borderColor="neutral.400"
+            />
+            <SearchableSelect
+              options={districtOptions}
+              value={selectedDistrict}
+              onChange={setSelectedDistrict}
+              placeholder="District"
+              width="162px"
+              height="32px"
+              borderRadius="4px"
+              fontSize="sm"
+              textColor="neutral.400"
+              borderColor="neutral.400"
+            />
+            <SearchableSelect
+              options={blockOptions}
+              value={selectedBlock}
+              onChange={setSelectedBlock}
+              placeholder="Block"
+              width="162px"
+              height="32px"
+              borderRadius="4px"
+              fontSize="sm"
+              textColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
+              borderColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
+              disabled={!isAdvancedEnabled}
+            />
+            <SearchableSelect
+              options={gramPanchayatOptions}
+              value={selectedGramPanchayat}
+              onChange={setSelectedGramPanchayat}
+              placeholder="Gram Panchayat"
+              width="162px"
+              height="32px"
+              borderRadius="4px"
+              fontSize="sm"
+              textColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
+              borderColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
+              disabled={!isAdvancedEnabled}
+            />
+            <SearchableSelect
+              options={villageOptions}
+              value={selectedVillage}
+              onChange={setSelectedVillage}
+              placeholder="Village"
+              width="162px"
+              height="32px"
+              borderRadius="4px"
+              fontSize="sm"
+              textColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
+              borderColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
+              disabled={!isAdvancedEnabled}
+            />
+            <SearchableSelect
+              options={mockFilterDuration}
+              value={selectedDuration}
+              onChange={setSelectedDuration}
+              placeholder="Duration"
+              width="162px"
+              height="32px"
+              borderRadius="4px"
+              fontSize="sm"
+              textColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
+              borderColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
+              disabled={!isAdvancedEnabled}
+            />
+            <SearchableSelect
+              options={mockFilterSchemes}
+              value={selectedScheme}
+              onChange={setSelectedScheme}
+              placeholder="Scheme"
+              width="162px"
+              height="32px"
+              borderRadius="4px"
+              fontSize="sm"
+              textColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
+              borderColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
+              disabled={!isAdvancedEnabled}
+            />
+          </>
+        ) : (
+          <>
+            <SearchableSelect
+              options={emptyOptions}
+              value=""
+              onChange={() => {}}
+              placeholder="Zone"
+              width="162px"
+              height="32px"
+              borderRadius="4px"
+              fontSize="sm"
+              textColor="neutral.300"
+              borderColor="neutral.300"
+              disabled
+            />
+            <SearchableSelect
+              options={emptyOptions}
+              value=""
+              onChange={() => {}}
+              placeholder="Circle"
+              width="162px"
+              height="32px"
+              borderRadius="4px"
+              fontSize="sm"
+              textColor="neutral.300"
+              borderColor="neutral.300"
+              disabled
+            />
+            <SearchableSelect
+              options={emptyOptions}
+              value=""
+              onChange={() => {}}
+              placeholder="Division"
+              width="162px"
+              height="32px"
+              borderRadius="4px"
+              fontSize="sm"
+              textColor="neutral.300"
+              borderColor="neutral.300"
+              disabled
+            />
+            <SearchableSelect
+              options={emptyOptions}
+              value=""
+              onChange={() => {}}
+              placeholder="Subdivision"
+              width="162px"
+              height="32px"
+              borderRadius="4px"
+              fontSize="sm"
+              textColor="neutral.300"
+              borderColor="neutral.300"
+              disabled
+            />
+            <SearchableSelect
+              options={emptyOptions}
+              value=""
+              onChange={() => {}}
+              placeholder="Village"
+              width="162px"
+              height="32px"
+              borderRadius="4px"
+              fontSize="sm"
+              textColor="neutral.300"
+              borderColor="neutral.300"
+              disabled
+            />
+          </>
+        )}
       </FilterLayout>
 
       {/* KPI Cards */}
