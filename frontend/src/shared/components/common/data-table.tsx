@@ -1,6 +1,22 @@
 import { useState } from 'react'
-import { Box, Table, Thead, Tbody, Tr, Th, Td, Text, Flex } from '@chakra-ui/react'
-import { ChevronUpIcon, ChevronDownIcon } from '@chakra-ui/icons'
+import {
+  Box,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  Text,
+  Flex,
+  HStack,
+  Button,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+} from '@chakra-ui/react'
+import { ChevronUpIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons'
 
 export interface DataTableColumn<T> {
   key: string
@@ -9,25 +25,37 @@ export interface DataTableColumn<T> {
   render?: (row: T) => React.ReactNode
 }
 
+export interface PaginationConfig {
+  enabled: boolean
+  pageSize?: number
+  pageSizeOptions?: number[]
+}
+
 export interface DataTableProps<T> {
   columns: DataTableColumn<T>[]
   data: T[]
   getRowKey: (row: T) => string | number
   emptyMessage?: string
   isLoading?: boolean
+  pagination?: PaginationConfig
 }
 
 type SortDirection = 'asc' | 'desc' | null
 
-export function DataTable<T extends Record<string, unknown>>({
+export function DataTable<T extends object>({
   columns,
   data,
   getRowKey,
   emptyMessage = 'No data available',
   isLoading = false,
+  pagination,
 }: DataTableProps<T>) {
   const [sortColumn, setSortColumn] = useState<string | null>(null)
   const [sortDirection, setSortDirection] = useState<SortDirection>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(pagination?.pageSize ?? 10)
+
+  const pageSizeOptions = pagination?.pageSizeOptions ?? [10, 25, 50]
 
   const handleSort = (columnKey: string, sortable?: boolean) => {
     if (!sortable) return
@@ -50,8 +78,8 @@ export function DataTable<T extends Record<string, unknown>>({
     if (!sortColumn || !sortDirection) return data
 
     return [...data].sort((a, b) => {
-      const aValue = a[sortColumn]
-      const bValue = b[sortColumn]
+      const aValue = (a as Record<string, unknown>)[sortColumn]
+      const bValue = (b as Record<string, unknown>)[sortColumn]
 
       // Handle different data types
       if (aValue instanceof Date && bValue instanceof Date) {
@@ -76,6 +104,64 @@ export function DataTable<T extends Record<string, unknown>>({
   }
 
   const sortedData = getSortedData()
+
+  // Pagination logic
+  const totalPages = pagination?.enabled ? Math.ceil(sortedData.length / itemsPerPage) : 1
+  const paginatedData = pagination?.enabled
+    ? sortedData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+    : sortedData
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page)
+    }
+  }
+
+  const handleItemsPerPageChange = (size: number) => {
+    setItemsPerPage(size)
+    setCurrentPage(1) // Reset to first page when changing page size
+  }
+
+  // Generate page numbers to display
+  const getPageNumbers = (): (number | 'ellipsis')[] => {
+    const pages: (number | 'ellipsis')[] = []
+    const maxVisiblePages = 3
+
+    if (totalPages <= maxVisiblePages + 2) {
+      // Show all pages if total is small
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i)
+      }
+    } else {
+      // Always show first page
+      pages.push(1)
+
+      if (currentPage > 3) {
+        pages.push('ellipsis')
+      }
+
+      // Show pages around current page
+      const start = Math.max(2, currentPage - 1)
+      const end = Math.min(totalPages - 1, currentPage + 1)
+
+      for (let i = start; i <= end; i++) {
+        if (!pages.includes(i)) {
+          pages.push(i)
+        }
+      }
+
+      if (currentPage < totalPages - 2) {
+        pages.push('ellipsis')
+      }
+
+      // Always show last page
+      if (!pages.includes(totalPages)) {
+        pages.push(totalPages)
+      }
+    }
+
+    return pages
+  }
 
   if (isLoading) {
     return (
@@ -165,7 +251,7 @@ export function DataTable<T extends Record<string, unknown>>({
           </Tr>
         </Thead>
         <Tbody>
-          {sortedData.map((row) => (
+          {paginatedData.map((row) => (
             <Tr key={getRowKey(row)} _hover={{ bg: 'neutral.25' }}>
               {columns.map((column) => (
                 <Td
@@ -177,13 +263,112 @@ export function DataTable<T extends Record<string, unknown>>({
                   py={3}
                   h={12}
                 >
-                  {column.render ? column.render(row) : String(row[column.key as keyof T] ?? '')}
+                  {column.render
+                    ? column.render(row)
+                    : String((row as Record<string, unknown>)[column.key] ?? '')}
                 </Td>
               ))}
             </Tr>
           ))}
         </Tbody>
       </Table>
+
+      {/* Pagination Controls */}
+      {pagination?.enabled && totalPages > 0 && (
+        <Flex justify="space-between" align="center" mt={6} px={4}>
+          {/* Items per page selector */}
+          <HStack spacing={2}>
+            <Text fontSize="14px" color="neutral.600">
+              Items per Page
+            </Text>
+            <Menu>
+              <MenuButton
+                as={Button}
+                variant="outline"
+                size="sm"
+                rightIcon={<ChevronDownIcon />}
+                fontWeight="400"
+                borderColor="neutral.200"
+                bg="white"
+                _hover={{ bg: 'neutral.50' }}
+                _active={{ bg: 'neutral.100' }}
+              >
+                {itemsPerPage}
+              </MenuButton>
+              <MenuList minW="80px">
+                {pageSizeOptions.map((size) => (
+                  <MenuItem
+                    key={size}
+                    onClick={() => handleItemsPerPageChange(size)}
+                    fontWeight={itemsPerPage === size ? '600' : '400'}
+                  >
+                    {size}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
+          </HStack>
+
+          {/* Page navigation */}
+          <HStack spacing={2}>
+            {/* Previous button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handlePageChange(currentPage - 1)}
+              isDisabled={currentPage === 1}
+              leftIcon={<ChevronLeftIcon />}
+              fontWeight="400"
+              color="neutral.600"
+              _hover={{ bg: 'neutral.50' }}
+            >
+              Previous
+            </Button>
+
+            {/* Page numbers */}
+            <HStack spacing={1}>
+              {getPageNumbers().map((page, index) =>
+                page === 'ellipsis' ? (
+                  <Text key={`ellipsis-${index}`} px={2} color="neutral.400">
+                    ...
+                  </Text>
+                ) : (
+                  <Button
+                    key={page}
+                    size="sm"
+                    variant={currentPage === page ? 'solid' : 'ghost'}
+                    onClick={() => handlePageChange(page)}
+                    minW="32px"
+                    h="32px"
+                    fontWeight={currentPage === page ? '600' : '400'}
+                    bg={currentPage === page ? 'primary.500' : 'transparent'}
+                    color={currentPage === page ? 'white' : 'neutral.600'}
+                    _hover={{
+                      bg: currentPage === page ? 'primary.600' : 'neutral.50',
+                    }}
+                  >
+                    {page}
+                  </Button>
+                )
+              )}
+            </HStack>
+
+            {/* Next button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handlePageChange(currentPage + 1)}
+              isDisabled={currentPage === totalPages}
+              rightIcon={<ChevronRightIcon />}
+              fontWeight="400"
+              color="neutral.600"
+              _hover={{ bg: 'neutral.50' }}
+            >
+              Next
+            </Button>
+          </HStack>
+        </Flex>
+      )}
     </Box>
   )
 }

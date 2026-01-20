@@ -1,6 +1,8 @@
 import type { SuperAdminOverviewData } from '../types/overview'
 import type { SystemRulesConfiguration } from '../types/system-rules'
 import type { IngestionMonitorData } from '../types/ingestion-monitor'
+import type { ApiCredentialsData } from '../types/api-credentials'
+import type { StateUT, CreateStateUTInput, UpdateStateUTInput } from '../types/states-uts'
 
 export const mockSuperAdminOverviewData: SuperAdminOverviewData = {
   stats: {
@@ -157,4 +159,325 @@ export const getMockIngestionMonitorData = (): Promise<IngestionMonitorData> => 
       resolve(mockIngestionMonitorData)
     }, 300)
   })
+}
+
+// API Credentials Mock Data
+export const mockApiCredentialsData: ApiCredentialsData = {
+  credentials: [
+    {
+      id: '1',
+      stateUtName: 'Maharashtra',
+      apiKey: 'ak-r88880z1a',
+      lastUsed: new Date('2025-09-08T15:00:00'),
+      createdOn: new Date('2025-02-05'),
+      nextRotation: new Date('2025-09-10'),
+      status: 'active',
+    },
+    {
+      id: '2',
+      stateUtName: 'Himachal Pradesh',
+      apiKey: 'ak-r88880z1a',
+      lastUsed: new Date('2025-09-08T15:00:00'),
+      createdOn: new Date('2025-02-05'),
+      nextRotation: new Date('2025-09-10'),
+      status: 'inactive',
+    },
+    {
+      id: '3',
+      stateUtName: 'Gujrat',
+      apiKey: 'ak-r88880z1a',
+      lastUsed: new Date('2025-09-08T15:00:00'),
+      createdOn: new Date('2025-02-05'),
+      nextRotation: new Date('2025-09-10'),
+      status: 'inactive',
+    },
+    {
+      id: '4',
+      stateUtName: 'Haryana',
+      apiKey: 'ak-r88880z1a',
+      lastUsed: new Date('2025-09-08T15:00:00'),
+      createdOn: new Date('2025-02-05'),
+      nextRotation: new Date('2025-09-10'),
+      status: 'active',
+    },
+    {
+      id: '5',
+      stateUtName: 'Punjab',
+      apiKey: 'ak-r88880z1a',
+      lastUsed: new Date('2025-09-08T15:00:00'),
+      createdOn: new Date('2025-02-05'),
+      nextRotation: new Date('2025-09-10'),
+      status: 'active',
+    },
+    {
+      id: '6',
+      stateUtName: 'Uttar Pradesh',
+      apiKey: 'ak-r88880z1a',
+      lastUsed: new Date('2025-09-08T15:00:00'),
+      createdOn: new Date('2025-02-05'),
+      nextRotation: new Date('2025-09-10'),
+      status: 'active',
+    },
+  ],
+}
+
+export const getMockApiCredentialsData = (): Promise<ApiCredentialsData> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(mockApiCredentialsData)
+    }, 300)
+  })
+}
+
+export const generateApiKey = (_stateId: string): Promise<string> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const randomPart = Math.random().toString(36).substring(2, 10)
+      resolve(`ak-${randomPart}`)
+    }, 300)
+  })
+}
+
+export const sendApiKey = (_stateId: string): Promise<{ success: boolean }> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({ success: true })
+    }, 300)
+  })
+}
+
+// States/UTs Mock Data
+const mockStatesUTsData: StateUT[] = [
+  {
+    id: '1',
+    name: 'Andhra Pradesh',
+    code: '28',
+    status: 'active',
+    lastSyncDate: new Date('2025-09-08T15:00:00'),
+    totalDistricts: 29,
+    admin: {
+      firstName: 'Rajesh',
+      lastName: 'Kumar',
+      email: 'rajesh.kumar@jalsoochak.com',
+      phone: '9876543210',
+      secondaryEmail: '',
+      contactNumber: '',
+    },
+  },
+  {
+    id: '2',
+    name: 'Arunachal Pradesh',
+    code: '12',
+    status: 'active',
+    lastSyncDate: new Date('2025-11-02T09:30:00'),
+    totalDistricts: 28,
+    admin: {
+      firstName: 'Tenzin',
+      lastName: 'Dorje',
+      email: 'tenzin.dorje@jalsoochak.com',
+      phone: '9876543211',
+    },
+  },
+  {
+    id: '3',
+    name: 'Assam',
+    code: '18',
+    status: 'active',
+    lastSyncDate: new Date('2025-08-22T13:30:00'),
+    totalDistricts: 35,
+    admin: {
+      firstName: 'Priya',
+      lastName: 'Sharma',
+      email: 'priya.sharma@jalsoochak.com',
+      phone: '9876543212',
+    },
+  },
+  {
+    id: '4',
+    name: 'Bihar',
+    code: '10',
+    status: 'active',
+    lastSyncDate: new Date('2025-02-16T18:00:00'),
+    totalDistricts: 38,
+    admin: {
+      firstName: 'Amit',
+      lastName: 'Singh',
+      email: 'amit.singh@jalsoochak.com',
+      phone: '9876543213',
+    },
+  },
+  {
+    id: '5',
+    name: 'Chhattisgarh',
+    code: '22',
+    status: 'active',
+    lastSyncDate: new Date('2025-04-29T11:00:00'),
+    totalDistricts: 33,
+    admin: {
+      firstName: 'Sunita',
+      lastName: 'Verma',
+      email: 'sunita.verma@jalsoochak.com',
+      phone: '9876543214',
+    },
+  },
+  {
+    id: '6',
+    name: 'Goa',
+    code: '30',
+    status: 'active',
+    lastSyncDate: new Date('2025-12-04T16:30:00'),
+    totalDistricts: 2,
+    admin: {
+      firstName: 'Miguel',
+      lastName: 'Fernandes',
+      email: 'miguel.fernandes@jalsoochak.com',
+      phone: '9876543215',
+    },
+  },
+  {
+    id: '7',
+    name: 'Gujarat',
+    code: '24',
+    status: 'inactive',
+    lastSyncDate: new Date('2025-07-19T07:00:00'),
+    totalDistricts: 33,
+    admin: {
+      firstName: 'Kiran',
+      lastName: 'Patel',
+      email: 'kiran.patel@jalsoochak.com',
+      phone: '9876543216',
+    },
+  },
+  {
+    id: '8',
+    name: 'Haryana',
+    code: '06',
+    status: 'active',
+    lastSyncDate: new Date('2025-03-06T14:00:00'),
+    totalDistricts: 23,
+    admin: {
+      firstName: 'Deepak',
+      lastName: 'Yadav',
+      email: 'deepak.yadav@jalsoochak.com',
+      phone: '9876543217',
+    },
+  },
+  {
+    id: '9',
+    name: 'Himachal Pradesh',
+    code: '02',
+    status: 'inactive',
+    lastSyncDate: new Date('2025-05-14T12:30:00'),
+    totalDistricts: 12,
+    admin: {
+      firstName: 'Anita',
+      lastName: 'Thakur',
+      email: 'anita.thakur@jalsoochak.com',
+      phone: '9876543218',
+    },
+  },
+  {
+    id: '10',
+    name: 'Jharkhand',
+    code: '20',
+    status: 'active',
+    lastSyncDate: new Date('2025-09-11T20:30:00'),
+    totalDistricts: 24,
+    admin: {
+      firstName: 'Ravi',
+      lastName: 'Oraon',
+      email: 'ravi.oraon@jalsoochak.com',
+      phone: '9876543219',
+    },
+  },
+]
+
+export const getMockStatesUTsData = (): Promise<StateUT[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([...mockStatesUTsData])
+    }, 300)
+  })
+}
+
+export const getStateUTById = (id: string): Promise<StateUT | null> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const state = mockStatesUTsData.find((s) => s.id === id)
+      resolve(state ? { ...state } : null)
+    }, 300)
+  })
+}
+
+export const createStateUT = (data: CreateStateUTInput): Promise<StateUT> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const newState: StateUT = {
+        id: String(mockStatesUTsData.length + 1),
+        name: data.name,
+        code: data.code,
+        status: 'active',
+        lastSyncDate: new Date(),
+        totalDistricts: 0,
+        admin: {
+          firstName: data.admin.firstName,
+          lastName: data.admin.lastName,
+          email: data.admin.email,
+          phone: data.admin.phone,
+          secondaryEmail: data.admin.secondaryEmail,
+          contactNumber: data.admin.contactNumber,
+        },
+      }
+      mockStatesUTsData.push(newState)
+      resolve({ ...newState })
+    }, 500)
+  })
+}
+
+export const updateStateUT = (id: string, data: UpdateStateUTInput): Promise<StateUT | null> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const index = mockStatesUTsData.findIndex((s) => s.id === id)
+      if (index === -1) {
+        resolve(null)
+        return
+      }
+      mockStatesUTsData[index] = {
+        ...mockStatesUTsData[index],
+        admin: {
+          ...mockStatesUTsData[index].admin,
+          firstName: data.admin.firstName,
+          lastName: data.admin.lastName,
+          phone: data.admin.phone,
+          secondaryEmail: data.admin.secondaryEmail,
+          contactNumber: data.admin.contactNumber,
+        },
+      }
+      resolve({ ...mockStatesUTsData[index] })
+    }, 500)
+  })
+}
+
+export const updateStateUTStatus = (
+  id: string,
+  status: 'active' | 'inactive'
+): Promise<StateUT | null> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const index = mockStatesUTsData.findIndex((s) => s.id === id)
+      if (index === -1) {
+        resolve(null)
+        return
+      }
+      mockStatesUTsData[index] = {
+        ...mockStatesUTsData[index],
+        status,
+      }
+      resolve({ ...mockStatesUTsData[index] })
+    }, 300)
+  })
+}
+
+export const getAssignedStateNames = (): string[] => {
+  return mockStatesUTsData.map((s) => s.name)
 }

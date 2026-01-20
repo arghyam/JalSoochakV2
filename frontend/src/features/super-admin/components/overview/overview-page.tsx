@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Box, Flex, Grid, Text, Icon, Stack, Button } from '@chakra-ui/react'
 import { getMockSuperAdminOverviewData } from '../../services/mock-data'
 import { BarLineChart } from '@/shared/components/charts/bar-line-chart'
@@ -6,8 +7,10 @@ import type { SuperAdminOverviewData } from '../../types/overview'
 import { MdOutlinePlace } from 'react-icons/md'
 import { BsCheck2Circle } from 'react-icons/bs'
 import { IoCloseCircleOutline } from 'react-icons/io5'
+import { ROUTES } from '@/shared/constants/routes'
 
 export function OverviewPage() {
+  const navigate = useNavigate()
   const [data, setData] = useState<SuperAdminOverviewData | null>(null)
 
   useEffect(() => {
@@ -65,7 +68,12 @@ export function OverviewPage() {
       {/* Page Header with Add Button */}
       <Flex justify="space-between" align="center" mb={5} h={12}>
         <Text textStyle="h5">Overview</Text>
-        <Button variant="secondary" size="sm" fontWeight="600">
+        <Button
+          variant="secondary"
+          size="sm"
+          fontWeight="600"
+          onClick={() => navigate(ROUTES.SUPER_ADMIN_STATES_UTS_ADD)}
+        >
           + Add New State/UT
         </Button>
       </Flex>

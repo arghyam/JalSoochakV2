@@ -1,25 +1,192 @@
-import { Box, Text } from '@chakra-ui/react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import {
+  Box,
+  Text,
+  Flex,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Button,
+  Icon,
+} from '@chakra-ui/react'
+import { SearchIcon } from '@chakra-ui/icons'
+import { FiEye, FiEdit2 } from 'react-icons/fi'
+import { DataTable, type DataTableColumn } from '@/shared/components/common'
+import { getMockStatesUTsData } from '../../services/mock-data'
+import type { StateUT } from '../../types/states-uts'
+import { ROUTES } from '@/shared/constants/routes'
 
 export function StatesUTsPage() {
+  const navigate = useNavigate()
+  const [states, setStates] = useState<StateUT[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+
+  useEffect(() => {
+    fetchStates()
+  }, [])
+
+  const fetchStates = async () => {
+    setIsLoading(true)
+    try {
+      const data = await getMockStatesUTsData()
+      setStates(data)
+    } catch (error) {
+      console.error('Failed to fetch states:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const formatTimestamp = (date: Date): string => {
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const year = String(date.getFullYear()).slice(-2)
+
+    let hours = date.getHours()
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+    const ampm = hours >= 12 ? 'pm' : 'am'
+
+    hours = hours % 12 || 12
+
+    return `${month}-${day}-${year}, ${hours}:${minutes}${ampm}`
+  }
+
+  const filteredStates = states.filter((state) =>
+    state.name.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const handleAddNew = () => {
+    navigate(ROUTES.SUPER_ADMIN_STATES_UTS_ADD)
+  }
+
+  const handleView = (id: string) => {
+    navigate(ROUTES.SUPER_ADMIN_STATES_UTS_VIEW.replace(':id', id))
+  }
+
+  const handleEdit = (id: string) => {
+    navigate(ROUTES.SUPER_ADMIN_STATES_UTS_EDIT.replace(':id', id))
+  }
+
+  const columns: DataTableColumn<StateUT>[] = [
+    {
+      key: 'name',
+      header: 'State/UT',
+      sortable: true,
+      render: (row) => (
+        <Text textStyle="h10" fontWeight="400">
+          {row.name}
+        </Text>
+      ),
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      sortable: true,
+      render: (row) => (
+        <Box
+          as="span"
+          display="inline-block"
+          px={3}
+          py={0.5}
+          borderRadius="16px"
+          h={6}
+          textStyle="h10"
+          fontWeight="400"
+          bg={row.status === 'active' ? 'success.50' : 'error.50'}
+          color={row.status === 'active' ? 'success.500' : 'error.500'}
+        >
+          {row.status === 'active' ? 'Active' : 'Inactive'}
+        </Box>
+      ),
+    },
+    {
+      key: 'lastSyncDate',
+      header: 'Last Sync Date',
+      sortable: true,
+      render: (row) => (
+        <Text textStyle="h10" fontWeight="400">
+          {formatTimestamp(row.lastSyncDate)}
+        </Text>
+      ),
+    },
+    {
+      key: 'totalDistricts',
+      header: 'Total Districts',
+      sortable: true,
+      render: (row) => (
+        <Text textStyle="h10" fontWeight="400">
+          {row.totalDistricts}
+        </Text>
+      ),
+    },
+    {
+      key: 'actions',
+      header: 'Actions',
+      render: (row) => (
+        <Flex gap={3}>
+          <Icon
+            as={FiEye}
+            boxSize={5}
+            color="neutral.600"
+            cursor="pointer"
+            _hover={{ color: 'primary.500' }}
+            onClick={() => handleView(row.id)}
+          />
+          <Icon
+            as={FiEdit2}
+            boxSize={5}
+            color="neutral.600"
+            cursor="pointer"
+            _hover={{ color: 'primary.500' }}
+            onClick={() => handleEdit(row.id)}
+          />
+        </Flex>
+      ),
+    },
+  ]
+
   return (
     <Box w="full">
       {/* Page Header */}
       <Box mb={5}>
-        <Text textStyle="h5">States/UTs</Text>
+        <Text textStyle="h5">Manage States/UTs</Text>
       </Box>
 
-      {/* Content Placeholder */}
-      <Box
-        bg="white"
-        borderWidth="1px"
-        borderColor="neutral.100"
-        borderRadius="lg"
-        boxShadow="default"
-        p={6}
-        minH="calc(100vh - 200px)"
-      >
-        <Text color="neutral.600">Coming soon...</Text>
-      </Box>
+      {/* Search and Add Button */}
+      <Flex justify="space-between" align="center" mb={5}>
+        <InputGroup maxW="320px">
+          <InputLeftElement pointerEvents="none">
+            <SearchIcon color="neutral.400" />
+          </InputLeftElement>
+          <Input
+            placeholder="Search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            bg="white"
+            borderColor="neutral.200"
+            _placeholder={{ color: 'neutral.400' }}
+          />
+        </InputGroup>
+        <Button variant="secondary" size="sm" fontWeight="600" onClick={handleAddNew}>
+          + Add New State/UT
+        </Button>
+      </Flex>
+
+      {/* Data Table */}
+      <DataTable<StateUT>
+        columns={columns}
+        data={filteredStates}
+        getRowKey={(row) => row.id}
+        emptyMessage="No states/UTs found"
+        isLoading={isLoading}
+        pagination={{
+          enabled: true,
+          pageSize: 10,
+          pageSizeOptions: [10, 25, 50],
+        }}
+      />
     </Box>
   )
 }
