@@ -69,7 +69,7 @@ public class PersonService {
     private final TenantMasterRepository tenantMasterRepository;
     private final KeycloakClient keycloakClient;
 
-    private static final String SUPER_ADMIN_ROLE = "super_admin";
+    private static final String SUPER_ADMIN_ROLE = "super_user";
 
     public PersonService(KeycloakProvider keycloakProvider, PersonTypeMasterRepository personTypeMasterRepository,
                          PersonMasterRepository personMasterRepository, TenantMasterRepository tenantMasterRepository, KeycloakClient keycloakClient) {
@@ -96,21 +96,35 @@ public class PersonService {
         }
 
         UserRepresentation user = new UserRepresentation();
+        user.setUsername(inviteRequest.getEmail());
         user.setEmail(inviteRequest.getEmail());
         user.setEnabled(true);
         user.setEmailVerified(false);
         user.setRequiredActions(List.of("UPDATE_PASSWORD", "VERIFY_EMAIL"));
 
-        Response response = users.create(user);
-        log.info("Keycloak create user response status: {}", response);
 
-        if (response.getStatus() != 201) {
-            throw new RuntimeException("Failed to create new user in Keycloak");
-        }
-
-        String userId = response.getLocation().getPath().replaceAll(".*/", "");
-
+        Response response = null;
+        String responseBody = "";
         try {
+            response = users.create(user);
+            int status = response.getStatus();
+
+            try {
+                responseBody = response.readEntity(String.class);
+            } catch (Exception e) {
+                log.warn("Unable to read response body from Keycloak", e);
+            }
+
+            log.info("Keycloak create user response: status={}, body={}", status, responseBody);
+
+            if (status != 201) {
+                throw new RuntimeException(
+                        "Failed to create new user in Keycloak: status=" + status + ", body=" + responseBody
+                );
+            }
+
+            String userId = response.getLocation().getPath().replaceAll(".*/", "");
+
             users.get(userId).executeActionsEmail(List.of("UPDATE_PASSWORD", "VERIFY_EMAIL"));
 
             PersonMaster person = PersonMaster.builder()
@@ -119,16 +133,19 @@ public class PersonService {
 
             personMasterRepository.save(person);
 
+        } catch (RuntimeException e) {
+            log.error("Error during user creation in Keycloak", e);
+            throw e;
         } catch (Exception e) {
-            log.error("Failed to complete user creation, rolling back Keycloak user", e);
-            try {
-                users.get(userId).remove();
-            } catch (Exception ex) {
-                log.error("Failed to rollback Keycloak user after error", ex);
-            }
+            log.error("Unexpected error during Keycloak user creation", e);
             throw new RuntimeException("Failed to invite user: " + e.getMessage(), e);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
     }
+
 
 
     @Transactional
@@ -235,8 +252,9 @@ public class PersonService {
     public boolean isSuperAdmin(String accessToken) {
         try {
             Map<String, Object> userInfo = keycloakClient.getUserInfo(accessToken);
-
+            log.info("user info: {}", userInfo);
             String username = (String) userInfo.get("preferred_username");
+            log.info("userName: {}", username);
             if (username == null || username.isBlank()) {
                 log.warn("preferred_username claim is missing or empty");
                 return false;
@@ -244,6 +262,8 @@ public class PersonService {
 
             PersonMaster person = personMasterRepository.findByPhoneNumber(username)
                     .orElseThrow(() -> new RuntimeException("User not found"));
+
+            log.info("person: {}", person);
 
             return person.getPersonType() != null
                     && SUPER_ADMIN_ROLE.equals(person.getPersonType().getCName());

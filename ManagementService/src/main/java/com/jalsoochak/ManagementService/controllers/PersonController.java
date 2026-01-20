@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v2/auth")
 @RequiredArgsConstructor
@@ -93,10 +95,19 @@ public class PersonController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest request) {
-        TokenResponse response = personService.login(request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        try {
+            TokenResponse response = personService.login(request);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Unexpected error: " + e.getMessage()));
+        }
     }
+
 
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponse> refresh(@RequestBody TokenRequest tokenRequest) {

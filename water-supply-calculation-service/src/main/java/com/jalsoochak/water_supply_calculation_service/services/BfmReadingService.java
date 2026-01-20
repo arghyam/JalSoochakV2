@@ -65,6 +65,7 @@ public class BfmReadingService {
         FlowVisionResult ocrResult = null;
         BigDecimal finalReading = request.getReadingValue();
         String message = "Reading created successfully";
+        BigDecimal confidenceLevel = null;
 
         if (finalReading == null) {
 
@@ -82,6 +83,7 @@ public class BfmReadingService {
                     message = "Image processed but meter reading could not be detected clearly";
                 } else {
                     finalReading = ocrResult.getAdjustedReading();
+                    confidenceLevel = ocrResult.getQualityConfidence();
                 }
 
             } catch (Exception ex) {
@@ -97,13 +99,9 @@ public class BfmReadingService {
             }
         }
 
-        if (finalReading == null) {
-            return CreateReadingResponse.builder()
-                    .success(false)
-                    .message("Meter reading could not be determined. Please retry.")
-                    .correlationId(UUID.randomUUID().toString())
-                    .build();
-        }
+        boolean isValid = finalReading != null
+                && finalReading.compareTo(BigDecimal.ZERO) > 0
+                && (confidenceLevel == null || confidenceLevel.compareTo(BigDecimal.valueOf(0.7)) >= 0);
 
         BfmReading reading = BfmReading.builder()
                 .scheme(scheme)
@@ -117,6 +115,7 @@ public class BfmReadingService {
                                 ? request.getReadingValue()
                                 : finalReading
                 )
+                .qualityConfidence(confidenceLevel)
                 .readingDateTime(
                         Optional.ofNullable(request.getReadingTime())
                                 .orElse(LocalDateTime.now())
@@ -132,17 +131,19 @@ public class BfmReadingService {
         bfmReadingRepository.save(reading);
 
         return CreateReadingResponse.builder()
-                .success(true)
-                .message(message)
+                .success(isValid)
+                .message(isValid
+                        ? message
+                        : finalReading == null || finalReading.compareTo(BigDecimal.ZERO) <= 0
+                        ? "Meter reading is invalid"
+                        : "Confidence too low")
                 .correlationId(reading.getCorrelationId())
                 .meterReading(finalReading)
+                .qualityConfidence(confidenceLevel)
                 .qualityStatus(ocrResult != null ? ocrResult.getQualityStatus() : null)
-                .qualityConfidence(ocrResult != null ? ocrResult.getQualityConfidence() : null)
                 .lastConfirmedReading(
                         bfmReadingRepository
-                                .findTopByScheme_IdAndTenantIdOrderByReadingDateTimeDesc(
-                                        scheme.getId(), tenantId
-                                )
+                                .findTopByScheme_IdAndTenantIdOrderByReadingDateTimeDesc(scheme.getId(), tenantId)
                                 .map(BfmReading::getConfirmedReading)
                                 .orElse(null)
                 )
