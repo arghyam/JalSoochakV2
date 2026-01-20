@@ -26,6 +26,8 @@ export interface SearchableSelectProps {
   fontSize?: string
   textColor?: string
   height?: string
+  borderRadius?: string
+  borderColor?: string
 }
 
 export function SearchableSelect({
@@ -38,6 +40,8 @@ export function SearchableSelect({
   fontSize = 'md',
   textColor,
   height = '36px',
+  borderRadius = '6px',
+  borderColor = 'neutral.300',
 }: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -75,6 +79,9 @@ export function SearchableSelect({
     }
   }
 
+  const displayColor = selectedOption ? 'primary.500' : textColor || 'neutral.500'
+  const displayBorderColor = selectedOption ? 'primary.500' : borderColor
+
   return (
     <Box position="relative" ref={containerRef} w={width}>
       {/* Select Input */}
@@ -93,8 +100,8 @@ export function SearchableSelect({
         py="6px"
         bg="white"
         borderWidth="1px"
-        borderColor="neutral.300"
-        borderRadius="6px"
+        borderColor={displayBorderColor}
+        borderRadius={borderRadius}
         align="center"
         justify="space-between"
         cursor={disabled ? 'not-allowed' : 'pointer'}
@@ -108,11 +115,7 @@ export function SearchableSelect({
           pointerEvents: 'none',
         }}
       >
-        <Text
-          fontSize={fontSize}
-          color={textColor || (selectedOption ? 'neutral.950' : 'neutral.500')}
-          noOfLines={1}
-        >
+        <Text fontSize={fontSize} color={displayColor} noOfLines={1}>
           {selectedOption ? selectedOption.label : placeholder}
         </Text>
         <ChevronDownIcon
@@ -149,7 +152,7 @@ export function SearchableSelect({
                 placeholder="Search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                borderColor="neutral.300"
+                borderColor={borderColor}
                 borderRadius="4px"
                 _hover={{ borderColor: 'neutral.400' }}
                 _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}

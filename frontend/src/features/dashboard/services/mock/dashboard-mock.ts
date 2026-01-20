@@ -8,6 +8,22 @@ import type {
   KPIData,
 } from '../../types'
 
+export const mockFilterStates = [
+  { value: 'andhra-pradesh', label: 'Andhra Pradesh' },
+  { value: 'karnataka', label: 'Karnataka' },
+  { value: 'maharashtra', label: 'Maharashtra' },
+  { value: 'tamil-nadu', label: 'Tamil Nadu' },
+  { value: 'uttar-pradesh', label: 'Uttar Pradesh' },
+]
+
+export const mockFilterDistricts = [
+  { value: 'bengaluru-urban', label: 'Bengaluru Urban' },
+  { value: 'pune', label: 'Pune' },
+  { value: 'chennai', label: 'Chennai' },
+  { value: 'lucknow', label: 'Lucknow' },
+  { value: 'visakhapatnam', label: 'Visakhapatnam' },
+]
+
 // Mock state data for India map
 const mockStates: EntityPerformance[] = [
   {

@@ -1,15 +1,25 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Box, Flex, Text, Heading, Grid } from '@chakra-ui/react'
 import { useDashboardData } from '../hooks/use-dashboard-data'
 import { KPICard } from './kpi-card'
 import { IndiaMapChart, DemandSupplyChart, BarChart } from './charts'
 import { PerformanceTable } from './tables'
-import { LoadingSpinner } from '@/shared/components/common'
-import { SearchLayout } from '@/shared/components/layout'
+import { LoadingSpinner, SearchableSelect } from '@/shared/components/common'
+import { SearchLayout, FilterLayout } from '@/shared/components/layout'
+import { mockFilterStates, mockFilterDistricts } from '../services/mock/dashboard-mock'
 
 export function CentralDashboard() {
   const navigate = useNavigate()
   const { data, isLoading, error } = useDashboardData('central')
+  const [selectedState, setSelectedState] = useState('')
+  const [selectedDistrict, setSelectedDistrict] = useState('')
+
+  const emptyOptions: { value: string; label: string }[] = []
+  const handleClearFilters = () => {
+    setSelectedState('')
+    setSelectedDistrict('')
+  }
 
   const handleStateClick = (stateId: string, _stateName: string) => {
     navigate(`/states/${stateId}`)
@@ -70,13 +80,92 @@ export function CentralDashboard() {
   return (
     <Box>
       <SearchLayout />
-      {/* Header */}
-      <Box mt="24px" mb="24px">
-        <Heading fontSize="3xl" fontWeight="bold">
-          Central Dashboard
-        </Heading>
-        <Text color="gray.600">National-level water supply scheme monitoring</Text>
-      </Box>
+      <FilterLayout onClear={handleClearFilters}>
+        <SearchableSelect
+          options={mockFilterStates}
+          value={selectedState}
+          onChange={setSelectedState}
+          placeholder="States/UTs"
+          width="162px"
+          height="32px"
+          borderRadius="4px"
+          fontSize="sm"
+          textColor="neutral.400"
+          borderColor="neutral.400"
+        />
+        <SearchableSelect
+          options={mockFilterDistricts}
+          value={selectedDistrict}
+          onChange={setSelectedDistrict}
+          placeholder="District"
+          width="162px"
+          height="32px"
+          borderRadius="4px"
+          fontSize="sm"
+          textColor="neutral.400"
+          borderColor="neutral.400"
+        />
+        <SearchableSelect
+          options={emptyOptions}
+          value=""
+          onChange={() => {}}
+          placeholder="Block"
+          width="162px"
+          height="32px"
+          borderRadius="4px"
+          fontSize="sm"
+          textColor="neutral.300"
+          disabled
+        />
+        <SearchableSelect
+          options={emptyOptions}
+          value=""
+          onChange={() => {}}
+          placeholder="Gram Panchayat"
+          width="162px"
+          height="32px"
+          borderRadius="4px"
+          fontSize="sm"
+          textColor="neutral.300"
+          disabled
+        />
+        <SearchableSelect
+          options={emptyOptions}
+          value=""
+          onChange={() => {}}
+          placeholder="Village"
+          width="162px"
+          height="32px"
+          borderRadius="4px"
+          fontSize="sm"
+          textColor="neutral.300"
+          disabled
+        />
+        <SearchableSelect
+          options={emptyOptions}
+          value=""
+          onChange={() => {}}
+          placeholder="Duration"
+          width="162px"
+          height="32px"
+          borderRadius="4px"
+          fontSize="sm"
+          textColor="neutral.300"
+          disabled
+        />
+        <SearchableSelect
+          options={emptyOptions}
+          value=""
+          onChange={() => {}}
+          placeholder="Scheme"
+          width="162px"
+          height="32px"
+          borderRadius="4px"
+          fontSize="sm"
+          textColor="neutral.300"
+          disabled
+        />
+      </FilterLayout>
 
       {/* KPI Cards */}
       <Grid
