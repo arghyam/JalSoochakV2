@@ -1,8 +1,12 @@
 package com.jalsoochak.water_supply_calculation_service.repositories;
 
 import com.jalsoochak.water_supply_calculation_service.models.entities.BfmReading;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 public interface BfmReadingRepository extends JpaRepository<BfmReading, Long> {
@@ -11,4 +15,18 @@ public interface BfmReadingRepository extends JpaRepository<BfmReading, Long> {
             String correlationId,
             String tenantId
     );
+    Optional<BfmReading> findTopByScheme_IdAndTenantIdAndIdNotOrderByReadingDateTimeDesc(
+            Long schemeId,
+            String tenantId,
+            Long excludedId
+    );
+
+    Optional<BfmReading> findTopByScheme_IdAndTenantIdAndIdNotAndConfirmedReadingGreaterThanAndQualityConfidenceGreaterThanEqualOrderByReadingDateTimeDesc(
+            Long schemeId,
+            String tenantId,
+            Long excludedId,
+            BigDecimal confirmedReading,
+            Double qualityConfidence
+    );
+
 }
