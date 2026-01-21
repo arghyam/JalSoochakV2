@@ -28,6 +28,8 @@ export interface SearchableSelectProps {
   height?: string
   borderRadius?: string
   borderColor?: string
+  textStyle?: string
+  required?: boolean
 }
 
 export function SearchableSelect({
@@ -42,6 +44,8 @@ export function SearchableSelect({
   height = '36px',
   borderRadius = '6px',
   borderColor = 'neutral.300',
+  textStyle = 'h10',
+  required = false,
 }: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -115,8 +119,26 @@ export function SearchableSelect({
           pointerEvents: 'none',
         }}
       >
-        <Text fontSize={fontSize} color={displayColor} noOfLines={1}>
-          {selectedOption ? selectedOption.label : placeholder}
+        <Text
+          fontSize={fontSize}
+          color={displayColor}
+          textStyle={textStyle}
+          fontWeight="600"
+          noOfLines={1}
+        >
+          {selectedOption ? (
+            selectedOption.label
+          ) : (
+            <>
+              {placeholder}
+              {required && (
+                <Text as="span" color="#D92D20">
+                  {' '}
+                  *
+                </Text>
+              )}
+            </>
+          )}
         </Text>
         <ChevronDownIcon
           boxSize={5}

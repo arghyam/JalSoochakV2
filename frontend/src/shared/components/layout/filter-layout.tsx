@@ -62,7 +62,7 @@ export function FilterLayout({
             onClick={onClear}
             _hover={{ textDecoration: 'underline', textDecorationColor: 'neutral.300' }}
           >
-            <Text textStyle="h10" color="neutral.300">
+            <Text textStyle="h10" fontWeight="600" color="neutral.300">
               clear all filters
             </Text>
           </Button>

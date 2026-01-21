@@ -121,6 +121,7 @@ export function CentralDashboard() {
               value={selectedState}
               onChange={setSelectedState}
               placeholder="States/UTs"
+              required
               width="162px"
               height="32px"
               borderRadius="4px"
@@ -133,6 +134,7 @@ export function CentralDashboard() {
               value={selectedDistrict}
               onChange={setSelectedDistrict}
               placeholder="District"
+              required
               width="162px"
               height="32px"
               borderRadius="4px"
