@@ -184,7 +184,7 @@ export const mockApiCredentialsData: ApiCredentialsData = {
     },
     {
       id: '3',
-      stateUtName: 'Gujrat',
+      stateUtName: 'Gujarat',
       apiKey: 'ak-r88880z1a',
       lastUsed: new Date('2025-09-08T15:00:00'),
       createdOn: new Date('2025-02-05'),

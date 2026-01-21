@@ -107,9 +107,17 @@ export function DataTable<T extends object>({
   const sortedData = getSortedData()
 
   // Pagination logic
-  const totalPages = pagination?.enabled ? Math.ceil(sortedData.length / itemsPerPage) : 1
+  const totalPages = pagination?.enabled
+    ? Math.max(1, Math.ceil(sortedData.length / itemsPerPage))
+    : 1
+
+  const effectiveCurrentPage = Math.min(Math.max(1, currentPage), totalPages)
+
   const paginatedData = pagination?.enabled
-    ? sortedData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+    ? sortedData.slice(
+        (effectiveCurrentPage - 1) * itemsPerPage,
+        effectiveCurrentPage * itemsPerPage
+      )
     : sortedData
 
   const handlePageChange = (page: number) => {
@@ -137,13 +145,13 @@ export function DataTable<T extends object>({
       // Always show first page
       pages.push(1)
 
-      if (currentPage > 3) {
+      if (effectiveCurrentPage > 3) {
         pages.push('ellipsis')
       }
 
       // Show pages around current page
-      const start = Math.max(2, currentPage - 1)
-      const end = Math.min(totalPages - 1, currentPage + 1)
+      const start = Math.max(2, effectiveCurrentPage - 1)
+      const end = Math.min(totalPages - 1, effectiveCurrentPage + 1)
 
       for (let i = start; i <= end; i++) {
         if (!pages.includes(i)) {
@@ -151,7 +159,7 @@ export function DataTable<T extends object>({
         }
       }
 
-      if (currentPage < totalPages - 2) {
+      if (effectiveCurrentPage < totalPages - 2) {
         pages.push('ellipsis')
       }
 
@@ -321,8 +329,8 @@ export function DataTable<T extends object>({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => handlePageChange(currentPage - 1)}
-              isDisabled={currentPage === 1}
+              onClick={() => handlePageChange(effectiveCurrentPage - 1)}
+              isDisabled={effectiveCurrentPage === 1}
               leftIcon={<FaArrowLeft />}
               fontWeight="400"
               color="neutral.600"
@@ -342,18 +350,18 @@ export function DataTable<T extends object>({
                   <Button
                     key={page}
                     size="sm"
-                    variant={currentPage === page ? 'solid' : 'ghost'}
+                    variant={effectiveCurrentPage === page ? 'solid' : 'ghost'}
                     onClick={() => handlePageChange(page)}
                     w="32px"
                     h="32px"
                     px={3}
                     py={2}
                     borderRadius="8px"
-                    fontWeight={currentPage === page ? '600' : '400'}
-                    bg={currentPage === page ? 'primary.500' : 'transparent'}
-                    color={currentPage === page ? 'white' : 'neutral.600'}
+                    fontWeight={effectiveCurrentPage === page ? '600' : '400'}
+                    bg={effectiveCurrentPage === page ? 'primary.500' : 'transparent'}
+                    color={effectiveCurrentPage === page ? 'white' : 'neutral.600'}
                     _hover={{
-                      bg: currentPage === page ? 'primary.600' : 'neutral.50',
+                      bg: effectiveCurrentPage === page ? 'primary.600' : 'neutral.50',
                     }}
                   >
                     {page}
@@ -366,8 +374,8 @@ export function DataTable<T extends object>({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => handlePageChange(currentPage + 1)}
-              isDisabled={currentPage === totalPages}
+              onClick={() => handlePageChange(effectiveCurrentPage + 1)}
+              isDisabled={effectiveCurrentPage === totalPages}
               rightIcon={<FaArrowRight />}
               fontWeight="400"
               color="neutral.600"

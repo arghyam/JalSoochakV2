@@ -8,7 +8,7 @@ import {
   InputGroup,
   InputLeftElement,
   Button,
-  Icon,
+  IconButton,
 } from '@chakra-ui/react'
 import { SearchIcon, EditIcon } from '@chakra-ui/icons'
 import { FiEye } from 'react-icons/fi'
@@ -125,20 +125,26 @@ export function StatesUTsPage() {
       key: 'actions',
       header: 'Actions',
       render: (row) => (
-        <Flex gap={3}>
-          <Icon
-            as={FiEye}
-            boxSize={5}
-            cursor="pointer"
-            _hover={{ color: 'primary.500' }}
+        <Flex gap={1}>
+          <IconButton
+            aria-label="View State/UT"
+            icon={<FiEye />}
+            variant="ghost"
+            w={5}
+            h={5}
+            size="sm"
             onClick={() => handleView(row.id)}
+            _hover={{ color: 'primary.500', bg: 'transparent' }}
           />
-          <Icon
-            as={EditIcon}
-            boxSize={5}
-            cursor="pointer"
-            _hover={{ color: 'primary.500' }}
+          <IconButton
+            aria-label="Edit State/UT"
+            icon={<EditIcon />}
+            variant="ghost"
+            w={5}
+            h={5}
+            size="sm"
             onClick={() => handleEdit(row.id)}
+            _hover={{ color: 'primary.500', bg: 'transparent' }}
           />
         </Flex>
       ),

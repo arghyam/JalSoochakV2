@@ -187,7 +187,7 @@ export function EditStateUTPage() {
             _hover={{ textDecoration: 'underline' }}
             onClick={() => navigate(ROUTES.SUPER_ADMIN_STATES_UTS)}
           >
-            Manages States/UTs
+            Manage States/UTs
           </Text>
           <Text fontSize="14px" color="neutral.500">
             /

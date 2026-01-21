@@ -122,7 +122,7 @@ export function AddStateUTPage() {
         <Text textStyle="h5" mb={2}>
           Add State/UT
         </Text>
-        <Flex gap={2} mt={1}>
+        <Flex gap={2}>
           <Text
             fontSize="14px"
             color="neutral.500"
@@ -130,7 +130,7 @@ export function AddStateUTPage() {
             _hover={{ textDecoration: 'underline' }}
             onClick={() => navigate(ROUTES.SUPER_ADMIN_STATES_UTS)}
           >
-            Manages States/UTs
+            Manage States/UTs
           </Text>
           <Text fontSize="14px" color="neutral.500">
             /

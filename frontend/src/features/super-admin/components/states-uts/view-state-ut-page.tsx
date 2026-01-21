@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Box, Text, Flex, Grid, Icon } from '@chakra-ui/react'
+import { Box, Text, Flex, Grid, IconButton } from '@chakra-ui/react'
 import { EditIcon } from '@chakra-ui/icons'
 import { Toggle, ToastContainer } from '@/shared/components/common'
 import { useToast } from '@/shared/hooks/use-toast'
@@ -30,9 +30,12 @@ export function ViewStateUTPage() {
   }, [])
 
   useEffect(() => {
-    if (id) {
-      fetchState(id)
+    if (!id) {
+      setState(null)
+      setIsLoading(false)
+      return
     }
+    fetchState(id)
   }, [id, fetchState])
 
   const handleStatusToggle = async () => {
@@ -49,6 +52,8 @@ export function ViewStateUTPage() {
           `State/UT ${newStatus === 'active' ? 'activated' : 'deactivated'} successfully`,
           'success'
         )
+      } else {
+        toast.addToast('State/UT not found', 'error')
       }
     } catch (error) {
       console.error('Failed to update status:', error)
@@ -101,7 +106,7 @@ export function ViewStateUTPage() {
             _hover={{ textDecoration: 'underline' }}
             onClick={() => navigate(ROUTES.SUPER_ADMIN_STATES_UTS)}
           >
-            Manages States/UTs
+            Manage States/UTs
           </Text>
           <Text fontSize="14px" color="neutral.500">
             /
@@ -126,15 +131,14 @@ export function ViewStateUTPage() {
         {/* State/UT Details Section */}
         <Flex justify="space-between" align="flex-start" mb={4}>
           <Text textStyle="h8">State/UT Details</Text>
-          <Icon
-            as={EditIcon}
-            boxSize={5}
+          <IconButton
+            aria-label="Edit State/UT"
+            icon={<EditIcon boxSize={5} />}
+            variant="ghost"
+            size="sm"
             color="neutral.600"
-            cursor="pointer"
-            _hover={{ color: 'primary.500' }}
+            _hover={{ color: 'primary.500', bg: 'transparent' }}
             onClick={handleEdit}
-            h={5}
-            w={5}
           />
         </Flex>
         <Grid templateColumns="repeat(2, 1fr)" gap={6} mb={7}>
