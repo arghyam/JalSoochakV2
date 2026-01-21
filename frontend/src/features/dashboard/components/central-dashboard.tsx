@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Box, Flex, Text, Heading, Grid } from '@chakra-ui/react'
+import { Box, Flex, Text, Heading, Grid, Icon } from '@chakra-ui/react'
 import { useDashboardData } from '../hooks/use-dashboard-data'
 import { KPICard } from './kpi-card'
 import { IndiaMapChart, DemandSupplyChart, BarChart } from './charts'
 import { PerformanceTable } from './tables'
 import { LoadingSpinner, SearchableSelect } from '@/shared/components/common'
+import { MdOutlineWaterDrop } from 'react-icons/md'
+import { AiOutlineHome } from 'react-icons/ai'
+import { FaFaucet } from 'react-icons/fa'
 import type { SearchableSelectOption } from '@/shared/components/common'
 import { SearchLayout, FilterLayout } from '@/shared/components/layout'
 import {
@@ -286,38 +289,52 @@ export function CentralDashboard() {
         mb={6}
       >
         <KPICard
-          title="National Coverage %"
+          title="Number of schemes"
           value={data.kpis.nationalCoverage}
-          unit="%"
-          description="Households with functional tap connections"
+          icon={
+            <Flex
+              w="48px"
+              h="48px"
+              borderRadius="100px"
+              bg="primary.25"
+              align="center"
+              justify="center"
+            >
+              <Icon as={MdOutlineWaterDrop} boxSize="28px" color="primary.500" />
+            </Flex>
+          }
         />
         <KPICard
-          title="Regularity %"
+          title="Total Number of Rural Households"
           value={data.kpis.regularity}
-          unit="%"
-          description="Based on time period"
+          icon={
+            <Flex
+              w="48px"
+              h="48px"
+              borderRadius="100px"
+              bg="#FFFBD7"
+              align="center"
+              justify="center"
+            >
+              <Icon as={AiOutlineHome} boxSize="28px" color="#CA8A04" />
+            </Flex>
+          }
         />
         <KPICard
-          title="Continuity Index"
+          title="Functional Household Tap Connection"
           value={data.kpis.continuity}
-          unit="/100"
-          description="Uninterrupted supply periods"
-        />
-        <KPICard
-          title="Average Quantity"
-          value={data.kpis.averageQuantity}
-          unit="LPCD"
-          description="Litres per capita per day"
-        />
-        <KPICard
-          title="Total Schemes"
-          value={data.kpis.totalSchemes}
-          description="Active water supply schemes"
-        />
-        <KPICard
-          title="Total Households"
-          value={data.kpis.totalHouseholds}
-          description="Households covered"
+          icon={
+            <Flex
+              w="48px"
+              h="48px"
+              borderRadius="100px"
+              bg="#E1FFEA"
+              align="center"
+              justify="center"
+            >
+              <Icon as={FaFaucet} boxSize="24px" color="#079455" />
+            </Flex>
+          }
         />
       </Grid>
 

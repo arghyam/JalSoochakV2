@@ -16,9 +16,6 @@ export interface KPIData {
   nationalCoverage: number // %
   regularity: number // %
   continuity: number // 0-100 index
-  averageQuantity: number // LPCD
-  totalSchemes: number
-  totalHouseholds: number
 }
 
 export interface EntityPerformance {
