@@ -29,7 +29,7 @@ export function OverviewPage() {
     {
       title: 'Pump Operators Synced',
       value: data.stats.pumpOperatorsSynced.toLocaleString(),
-      subtitle: 'Out of 30',
+      subtitle: 'Out of 3000',
       icon: BsPerson,
       iconBg: '#F1EEFF',
       iconColor: '#584C93',
