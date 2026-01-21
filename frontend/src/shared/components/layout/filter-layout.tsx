@@ -55,18 +55,19 @@ export function FilterLayout({
             ))}
           </TabList>
         </Tabs>
-        {rightSlot ?? (
-          <Button
-            variant="link"
-            size="sm"
-            onClick={onClear}
-            _hover={{ textDecoration: 'underline', textDecorationColor: 'neutral.300' }}
-          >
-            <Text textStyle="h10" fontWeight="600" color="neutral.300">
-              clear all filters
-            </Text>
-          </Button>
-        )}
+        {rightSlot ??
+          (onClear ? (
+            <Button
+              variant="link"
+              size="sm"
+              onClick={onClear}
+              _hover={{ textDecoration: 'underline', textDecorationColor: 'neutral.300' }}
+            >
+              <Text textStyle="h10" fontWeight="600" color="neutral.300">
+                clear all filters
+              </Text>
+            </Button>
+          ) : null)}
       </Flex>
 
       <Flex w="full" align="center" gap={3} wrap="wrap">
