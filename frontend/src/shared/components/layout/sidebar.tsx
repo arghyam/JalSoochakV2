@@ -1,5 +1,16 @@
-import { Link as RouterLink, useLocation } from 'react-router-dom'
-import { Box, Flex, Stack, Text, Icon, Image } from '@chakra-ui/react'
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom'
+import {
+  Box,
+  Flex,
+  Stack,
+  Text,
+  Icon,
+  Image,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+} from '@chakra-ui/react'
 import { MdOutlineMoving, MdOutlinePlace } from 'react-icons/md'
 import { AiOutlineEye, AiOutlineSetting, AiOutlineWarning, AiOutlineApi } from 'react-icons/ai'
 import { BiKey } from 'react-icons/bi'
@@ -116,7 +127,9 @@ const NAV_ITEMS: NavItem[] = [
 
 export function Sidebar() {
   const user = useAuthStore((state) => state.user)
+  const logout = useAuthStore((state) => state.logout)
   const location = useLocation()
+  const navigate = useNavigate()
 
   const userRole = user?.role
   const visibleNavItems = NAV_ITEMS.filter((item) => userRole && item.roles.includes(userRole))
@@ -127,6 +140,15 @@ export function Sidebar() {
       return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
     }
     return name.substring(0, 2).toUpperCase()
+  }
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+    } catch {
+      // ignore
+    }
+    navigate(ROUTES.LOGIN, { replace: true })
   }
 
   return (
@@ -185,27 +207,42 @@ export function Sidebar() {
         </Stack>
 
         {/* Profile Section */}
-        <Flex align="center" gap={3} borderTop="1px" borderColor="neutral.100" px={7} py={4}>
-          <Flex
-            h="40px"
-            w="40px"
-            flexShrink={0}
-            align="center"
-            justify="center"
-            borderRadius="full"
-            bg="primary.500"
-            color="white"
+        <Menu placement="top-start">
+          <MenuButton
+            w="100%"
+            borderTop="1px"
+            borderColor="neutral.100"
+            px={7}
+            py={4}
+            cursor="pointer"
+            _hover={{ bg: 'neutral.50' }}
           >
-            <Text fontSize="sm" fontWeight="semibold">
-              {user ? getInitials(user.name) : 'U'}
-            </Text>
-          </Flex>
-          <Flex direction="column" minW={0}>
-            <Text fontSize="sm" fontWeight="medium" color="neutral.950" isTruncated>
-              {user?.name || 'User'}
-            </Text>
-          </Flex>
-        </Flex>
+            <Flex align="center" gap={3}>
+              <Flex
+                h="40px"
+                w="40px"
+                flexShrink={0}
+                align="center"
+                justify="center"
+                borderRadius="full"
+                bg="primary.500"
+                color="white"
+              >
+                <Text fontSize="sm" fontWeight="semibold">
+                  {user ? getInitials(user.name) : 'U'}
+                </Text>
+              </Flex>
+              <Flex direction="column" minW={0}>
+                <Text fontSize="sm" fontWeight="medium" color="neutral.950" isTruncated>
+                  {user?.name || 'User'}
+                </Text>
+              </Flex>
+            </Flex>
+          </MenuButton>
+          <MenuList>
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+          </MenuList>
+        </Menu>
       </Flex>
     </Box>
   )
