@@ -7,6 +7,94 @@ import type {
   DemandSupplyData,
   KPIData,
 } from '../../types'
+import type { SearchableSelectOption } from '@/shared/components/common'
+
+type FilterOptionsByKey = Record<string, SearchableSelectOption[]>
+
+// Mock data for filters in dashboard
+export const mockFilterStates = [{ value: 'telangana', label: 'Telangana' }]
+
+export const mockFilterDistricts: FilterOptionsByKey = {
+  telangana: [
+    { value: 'sangareddy', label: 'Sangareddy' },
+    { value: 'rangareddy', label: 'Ranga Reddy' },
+  ],
+}
+
+export const mockFilterBlocks: FilterOptionsByKey = {
+  sangareddy: [
+    { value: 'patancheru', label: 'Patancheru' },
+    { value: 'zaheerabad', label: 'Zaheerabad' },
+  ],
+  rangareddy: [
+    { value: 'shamshabad', label: 'Shamshabad' },
+    { value: 'chevella', label: 'Chevella' },
+  ],
+}
+
+export const mockFilterGramPanchayats: FilterOptionsByKey = {
+  patancheru: [
+    { value: 'isnapur', label: 'Isnapur' },
+    { value: 'rudraram', label: 'Rudraram' },
+  ],
+  zaheerabad: [
+    { value: 'machanpalli', label: 'Machanpalli' },
+    { value: 'nagur', label: 'Nagur' },
+  ],
+  shamshabad: [
+    { value: 'sathamrai', label: 'Sathamrai' },
+    { value: 'gollapalli', label: 'Gollapalli' },
+  ],
+  chevella: [
+    { value: 'ankireddypalli', label: 'Ankireddypalli' },
+    { value: 'devuni-erravalli', label: 'Devuni Erravalli' },
+  ],
+}
+
+export const mockFilterVillages: FilterOptionsByKey = {
+  isnapur: [
+    { value: 'kistareddypet', label: 'Kistareddypet' },
+    { value: 'industrial-area', label: 'Industrial Area' },
+  ],
+  rudraram: [
+    { value: 'iit-hyderabad-area', label: 'IIT Hyderabad Area' },
+    { value: 'bandalguda', label: 'Bandalguda' },
+  ],
+  machanpalli: [
+    { value: 'machanpalli-village', label: 'Machanpalli Village' },
+    { value: 'thimmapur', label: 'Thimmapur' },
+  ],
+  nagur: [
+    { value: 'nagur-village', label: 'Nagur Village' },
+    { value: 'khanapur', label: 'Khanapur' },
+  ],
+  sathamrai: [
+    { value: 'sathamrai-village', label: 'Sathamrai Village' },
+    { value: 'malkapur', label: 'Malkapur' },
+  ],
+  gollapalli: [
+    { value: 'gollapalli-village', label: 'Gollapalli Village' },
+    { value: 'ramanujapur', label: 'Ramanujapur' },
+  ],
+  ankireddypalli: [
+    { value: 'ankireddypalli-village', label: 'Ankireddypalli Village' },
+    { value: 'mallapur', label: 'Mallapur' },
+  ],
+  'devuni-erravalli': [
+    { value: 'erravalli-village', label: 'Erravalli Village' },
+    { value: 'thangedpalli', label: 'Thangedpalli' },
+  ],
+}
+
+export const mockFilterDuration = [
+  { value: 'last_7_days', label: 'Last 7 Days' },
+  { value: 'last_30_days', label: 'Last 30 Days' },
+]
+
+export const mockFilterSchemes = [
+  { value: 'jal-jeevan-mission', label: 'Jal Jeevan Mission' },
+  { value: 'swachh-bharat-mission', label: 'Swachh Bharat Mission' },
+]
 
 // Mock state data for India map
 const mockStates: EntityPerformance[] = [

@@ -26,6 +26,10 @@ export interface SearchableSelectProps {
   fontSize?: string
   textColor?: string
   height?: string
+  borderRadius?: string
+  borderColor?: string
+  textStyle?: string
+  required?: boolean
 }
 
 export function SearchableSelect({
@@ -38,6 +42,10 @@ export function SearchableSelect({
   fontSize = 'md',
   textColor,
   height = '36px',
+  borderRadius = '6px',
+  borderColor = 'neutral.300',
+  textStyle = 'h10',
+  required = false,
 }: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -75,6 +83,9 @@ export function SearchableSelect({
     }
   }
 
+  const displayColor = selectedOption ? 'primary.500' : textColor || 'neutral.500'
+  const displayBorderColor = selectedOption ? 'primary.500' : borderColor
+
   return (
     <Box position="relative" ref={containerRef} w={width}>
       {/* Select Input */}
@@ -93,8 +104,8 @@ export function SearchableSelect({
         py="6px"
         bg="white"
         borderWidth="1px"
-        borderColor="neutral.300"
-        borderRadius="6px"
+        borderColor={displayBorderColor}
+        borderRadius={borderRadius}
         align="center"
         justify="space-between"
         cursor={disabled ? 'not-allowed' : 'pointer'}
@@ -110,10 +121,24 @@ export function SearchableSelect({
       >
         <Text
           fontSize={fontSize}
-          color={textColor || (selectedOption ? 'neutral.950' : 'neutral.500')}
+          color={displayColor}
+          textStyle={textStyle}
+          fontWeight="600"
           noOfLines={1}
         >
-          {selectedOption ? selectedOption.label : placeholder}
+          {selectedOption ? (
+            selectedOption.label
+          ) : (
+            <>
+              {placeholder}
+              {required && (
+                <Text as="span" color="#D92D20">
+                  {' '}
+                  *
+                </Text>
+              )}
+            </>
+          )}
         </Text>
         <ChevronDownIcon
           boxSize={5}
@@ -149,7 +174,7 @@ export function SearchableSelect({
                 placeholder="Search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                borderColor="neutral.300"
+                borderColor={borderColor}
                 borderRadius="4px"
                 _hover={{ borderColor: 'neutral.400' }}
                 _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
