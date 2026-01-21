@@ -1,6 +1,7 @@
 package com.jalsoochak.water_supply_calculation_service.repositories;
 
 import com.jalsoochak.water_supply_calculation_service.models.entities.BfmReading;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,6 +19,7 @@ public interface BfmReadingRepository extends JpaRepository<BfmReading, Long> {
             String tenantId,
             Long excludedId
     );
+
     @Query("""
     SELECT r FROM BfmReading r
     WHERE r.scheme.id = :schemeId
@@ -30,7 +32,9 @@ public interface BfmReadingRepository extends JpaRepository<BfmReading, Long> {
     Optional<BfmReading> findLastValidConfirmedReading(
             @Param("schemeId") Long schemeId,
             @Param("tenantId") String tenantId,
-            @Param("excludedId") Long excludedId
+            @Param("excludedId") Long excludedId,
+            Pageable pageable
     );
+
 
 }

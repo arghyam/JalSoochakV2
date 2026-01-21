@@ -115,7 +115,7 @@ public class PersonService {
                 log.warn("Unable to read response body from Keycloak", e);
             }
 
-            log.info("Keycloak create user response: status={}, body={}", status, responseBody);
+            log.debug("Keycloak create user response: status={}, body={}", status, responseBody);
 
             if (status != 201) {
                 throw new RuntimeException(
@@ -282,8 +282,6 @@ public class PersonService {
 
             PersonMaster person = personMasterRepository.findByEmail(username)
                     .orElseThrow(() -> new RuntimeException("User not found"));
-
-            log.info("person: {}", person);
 
             return person.getPersonType() != null
                     && SUPER_ADMIN_ROLE.equals(person.getPersonType().getCName());

@@ -13,6 +13,7 @@ import com.jalsoochak.water_supply_calculation_service.repositories.SchemeReposi
 import com.jalsoochak.water_supply_calculation_service.tenant.TenantContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -130,15 +131,9 @@ public class BfmReadingService {
 
         bfmReadingRepository.save(reading);
 
-        BigDecimal lastConfirmedReading =
-                bfmReadingRepository
-                        .findLastValidConfirmedReading(
-                                scheme.getId(),
-                                tenantId,
-                                reading.getId()
-                        )
-                        .map(BfmReading::getConfirmedReading)
-                        .orElse(null);
+        BfmReading lastReading = bfmReadingRepository
+                .findLastValidConfirmedReading(scheme.getId(), tenantId, reading.getId(), PageRequest.of(0, 1))
+                .orElse(null);
 
         return CreateReadingResponse.builder()
                 .success(isValid)
@@ -151,7 +146,9 @@ public class BfmReadingService {
                 .meterReading(finalReading)
                 .qualityConfidence(confidenceLevel)
                 .qualityStatus(ocrResult != null ? ocrResult.getQualityStatus() : null)
-                .lastConfirmedReading(lastConfirmedReading)
+                .lastConfirmedReading(
+                        lastReading != null ? lastReading.getConfirmedReading() : null
+                )
                 .build();
     }
 
