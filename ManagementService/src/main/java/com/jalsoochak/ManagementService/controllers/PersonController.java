@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -132,6 +133,32 @@ public class PersonController {
         boolean success = personService.logout(refreshToken);
         return success ? ResponseEntity.ok("Logged out") :
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Logout failed");
+    }
+
+
+    @PostMapping("/bulk/invite")
+    public ResponseEntity<?> bulkInvite(
+            @RequestParam("file") MultipartFile file,
+            @RequestHeader("X-Tenant-ID") String tenantId,
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Missing or invalid Authorization header");
+        }
+
+//        String token = authHeader.substring(7).trim();
+        try {
+            Map<String, Object> result = personService.bulkInviteUsers(file, tenantId);
+            return ResponseEntity.ok(result);
+
+        } catch (BadRequestException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            log.error("Error in bulkInvite", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred");
+        }
     }
 
 }

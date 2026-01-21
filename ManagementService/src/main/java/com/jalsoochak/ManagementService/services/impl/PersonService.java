@@ -7,13 +7,29 @@ import com.jalsoochak.ManagementService.models.app.request.LoginRequest;
 import com.jalsoochak.ManagementService.models.app.request.RegisterRequest;
 import com.jalsoochak.ManagementService.models.app.response.TokenResponse;
 import com.jalsoochak.ManagementService.models.entity.PersonMaster;
+import com.jalsoochak.ManagementService.models.entity.PersonSchemeMapping;
 import com.jalsoochak.ManagementService.models.entity.PersonTypeMaster;
+import com.jalsoochak.ManagementService.models.entity.SchemeMaster;
 import com.jalsoochak.ManagementService.models.entity.TenantMaster;
 import com.jalsoochak.ManagementService.models.enums.KeycloakRole;
 import com.jalsoochak.ManagementService.repositories.PersonMasterRepository;
+import com.jalsoochak.ManagementService.repositories.PersonSchemeMappingRepository;
 import com.jalsoochak.ManagementService.repositories.PersonTypeMasterRepository;
+import com.jalsoochak.ManagementService.repositories.SchemeMasterRepository;
 import com.jalsoochak.ManagementService.repositories.TenantMasterRepository;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 import jakarta.ws.rs.BadRequestException;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.keycloak.TokenVerifier;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.common.VerificationException;
@@ -27,15 +43,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import jakarta.ws.rs.core.Response;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -65,16 +90,20 @@ public class PersonService {
     private final PersonTypeMasterRepository personTypeMasterRepository;
     private final PersonMasterRepository personMasterRepository;
     private final TenantMasterRepository tenantMasterRepository;
+    private final PersonSchemeMappingRepository personSchemeMappingRepository;
+    private final SchemeMasterRepository schemeMasterRepository;
     private final KeycloakClient keycloakClient;
 
     private static final String SUPER_ADMIN_ROLE = "super_user";
 
     public PersonService(KeycloakProvider keycloakProvider, PersonTypeMasterRepository personTypeMasterRepository,
-                         PersonMasterRepository personMasterRepository, TenantMasterRepository tenantMasterRepository, KeycloakClient keycloakClient) {
+                         PersonMasterRepository personMasterRepository, TenantMasterRepository tenantMasterRepository, PersonSchemeMappingRepository personSchemeMappingRepository, SchemeMasterRepository schemeMasterRepository, KeycloakClient keycloakClient) {
         this.keycloakProvider = keycloakProvider;
         this.personTypeMasterRepository = personTypeMasterRepository;
         this.personMasterRepository = personMasterRepository;
         this.tenantMasterRepository = tenantMasterRepository;
+        this.personSchemeMappingRepository = personSchemeMappingRepository;
+        this.schemeMasterRepository = schemeMasterRepository;
         this.keycloakClient = keycloakClient;
     }
 
@@ -195,7 +224,7 @@ public class PersonService {
                 loginRequest.getUsername(), loginRequest.getPassword()
         );
 
-        PersonMaster person = personMasterRepository.findByEmail(loginRequest.getUsername())
+        PersonMaster person = personMasterRepository.findByPhoneNumber(loginRequest.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         log.debug("User '{}' logged in with tenant '{}'", person.getPhoneNumber(), person.getTenantId());
@@ -236,7 +265,7 @@ public class PersonService {
             throw new RuntimeException("Unable to extract username from token");
         }
 
-        PersonMaster person = personMasterRepository.findByEmail(username)
+        PersonMaster person = personMasterRepository.findByPhoneNumber(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         log.debug("User '{}' logged in with tenant '{}'", person.getPhoneNumber(), person.getTenantId());
@@ -291,7 +320,6 @@ public class PersonService {
             return false;
         }
     }
-
 
     private String extractEmailFromToken(String token) throws VerificationException {
         String publicKeyPemClean = publicKeyPem
@@ -348,6 +376,156 @@ public class PersonService {
         }
 
         return results.get(0).getId();
+    }
+
+    @Transactional
+    public Map<String, Object> bulkInviteUsers(MultipartFile file, String tenantId) {
+        if (file.isEmpty()) {
+            throw new BadRequestException("File is empty");
+        }
+
+        String filename = file.getOriginalFilename();
+        if (filename == null) {
+            throw new BadRequestException("File name is missing");
+        }
+
+        List<Map<String, String>> errors = new ArrayList<>();
+        List<PersonMaster> personsToSave = new ArrayList<>();
+        List<PersonSchemeMapping> mappingsToSave = new ArrayList<>();
+        Set<String> phoneNumbers = new HashSet<>();
+
+        try (InputStream is = file.getInputStream()) {
+
+            Workbook workbook = null;
+            Sheet sheet = null;
+
+            if (filename.endsWith(".xlsx")) {
+                workbook = new XSSFWorkbook(is);
+                sheet = workbook.getSheetAt(0);
+            } else if (filename.endsWith(".xls")) {
+                workbook = new HSSFWorkbook(is);
+                sheet = workbook.getSheetAt(0);
+            } else if (filename.endsWith(".csv")) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+                String line;
+                int rowNum = 0;
+                while ((line = reader.readLine()) != null) {
+                    if (rowNum == 0) { rowNum++; continue; }
+                    String[] cells = line.split(",");
+                    processRow(cells, rowNum, tenantId, phoneNumbers, personsToSave, mappingsToSave, errors);
+                    rowNum++;
+                }
+            } else {
+                throw new BadRequestException("Unsupported file type: " + filename);
+            }
+
+            if (sheet != null) {
+                for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                    Row row = sheet.getRow(i);
+                    if (row == null) continue;
+
+                    String[] cells = new String[8];
+                    for (int c = 0; c < 8; c++) {
+                        cells[c] = getCellValue(row.getCell(c));
+                    }
+                    processRow(cells, i, tenantId, phoneNumbers, personsToSave, mappingsToSave, errors);
+                }
+            }
+
+            if (!errors.isEmpty()) {
+                throw new BadRequestException("Validation failed: " + errors);
+            }
+
+
+            personMasterRepository.saveAll(personsToSave);
+            personSchemeMappingRepository.saveAll(mappingsToSave);
+
+            return Map.of(
+                    "message", "Onboarding Successful",
+                    "count", personsToSave.size()
+            );
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read file", e);
+        }
+    }
+
+    private void processRow(String[] cells, int rowNum, String tenantId, Set<String> phoneNumbers,
+                            List<PersonMaster> personsToSave, List<PersonSchemeMapping> mappingsToSave,
+                            List<Map<String, String>> errors) {
+
+        String firstName = cells[0];
+        String lastName = cells[1];
+        String fullName = cells[2];
+        String phoneNumber = cells[3];
+        String alternateNumber = cells[4];
+        String personTypeTitle = cells[5];
+        String stateSchemeIdStr = cells[6];
+        String centerSchemeIdStr = cells[7];
+
+        Map<String, String> rowErrors = new HashMap<>();
+
+        if (phoneNumber.isBlank()) rowErrors.put("phoneNumber", "Phone number is required");
+        if (!phoneNumbers.add(phoneNumber)) rowErrors.put("phoneNumber", "Duplicate phone number in file");
+        if (personMasterRepository.existsByPhoneNumberAndTenantId(phoneNumber, tenantId))
+            rowErrors.put("phoneNumber", "Phone number already exists in system");
+
+        PersonTypeMaster personType = personTypeMasterRepository.findByTitle(personTypeTitle).orElse(null);
+        if (personType == null) rowErrors.put("personType", "Invalid person_type title at row " + (rowNum + 1));
+
+        if (!rowErrors.isEmpty()) {
+            rowErrors.put("row", String.valueOf(rowNum + 1));
+            errors.add(rowErrors);
+            return;
+        }
+
+        PersonMaster person = PersonMaster.builder()
+                .firstName(firstName)
+                .lastName(lastName)
+                .fullName(fullName)
+                .phoneNumber(phoneNumber)
+                .alternateNumber(alternateNumber)
+                .tenantId(tenantId)
+                .personType(personType)
+                .build();
+
+        personsToSave.add(person);
+
+        if (!stateSchemeIdStr.isBlank()) {
+            Long stateSchemeId = Long.parseLong(stateSchemeIdStr);
+            SchemeMaster stateScheme = schemeMasterRepository.findById(stateSchemeId)
+                    .orElseThrow(() -> new BadRequestException("Invalid state scheme at row " + (rowNum + 1)));
+            mappingsToSave.add(PersonSchemeMapping.builder().person(person).scheme(stateScheme).build());
+        }
+
+    }
+
+    private String getCellValue(Cell cell) {
+        if (cell == null) return "";
+
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue().trim();
+
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    return new DataFormatter().formatCellValue(cell).trim();
+                } else {
+                    return new BigDecimal(cell.getNumericCellValue())
+                            .toPlainString()
+                            .replaceAll("\\.0$", "");
+                }
+
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue()).trim();
+
+            case FORMULA:
+                return new DataFormatter().formatCellValue(cell).trim();
+
+            case BLANK:
+            default:
+                return "";
+        }
     }
 
 }

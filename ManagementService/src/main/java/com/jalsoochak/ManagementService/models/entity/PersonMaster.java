@@ -59,6 +59,8 @@ public class PersonMaster {
     @Column(name = "tenant_id", length = 50)
     private String tenantId;
 
+    private String alternateNumber;
+
     @Column(nullable = false)
     private boolean profileCompleted = false;
 
