@@ -411,18 +411,32 @@ public class PersonService {
                         processRow(cells, i, tenantId, phoneNumbers, personsToSave, mappingsToSave, errors);
                     }
                 }
-            } else if (filename.endsWith(".csv")) {
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
-                    String line;
-                    int rowNum = 0;
-                    while ((line = reader.readLine()) != null) {
-                        if (rowNum == 0) { rowNum++; continue; }
-                        String[] cells = line.split(",");
-                        processRow(cells, rowNum, tenantId, phoneNumbers, personsToSave, mappingsToSave, errors);
-                        rowNum++;
+            }  else if (filename.endsWith(".csv")) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+                 CSVReader csvReader = new CSVReader(reader)) {
+
+                String[] cells;
+                int rowNum = 0;
+                while ((cells = csvReader.readNext()) != null) {
+                    rowNum++;
+                    if (rowNum == 1) continue;
+
+                    String[] paddedCells = new String[8];
+                    for (int i = 0; i < 8; i++) {
+                        if (i < cells.length) {
+                            paddedCells[i] = cells[i] != null ? cells[i].trim() : "";
+                        } else {
+                            paddedCells[i] = "";
+                        }
                     }
+
+                    processRow(paddedCells, rowNum, tenantId, phoneNumbers, personsToSave, mappingsToSave, errors);
                 }
-            } else {
+            } catch (CsvValidationException e) {
+                throw new BadRequestException("Invalid CSV format: " + e.getMessage());
+            }
+        }
+        else {
                 throw new BadRequestException("Unsupported file type: " + filename);
             }
 
