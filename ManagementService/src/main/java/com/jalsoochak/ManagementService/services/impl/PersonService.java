@@ -309,7 +309,7 @@ public class PersonService {
                 return false;
             }
 
-            PersonMaster person = personMasterRepository.findByEmail(username)
+            PersonMaster person = personMasterRepository.findByPhoneNumber(username)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             return person.getPersonType() != null
@@ -396,46 +396,39 @@ public class PersonService {
 
         try (InputStream is = file.getInputStream()) {
 
-            Workbook workbook = null;
-            Sheet sheet = null;
+            if (filename.endsWith(".xlsx") || filename.endsWith(".xls")) {
+                try (Workbook workbook = filename.endsWith(".xlsx") ? new XSSFWorkbook(is) : new HSSFWorkbook(is)) {
+                    Sheet sheet = workbook.getSheetAt(0);
 
-            if (filename.endsWith(".xlsx")) {
-                workbook = new XSSFWorkbook(is);
-                sheet = workbook.getSheetAt(0);
-            } else if (filename.endsWith(".xls")) {
-                workbook = new HSSFWorkbook(is);
-                sheet = workbook.getSheetAt(0);
+                    for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                        Row row = sheet.getRow(i);
+                        if (row == null) continue;
+
+                        String[] cells = new String[8];
+                        for (int c = 0; c < 8; c++) {
+                            cells[c] = getCellValue(row.getCell(c));
+                        }
+                        processRow(cells, i, tenantId, phoneNumbers, personsToSave, mappingsToSave, errors);
+                    }
+                }
             } else if (filename.endsWith(".csv")) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-                String line;
-                int rowNum = 0;
-                while ((line = reader.readLine()) != null) {
-                    if (rowNum == 0) { rowNum++; continue; }
-                    String[] cells = line.split(",");
-                    processRow(cells, rowNum, tenantId, phoneNumbers, personsToSave, mappingsToSave, errors);
-                    rowNum++;
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+                    String line;
+                    int rowNum = 0;
+                    while ((line = reader.readLine()) != null) {
+                        if (rowNum == 0) { rowNum++; continue; }
+                        String[] cells = line.split(",");
+                        processRow(cells, rowNum, tenantId, phoneNumbers, personsToSave, mappingsToSave, errors);
+                        rowNum++;
+                    }
                 }
             } else {
                 throw new BadRequestException("Unsupported file type: " + filename);
             }
 
-            if (sheet != null) {
-                for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-                    Row row = sheet.getRow(i);
-                    if (row == null) continue;
-
-                    String[] cells = new String[8];
-                    for (int c = 0; c < 8; c++) {
-                        cells[c] = getCellValue(row.getCell(c));
-                    }
-                    processRow(cells, i, tenantId, phoneNumbers, personsToSave, mappingsToSave, errors);
-                }
-            }
-
             if (!errors.isEmpty()) {
                 throw new BadRequestException("Validation failed: " + errors);
             }
-
 
             personMasterRepository.saveAll(personsToSave);
             personSchemeMappingRepository.saveAll(mappingsToSave);
@@ -449,6 +442,7 @@ public class PersonService {
             throw new RuntimeException("Failed to read file", e);
         }
     }
+
 
     private void processRow(String[] cells, int rowNum, String tenantId, Set<String> phoneNumbers,
                             List<PersonMaster> personsToSave, List<PersonSchemeMapping> mappingsToSave,
@@ -492,13 +486,32 @@ public class PersonService {
         personsToSave.add(person);
 
         if (!stateSchemeIdStr.isBlank()) {
-            Long stateSchemeId = Long.parseLong(stateSchemeIdStr);
-            SchemeMaster stateScheme = schemeMasterRepository.findById(stateSchemeId)
-                    .orElseThrow(() -> new BadRequestException("Invalid state scheme at row " + (rowNum + 1)));
-            mappingsToSave.add(PersonSchemeMapping.builder().person(person).scheme(stateScheme).build());
+            try {
+                Long stateSchemeId = Long.parseLong(stateSchemeIdStr);
+                SchemeMaster stateScheme = schemeMasterRepository.findById(stateSchemeId)
+                        .orElseThrow(() -> new BadRequestException("Invalid state scheme at row " + (rowNum + 1)));
+                mappingsToSave.add(PersonSchemeMapping.builder().person(person).scheme(stateScheme).build());
+            } catch (NumberFormatException e) {
+                rowErrors.put("stateSchemeId", "Invalid numeric value for state scheme at row " + (rowNum + 1));
+                rowErrors.put("row", String.valueOf(rowNum + 1));
+                errors.add(rowErrors);
+            }
         }
 
+//        if (!centerSchemeIdStr.isBlank()) {
+//            try {
+//                Long centerSchemeId = Long.parseLong(centerSchemeIdStr);
+//                SchemeMaster centerScheme = schemeMasterRepository.findById(centerSchemeId)
+//                        .orElseThrow(() -> new BadRequestException("Invalid center scheme at row " + (rowNum + 1)));
+//                mappingsToSave.add(PersonSchemeMapping.builder().person(person).scheme(centerScheme).build());
+//            } catch (NumberFormatException e) {
+//                rowErrors.put("centerSchemeId", "Invalid numeric value for center scheme at row " + (rowNum + 1));
+//                rowErrors.put("row", String.valueOf(rowNum + 1));
+//                errors.add(rowErrors);
+//            }
+//        }
     }
+
 
     private String getCellValue(Cell cell) {
         if (cell == null) return "";

@@ -147,17 +147,18 @@ public class PersonController {
                     .body("Missing or invalid Authorization header");
         }
 
-//        String token = authHeader.substring(7).trim();
         try {
             Map<String, Object> result = personService.bulkInviteUsers(file, tenantId);
             return ResponseEntity.ok(result);
 
         } catch (BadRequestException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            log.warn("BadRequestException in bulkInvite: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Invalid request data. Please check your file and try again."));
         } catch (Exception e) {
             log.error("Error in bulkInvite", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred");
+                    .body(Map.of("error", "An unexpected error occurred. Please contact support."));
         }
     }
 
