@@ -6,7 +6,7 @@ import com.jalsoochak.ManagementService.models.app.request.RegisterRequest;
 import com.jalsoochak.ManagementService.models.app.request.TokenRequest;
 import com.jalsoochak.ManagementService.models.app.response.TokenResponse;
 import com.jalsoochak.ManagementService.services.impl.PersonService;
-import jakarta.ws.rs.BadRequestException;
+import com.jalsoochak.ManagementService.exceptions.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.common.VerificationException;
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -156,7 +157,7 @@ public class PersonController {
 
         if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Missing or invalid Authorization header");
+                    .body(Map.of("message", "Missing or invalid Authorization header"));
         }
 
         try {
@@ -165,12 +166,20 @@ public class PersonController {
 
         } catch (BadRequestException e) {
             log.warn("BadRequestException in bulkInvite: {}", e.getMessage());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", e.getMessage());
+
+            if (e.getErrors() != null) {
+                response.put("errors", e.getErrors());
+            }
+
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "Invalid request data. Please check your file and try again."));
+                    .body(response);
         } catch (Exception e) {
             log.error("Error in bulkInvite", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "An unexpected error occurred. Please contact support."));
+                    .body(Map.of("message", "An unexpected error occurred. Please contact support."));
         }
     }
 

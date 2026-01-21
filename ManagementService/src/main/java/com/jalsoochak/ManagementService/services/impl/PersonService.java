@@ -22,13 +22,11 @@ import com.opencsv.exceptions.CsvValidationException;
 import jakarta.ws.rs.BadRequestException;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.keycloak.TokenVerifier;
 import org.keycloak.admin.client.resource.RealmResource;
@@ -45,6 +43,8 @@ import jakarta.ws.rs.core.Response;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.client.HttpClientErrorException.BadRequest;
+
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -93,6 +93,8 @@ public class PersonService {
     private final PersonSchemeMappingRepository personSchemeMappingRepository;
     private final SchemeMasterRepository schemeMasterRepository;
     private final KeycloakClient keycloakClient;
+    private static final String ALLOWED_PERSON_TYPE = "Pump Operator";
+
 
     private static final String SUPER_ADMIN_ROLE = "super_user";
 
@@ -394,11 +396,35 @@ public class PersonService {
         List<PersonSchemeMapping> mappingsToSave = new ArrayList<>();
         Set<String> phoneNumbers = new HashSet<>();
 
+        String[] EXPECTED_HEADERS = {
+                "first_name",
+                "last_name",
+                "full_name",
+                "phone_number",
+                "alternate_number",
+                "person_type_id",
+                "state_scheme_id",
+                "center_scheme_id"
+        };
+
         try (InputStream is = file.getInputStream()) {
 
             if (filename.endsWith(".xlsx") || filename.endsWith(".xls")) {
                 try (Workbook workbook = filename.endsWith(".xlsx") ? new XSSFWorkbook(is) : new HSSFWorkbook(is)) {
                     Sheet sheet = workbook.getSheetAt(0);
+
+                    Row headerRow = sheet.getRow(0);
+                    if (headerRow == null) {
+                        throw new com.jalsoochak.ManagementService.exceptions.BadRequestException("Header row is missing");
+                    }
+
+                    for (int i = 0; i < EXPECTED_HEADERS.length; i++) {
+                        String cellValue = getCellValue(headerRow.getCell(i)).toLowerCase().trim();
+                        if (!EXPECTED_HEADERS[i].equals(cellValue)) {
+                            throw new com.jalsoochak.ManagementService.exceptions.BadRequestException("Invalid header at column " + (i + 1)
+                                    + ": expected '" + EXPECTED_HEADERS[i] + "', found '" + cellValue + "'");
+                        }
+                    }
 
                     for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                         Row row = sheet.getRow(i);
@@ -408,18 +434,31 @@ public class PersonService {
                         for (int c = 0; c < 8; c++) {
                             cells[c] = getCellValue(row.getCell(c));
                         }
-                        processRow(cells, i, tenantId, phoneNumbers, personsToSave, mappingsToSave, errors);
+
+                        processRow(cells, i + 1, tenantId, phoneNumbers, personsToSave, mappingsToSave, errors);
                     }
                 }
-            }  else if (filename.endsWith(".csv")) {
+            } else if (filename.endsWith(".csv")) {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(is));
                      CSVReader csvReader = new CSVReader(reader)) {
 
+                    String[] headerRow = csvReader.readNext();
+                    if (headerRow == null) {
+                        throw new com.jalsoochak.ManagementService.exceptions.BadRequestException("CSV file is empty or missing header row");
+                    }
+
+                    for (int i = 0; i < EXPECTED_HEADERS.length; i++) {
+                        String cellValue = i < headerRow.length ? headerRow[i].toLowerCase().trim() : "";
+                        if (!EXPECTED_HEADERS[i].equals(cellValue)) {
+                            throw new com.jalsoochak.ManagementService.exceptions.BadRequestException("Invalid CSV header at column " + (i + 1)
+                                    + ": expected '" + EXPECTED_HEADERS[i] + "', found '" + cellValue + "'");
+                        }
+                    }
+
                     String[] cells;
-                    int rowNum = 0;
+                    int rowNum = 1;
                     while ((cells = csvReader.readNext()) != null) {
                         rowNum++;
-                        if (rowNum == 1) continue;
 
                         String[] paddedCells = new String[8];
                         for (int i = 0; i < 8; i++) {
@@ -429,18 +468,18 @@ public class PersonService {
                                 paddedCells[i] = "";
                             }
                         }
+
                         processRow(paddedCells, rowNum, tenantId, phoneNumbers, personsToSave, mappingsToSave, errors);
                     }
                 } catch (CsvValidationException e) {
                     throw new BadRequestException("Invalid CSV format: " + e.getMessage());
                 }
-            }
-        else {
+            } else {
                 throw new BadRequestException("Unsupported file type: " + filename);
             }
 
             if (!errors.isEmpty()) {
-                throw new BadRequestException("Validation failed: " + errors);
+                throw new com.jalsoochak.ManagementService.exceptions.BadRequestException("Validation failed", errors);
             }
 
             personMasterRepository.saveAll(personsToSave);
@@ -457,8 +496,10 @@ public class PersonService {
     }
 
 
-    private void processRow(String[] cells, int rowNum, String tenantId, Set<String> phoneNumbers,
-                            List<PersonMaster> personsToSave, List<PersonSchemeMapping> mappingsToSave,
+    private void processRow(String[] cells, int rowNum, String tenantId,
+                            Set<String> phoneNumbers,
+                            List<PersonMaster> personsToSave,
+                            List<PersonSchemeMapping> mappingsToSave,
                             List<Map<String, String>> errors) {
 
         String firstName = cells[0];
@@ -472,16 +513,36 @@ public class PersonService {
 
         Map<String, String> rowErrors = new HashMap<>();
 
-        if (phoneNumber.isBlank()) rowErrors.put("phoneNumber", "Phone number is required");
-        if (!phoneNumbers.add(phoneNumber)) rowErrors.put("phoneNumber", "Duplicate phone number in file");
-        if (personMasterRepository.existsByPhoneNumberAndTenantId(phoneNumber, tenantId))
-            rowErrors.put("phoneNumber", "Phone number already exists in system");
+        if (firstName == null || firstName.isBlank()) rowErrors.put("first_name", "First Name is required");
+        if (lastName == null || lastName.isBlank()) rowErrors.put("last_name", "Last Name is required");
+        if (fullName == null || fullName.isBlank()) rowErrors.put("full_name", "Full Name is required");
+        if (phoneNumber == null || phoneNumber.isBlank()) {
+            rowErrors.put("phone_number", "Phone number is required");
+        } else {
+            if (!phoneNumbers.add(phoneNumber)) rowErrors.put("phone_number", "Duplicate phone number in file");
+            if (personMasterRepository.existsByPhoneNumberAndTenantId(phoneNumber, tenantId))
+                rowErrors.put("phone_number", "Phone number already exists in system");
+        }
+        if (personTypeTitle == null || personTypeTitle.isBlank())
+            rowErrors.put("person_type", "person_type is required");
+        else if (!ALLOWED_PERSON_TYPE.equalsIgnoreCase(personTypeTitle.trim()))
+            rowErrors.put("person_type", "person_type must be 'Pump Operator'");
 
-        PersonTypeMaster personType = personTypeMasterRepository.findByTitle(personTypeTitle).orElse(null);
-        if (personType == null) rowErrors.put("personType", "Invalid person_type title at row " + (rowNum + 1));
+        if (stateSchemeIdStr == null || stateSchemeIdStr.isBlank())
+            rowErrors.put("state_scheme_id", "State scheme id is required");
+        if (centerSchemeIdStr == null || centerSchemeIdStr.isBlank())
+            rowErrors.put("center_scheme_id", "Center scheme id is required");
 
         if (!rowErrors.isEmpty()) {
-            rowErrors.put("row", String.valueOf(rowNum + 1));
+            rowErrors.put("row", String.valueOf(rowNum));
+            errors.add(rowErrors);
+            return;
+        }
+
+        PersonTypeMaster personType = personTypeMasterRepository.findByTitle(ALLOWED_PERSON_TYPE).orElse(null);
+        if (personType == null) {
+            rowErrors.put("person_type", "'Pump Operator' not configured in system");
+            rowErrors.put("row", String.valueOf(rowNum));
             errors.add(rowErrors);
             return;
         }
@@ -495,36 +556,27 @@ public class PersonService {
                 .tenantId(tenantId)
                 .personType(personType)
                 .build();
-
         personsToSave.add(person);
 
-        if (!stateSchemeIdStr.isBlank()) {
+        if (stateSchemeIdStr != null && !stateSchemeIdStr.isBlank()) {
             try {
                 Long stateSchemeId = Long.parseLong(stateSchemeIdStr);
                 SchemeMaster stateScheme = schemeMasterRepository.findById(stateSchemeId)
-                        .orElseThrow(() -> new BadRequestException("Invalid state scheme at row " + (rowNum + 1)));
-                mappingsToSave.add(PersonSchemeMapping.builder().person(person).scheme(stateScheme).build());
+                        .orElseThrow(() -> new BadRequestException("Invalid state scheme at row " + rowNum));
+
+                mappingsToSave.add(
+                        PersonSchemeMapping.builder()
+                                .person(person)
+                                .scheme(stateScheme)
+                                .build()
+                );
             } catch (NumberFormatException e) {
-                rowErrors.put("stateSchemeId", "Invalid numeric value for state scheme at row " + (rowNum + 1));
-                rowErrors.put("row", String.valueOf(rowNum + 1));
+                rowErrors.put("state_scheme_id", "State scheme must be a number");
+                rowErrors.put("row", String.valueOf(rowNum));
                 errors.add(rowErrors);
             }
         }
-
-//        if (!centerSchemeIdStr.isBlank()) {
-//            try {
-//                Long centerSchemeId = Long.parseLong(centerSchemeIdStr);
-//                SchemeMaster centerScheme = schemeMasterRepository.findById(centerSchemeId)
-//                        .orElseThrow(() -> new BadRequestException("Invalid center scheme at row " + (rowNum + 1)));
-//                mappingsToSave.add(PersonSchemeMapping.builder().person(person).scheme(centerScheme).build());
-//            } catch (NumberFormatException e) {
-//                rowErrors.put("centerSchemeId", "Invalid numeric value for center scheme at row " + (rowNum + 1));
-//                rowErrors.put("row", String.valueOf(rowNum + 1));
-//                errors.add(rowErrors);
-//            }
-//        }
     }
-
 
     private String getCellValue(Cell cell) {
         if (cell == null) return "";
