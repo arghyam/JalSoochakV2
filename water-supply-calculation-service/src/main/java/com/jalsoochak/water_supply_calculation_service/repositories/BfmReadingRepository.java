@@ -11,4 +11,9 @@ public interface BfmReadingRepository extends JpaRepository<BfmReading, Long> {
             String correlationId,
             String tenantId
     );
+    Optional<BfmReading> findTopByScheme_IdAndTenantIdAndIdNotOrderByReadingDateTimeDesc(
+            Long schemeId,
+            String tenantId,
+            Long excludedId
+    );
 }

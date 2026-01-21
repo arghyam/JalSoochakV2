@@ -61,8 +61,6 @@ public class PersonService {
     @Value("${keycloak.public-key}")
     private String publicKeyPem;
 
-    private final RestTemplate restTemplate;
-
     private final KeycloakProvider keycloakProvider;
     private final PersonTypeMasterRepository personTypeMasterRepository;
     private final PersonMasterRepository personMasterRepository;
@@ -78,7 +76,6 @@ public class PersonService {
         this.personMasterRepository = personMasterRepository;
         this.tenantMasterRepository = tenantMasterRepository;
         this.keycloakClient = keycloakClient;
-        this.restTemplate = new RestTemplate();
     }
 
     public void inviteUser(InviteRequest inviteRequest) {
@@ -90,10 +87,13 @@ public class PersonService {
                 .realm(realm)
                 .users();
 
-        List<UserRepresentation> existingUsers = users.search(inviteRequest.getEmail(), true);
-        if (!existingUsers.isEmpty()) {
-            throw new BadRequestException("User already exists in Keycloak");
-        }
+//        List<UserRepresentation> existingUsers = users.search(inviteRequest.getEmail());
+//
+//        log.info("existingUser: {}", existingUsers);
+//
+//        if (!existingUsers.isEmpty()) {
+//            throw new BadRequestException("User already exists in Keycloak");
+//        }
 
         UserRepresentation user = new UserRepresentation();
         user.setUsername(inviteRequest.getEmail());
@@ -145,8 +145,6 @@ public class PersonService {
             }
         }
     }
-
-
 
     @Transactional
     public void completeProfile(RegisterRequest registerRequest, String token) throws VerificationException {
@@ -205,12 +203,24 @@ public class PersonService {
         TokenResponse tokenResponse = new TokenResponse();
         tokenResponse.setAccessToken((String) tokenMap.get("access_token"));
         tokenResponse.setRefreshToken((String) tokenMap.get("refresh_token"));
-        tokenResponse.setExpiresIn((Integer) tokenMap.get("expires_in"));
-        tokenResponse.setRefreshExpiresIn((Integer) tokenMap.get("refresh_expires_in"));
+
+        tokenResponse.setExpiresIn(
+                tokenMap.get("expires_in") instanceof Number
+                        ? ((Number) tokenMap.get("expires_in")).intValue()
+                        : 0
+        );
+
+        tokenResponse.setRefreshExpiresIn(
+                tokenMap.get("refresh_expires_in") instanceof Number
+                        ? ((Number) tokenMap.get("refresh_expires_in")).intValue()
+                        : 0
+        );
+
         tokenResponse.setTokenType((String) tokenMap.get("token_type"));
         tokenResponse.setIdToken((String) tokenMap.get("id_token"));
         tokenResponse.setSessionState((String) tokenMap.get("session_state"));
         tokenResponse.setScope((String) tokenMap.get("scope"));
+
 
         return tokenResponse;
     }
@@ -234,12 +244,24 @@ public class PersonService {
         TokenResponse tokenResponse = new TokenResponse();
         tokenResponse.setAccessToken(accessToken);
         tokenResponse.setRefreshToken((String) tokenMap.get("refresh_token"));
-        tokenResponse.setExpiresIn((Integer) tokenMap.get("expires_in"));
-        tokenResponse.setRefreshExpiresIn((Integer) tokenMap.get("refresh_expires_in"));
+
+        tokenResponse.setExpiresIn(
+                tokenMap.get("expires_in") instanceof Number
+                        ? ((Number) tokenMap.get("expires_in")).intValue()
+                        : 0
+        );
+
+        tokenResponse.setRefreshExpiresIn(
+                tokenMap.get("refresh_expires_in") instanceof Number
+                        ? ((Number) tokenMap.get("refresh_expires_in")).intValue()
+                        : 0
+        );
+
         tokenResponse.setTokenType((String) tokenMap.get("token_type"));
         tokenResponse.setIdToken((String) tokenMap.get("id_token"));
         tokenResponse.setSessionState((String) tokenMap.get("session_state"));
         tokenResponse.setScope((String) tokenMap.get("scope"));
+
 
         return tokenResponse;
     }
