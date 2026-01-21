@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 public interface BfmReadingRepository extends JpaRepository<BfmReading, Long> {
@@ -20,21 +21,12 @@ public interface BfmReadingRepository extends JpaRepository<BfmReading, Long> {
             Long excludedId
     );
 
-    @Query("""
-    SELECT r FROM BfmReading r
-    WHERE r.scheme.id = :schemeId
-      AND r.tenantId = :tenantId
-      AND r.id <> :excludedId
-      AND r.confirmedReading > 0
-      AND (r.qualityConfidence IS NULL OR r.qualityConfidence >= 0.7)
-    ORDER BY r.readingDateTime DESC
-""")
-    Optional<BfmReading> findLastValidConfirmedReading(
-            @Param("schemeId") Long schemeId,
-            @Param("tenantId") String tenantId,
-            @Param("excludedId") Long excludedId,
-            Pageable pageable
+    Optional<BfmReading> findTopByScheme_IdAndTenantIdAndIdNotAndConfirmedReadingGreaterThanAndQualityConfidenceGreaterThanEqualOrderByReadingDateTimeDesc(
+            Long schemeId,
+            String tenantId,
+            Long excludedId,
+            BigDecimal confirmedReading,
+            Double qualityConfidence
     );
-
 
 }

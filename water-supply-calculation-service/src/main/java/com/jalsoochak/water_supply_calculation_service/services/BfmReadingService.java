@@ -131,8 +131,15 @@ public class BfmReadingService {
 
         bfmReadingRepository.save(reading);
 
-        BfmReading lastReading = bfmReadingRepository
-                .findLastValidConfirmedReading(scheme.getId(), tenantId, reading.getId(), PageRequest.of(0, 1))
+        BigDecimal lastConfirmedReading = bfmReadingRepository
+                .findTopByScheme_IdAndTenantIdAndIdNotAndConfirmedReadingGreaterThanAndQualityConfidenceGreaterThanEqualOrderByReadingDateTimeDesc(
+                        scheme.getId(),
+                        tenantId,
+                        reading.getId(),
+                        BigDecimal.ZERO,
+                        0.7
+                )
+                .map(BfmReading::getConfirmedReading)
                 .orElse(null);
 
         return CreateReadingResponse.builder()
@@ -146,9 +153,7 @@ public class BfmReadingService {
                 .meterReading(finalReading)
                 .qualityConfidence(confidenceLevel)
                 .qualityStatus(ocrResult != null ? ocrResult.getQualityStatus() : null)
-                .lastConfirmedReading(
-                        lastReading != null ? lastReading.getConfirmedReading() : null
-                )
+                .lastConfirmedReading(lastConfirmedReading)
                 .build();
     }
 
