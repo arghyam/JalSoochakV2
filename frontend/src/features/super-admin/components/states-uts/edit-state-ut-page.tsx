@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Box, Text, Flex, Grid, Input, Button, HStack, Icon } from '@chakra-ui/react'
-import { FiEdit2 } from 'react-icons/fi'
+import { EditIcon } from '@chakra-ui/icons'
 import { Toggle, ToastContainer } from '@/shared/components/common'
 import { useToast } from '@/shared/hooks/use-toast'
 import { getStateUTById, updateStateUT, updateStateUTStatus } from '../../services/mock-data'
@@ -176,21 +176,23 @@ export function EditStateUTPage() {
     <Box w="full">
       {/* Page Header with Breadcrumb */}
       <Box mb={5}>
-        <Text textStyle="h5">Edit State/UT</Text>
-        <Flex gap={2} mt={1}>
+        <Text textStyle="h5" mb={2}>
+          Edit State/UT
+        </Text>
+        <Flex gap={2}>
           <Text
             fontSize="14px"
-            color="primary.500"
+            color="neutral.500"
             cursor="pointer"
             _hover={{ textDecoration: 'underline' }}
             onClick={() => navigate(ROUTES.SUPER_ADMIN_STATES_UTS)}
           >
             Manages States/UTs
           </Text>
-          <Text fontSize="14px" color="neutral.400">
+          <Text fontSize="14px" color="neutral.500">
             /
           </Text>
-          <Text fontSize="14px" color="neutral.600">
+          <Text fontSize="14px" color="#26272B">
             Edit State/UT
           </Text>
         </Flex>
@@ -212,11 +214,11 @@ export function EditStateUTPage() {
             {/* State/UT Details Section */}
             <Flex justify="space-between" align="flex-start" mb={4}>
               <Text textStyle="h8">State/UT Details</Text>
-              <Icon as={FiEdit2} boxSize={5} color="neutral.300" cursor="not-allowed" />
+              <Icon as={EditIcon} boxSize={5} cursor="not-allowed" h={5} w={5} />
             </Flex>
-            <Grid templateColumns="repeat(2, 1fr)" gap={6} mb={8}>
+            <Grid templateColumns="repeat(2, 1fr)" gap={6} mb={7}>
               <Box>
-                <Text fontSize="14px" color="neutral.400" mb={2}>
+                <Text fontSize="14px" color="neutral.400" mb={1}>
                   State/UT name
                 </Text>
                 <Input
@@ -225,11 +227,13 @@ export function EditStateUTPage() {
                   isDisabled
                   bg="neutral.50"
                   borderColor="neutral.200"
-                  color="neutral.500"
+                  color="neutral.400"
+                  h={9}
+                  maxW="486px"
                 />
               </Box>
               <Box>
-                <Text fontSize="14px" color="neutral.400" mb={2}>
+                <Text fontSize="14px" color="neutral.400" mb={1}>
                   State/UT code
                 </Text>
                 <Input
@@ -238,7 +242,9 @@ export function EditStateUTPage() {
                   isDisabled
                   bg="neutral.50"
                   borderColor="neutral.200"
-                  color="neutral.500"
+                  color="neutral.400"
+                  h={9}
+                  maxW="486px"
                 />
               </Box>
             </Grid>
@@ -247,9 +253,9 @@ export function EditStateUTPage() {
             <Text textStyle="h8" mb={4}>
               State Admin Details
             </Text>
-            <Grid templateColumns="repeat(2, 1fr)" gap={6} mb={8}>
+            <Grid templateColumns="repeat(2, 1fr)" gap={6} mb={7}>
               <Box>
-                <Text fontSize="14px" fontWeight="500" mb={2}>
+                <Text fontSize="14px" fontWeight="500" mb={1}>
                   First name
                   <Text as="span" color="error.500">
                     *
@@ -260,11 +266,13 @@ export function EditStateUTPage() {
                   onChange={(e) => setFirstName(e.target.value)}
                   placeholder="Enter"
                   borderColor="neutral.200"
+                  h={9}
+                  maxW="486px"
                   _placeholder={{ color: 'neutral.400' }}
                 />
               </Box>
               <Box>
-                <Text fontSize="14px" fontWeight="500" mb={2}>
+                <Text fontSize="14px" fontWeight="500" mb={1}>
                   Last name
                   <Text as="span" color="error.500">
                     *
@@ -275,27 +283,28 @@ export function EditStateUTPage() {
                   onChange={(e) => setLastName(e.target.value)}
                   placeholder="Enter"
                   borderColor="neutral.200"
+                  h={9}
+                  maxW="486px"
                   _placeholder={{ color: 'neutral.400' }}
                 />
               </Box>
               <Box>
-                <Text fontSize="14px" color="neutral.400" mb={2}>
+                <Text fontSize="14px" color="neutral.400" mb={1}>
                   Email address
-                  <Text as="span" color="error.500">
-                    *
-                  </Text>
                 </Text>
                 <Input
                   value={originalState.admin.email}
                   isReadOnly
                   isDisabled
                   bg="neutral.50"
+                  h={9}
+                  maxW="486px"
                   borderColor="neutral.200"
-                  color="neutral.500"
+                  color="neutral.400"
                 />
               </Box>
               <Box>
-                <Text fontSize="14px" fontWeight="500" mb={2}>
+                <Text fontSize="14px" fontWeight="500" mb={1}>
                   Phone number
                   <Text as="span" color="error.500">
                     *
@@ -312,11 +321,13 @@ export function EditStateUTPage() {
                   }}
                   placeholder="+91"
                   borderColor="neutral.200"
+                  h={9}
+                  maxW="486px"
                   _placeholder={{ color: 'neutral.400' }}
                 />
               </Box>
               <Box>
-                <Text fontSize="14px" fontWeight="500" mb={2}>
+                <Text fontSize="14px" fontWeight="500" mb={1}>
                   Secondary email address (optional)
                 </Text>
                 <Input
@@ -325,11 +336,13 @@ export function EditStateUTPage() {
                   onChange={(e) => setSecondaryEmail(e.target.value)}
                   placeholder="Enter"
                   borderColor="neutral.200"
+                  h={9}
+                  maxW="486px"
                   _placeholder={{ color: 'neutral.400' }}
                 />
               </Box>
               <Box>
-                <Text fontSize="14px" fontWeight="500" mb={2}>
+                <Text fontSize="14px" fontWeight="500" mb={1}>
                   Contact number (optional)
                 </Text>
                 <Input
@@ -343,6 +356,8 @@ export function EditStateUTPage() {
                   }}
                   placeholder="Enter"
                   borderColor="neutral.200"
+                  h={9}
+                  maxW="486px"
                   _placeholder={{ color: 'neutral.400' }}
                 />
               </Box>
@@ -352,7 +367,7 @@ export function EditStateUTPage() {
             <Text textStyle="h8" mb={4}>
               Status
             </Text>
-            <Flex align="center" gap={3}>
+            <Flex align="center" gap={2} h={6}>
               <Text fontSize="14px" fontWeight="500">
                 Activated
               </Text>

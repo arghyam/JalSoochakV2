@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Box, Text, Flex, Grid, Icon } from '@chakra-ui/react'
-import { FiEdit2 } from 'react-icons/fi'
+import { EditIcon } from '@chakra-ui/icons'
 import { Toggle, ToastContainer } from '@/shared/components/common'
 import { useToast } from '@/shared/hooks/use-toast'
 import { getStateUTById, updateStateUTStatus } from '../../services/mock-data'
@@ -90,21 +90,23 @@ export function ViewStateUTPage() {
     <Box w="full">
       {/* Page Header with Breadcrumb */}
       <Box mb={5}>
-        <Text textStyle="h5">Manage State/UTs</Text>
-        <Flex gap={2} mt={1}>
+        <Text textStyle="h5" mb={2}>
+          Manage State/UTs
+        </Text>
+        <Flex gap={2}>
           <Text
             fontSize="14px"
-            color="primary.500"
+            color="neutral.500"
             cursor="pointer"
             _hover={{ textDecoration: 'underline' }}
             onClick={() => navigate(ROUTES.SUPER_ADMIN_STATES_UTS)}
           >
             Manages States/UTs
           </Text>
-          <Text fontSize="14px" color="neutral.400">
+          <Text fontSize="14px" color="neutral.500">
             /
           </Text>
-          <Text fontSize="14px" color="neutral.600">
+          <Text fontSize="14px" color="#26272B">
             View State/UT
           </Text>
         </Flex>
@@ -125,28 +127,30 @@ export function ViewStateUTPage() {
         <Flex justify="space-between" align="flex-start" mb={4}>
           <Text textStyle="h8">State/UT Details</Text>
           <Icon
-            as={FiEdit2}
+            as={EditIcon}
             boxSize={5}
             color="neutral.600"
             cursor="pointer"
             _hover={{ color: 'primary.500' }}
             onClick={handleEdit}
+            h={5}
+            w={5}
           />
         </Flex>
-        <Grid templateColumns="repeat(2, 1fr)" gap={6} mb={8}>
+        <Grid templateColumns="repeat(2, 1fr)" gap={6} mb={7}>
           <Box>
-            <Text fontSize="14px" color="neutral.500" mb={1}>
+            <Text fontSize="14px" fontWeight="500" mb={1}>
               State/UT name
             </Text>
-            <Text fontSize="14px" fontWeight="500">
+            <Text fontSize="14px" fontWeight="400">
               {state.name}
             </Text>
           </Box>
           <Box>
-            <Text fontSize="14px" color="neutral.500" mb={1}>
+            <Text fontSize="14px" fontWeight="500" mb={1}>
               State/UT code
             </Text>
-            <Text fontSize="14px" fontWeight="500">
+            <Text fontSize="14px" fontWeight="400">
               {state.code}
             </Text>
           </Box>
@@ -156,52 +160,52 @@ export function ViewStateUTPage() {
         <Text textStyle="h8" mb={4}>
           State Admin Details
         </Text>
-        <Grid templateColumns="repeat(2, 1fr)" gap={6} mb={8}>
+        <Grid templateColumns="repeat(2, 1fr)" gap={6} mb={7}>
           <Box>
-            <Text fontSize="14px" color="neutral.500" mb={1}>
+            <Text fontSize="14px" fontWeight="500" mb={1}>
               First name
             </Text>
-            <Text fontSize="14px" fontWeight="500">
+            <Text fontSize="14px" fontWeight="400">
               {state.admin.firstName}
             </Text>
           </Box>
           <Box>
-            <Text fontSize="14px" color="neutral.500" mb={1}>
+            <Text fontSize="14px" fontWeight="500" mb={1}>
               Last name
             </Text>
-            <Text fontSize="14px" fontWeight="500">
+            <Text fontSize="14px" fontWeight="400">
               {state.admin.lastName}
             </Text>
           </Box>
           <Box>
-            <Text fontSize="14px" color="neutral.500" mb={1}>
+            <Text fontSize="14px" fontWeight="500" mb={1}>
               Email address
             </Text>
-            <Text fontSize="14px" fontWeight="500">
+            <Text fontSize="14px" fontWeight="400">
               {state.admin.email}
             </Text>
           </Box>
           <Box>
-            <Text fontSize="14px" color="neutral.500" mb={1}>
+            <Text fontSize="14px" fontWeight="500" mb={1}>
               Phone number
             </Text>
-            <Text fontSize="14px" fontWeight="500">
+            <Text fontSize="14px" fontWeight="400">
               +91 {state.admin.phone.replace(/(\d{5})(\d{5})/, '$1-$2')}
             </Text>
           </Box>
           <Box>
-            <Text fontSize="14px" color="neutral.500" mb={1}>
+            <Text fontSize="14px" fontWeight="500" mb={1}>
               Secondary email address (optional)
             </Text>
-            <Text fontSize="14px" fontWeight="500">
+            <Text fontSize="14px" fontWeight="400">
               {state.admin.secondaryEmail || 'N/A'}
             </Text>
           </Box>
           <Box>
-            <Text fontSize="14px" color="neutral.500" mb={1}>
+            <Text fontSize="14px" fontWeight="500" mb={1}>
               Contact number (optional)
             </Text>
-            <Text fontSize="14px" fontWeight="500">
+            <Text fontSize="14px" fontWeight="400">
               {state.admin.contactNumber || 'N/A'}
             </Text>
           </Box>
@@ -211,7 +215,7 @@ export function ViewStateUTPage() {
         <Text textStyle="h8" mb={4}>
           Status
         </Text>
-        <Flex align="center" gap={3}>
+        <Flex align="center" gap={2} h={6}>
           <Text fontSize="14px" fontWeight="500">
             Activated
           </Text>

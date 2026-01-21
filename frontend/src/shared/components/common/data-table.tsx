@@ -16,7 +16,8 @@ import {
   MenuList,
   MenuItem,
 } from '@chakra-ui/react'
-import { ChevronUpIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons'
+import { ChevronUpIcon, ChevronDownIcon } from '@chakra-ui/icons'
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
 
 export interface DataTableColumn<T> {
   key: string
@@ -226,9 +227,11 @@ export function DataTable<T extends object>({
                 _hover={column.sortable ? { bg: 'neutral.50' } : undefined}
                 bg="transparent"
                 h={10}
+                px={5}
+                py={3}
                 textTransform="none"
               >
-                <Flex align="center" gap={2} textStyle="h10" px={5} py={3}>
+                <Flex align="center" gap={2} textStyle="h10">
                   <Text>{column.header}</Text>
                   {column.sortable && (
                     <Box>
@@ -275,12 +278,10 @@ export function DataTable<T extends object>({
 
       {/* Pagination Controls */}
       {pagination?.enabled && totalPages > 0 && (
-        <Flex justify="space-between" align="center" mt={6} px={4}>
+        <Flex justify="space-between" align="center" mt={6} px={4} h="42px">
           {/* Items per page selector */}
-          <HStack spacing={2}>
-            <Text fontSize="14px" color="neutral.600">
-              Items per Page
-            </Text>
+          <HStack spacing="10px">
+            <Text>Items per Page</Text>
             <Menu>
               <MenuButton
                 as={Button}
@@ -288,8 +289,13 @@ export function DataTable<T extends object>({
                 size="sm"
                 rightIcon={<ChevronDownIcon />}
                 fontWeight="400"
-                borderColor="neutral.200"
-                bg="white"
+                borderColor="#E9EAEB"
+                borderRadius="8px"
+                border="0.5px"
+                py={2}
+                px="15px"
+                maxW="72px"
+                bg="neutral.100"
                 _hover={{ bg: 'neutral.50' }}
                 _active={{ bg: 'neutral.100' }}
               >
@@ -310,14 +316,14 @@ export function DataTable<T extends object>({
           </HStack>
 
           {/* Page navigation */}
-          <HStack spacing={2}>
+          <HStack spacing={2} h={8}>
             {/* Previous button */}
             <Button
               variant="ghost"
               size="sm"
               onClick={() => handlePageChange(currentPage - 1)}
               isDisabled={currentPage === 1}
-              leftIcon={<ChevronLeftIcon />}
+              leftIcon={<FaArrowLeft />}
               fontWeight="400"
               color="neutral.600"
               _hover={{ bg: 'neutral.50' }}
@@ -326,7 +332,7 @@ export function DataTable<T extends object>({
             </Button>
 
             {/* Page numbers */}
-            <HStack spacing={1}>
+            <HStack spacing={2}>
               {getPageNumbers().map((page, index) =>
                 page === 'ellipsis' ? (
                   <Text key={`ellipsis-${index}`} px={2} color="neutral.400">
@@ -338,8 +344,11 @@ export function DataTable<T extends object>({
                     size="sm"
                     variant={currentPage === page ? 'solid' : 'ghost'}
                     onClick={() => handlePageChange(page)}
-                    minW="32px"
+                    w="32px"
                     h="32px"
+                    px={3}
+                    py={2}
+                    borderRadius="8px"
                     fontWeight={currentPage === page ? '600' : '400'}
                     bg={currentPage === page ? 'primary.500' : 'transparent'}
                     color={currentPage === page ? 'white' : 'neutral.600'}
@@ -359,7 +368,7 @@ export function DataTable<T extends object>({
               size="sm"
               onClick={() => handlePageChange(currentPage + 1)}
               isDisabled={currentPage === totalPages}
-              rightIcon={<ChevronRightIcon />}
+              rightIcon={<FaArrowRight />}
               fontWeight="400"
               color="neutral.600"
               _hover={{ bg: 'neutral.50' }}

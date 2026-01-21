@@ -119,21 +119,23 @@ export function AddStateUTPage() {
     <Box w="full">
       {/* Page Header with Breadcrumb */}
       <Box mb={5}>
-        <Text textStyle="h5">Add State/UT</Text>
+        <Text textStyle="h5" mb={2}>
+          Add State/UT
+        </Text>
         <Flex gap={2} mt={1}>
           <Text
             fontSize="14px"
-            color="primary.500"
+            color="neutral.500"
             cursor="pointer"
             _hover={{ textDecoration: 'underline' }}
             onClick={() => navigate(ROUTES.SUPER_ADMIN_STATES_UTS)}
           >
             Manages States/UTs
           </Text>
-          <Text fontSize="14px" color="neutral.400">
+          <Text fontSize="14px" color="neutral.500">
             /
           </Text>
-          <Text fontSize="14px" color="neutral.600">
+          <Text fontSize="14px" color="#26272B">
             Add New State/UT
           </Text>
         </Flex>
@@ -156,9 +158,9 @@ export function AddStateUTPage() {
             <Text textStyle="h8" mb={4}>
               State/UT Details
             </Text>
-            <Grid templateColumns="repeat(2, 1fr)" gap={6} mb={8}>
+            <Grid templateColumns="repeat(2, 1fr)" gap={6} mb={7}>
               <Box>
-                <Text fontSize="14px" fontWeight="500" mb={2}>
+                <Text fontSize="14px" fontWeight="500" mb={1}>
                   State/UT name
                   <Text as="span" color="error.500">
                     *
@@ -169,17 +171,19 @@ export function AddStateUTPage() {
                   value={stateName}
                   onChange={handleStateChange}
                   placeholder="Select"
-                  width="100%"
+                  width="486px"
                 />
               </Box>
               <Box>
-                <Text fontSize="14px" fontWeight="500" mb={2}>
+                <Text fontSize="14px" fontWeight="500" mb={1}>
                   State/UT code
                 </Text>
                 <Input
                   value={stateCode}
                   isReadOnly
                   bg="neutral.50"
+                  h={9}
+                  maxW="486px"
                   borderColor="neutral.200"
                   _placeholder={{ color: 'neutral.400' }}
                 />
@@ -190,9 +194,9 @@ export function AddStateUTPage() {
             <Text textStyle="h8" mb={4}>
               State Admin Details
             </Text>
-            <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+            <Grid templateColumns="repeat(2, 1fr)" gap={3}>
               <Box>
-                <Text fontSize="14px" fontWeight="500" mb={2}>
+                <Text fontSize="14px" fontWeight="500" mb={1}>
                   First name
                   <Text as="span" color="error.500">
                     *
@@ -202,12 +206,14 @@ export function AddStateUTPage() {
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   placeholder="Enter"
+                  h={9}
+                  maxW="486px"
                   borderColor="neutral.200"
                   _placeholder={{ color: 'neutral.400' }}
                 />
               </Box>
               <Box>
-                <Text fontSize="14px" fontWeight="500" mb={2}>
+                <Text fontSize="14px" fontWeight="500" mb={1}>
                   Last name
                   <Text as="span" color="error.500">
                     *
@@ -217,12 +223,14 @@ export function AddStateUTPage() {
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   placeholder="Enter"
+                  h={9}
+                  maxW="486px"
                   borderColor="neutral.200"
                   _placeholder={{ color: 'neutral.400' }}
                 />
               </Box>
               <Box>
-                <Text fontSize="14px" fontWeight="500" mb={2}>
+                <Text fontSize="14px" fontWeight="500" mb={1}>
                   Email address
                   <Text as="span" color="error.500">
                     *
@@ -233,12 +241,14 @@ export function AddStateUTPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter"
+                  h={9}
+                  maxW="486px"
                   borderColor="neutral.200"
                   _placeholder={{ color: 'neutral.400' }}
                 />
               </Box>
               <Box>
-                <Text fontSize="14px" fontWeight="500" mb={2}>
+                <Text fontSize="14px" fontWeight="500" mb={1}>
                   Phone number
                   <Text as="span" color="error.500">
                     *
@@ -254,12 +264,14 @@ export function AddStateUTPage() {
                     }
                   }}
                   placeholder="+91"
+                  h={9}
+                  maxW="486px"
                   borderColor="neutral.200"
                   _placeholder={{ color: 'neutral.400' }}
                 />
               </Box>
               <Box>
-                <Text fontSize="14px" fontWeight="500" mb={2}>
+                <Text fontSize="14px" fontWeight="500" mb={1}>
                   Secondary email address (optional)
                 </Text>
                 <Input
@@ -267,12 +279,14 @@ export function AddStateUTPage() {
                   value={secondaryEmail}
                   onChange={(e) => setSecondaryEmail(e.target.value)}
                   placeholder="Enter"
+                  h={9}
+                  maxW="486px"
                   borderColor="neutral.200"
                   _placeholder={{ color: 'neutral.400' }}
                 />
               </Box>
               <Box>
-                <Text fontSize="14px" fontWeight="500" mb={2}>
+                <Text fontSize="14px" fontWeight="500" mb={1}>
                   Contact number (optional)
                 </Text>
                 <Input
@@ -285,6 +299,8 @@ export function AddStateUTPage() {
                     }
                   }}
                   placeholder="Enter"
+                  h={9}
+                  maxW="486px"
                   borderColor="neutral.200"
                   _placeholder={{ color: 'neutral.400' }}
                 />
@@ -306,6 +322,7 @@ export function AddStateUTPage() {
             <Button
               variant="primary"
               size="md"
+              maxWidth="275px"
               onClick={handleSubmit}
               isLoading={isSaving}
               isDisabled={!isFormValid}

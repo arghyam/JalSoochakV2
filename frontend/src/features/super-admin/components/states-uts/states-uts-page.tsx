@@ -10,8 +10,8 @@ import {
   Button,
   Icon,
 } from '@chakra-ui/react'
-import { SearchIcon } from '@chakra-ui/icons'
-import { FiEye, FiEdit2 } from 'react-icons/fi'
+import { SearchIcon, EditIcon } from '@chakra-ui/icons'
+import { FiEye } from 'react-icons/fi'
 import { DataTable, type DataTableColumn } from '@/shared/components/common'
 import { getMockStatesUTsData } from '../../services/mock-data'
 import type { StateUT } from '../../types/states-uts'
@@ -88,7 +88,7 @@ export function StatesUTsPage() {
         <Box
           as="span"
           display="inline-block"
-          px={3}
+          px={2}
           py={0.5}
           borderRadius="16px"
           h={6}
@@ -129,15 +129,13 @@ export function StatesUTsPage() {
           <Icon
             as={FiEye}
             boxSize={5}
-            color="neutral.600"
             cursor="pointer"
             _hover={{ color: 'primary.500' }}
             onClick={() => handleView(row.id)}
           />
           <Icon
-            as={FiEdit2}
+            as={EditIcon}
             boxSize={5}
-            color="neutral.600"
             cursor="pointer"
             _hover={{ color: 'primary.500' }}
             onClick={() => handleEdit(row.id)}
@@ -155,18 +153,32 @@ export function StatesUTsPage() {
       </Box>
 
       {/* Search and Add Button */}
-      <Flex justify="space-between" align="center" mb={5}>
+      <Flex
+        justify="space-between"
+        align="center"
+        mb={6}
+        h={16}
+        py={4}
+        px={6}
+        border="0.5px"
+        borderColor="neutral.200"
+        borderRadius="12px"
+        bg="white"
+      >
         <InputGroup maxW="320px">
-          <InputLeftElement pointerEvents="none">
-            <SearchIcon color="neutral.400" />
+          <InputLeftElement pointerEvents="none" h={8}>
+            <SearchIcon color="neutral.300" />
           </InputLeftElement>
           <Input
             placeholder="Search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             bg="white"
-            borderColor="neutral.200"
-            _placeholder={{ color: 'neutral.400' }}
+            h={8}
+            border="1px"
+            borderRadius="4px"
+            borderColor="neutral.300"
+            _placeholder={{ color: 'neutral.300' }}
           />
         </InputGroup>
         <Button variant="secondary" size="sm" fontWeight="600" onClick={handleAddNew}>
