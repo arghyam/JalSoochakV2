@@ -99,7 +99,7 @@ public class PersonService {
         user.setUsername(inviteRequest.getEmail());
         user.setEmail(inviteRequest.getEmail());
         user.setEnabled(true);
-        user.setEmailVerified(false);
+        user.setEmailVerified(true);
         user.setRequiredActions(List.of("UPDATE_PASSWORD", "VERIFY_EMAIL"));
 
 
@@ -195,7 +195,7 @@ public class PersonService {
                 loginRequest.getUsername(), loginRequest.getPassword()
         );
 
-        PersonMaster person = personMasterRepository.findByPhoneNumber(loginRequest.getUsername())
+        PersonMaster person = personMasterRepository.findByEmail(loginRequest.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         log.debug("User '{}' logged in with tenant '{}'", person.getPhoneNumber(), person.getTenantId());
@@ -236,7 +236,7 @@ public class PersonService {
             throw new RuntimeException("Unable to extract username from token");
         }
 
-        PersonMaster person = personMasterRepository.findByPhoneNumber(username)
+        PersonMaster person = personMasterRepository.findByEmail(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         log.debug("User '{}' logged in with tenant '{}'", person.getPhoneNumber(), person.getTenantId());
@@ -274,15 +274,13 @@ public class PersonService {
     public boolean isSuperAdmin(String accessToken) {
         try {
             Map<String, Object> userInfo = keycloakClient.getUserInfo(accessToken);
-            log.info("user info: {}", userInfo);
             String username = (String) userInfo.get("preferred_username");
-            log.info("userName: {}", username);
             if (username == null || username.isBlank()) {
                 log.warn("preferred_username claim is missing or empty");
                 return false;
             }
 
-            PersonMaster person = personMasterRepository.findByPhoneNumber(username)
+            PersonMaster person = personMasterRepository.findByEmail(username)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             log.info("person: {}", person);

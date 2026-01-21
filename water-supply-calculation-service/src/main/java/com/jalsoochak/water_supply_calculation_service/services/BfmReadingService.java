@@ -132,7 +132,7 @@ public class BfmReadingService {
 
         BigDecimal lastConfirmedReading =
                 bfmReadingRepository
-                        .findTopByScheme_IdAndTenantIdAndIdNotOrderByReadingDateTimeDesc(
+                        .findLastValidConfirmedReading(
                                 scheme.getId(),
                                 tenantId,
                                 reading.getId()
