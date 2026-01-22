@@ -290,7 +290,7 @@ export function CentralDashboard() {
       >
         <KPICard
           title="Number of schemes"
-          value={data.kpis.nationalCoverage}
+          value={data.kpis.totalSchemes}
           icon={
             <Flex
               w="48px"
@@ -306,7 +306,7 @@ export function CentralDashboard() {
         />
         <KPICard
           title="Total Number of Rural Households"
-          value={data.kpis.regularity}
+          value={data.kpis.totalRuralHouseholds}
           icon={
             <Flex
               w="48px"
@@ -322,7 +322,7 @@ export function CentralDashboard() {
         />
         <KPICard
           title="Functional Household Tap Connection"
-          value={data.kpis.continuity}
+          value={data.kpis.functionalTapConnections}
           icon={
             <Flex
               w="48px"

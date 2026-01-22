@@ -34,7 +34,7 @@ export function KPICard({ title, value, icon }: KPICardProps) {
             {title}
           </Text>
           <Flex align="baseline" gap={2}>
-            <Text fontSize="3xl" textStyle="bodyText2" color="neutral.950">
+            <Text textStyle="bodyText2" color="neutral.950">
               {formattedValue}
             </Text>
           </Flex>

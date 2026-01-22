@@ -322,9 +322,9 @@ const mockDemandSupply: DemandSupplyData[] = [
 
 // Mock KPI data for central dashboard
 const mockCentralKPIs: KPIData = {
-  nationalCoverage: 650000,
-  regularity: 193620012,
-  continuity: 93620012,
+  totalSchemes: 650000,
+  totalRuralHouseholds: 193620012,
+  functionalTapConnections: 93620012,
 }
 
 export const dashboardMockService = {
