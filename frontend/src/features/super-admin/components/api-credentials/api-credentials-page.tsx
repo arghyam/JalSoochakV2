@@ -210,6 +210,8 @@ export function ApiCredentialsPage() {
           width="140px"
           fontSize="14px"
           textColor="neutral.400"
+          primaryColor="neutral.400"
+          borderRadius="4px"
           height="32px"
         />
       </Flex>
