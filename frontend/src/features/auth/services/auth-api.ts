@@ -50,8 +50,45 @@ export interface LoginResponse {
   refreshToken: string
 }
 
+// Hardcoded credentials for testing (temporary - remove when backend is fixed)
+const HARDCODED_USERS: Record<string, { password: string; user: AuthUser }> = {
+  '4564564566': {
+    password: 'sdsdsd',
+    user: {
+      id: 'super-admin-001',
+      name: 'John Doe',
+      email: 'johndoe@jalsoochak.com',
+      role: 'super_admin',
+      phoneNumber: '4564564566',
+      tenantId: '',
+    },
+  },
+  '9876543210': {
+    password: 'sdsdsd',
+    user: {
+      id: 'state-admin-001',
+      name: 'Jane Doe',
+      email: 'janedoe@jalsoochak.com',
+      role: 'state_admin',
+      phoneNumber: '9876543210',
+      tenantId: 'Telangana',
+    },
+  },
+}
+
 export const authApi = {
   login: async (payload: LoginRequest): Promise<LoginResponse> => {
+    // Check hardcoded credentials first (temporary - remove when backend is fixed)
+    const hardcodedUser = HARDCODED_USERS[payload.phoneNumber]
+    if (hardcodedUser && hardcodedUser.password === payload.password) {
+      return {
+        user: hardcodedUser.user,
+        accessToken: `mock-access-token-${hardcodedUser.user.role}-${Date.now()}`,
+        refreshToken: `mock-refresh-token-${hardcodedUser.user.role}-${Date.now()}`,
+      }
+    }
+
+    // Fallback to real API call
     const response = await apiClient.post<TokenResponse>('/api/v2/auth/login', {
       username: payload.phoneNumber,
       password: payload.password,
