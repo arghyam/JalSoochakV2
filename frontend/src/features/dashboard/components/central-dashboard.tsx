@@ -109,43 +109,25 @@ export function CentralDashboard() {
     )
   }
 
-  const totalEntities = data.mapData.length || 1
-  const aggregatedMetrics = data.mapData.reduce(
-    (accumulator, entity) => ({
-      coverage: accumulator.coverage + entity.coverage,
-      regularity: accumulator.regularity + entity.regularity,
-      continuity: accumulator.continuity + entity.continuity,
-      quantity: accumulator.quantity + entity.quantity,
-    }),
-    { coverage: 0, regularity: 0, continuity: 0, quantity: 0 }
-  )
-
-  const averageMetrics = {
-    coverage: aggregatedMetrics.coverage / totalEntities,
-    regularity: aggregatedMetrics.regularity / totalEntities,
-    continuity: aggregatedMetrics.continuity / totalEntities,
-    quantity: aggregatedMetrics.quantity / totalEntities,
-  }
-
   const coreMetrics = [
     {
       label: 'Coverage',
-      value: `${averageMetrics.coverage.toFixed(1)}%`,
+      value: '78.4%',
       trend: { direction: 'up', text: '+0.5% vs last month' },
     },
     {
       label: 'Continuity',
-      value: `${Math.round(averageMetrics.continuity)}`,
+      value: '94',
       trend: { direction: 'down', text: '-1 vs last month' },
     },
     {
       label: 'Quantity',
-      value: `${Math.round(averageMetrics.quantity)} LPCD`,
+      value: '78.4%',
       trend: { direction: 'up', text: '+2 LPCD vs last month' },
     },
     {
       label: 'Regularity',
-      value: `${averageMetrics.regularity.toFixed(1)}%`,
+      value: '78.4%',
       trend: { direction: 'down', text: '-3% vs last month' },
     },
   ] as const
