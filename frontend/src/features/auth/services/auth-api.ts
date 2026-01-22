@@ -52,7 +52,7 @@ export interface LoginResponse {
 
 export const authApi = {
   login: async (payload: LoginRequest): Promise<LoginResponse> => {
-    const response = await apiClient.post<TokenResponse>('/api/auth/login', {
+    const response = await apiClient.post<TokenResponse>('/api/v2/auth/login', {
       username: payload.phoneNumber,
       password: payload.password,
     })
@@ -77,7 +77,7 @@ export const authApi = {
   },
 
   refresh: async (refreshToken: string): Promise<LoginResponse> => {
-    const response = await apiClient.post<Partial<TokenResponse>>('/api/auth/refresh', {
+    const response = await apiClient.post<Partial<TokenResponse>>('/api/v2/auth/refresh', {
       refreshToken,
     })
     const { access_token, refresh_token, id_token, person_type, tenant_id } = response.data
@@ -105,12 +105,12 @@ export const authApi = {
   },
 
   logout: async (refreshToken: string): Promise<void> => {
-    await apiClient.post('/api/auth/logout', {
+    await apiClient.post('/api/v2/auth/logout', {
       refreshToken,
     })
   },
 
   register: async (payload: RegisterRequest): Promise<void> => {
-    await apiClient.post('/api/auth/register', payload)
+    await apiClient.post('/api/v2/auth/register', payload)
   },
 }
