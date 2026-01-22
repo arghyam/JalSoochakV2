@@ -14,10 +14,7 @@ import org.springframework.context.annotation.Configuration;
 //                bearerFormat = "JWT")
 //})
 @OpenAPIDefinition(
-        info = @Info(title = "Management Service API", version = "v2"),
-        servers = {
-                @Server(url = "http://localhost:8086/api/v2/", description = "Local Server")
-        }
+        info = @Info(title = "Management Service API", version = "v2")
 )
 public class SwaggerConfig {
 }

@@ -28,7 +28,6 @@ public class GlificWebhookController {
     )
     public ResponseEntity<CreateReadingResponse> receive(@RequestBody GlificWebhookRequest glificWebhookRequest,
                                                           @RequestHeader(value = "X-Tenant-ID", required = false) String tenantId) {
-        System.out.println("Payload received: " + glificWebhookRequest);
         try {
             CreateReadingResponse response = glificWebhookService.processImage(glificWebhookRequest);
             return ResponseEntity.ok(response);
