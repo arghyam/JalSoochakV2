@@ -13,12 +13,9 @@ export type DashboardLevel =
 export type EntityStatus = 'good' | 'needs-attention' | 'critical'
 
 export interface KPIData {
-  nationalCoverage: number // %
-  regularity: number // %
-  continuity: number // 0-100 index
-  averageQuantity: number // LPCD
   totalSchemes: number
-  totalHouseholds: number
+  totalRuralHouseholds: number
+  functionalTapConnections: number
 }
 
 export interface EntityPerformance {
