@@ -36,8 +36,8 @@ export function IndiaMapChart({
     }))
 
     return {
+      backgroundColor: '#FAFAFA',
       title: {
-        text: 'India Water Supply Performance Map',
         left: 'center',
         textStyle: {
           fontSize: 18,
@@ -75,20 +75,6 @@ export function IndiaMapChart({
           return (p as { name?: string }).name || ''
         },
       },
-      visualMap: {
-        min: 0,
-        max: 100,
-        left: 'left',
-        top: 'bottom',
-        text: ['High', 'Low'],
-        calculable: true,
-        inRange: {
-          color: ['#ef4444', '#f97316', '#22c55e'], // Red to Orange to Green
-        },
-        textStyle: {
-          color: '#333',
-        },
-      },
       series: [
         {
           name: 'State Performance',
@@ -103,12 +89,13 @@ export function IndiaMapChart({
           },
           data: mapSeries,
           itemStyle: {
+            areaColor: '#3291D1',
             borderColor: '#fff',
             borderWidth: 1,
           },
           emphasis: {
             itemStyle: {
-              areaColor: '#ffd700',
+              areaColor: '#2874A7',
               borderWidth: 2,
             },
             label: {
