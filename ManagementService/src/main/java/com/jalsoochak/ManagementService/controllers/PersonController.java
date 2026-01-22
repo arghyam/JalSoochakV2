@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v2/auth")
+@RequestMapping({"/api/v2/auth", "/auth"})
 @RequiredArgsConstructor
 @Slf4j
 public class PersonController {
