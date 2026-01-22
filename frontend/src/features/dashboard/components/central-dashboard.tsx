@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Box, Flex, Text, Heading, Grid, Icon } from '@chakra-ui/react'
+import { Box, Flex, Text, Heading, Grid, Icon, Image } from '@chakra-ui/react'
 import { useDashboardData } from '../hooks/use-dashboard-data'
 import { KPICard } from './kpi-card'
 import { IndiaMapChart, DemandSupplyChart, BarChart } from './charts'
 import { PerformanceTable } from './tables'
 import { LoadingSpinner, SearchableSelect } from '@/shared/components/common'
-import { MdOutlineWaterDrop } from 'react-icons/md'
-import { AiOutlineHome } from 'react-icons/ai'
-import { FaFaucet } from 'react-icons/fa'
+import { MdOutlineWaterDrop, MdArrowUpward, MdArrowDownward } from 'react-icons/md'
+import { AiOutlineHome, AiOutlineInfoCircle } from 'react-icons/ai'
+import waterTapIcon from '@/assets/media/water-tap_1822589 1.svg'
 import type { SearchableSelectOption } from '@/shared/components/common'
 import { SearchLayout, FilterLayout } from '@/shared/components/layout'
 import {
@@ -108,6 +108,47 @@ export function CentralDashboard() {
       </Flex>
     )
   }
+
+  const totalEntities = data.mapData.length || 1
+  const aggregatedMetrics = data.mapData.reduce(
+    (accumulator, entity) => ({
+      coverage: accumulator.coverage + entity.coverage,
+      regularity: accumulator.regularity + entity.regularity,
+      continuity: accumulator.continuity + entity.continuity,
+      quantity: accumulator.quantity + entity.quantity,
+    }),
+    { coverage: 0, regularity: 0, continuity: 0, quantity: 0 }
+  )
+
+  const averageMetrics = {
+    coverage: aggregatedMetrics.coverage / totalEntities,
+    regularity: aggregatedMetrics.regularity / totalEntities,
+    continuity: aggregatedMetrics.continuity / totalEntities,
+    quantity: aggregatedMetrics.quantity / totalEntities,
+  }
+
+  const coreMetrics = [
+    {
+      label: 'Coverage',
+      value: `${averageMetrics.coverage.toFixed(1)}%`,
+      trend: { direction: 'up', text: '+0.5% vs last month' },
+    },
+    {
+      label: 'Continuity',
+      value: `${Math.round(averageMetrics.continuity)}`,
+      trend: { direction: 'down', text: '-1 vs last month' },
+    },
+    {
+      label: 'Quantity',
+      value: `${Math.round(averageMetrics.quantity)} LPCD`,
+      trend: { direction: 'up', text: '+2 LPCD vs last month' },
+    },
+    {
+      label: 'Regularity',
+      value: `${averageMetrics.regularity.toFixed(1)}%`,
+      trend: { direction: 'down', text: '-3% vs last month' },
+    },
+  ] as const
 
   return (
     <Box>
@@ -332,21 +373,85 @@ export function CentralDashboard() {
               align="center"
               justify="center"
             >
-              <Icon as={FaFaucet} boxSize="24px" color="#079455" />
+              <Image src={waterTapIcon} alt="" boxSize="24px" />
             </Flex>
           }
         />
       </Grid>
 
-      {/* India Map */}
-      <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} mb={6}>
-        <IndiaMapChart
-          data={data.mapData}
-          onStateClick={handleStateClick}
-          onStateHover={handleStateHover}
-          height="600px"
-        />
-      </Box>
+      {/* Map and Core Metrics */}
+      <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
+        <Box
+          bg="white"
+          borderWidth="0.5px"
+          borderRadius="12px"
+          borderColor="#E4E4E7"
+          pt="24px"
+          pb="24px"
+          pl="16px"
+          pr="16px"
+          w="full"
+          h="731px"
+        >
+          <IndiaMapChart
+            data={data.mapData}
+            onStateClick={handleStateClick}
+            onStateHover={handleStateHover}
+            height="100%"
+          />
+        </Box>
+        <Box
+          bg="white"
+          borderWidth="0.5px"
+          borderRadius="12px"
+          borderColor="#E4E4E7"
+          pt="24px"
+          pb="24px"
+          pl="16px"
+          pr="16px"
+          w="full"
+          h="731px"
+        >
+          <Text textStyle="bodyText3" fontWeight="400" mb={4}>
+            Core Metrics
+          </Text>
+          <Flex direction="column" gap="16px">
+            {coreMetrics.map((metric) => {
+              const isPositive = metric.trend.direction === 'up'
+              const TrendIcon = isPositive ? MdArrowUpward : MdArrowDownward
+              const trendColor = isPositive ? '#079455' : '#D92D20'
+
+              return (
+                <Box key={metric.label} bg="#FAFAFA" borderRadius="8px" px="16px" py="24px">
+                  <Flex direction="column" align="center" gap={2} h="100%" w="full">
+                    <Flex align="center" justify="center" w="full" position="relative">
+                      <Text textStyle="bodyText4" fontWeight="400" color="neutral.600">
+                        {metric.label}
+                      </Text>
+                      <Icon
+                        as={AiOutlineInfoCircle}
+                        boxSize="16px"
+                        color="neutral.400"
+                        position="absolute"
+                        right="0"
+                      />
+                    </Flex>
+                    <Text textStyle="bodyText2" fontWeight="400" color="neutral.900">
+                      {metric.value}
+                    </Text>
+                    <Flex align="center" gap={1}>
+                      <Icon as={TrendIcon} boxSize="16px" color={trendColor} />
+                      <Text textStyle="bodyText4" fontWeight="400" color={trendColor}>
+                        {metric.trend.text}
+                      </Text>
+                    </Flex>
+                  </Flex>
+                </Box>
+              )
+            })}
+          </Flex>
+        </Box>
+      </Grid>
 
       {/* Demand vs Supply Chart */}
       <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} mb={6}>
