@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface PersonTypeMasterRepository extends JpaRepository<PersonTypeMaster, Long> {
    Optional<PersonTypeMaster> findBycName(String cName);
+   Optional<PersonTypeMaster> findByTitle(String title);
 }

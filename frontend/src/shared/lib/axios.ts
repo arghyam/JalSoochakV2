@@ -43,9 +43,9 @@ apiClient.interceptors.response.use(
 
     // Do not attempt refresh for auth endpoints themselves
     if (
-      originalRequest?.url?.includes('/api/auth/login') ||
-      originalRequest?.url?.includes('/api/auth/refresh') ||
-      originalRequest?.url?.includes('/api/auth/register') ||
+      originalRequest?.url?.includes('/api/v2/auth/login') ||
+      originalRequest?.url?.includes('/api/v2/auth/refresh') ||
+      originalRequest?.url?.includes('/api/v2/auth/register') ||
       originalRequest?._retry
     ) {
       return Promise.reject(error)

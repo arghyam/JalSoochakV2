@@ -13,11 +13,17 @@ import org.springframework.context.annotation.Configuration;
 //                scheme = "bearer",
 //                bearerFormat = "JWT")
 //})
+//@OpenAPIDefinition(
+//        info = @Info(title = "Water Supply Calculation Service API", version = "v2"),
+//        servers = {
+//                @Server(url = "http://localhost:9100/api/v2/", description = "Local Server")
+//        }
+//)
 @OpenAPIDefinition(
-        info = @Info(title = "Water Supply Calculation Service API", version = "v2"),
-        servers = {
-                @Server(url = "http://localhost:9100/api/v2/", description = "Local Server")
-        }
+        info = @Info(
+                title = "Water Supply Calculation Service API",
+                version = "v2"
+        )
 )
 public class SwaggerConfig {
 }

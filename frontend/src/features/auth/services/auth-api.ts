@@ -50,9 +50,46 @@ export interface LoginResponse {
   refreshToken: string
 }
 
+// Hardcoded credentials for testing (temporary - remove when backend is fixed)
+const HARDCODED_USERS: Record<string, { password: string; user: AuthUser }> = {
+  '4564564566': {
+    password: 'sdsdsd',
+    user: {
+      id: 'super-admin-001',
+      name: 'John Doe',
+      email: 'johndoe@jalsoochak.com',
+      role: 'super_admin',
+      phoneNumber: '4564564566',
+      tenantId: '',
+    },
+  },
+  '9876543210': {
+    password: 'sdsdsd',
+    user: {
+      id: 'state-admin-001',
+      name: 'Jane Doe',
+      email: 'janedoe@jalsoochak.com',
+      role: 'state_admin',
+      phoneNumber: '9876543210',
+      tenantId: 'Telangana',
+    },
+  },
+}
+
 export const authApi = {
   login: async (payload: LoginRequest): Promise<LoginResponse> => {
-    const response = await apiClient.post<TokenResponse>('/api/auth/login', {
+    // Check hardcoded credentials first (temporary - remove when backend is fixed)
+    const hardcodedUser = HARDCODED_USERS[payload.phoneNumber]
+    if (hardcodedUser && hardcodedUser.password === payload.password) {
+      return {
+        user: hardcodedUser.user,
+        accessToken: `mock-access-token-${hardcodedUser.user.role}-${Date.now()}`,
+        refreshToken: `mock-refresh-token-${hardcodedUser.user.role}-${Date.now()}`,
+      }
+    }
+
+    // Fallback to real API call
+    const response = await apiClient.post<TokenResponse>('/api/v2/auth/login', {
       username: payload.phoneNumber,
       password: payload.password,
     })
@@ -77,7 +114,7 @@ export const authApi = {
   },
 
   refresh: async (refreshToken: string): Promise<LoginResponse> => {
-    const response = await apiClient.post<Partial<TokenResponse>>('/api/auth/refresh', {
+    const response = await apiClient.post<Partial<TokenResponse>>('/api/v2/auth/refresh', {
       refreshToken,
     })
     const { access_token, refresh_token, id_token, person_type, tenant_id } = response.data
@@ -105,12 +142,12 @@ export const authApi = {
   },
 
   logout: async (refreshToken: string): Promise<void> => {
-    await apiClient.post('/api/auth/logout', {
+    await apiClient.post('/api/v2/auth/logout', {
       refreshToken,
     })
   },
 
   register: async (payload: RegisterRequest): Promise<void> => {
-    await apiClient.post('/api/auth/register', payload)
+    await apiClient.post('/api/v2/auth/register', payload)
   },
 }
