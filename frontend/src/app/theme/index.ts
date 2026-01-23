@@ -91,6 +91,12 @@ const theme = extendTheme({
       lineHeight: '21px',
       color: 'neutral.950',
     },
+    bodyText7: {
+      fontSize: '12px',
+      lineHeight: '16px',
+      fontWeight: '400',
+      color: 'neutral.950',
+    },
   },
 
   colors: {
