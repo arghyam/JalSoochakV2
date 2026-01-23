@@ -3,8 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import { Box, Flex, Text, Heading, Grid, Icon, Image, Select } from '@chakra-ui/react'
 import { useDashboardData } from '../hooks/use-dashboard-data'
 import { KPICard } from './kpi-card'
-import { IndiaMapChart, DemandSupplyChart, BarChart, AllStatesPerformanceChart } from './charts'
-import { PerformanceTable } from './tables'
+import {
+  IndiaMapChart,
+  DemandSupplyChart,
+  AllStatesPerformanceChart,
+  SupplySubmissionRateChart,
+} from './charts'
+import { AllStatesTable } from './tables'
 import { LoadingSpinner, SearchableSelect } from '@/shared/components/common'
 import { MdOutlineWaterDrop, MdArrowUpward, MdArrowDownward } from 'react-icons/md'
 import { AiOutlineHome, AiOutlineInfoCircle } from 'react-icons/ai'
@@ -494,41 +499,19 @@ export function CentralDashboard() {
         </Box>
       </Grid>
 
-      {/* Performance Tables */}
+      {/* All States + Submission Rate */}
       <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-        <Box bg="white" borderWidth="1px" borderRadius="lg" p={4}>
-          <PerformanceTable
-            data={data.topPerformers}
-            title="Top 5 Best Performing States"
-            isBest={true}
-          />
+        <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6}>
+          <Text textStyle="bodyText3" fontWeight="400" mb="16px">
+            All States/UTs
+          </Text>
+          <AllStatesTable data={data.mapData} />
         </Box>
-        <Box bg="white" borderWidth="1px" borderRadius="lg" p={4}>
-          <PerformanceTable
-            data={data.worstPerformers}
-            title="Top 5 Worst Performing States"
-            isBest={false}
-          />
-        </Box>
-      </Grid>
-
-      {/* Bar Charts */}
-      <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6}>
-        <Box bg="white" borderWidth="1px" borderRadius="lg" p={4}>
-          <BarChart
-            data={data.regularityData}
-            metric="regularity"
-            title="Regularity by State"
-            height="400px"
-          />
-        </Box>
-        <Box bg="white" borderWidth="1px" borderRadius="lg" p={4}>
-          <BarChart
-            data={data.continuityData}
-            metric="continuity"
-            title="Continuity by State"
-            height="400px"
-          />
+        <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6}>
+          <Text textStyle="bodyText3" fontWeight="400" mb={2}>
+            Supply Data Submission Rate
+          </Text>
+          <SupplySubmissionRateChart data={data.mapData} height="383px" />
         </Box>
       </Grid>
     </Box>
