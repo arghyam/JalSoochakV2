@@ -5,6 +5,9 @@ import { ErrorBoundary } from '@/shared/components/common/error-boundary'
 import { router } from '@/app/router'
 // import { useAuthStore } from '@/app/store'
 
+// Initialize i18n
+import '@/app/i18n'
+
 // TODO: Temporarily disabled until new auth APIs are ready
 // The refresh API returns different user state without tenant_id, breaking the hardcoded login flow
 function App() {

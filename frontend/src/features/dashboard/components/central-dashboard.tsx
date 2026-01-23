@@ -154,6 +154,7 @@ export function CentralDashboard() {
               fontSize="sm"
               textColor="neutral.400"
               borderColor="neutral.400"
+              isFilter={true}
             />
             <SearchableSelect
               options={districtOptions}
@@ -167,6 +168,7 @@ export function CentralDashboard() {
               fontSize="sm"
               textColor="neutral.400"
               borderColor="neutral.400"
+              isFilter={true}
             />
             <SearchableSelect
               options={blockOptions}
@@ -180,6 +182,7 @@ export function CentralDashboard() {
               textColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
               borderColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
               disabled={!isAdvancedEnabled}
+              isFilter={true}
             />
             <SearchableSelect
               options={gramPanchayatOptions}
@@ -193,6 +196,7 @@ export function CentralDashboard() {
               textColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
               borderColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
               disabled={!isAdvancedEnabled}
+              isFilter={true}
             />
             <SearchableSelect
               options={villageOptions}
@@ -206,6 +210,7 @@ export function CentralDashboard() {
               textColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
               borderColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
               disabled={!isAdvancedEnabled}
+              isFilter={true}
             />
             <SearchableSelect
               options={mockFilterDuration}
@@ -219,6 +224,7 @@ export function CentralDashboard() {
               textColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
               borderColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
               disabled={!isAdvancedEnabled}
+              isFilter={true}
             />
             <SearchableSelect
               options={mockFilterSchemes}
@@ -232,6 +238,7 @@ export function CentralDashboard() {
               textColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
               borderColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
               disabled={!isAdvancedEnabled}
+              isFilter={true}
             />
           </>
         ) : (
@@ -248,6 +255,7 @@ export function CentralDashboard() {
               textColor="neutral.300"
               borderColor="neutral.300"
               disabled
+              isFilter={true}
             />
             <SearchableSelect
               options={emptyOptions}
@@ -261,6 +269,7 @@ export function CentralDashboard() {
               textColor="neutral.300"
               borderColor="neutral.300"
               disabled
+              isFilter={true}
             />
             <SearchableSelect
               options={emptyOptions}
@@ -274,6 +283,7 @@ export function CentralDashboard() {
               textColor="neutral.300"
               borderColor="neutral.300"
               disabled
+              isFilter={true}
             />
             <SearchableSelect
               options={emptyOptions}
@@ -287,6 +297,7 @@ export function CentralDashboard() {
               textColor="neutral.300"
               borderColor="neutral.300"
               disabled
+              isFilter={true}
             />
             <SearchableSelect
               options={emptyOptions}
@@ -300,6 +311,7 @@ export function CentralDashboard() {
               textColor="neutral.300"
               borderColor="neutral.300"
               disabled
+              isFilter={true}
             />
           </>
         )}

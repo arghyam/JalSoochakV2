@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Box, Flex, Grid, Text, Icon, Stack, Button, HStack, Badge } from '@chakra-ui/react'
+import { useTranslation } from 'react-i18next'
 import { getMockIngestionMonitorData } from '../../services/mock-data'
 import { BarLineChart } from '@/shared/components/charts/bar-line-chart'
 import { SearchableSelect } from '@/shared/components/common'
@@ -15,6 +16,7 @@ import { IoCloudOutline, IoCloseCircleOutline, IoWarningOutline } from 'react-ic
 import { BsCheck2Circle } from 'react-icons/bs'
 
 export function IngestionMonitorPage() {
+  const { t } = useTranslation(['super-admin', 'common'])
   const [data, setData] = useState<IngestionMonitorData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -38,7 +40,7 @@ export function IngestionMonitorPage() {
       } catch (err) {
         if (isMounted) {
           console.error('Failed to fetch ingestion monitor data:', err)
-          setError('Failed to load ingestion data. Please try again.')
+          setError(t('common:toast.failedToLoad'))
         }
       } finally {
         if (isMounted) {
@@ -73,17 +75,17 @@ export function IngestionMonitorPage() {
       successful: {
         bg: '#E1FFEA',
         color: '#079455',
-        label: 'Successful',
+        label: t('common:status.successful'),
       },
       warning: {
         bg: '#FFF3CD',
         color: '#CC8800',
-        label: 'Warning',
+        label: t('common:status.warning'),
       },
       failed: {
         bg: '#FEE4E2',
         color: '#D92D20',
-        label: 'Failed',
+        label: t('common:status.failed'),
       },
     }
 
@@ -116,7 +118,7 @@ export function IngestionMonitorPage() {
   if (isLoading) {
     return (
       <Flex h="64" align="center" justify="center">
-        <Text color="neutral.600">Loading...</Text>
+        <Text color="neutral.600">{t('common:loading')}</Text>
       </Flex>
     )
   }
@@ -134,7 +136,7 @@ export function IngestionMonitorPage() {
             setRetryKey((prev) => prev + 1)
           }}
         >
-          Retry
+          {t('common:retry')}
         </Button>
       </Flex>
     )
@@ -143,42 +145,42 @@ export function IngestionMonitorPage() {
   if (!data) {
     return (
       <Flex h="64" align="center" justify="center">
-        <Text color="neutral.600">No data available</Text>
+        <Text color="neutral.600">{t('common:noDataAvailable')}</Text>
       </Flex>
     )
   }
 
   const statsCards = [
     {
-      title: 'Total Ingestions',
+      title: t('ingestionMonitor.stats.totalIngestions'),
       value: data.stats.totalIngestions.toLocaleString(),
-      subtitle: 'Across all States/UTs',
+      subtitle: t('ingestionMonitor.stats.acrossAllStatesUts'),
       icon: IoCloudOutline,
       iconBg: '#EBF4FA',
       iconColor: '#3291D1',
     },
     {
-      title: 'Successful Ingestions',
+      title: t('ingestionMonitor.stats.successfulIngestions'),
       value: data.stats.successfulIngestions.toLocaleString(),
-      subtitle: `${data.stats.successRate}% success rate`,
+      subtitle: t('ingestionMonitor.stats.successRate', { rate: data.stats.successRate }),
       subtitleColor: '#079455',
       icon: BsCheck2Circle,
       iconBg: '#E1FFEA',
       iconColor: '#079455',
     },
     {
-      title: 'Failed Ingestions',
+      title: t('ingestionMonitor.stats.failedIngestions'),
       value: data.stats.failedIngestions.toLocaleString(),
-      subtitle: `${data.stats.failureRate}% failure rate`,
+      subtitle: t('ingestionMonitor.stats.failureRate', { rate: data.stats.failureRate }),
       subtitleColor: '#D92D20',
       icon: IoCloseCircleOutline,
       iconBg: '#FEE4E2',
       iconColor: '#D92D20',
     },
     {
-      title: 'Current Warnings',
+      title: t('ingestionMonitor.stats.currentWarnings'),
       value: data.stats.currentWarnings.toLocaleString(),
-      subtitle: 'Issues requiring attention',
+      subtitle: t('ingestionMonitor.stats.issuesRequiringAttention'),
       icon: IoWarningOutline,
       iconBg: '#FFF3CD',
       iconColor: '#CC8800',
@@ -189,7 +191,7 @@ export function IngestionMonitorPage() {
     <Box w="full">
       {/* Page Header */}
       <Flex justify="space-between" align="center" mb={5} h={12}>
-        <Text textStyle="h5">Ingestion Monitor</Text>
+        <Text textStyle="h5">{t('ingestionMonitor.title')}</Text>
       </Flex>
 
       <Stack gap={6}>
@@ -209,32 +211,36 @@ export function IngestionMonitorPage() {
             <HStack spacing={2}>
               <Icon as={BiFilterAlt} boxSize={5} />
               <Text fontSize="14px" fontWeight="500">
-                Filters
+                {t('common:filters')}
               </Text>
             </HStack>
             <SearchableSelect
               options={STATE_FILTER_OPTIONS}
               value={stateFilter}
               onChange={setStateFilter}
-              placeholder="All States/UTs"
+              placeholder={t('ingestionMonitor.filters.allStatesUts')}
               width="160px"
               fontSize="14px"
               textColor="neutral.400"
+              borderRadius="4px"
+              borderColor="neutral.400"
               height="32px"
             />
             <SearchableSelect
               options={TIME_FILTER_OPTIONS}
               value={timeFilter}
               onChange={setTimeFilter}
-              placeholder="Last 7 Days"
+              placeholder={t('ingestionMonitor.filters.lastDays', { days: 7 })}
               width="140px"
               fontSize="14px"
               textColor="neutral.400"
+              borderColor="neutral.400"
+              borderRadius="4px"
               height="32px"
             />
           </HStack>
           <Button variant="primary" size="sm" leftIcon={<Icon as={FiDownload} boxSize={4} />}>
-            Export Data
+            {t('common:button.exportData')}
           </Button>
         </Flex>
 
@@ -291,7 +297,7 @@ export function IngestionMonitorPage() {
           mb={1}
         >
           <Text textStyle="h8" mb={4}>
-            Ingestion Success Rate Over Time
+            {t('ingestionMonitor.charts.ingestionSuccessRate')}
           </Text>
           <BarLineChart
             data={data.chartData}
@@ -301,8 +307,8 @@ export function IngestionMonitorPage() {
             barColor="#3291D1"
             lineColor="#FFA100"
             height="400px"
-            barLegendLabel="Successful Ingestions"
-            lineLegendLabel="Failed Ingestions"
+            barLegendLabel={t('overview.charts.successfulIngestions')}
+            lineLegendLabel={t('overview.charts.failedIngestions')}
           />
         </Box>
 
@@ -318,13 +324,13 @@ export function IngestionMonitorPage() {
         >
           <Flex justify="space-between" align="center" mb={3}>
             <Text fontSize="14px" fontWeight="500" color="neutral.700">
-              Detailed Ingestion Logs
+              {t('ingestionMonitor.logs.title')}
             </Text>
             <SearchableSelect
               options={STATUS_FILTER_OPTIONS}
               value={statusFilter}
               onChange={setStatusFilter}
-              placeholder="Status"
+              placeholder={t('common:statusLabel')}
               width="120px"
               fontSize="13px"
               height="32px"
@@ -346,29 +352,32 @@ export function IngestionMonitorPage() {
                       {log.status === 'successful' && log.recordsProcessed && (
                         <Text as="span" fontWeight="400">
                           {' '}
-                          Records Processed: {log.recordsProcessed.toLocaleString()}
+                          {t('ingestionMonitor.logs.recordsProcessed', {
+                            recordCount: log.recordsProcessed.toLocaleString(),
+                          })}
                         </Text>
                       )}
                     </Text>
 
                     <Text fontSize="12px" color="neutral.600" mb={0.5}>
-                      Batch ID: {log.batchId} Source System: {log.sourceSystem} Processing Time:{' '}
-                      {log.processingTime}
+                      {t('ingestionMonitor.logs.batchId')} {log.batchId}{' '}
+                      {t('ingestionMonitor.logs.sourceSystem')} {log.sourceSystem}{' '}
+                      {t('ingestionMonitor.logs.processingTime')} {log.processingTime}
                     </Text>
 
                     {log.status === 'successful' && (
                       <Text fontSize="12px" color="neutral.600">
-                        No anomalies detected during ingestion.
+                        {t('ingestionMonitor.logs.noAnomalies')}
                       </Text>
                     )}
                     {log.status === 'warning' && log.issueDetails && (
                       <Text fontSize="12px" color="neutral.600">
-                        Issue: {log.issueDetails}
+                        {t('ingestionMonitor.logs.issue')} {log.issueDetails}
                       </Text>
                     )}
                     {log.status === 'failed' && log.errorDetails && (
                       <Text fontSize="12px" color="neutral.600">
-                        Error: {log.errorDetails}
+                        {t('ingestionMonitor.logs.error')} {log.errorDetails}
                       </Text>
                     )}
                   </Box>

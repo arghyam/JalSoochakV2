@@ -11,6 +11,7 @@ import {
   MenuList,
   MenuItem,
 } from '@chakra-ui/react'
+import { useTranslation } from 'react-i18next'
 import { MdOutlineMoving, MdOutlinePlace } from 'react-icons/md'
 import { AiOutlineEye, AiOutlineSetting, AiOutlineWarning, AiOutlineApi } from 'react-icons/ai'
 import { BiKey } from 'react-icons/bi'
@@ -24,7 +25,7 @@ import { AUTH_ROLES } from '@/shared/constants/auth'
 
 interface NavItem {
   path: string
-  label: string
+  labelKey: string
   roles: string[]
   icon?: React.ComponentType<{ className?: string }>
 }
@@ -33,31 +34,31 @@ const NAV_ITEMS: NavItem[] = [
   // Super Admin navigation
   {
     path: ROUTES.SUPER_ADMIN_OVERVIEW,
-    label: 'Overview',
+    labelKey: 'sidebar.overview',
     roles: [AUTH_ROLES.SUPER_ADMIN],
     icon: AiOutlineEye,
   },
   {
     path: ROUTES.SUPER_ADMIN_SYSTEM_RULES,
-    label: 'System Rules',
+    labelKey: 'sidebar.systemRules',
     roles: [AUTH_ROLES.SUPER_ADMIN],
     icon: AiOutlineSetting,
   },
   {
     path: ROUTES.SUPER_ADMIN_STATES_UTS,
-    label: 'States/UTs',
+    labelKey: 'sidebar.statesUts',
     roles: [AUTH_ROLES.SUPER_ADMIN],
     icon: MdOutlinePlace,
   },
   {
     path: ROUTES.SUPER_ADMIN_API_CREDENTIALS,
-    label: 'API Credentials',
+    labelKey: 'sidebar.apiCredentials',
     roles: [AUTH_ROLES.SUPER_ADMIN],
     icon: BiKey,
   },
   {
     path: ROUTES.SUPER_ADMIN_INGESTION_MONITOR,
-    label: 'Ingestion Monitor',
+    labelKey: 'sidebar.ingestionMonitor',
     roles: [AUTH_ROLES.SUPER_ADMIN],
     icon: AiOutlineApi,
   },
@@ -65,67 +66,68 @@ const NAV_ITEMS: NavItem[] = [
   // State Admin navigation
   {
     path: ROUTES.STATE_ADMIN_OVERVIEW,
-    label: 'Overview',
+    labelKey: 'sidebar.overview',
     roles: [AUTH_ROLES.STATE_ADMIN],
     icon: AiOutlineEye,
   },
   {
     path: ROUTES.STATE_ADMIN_LANGUAGE,
-    label: 'Language',
+    labelKey: 'sidebar.language',
     roles: [AUTH_ROLES.STATE_ADMIN],
     icon: IoLanguageOutline,
   },
   {
     path: ROUTES.STATE_ADMIN_WATER_NORMS,
-    label: 'Water Norms',
+    labelKey: 'sidebar.waterNorms',
     roles: [AUTH_ROLES.STATE_ADMIN],
     icon: IoWaterOutline,
   },
   {
     path: ROUTES.STATE_ADMIN_INTEGRATION,
-    label: 'Integration',
+    labelKey: 'sidebar.integration',
     roles: [AUTH_ROLES.STATE_ADMIN],
     icon: AiOutlineSetting,
   },
   {
     path: ROUTES.STATE_ADMIN_ESCALATIONS,
-    label: 'Escalations',
+    labelKey: 'sidebar.escalations',
     roles: [AUTH_ROLES.STATE_ADMIN],
     icon: MdOutlineMoving,
   },
   {
     path: ROUTES.STATE_ADMIN_THRESHOLDS,
-    label: 'Thresholds',
+    labelKey: 'sidebar.thresholds',
     roles: [AUTH_ROLES.STATE_ADMIN],
     icon: AiOutlineWarning,
   },
   {
     path: ROUTES.STATE_ADMIN_NUDGES,
-    label: 'Nudges Template',
+    labelKey: 'sidebar.nudgesTemplate',
     roles: [AUTH_ROLES.STATE_ADMIN],
     icon: HiOutlineTemplate,
   },
   {
     path: ROUTES.STATE_ADMIN_API_INGESTION,
-    label: 'API Ingestion',
+    labelKey: 'sidebar.apiIngestion',
     roles: [AUTH_ROLES.STATE_ADMIN],
     icon: AiOutlineApi,
   },
   {
     path: ROUTES.STATE_ADMIN_OPERATOR_SYNC,
-    label: 'Operator Sync',
+    labelKey: 'sidebar.operatorSync',
     roles: [AUTH_ROLES.STATE_ADMIN],
     icon: BsPerson,
   },
   {
     path: ROUTES.STATE_ADMIN_ACTIVITY,
-    label: 'Activity',
+    labelKey: 'sidebar.activity',
     roles: [AUTH_ROLES.STATE_ADMIN],
     icon: BsListUl,
   },
 ]
 
 export function Sidebar() {
+  const { t } = useTranslation('common')
   const user = useAuthStore((state) => state.user)
   const logout = useAuthStore((state) => state.logout)
   const location = useLocation()
@@ -199,7 +201,7 @@ export function Sidebar() {
                   }}
                 >
                   {ItemIcon && <Icon as={ItemIcon} boxSize={5} flexShrink={0} />}
-                  <Text isTruncated>{item.label}</Text>
+                  <Text isTruncated>{t(item.labelKey)}</Text>
                 </Flex>
               </RouterLink>
             )
@@ -240,7 +242,7 @@ export function Sidebar() {
             </Flex>
           </MenuButton>
           <MenuList>
-            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            <MenuItem onClick={handleLogout}>{t('sidebar.logout')}</MenuItem>
           </MenuList>
         </Menu>
       </Flex>
