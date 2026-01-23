@@ -30,6 +30,7 @@ export function LanguageSwitcher() {
           as={Button}
           variant="ghost"
           size="sm"
+          aria-label="Change language"
           px={2}
           py={1}
           h="36px"

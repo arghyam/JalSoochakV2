@@ -55,7 +55,7 @@ export function IngestionMonitorPage() {
       isMounted = false
     }
     // Re-fetch when filters change
-  }, [stateFilter, timeFilter, retryKey, t])
+  }, [stateFilter, timeFilter, retryKey])
 
   const formatTimestamp = (date: Date): string => {
     let hours = date.getHours()
@@ -222,8 +222,8 @@ export function IngestionMonitorPage() {
               width="160px"
               fontSize="14px"
               textColor="neutral.400"
-              primaryColor="neutral.400"
               borderRadius="4px"
+              borderColor="neutral.400"
               height="32px"
             />
             <SearchableSelect
@@ -234,7 +234,7 @@ export function IngestionMonitorPage() {
               width="140px"
               fontSize="14px"
               textColor="neutral.400"
-              primaryColor="neutral.400"
+              borderColor="neutral.400"
               borderRadius="4px"
               height="32px"
             />
@@ -330,7 +330,7 @@ export function IngestionMonitorPage() {
               options={STATUS_FILTER_OPTIONS}
               value={statusFilter}
               onChange={setStatusFilter}
-              placeholder={t('common:status')}
+              placeholder={t('common:statusLabel')}
               width="120px"
               fontSize="13px"
               height="32px"

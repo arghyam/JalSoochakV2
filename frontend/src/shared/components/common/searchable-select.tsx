@@ -30,7 +30,7 @@ export interface SearchableSelectProps {
   borderColor?: string
   textStyle?: string
   required?: boolean
-  primaryColor?: string
+  isFilter?: boolean
 }
 
 export function SearchableSelect({
@@ -44,10 +44,10 @@ export function SearchableSelect({
   textColor,
   height = '36px',
   borderRadius = '6px',
-  borderColor = 'neutral.400',
+  borderColor = 'neutral.300',
   textStyle = 'h10',
   required = false,
-  primaryColor = 'primary.500',
+  isFilter = false,
 }: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -85,8 +85,12 @@ export function SearchableSelect({
     }
   }
 
-  const displayColor = selectedOption ? primaryColor : textColor || 'neutral.500'
-  const displayBorderColor = selectedOption ? primaryColor : borderColor
+  const displayColor = isFilter
+    ? selectedOption
+      ? 'primary.500'
+      : textColor || 'neutral.500'
+    : textColor || (selectedOption ? 'neutral.950' : 'neutral.500')
+  const displayBorderColor = isFilter ? (selectedOption ? 'primary.500' : borderColor) : borderColor
 
   return (
     <Box position="relative" ref={containerRef} w={width}>
@@ -123,9 +127,10 @@ export function SearchableSelect({
       >
         <Text
           fontSize={fontSize}
+          // color={textColor || (selectedOption ? 'neutral.950' : 'neutral.500')}
           color={displayColor}
           textStyle={textStyle}
-          fontWeight="600"
+          fontWeight={isFilter ? 'semibold' : '400'}
           noOfLines={1}
         >
           {selectedOption ? (

@@ -4,7 +4,7 @@
   "search": "खोजें",
   "select": "चुनें",
   "enter": "दर्ज करें",
-  "status": "स्थिति",
+  "statusLabel": "स्थिति",
   "actions": "कार्रवाई",
   "filters": "फ़िल्टर",
   "retry": "पुनः प्रयास करें",

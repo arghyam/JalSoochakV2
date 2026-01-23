@@ -4,7 +4,7 @@
   "search": "Search",
   "select": "Select",
   "enter": "Enter",
-  "status": "Status",
+  "statusLabel": "Status",
   "actions": "Actions",
   "filters": "Filters",
   "retry": "Retry",
