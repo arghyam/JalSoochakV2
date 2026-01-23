@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import { useToken } from '@chakra-ui/react'
 import * as echarts from 'echarts'
 import { EChartsWrapper } from './echarts-wrapper'
 import type { DemandSupplyData } from '../../types'
@@ -11,7 +10,6 @@ interface DemandSupplyChartProps {
 }
 
 export function DemandSupplyChart({ data, className, height = '400px' }: DemandSupplyChartProps) {
-  const [titleColor] = useToken('colors', ['neutral.950'])
   const option = useMemo<echarts.EChartsOption>(() => {
     const periods = data.map((d) => d.period)
     const demand = data.map((d) => d.demand)
@@ -84,7 +82,7 @@ export function DemandSupplyChart({ data, className, height = '400px' }: DemandS
         },
       ],
     }
-  }, [data, titleColor])
+  }, [data])
 
   return <EChartsWrapper option={option} className={className} height={height} />
 }
