@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import { useTheme, useToken } from '@chakra-ui/react'
 import * as echarts from 'echarts'
 import { EChartsWrapper } from './echarts-wrapper'
 import type { EntityPerformance } from '../../types'
@@ -17,30 +16,6 @@ export function AllStatesPerformanceChart({
   height = '400px',
   maxItems = 5,
 }: AllStatesPerformanceChartProps) {
-  const theme = useTheme()
-  const bodyText7 = theme.textStyles?.bodyText7 as
-    | {
-        fontSize?: string | number
-        lineHeight?: string | number
-        fontWeight?: string | number
-        color?: string
-      }
-    | undefined
-  const bodyTextColorToken =
-    bodyText7?.color && bodyText7.color.includes('.') ? bodyText7.color : 'neutral.500'
-  const [quantityColor, regularityColor] = useToken('colors', ['primary.500', 'primary.200'])
-  const [bodyTextColor] = useToken('colors', [bodyTextColorToken])
-  const labelColor =
-    bodyText7?.color && !bodyText7.color.includes('.') ? bodyText7.color : bodyTextColor
-  const labelFontSize =
-    typeof bodyText7?.fontSize === 'string'
-      ? Number.parseInt(bodyText7.fontSize, 10)
-      : bodyText7?.fontSize
-  const labelLineHeight =
-    typeof bodyText7?.lineHeight === 'string'
-      ? Number.parseInt(bodyText7.lineHeight, 10)
-      : bodyText7?.lineHeight
-  const labelFontWeight = bodyText7?.fontWeight ?? 400
   const option = useMemo<echarts.EChartsOption>(() => {
     const sortedData = [...data].sort((a, b) => b.quantity - a.quantity).slice(0, maxItems)
     const entities = sortedData.map((d) => d.name)
@@ -76,11 +51,10 @@ export function AllStatesPerformanceChart({
           bottom: 36,
           style: {
             text: 'States/UTs',
-            fill: labelColor,
-            fontSize: labelFontSize,
-            fontWeight: labelFontWeight,
-            fontFamily: theme.fonts?.body,
-            lineHeight: labelLineHeight,
+            fill: '#70707B',
+            fontSize: 12,
+            fontWeight: 400,
+            lineHeight: 18,
           },
         },
       ],
@@ -116,7 +90,7 @@ export function AllStatesPerformanceChart({
           data: quantity,
           barWidth: 34,
           itemStyle: {
-            color: quantityColor,
+            color: '#3291D1',
             borderRadius: [4, 4, 0, 0],
           },
         },
@@ -127,23 +101,13 @@ export function AllStatesPerformanceChart({
           barWidth: 34,
           barGap: '30%',
           itemStyle: {
-            color: regularityColor,
+            color: '#ADD3ED',
             borderRadius: [4, 4, 0, 0],
           },
         },
       ],
     }
-  }, [
-    data,
-    maxItems,
-    quantityColor,
-    regularityColor,
-    labelColor,
-    labelFontSize,
-    labelFontWeight,
-    labelLineHeight,
-    theme.fonts?.body,
-  ])
+  }, [data, maxItems])
 
   return <EChartsWrapper option={option} className={className} height={height} />
 }
