@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Box, Text, Button, Flex, HStack, Grid } from '@chakra-ui/react'
+import { useTranslation } from 'react-i18next'
 import {
   getMockSystemRulesConfiguration,
   saveMockSystemRulesConfiguration,
@@ -15,6 +16,7 @@ import { useToast } from '@/shared/hooks/use-toast'
 import { ToastContainer, SearchableSelect } from '@/shared/components/common'
 
 export function SystemRulesPage() {
+  const { t } = useTranslation(['super-admin', 'common'])
   const [config, setConfig] = useState<SystemRulesConfiguration | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -42,7 +44,7 @@ export function SystemRulesPage() {
       setRegularity(data.regularity)
     } catch (error) {
       console.error('Failed to fetch system rules configuration:', error)
-      toast.addToast('Failed to load configuration', 'error')
+      toast.addToast(t('common:toast.failedToLoad'), 'error')
     } finally {
       setIsLoading(false)
     }
@@ -59,7 +61,7 @@ export function SystemRulesPage() {
 
   const handleSave = async () => {
     if (!coverage || !continuity || !quantity || !regularity) {
-      toast.addToast('Please fill all required fields', 'error')
+      toast.addToast(t('common:toast.fillAllFields'), 'error')
       return
     }
 
@@ -73,10 +75,10 @@ export function SystemRulesPage() {
         isConfigured: true,
       })
       setConfig(savedConfig)
-      toast.addToast('Changes saved successfully', 'success')
+      toast.addToast(t('common:toast.changesSaved'), 'success')
     } catch (error) {
       console.error('Failed to save system rules configuration:', error)
-      toast.addToast('Failed to save changes', 'error')
+      toast.addToast(t('common:toast.failedToSave'), 'error')
     } finally {
       setIsSaving(false)
     }
@@ -94,8 +96,8 @@ export function SystemRulesPage() {
   if (isLoading) {
     return (
       <Box w="full">
-        <Text textStyle="h5">System Rules</Text>
-        <Text color="neutral.600">Loading...</Text>
+        <Text textStyle="h5">{t('systemRules.title')}</Text>
+        <Text color="neutral.600">{t('common:loading')}</Text>
       </Box>
     )
   }
@@ -104,7 +106,7 @@ export function SystemRulesPage() {
     <Box w="full">
       {/* Page Header */}
       <Box mb={5}>
-        <Text textStyle="h5">System Rules</Text>
+        <Text textStyle="h5">{t('systemRules.title')}</Text>
       </Box>
 
       {/* Configuration Card */}
@@ -127,7 +129,7 @@ export function SystemRulesPage() {
         >
           <Flex direction="column" gap={4}>
             {/* Card Header */}
-            <Text textStyle="h8">Configuration Settings</Text>
+            <Text textStyle="h8">{t('systemRules.configurationSettings')}</Text>
 
             {/* Form Fields Grid - 2x2 Layout */}
             <Grid templateColumns="repeat(2, 1fr)" gap={7}>
@@ -141,17 +143,16 @@ export function SystemRulesPage() {
                 px={4}
               >
                 <Text textStyle="h8" mb={1}>
-                  Coverage
+                  {t('systemRules.coverage.title')}
                 </Text>
                 <Text fontSize="14px" mb={4}>
-                  Minimum percentage of households that must have Functional Household Tap
-                  Connections (FHTC) to avoid a coverage alert.
+                  {t('systemRules.coverage.description')}
                 </Text>
                 <SearchableSelect
                   options={COVERAGE_OPTIONS}
                   value={coverage}
                   onChange={setCoverage}
-                  placeholder="Select"
+                  placeholder={t('common:select')}
                   width="100%"
                 />
               </Box>
@@ -166,17 +167,16 @@ export function SystemRulesPage() {
                 px={4}
               >
                 <Text textStyle="h8" mb={1}>
-                  Continuity
+                  {t('systemRules.continuity.title')}
                 </Text>
                 <Text fontSize="14px" mb={4}>
-                  Maximum number of consecutive days for which water supply data is missing or no
-                  supply is recorded before a continuity alert is triggered.
+                  {t('systemRules.continuity.description')}
                 </Text>
                 <SearchableSelect
                   options={CONTINUITY_OPTIONS}
                   value={continuity}
                   onChange={setContinuity}
-                  placeholder="Select"
+                  placeholder={t('common:select')}
                   width="100%"
                 />
               </Box>
@@ -191,17 +191,16 @@ export function SystemRulesPage() {
                 px={4}
               >
                 <Text textStyle="h8" mb={1}>
-                  Quantity (per capita)
+                  {t('systemRules.quantity.title')}
                 </Text>
                 <Text fontSize="14px" mb={4}>
-                  Minimum per capita water supply (in LPCD) required per day. If the average
-                  supplied quantity falls below this value, a quantity alert will be triggered
+                  {t('systemRules.quantity.description')}
                 </Text>
                 <SearchableSelect
                   options={QUANTITY_OPTIONS}
                   value={quantity}
                   onChange={setQuantity}
-                  placeholder="Select"
+                  placeholder={t('common:select')}
                   width="100%"
                 />
               </Box>
@@ -216,17 +215,16 @@ export function SystemRulesPage() {
                 px={4}
               >
                 <Text textStyle="h8" mb={1}>
-                  Regularity Threshold
+                  {t('systemRules.regularity.title')}
                 </Text>
                 <Text fontSize="14px" mb={4}>
-                  Minimum percentage of days water must be supplied during the selected period to
-                  avoid a regularity alert.
+                  {t('systemRules.regularity.description')}
                 </Text>
                 <SearchableSelect
                   options={REGULARITY_OPTIONS}
                   value={regularity}
                   onChange={setRegularity}
-                  placeholder="Select"
+                  placeholder={t('common:select')}
                   width="100%"
                 />
               </Box>
@@ -242,7 +240,7 @@ export function SystemRulesPage() {
               onClick={handleCancel}
               isDisabled={isSaving || !hasChanges}
             >
-              Cancel
+              {t('common:button.cancel')}
             </Button>
             <Button
               variant="primary"
@@ -252,7 +250,7 @@ export function SystemRulesPage() {
               isLoading={isSaving}
               isDisabled={!isFormValid || !hasChanges}
             >
-              Save
+              {t('common:button.save')}
             </Button>
           </HStack>
         </Flex>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Box, Text, Button, Flex, HStack } from '@chakra-ui/react'
+import { useTranslation } from 'react-i18next'
 import { EditIcon } from '@chakra-ui/icons'
 import {
   getMockLanguageConfiguration,
@@ -11,6 +12,7 @@ import { useToast } from '@/shared/hooks/use-toast'
 import { ToastContainer, SearchableSelect } from '@/shared/components/common'
 
 export function LanguagePage() {
+  const { t } = useTranslation(['state-admin', 'common'])
   const [config, setConfig] = useState<LanguageConfiguration | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
@@ -63,10 +65,10 @@ export function LanguagePage() {
       })
       setConfig(savedConfig)
       setIsEditing(false)
-      toast.addToast('Changes saved', 'success')
+      toast.addToast(t('common:toast.changesSavedShort'), 'success')
     } catch (error) {
       console.error('Failed to save language configuration:', error)
-      toast.addToast('Failed to save changes', 'error')
+      toast.addToast(t('common:toast.failedToSave'), 'error')
     } finally {
       setIsSaving(false)
     }
@@ -87,9 +89,9 @@ export function LanguagePage() {
     return (
       <Box w="full">
         <Text fontSize="2xl" fontWeight="semibold" color="neutral.950" mb={6}>
-          Language
+          {t('language.title')}
         </Text>
-        <Text color="neutral.600">Loading...</Text>
+        <Text color="neutral.600">{t('common:loading')}</Text>
       </Box>
     )
   }
@@ -98,7 +100,7 @@ export function LanguagePage() {
     <Box w="full">
       {/* Page Header */}
       <Box mb={5}>
-        <Text textStyle="h5">Language</Text>
+        <Text textStyle="h5">{t('language.title')}</Text>
       </Box>
 
       {/* Language Configuration Card */}
@@ -115,7 +117,7 @@ export function LanguagePage() {
         <Flex direction="column" w="full" h="full" justify="space-between">
           {/* Card Header */}
           <Flex justify="space-between" align="center" mb={4}>
-            <Text textStyle="h8">Language Configuration</Text>
+            <Text textStyle="h8">{t('language.configuration')}</Text>
             {config?.isConfigured && !isEditing && (
               <Button
                 variant="ghost"
@@ -127,7 +129,7 @@ export function LanguagePage() {
                 onClick={handleEdit}
                 color="neutral.950"
                 _hover={{ bg: 'primary.50', color: 'primary.500' }}
-                aria-label="Edit language configuration"
+                aria-label={t('language.aria.editConfiguration')}
               >
                 <EditIcon h={5} w={5} />
               </Button>
@@ -140,7 +142,7 @@ export function LanguagePage() {
               <Flex gap={6} mb={4} justify="space-between">
                 <Box w="486px" h="36px">
                   <Text fontSize="sm" fontWeight="medium" color="neutral.700" mb={1}>
-                    Primary Language
+                    {t('language.primaryLanguage')}
                   </Text>
                   <Text fontSize="md" color="neutral.950">
                     {getPrimaryLanguageLabel()}
@@ -148,7 +150,7 @@ export function LanguagePage() {
                 </Box>
                 <Box w="486px" h="36px">
                   <Text fontSize="sm" fontWeight="medium" color="neutral.700" mb={1}>
-                    Secondary Language (optional)
+                    {t('language.secondaryLanguage')}
                   </Text>
                   <Text fontSize="md" color="neutral.950">
                     {getSecondaryLanguageLabel() || '-'}
@@ -168,25 +170,25 @@ export function LanguagePage() {
               <Flex gap={6} justify="space-between">
                 <Box w="486px">
                   <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
-                    Primary Language*
+                    {t('language.primaryLanguage')}*
                   </Text>
                   <SearchableSelect
                     options={AVAILABLE_LANGUAGES}
                     value={primaryLanguage}
                     onChange={setPrimaryLanguage}
-                    placeholder="Select"
+                    placeholder={t('common:select')}
                     width="486px"
                   />
                 </Box>
                 <Box w="486px">
                   <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
-                    Secondary Language (optional)
+                    {t('language.secondaryLanguage')}
                   </Text>
                   <SearchableSelect
                     options={AVAILABLE_LANGUAGES}
                     value={secondaryLanguage}
                     onChange={setSecondaryLanguage}
-                    placeholder="Select"
+                    placeholder={t('common:select')}
                     width="486px"
                   />
                 </Box>
@@ -202,7 +204,7 @@ export function LanguagePage() {
                     onClick={handleCancel}
                     isDisabled={isSaving}
                   >
-                    Cancel
+                    {t('common:button.cancel')}
                   </Button>
                 )}
                 <Button
@@ -213,7 +215,7 @@ export function LanguagePage() {
                   isLoading={isSaving}
                   isDisabled={!primaryLanguage}
                 >
-                  {config?.isConfigured ? 'Save Changes' : 'Save'}
+                  {config?.isConfigured ? t('common:button.saveChanges') : t('common:button.save')}
                 </Button>
               </HStack>
             </Flex>

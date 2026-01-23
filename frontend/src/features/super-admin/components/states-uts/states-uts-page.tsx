@@ -10,6 +10,7 @@ import {
   Button,
   IconButton,
 } from '@chakra-ui/react'
+import { useTranslation } from 'react-i18next'
 import { SearchIcon, EditIcon } from '@chakra-ui/icons'
 import { FiEye } from 'react-icons/fi'
 import { DataTable, type DataTableColumn } from '@/shared/components/common'
@@ -18,6 +19,7 @@ import type { StateUT } from '../../types/states-uts'
 import { ROUTES } from '@/shared/constants/routes'
 
 export function StatesUTsPage() {
+  const { t } = useTranslation(['super-admin', 'common'])
   const navigate = useNavigate()
   const [states, setStates] = useState<StateUT[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -72,7 +74,7 @@ export function StatesUTsPage() {
   const columns: DataTableColumn<StateUT>[] = [
     {
       key: 'name',
-      header: 'State/UT',
+      header: t('statesUts.table.stateUt'),
       sortable: true,
       render: (row) => (
         <Text textStyle="h10" fontWeight="400">
@@ -82,7 +84,7 @@ export function StatesUTsPage() {
     },
     {
       key: 'status',
-      header: 'Status',
+      header: t('statesUts.table.status'),
       sortable: true,
       render: (row) => (
         <Box
@@ -97,13 +99,13 @@ export function StatesUTsPage() {
           bg={row.status === 'active' ? 'success.50' : 'error.50'}
           color={row.status === 'active' ? 'success.500' : 'error.500'}
         >
-          {row.status === 'active' ? 'Active' : 'Inactive'}
+          {row.status === 'active' ? t('common:status.active') : t('common:status.inactive')}
         </Box>
       ),
     },
     {
       key: 'lastSyncDate',
-      header: 'Last Sync Date',
+      header: t('statesUts.table.lastSyncDate'),
       sortable: true,
       render: (row) => (
         <Text textStyle="h10" fontWeight="400">
@@ -113,7 +115,7 @@ export function StatesUTsPage() {
     },
     {
       key: 'totalDistricts',
-      header: 'Total Districts',
+      header: t('statesUts.table.totalDistricts'),
       sortable: true,
       render: (row) => (
         <Text textStyle="h10" fontWeight="400">
@@ -123,11 +125,11 @@ export function StatesUTsPage() {
     },
     {
       key: 'actions',
-      header: 'Actions',
+      header: t('statesUts.table.actions'),
       render: (row) => (
         <Flex gap={1}>
           <IconButton
-            aria-label="View State/UT"
+            aria-label={t('statesUts.aria.viewStateUt')}
             icon={<FiEye />}
             variant="ghost"
             w={5}
@@ -137,7 +139,7 @@ export function StatesUTsPage() {
             _hover={{ color: 'primary.500', bg: 'transparent' }}
           />
           <IconButton
-            aria-label="Edit State/UT"
+            aria-label={t('statesUts.aria.editStateUt')}
             icon={<EditIcon />}
             variant="ghost"
             w={5}
@@ -155,7 +157,7 @@ export function StatesUTsPage() {
     <Box w="full">
       {/* Page Header */}
       <Box mb={5}>
-        <Text textStyle="h5">Manage States/UTs</Text>
+        <Text textStyle="h5">{t('statesUts.title')}</Text>
       </Box>
 
       {/* Search and Add Button */}
@@ -176,7 +178,7 @@ export function StatesUTsPage() {
             <SearchIcon color="neutral.300" />
           </InputLeftElement>
           <Input
-            placeholder="Search"
+            placeholder={t('common:search')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             bg="white"
@@ -188,7 +190,7 @@ export function StatesUTsPage() {
           />
         </InputGroup>
         <Button variant="secondary" size="sm" fontWeight="600" onClick={handleAddNew}>
-          + Add New State/UT
+          {t('statesUts.addNewStateUt')}
         </Button>
       </Flex>
 
@@ -197,7 +199,7 @@ export function StatesUTsPage() {
         columns={columns}
         data={filteredStates}
         getRowKey={(row) => row.id}
-        emptyMessage="No states/UTs found"
+        emptyMessage={t('statesUts.messages.noStatesFound')}
         isLoading={isLoading}
         pagination={{
           enabled: true,

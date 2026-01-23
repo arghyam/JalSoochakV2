@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Box, Flex, Grid, Text, Icon, Stack, Select } from '@chakra-ui/react'
+import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/app/store'
 import { getMockOverviewData } from '../../services/mock-data'
 import { LineChart } from '@/shared/components/charts/line-chart'
@@ -10,6 +11,7 @@ import { AiOutlineApi, AiOutlineWarning } from 'react-icons/ai'
 import { BiMessageDetail } from 'react-icons/bi'
 
 export function OverviewPage() {
+  const { t } = useTranslation(['state-admin', 'common'])
   const user = useAuthStore((state) => state.user)
   const [data, setData] = useState<OverviewData | null>(null)
 
@@ -20,48 +22,48 @@ export function OverviewPage() {
   if (!data) {
     return (
       <Flex h="64" align="center" justify="center">
-        <Text color="neutral.600">Loading...</Text>
+        <Text color="neutral.600">{t('common:loading')}</Text>
       </Flex>
     )
   }
 
   const statsCards = [
     {
-      title: 'Pump Operators Synced',
+      title: t('overview.stats.pumpOperatorsSynced'),
       value: data.stats.pumpOperatorsSynced.toLocaleString(),
-      subtitle: 'Out of 3000',
+      subtitle: t('overview.stats.outOf', { total: '3000' }),
       icon: BsPerson,
       iconBg: '#F1EEFF',
       iconColor: '#584C93',
     },
     {
-      title: 'Configuration Status',
+      title: t('overview.stats.configurationStatus'),
       value: data.stats.configurationStatus,
-      subtitle: 'All modules configured',
+      subtitle: t('overview.stats.allModulesConfigured'),
       icon: BsCheck2Circle,
       iconBg: '#E1FFEA',
       iconColor: '#079455',
     },
     {
-      title: "Today's API Ingestion",
+      title: t('overview.stats.todayApiIngestion'),
       value: data.stats.todayApiIngestion,
-      subtitle: 'Successfully ingested',
+      subtitle: t('overview.stats.successfullyIngested'),
       icon: AiOutlineApi,
       iconBg: '#EBF4FA',
       iconColor: '#3291D1',
     },
     {
-      title: 'Pending Data Sync',
+      title: t('overview.stats.pendingDataSync'),
       value: data.stats.pendingDataSync.toLocaleString(),
-      subtitle: 'Requires Attention',
+      subtitle: t('overview.stats.requiresAttention'),
       icon: AiOutlineWarning,
       iconBg: '#FFFBD7',
       iconColor: '#CA8A04',
     },
     {
-      title: 'Active Integrations',
+      title: t('overview.stats.activeIntegrations'),
       value: data.stats.activeIntegrations.toLocaleString(),
-      subtitle: 'WhatsApp, Glyphic',
+      subtitle: t('overview.stats.integrationNames'),
       icon: BiMessageDetail,
       iconBg: '#FBEAFF',
       iconColor: '#DC72F2',
@@ -72,7 +74,11 @@ export function OverviewPage() {
     <Box w="full">
       {/* Page Header */}
       <Box mb={5}>
-        <Text textStyle="h5">Overview of {user?.tenantId || 'State'}</Text>
+        <Text textStyle="h5">
+          {user?.tenantId
+            ? t('overview.title', { state: user.tenantId })
+            : t('overview.titleFallback')}
+        </Text>
       </Box>
 
       <Stack gap={6}>
@@ -123,7 +129,7 @@ export function OverviewPage() {
           px={4}
         >
           <Text textStyle="h8" mb={4}>
-            Demand vs Supply
+            {t('overview.charts.demandVsSupply')}
           </Text>
           <LineChart
             data={data.demandSupplyData}
@@ -147,7 +153,7 @@ export function OverviewPage() {
           px={4}
         >
           <Flex align="center" justify="space-between" mb={4}>
-            <Text textStyle="h8">Daily Ingestion Monitor</Text>
+            <Text textStyle="h8">{t('overview.charts.dailyIngestionMonitor')}</Text>
             <Select
               h="32px"
               maxW="162px"
@@ -173,7 +179,7 @@ export function OverviewPage() {
             yKey="count"
             color="#FFA100"
             height="326px"
-            legendLabel="Success Rate"
+            legendLabel={t('overview.charts.successRate')}
           />
         </Box>
       </Stack>
