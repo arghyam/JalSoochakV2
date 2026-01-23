@@ -98,6 +98,12 @@ public class PersonService {
 
     private static final String SUPER_ADMIN_ROLE = "super_user";
 
+    private static final String NAME_REGEX = "^[A-Za-z]+$";
+    private static final String FULL_NAME_REGEX = "^[A-Za-z]+(\\s[A-Za-z]+)*$";
+    private static final String PHONE_REGEX = "^[0-9]{10}$";
+
+
+
     public PersonService(KeycloakProvider keycloakProvider, PersonTypeMasterRepository personTypeMasterRepository,
                          PersonMasterRepository personMasterRepository, TenantMasterRepository tenantMasterRepository, PersonSchemeMappingRepository personSchemeMappingRepository, SchemeMasterRepository schemeMasterRepository, KeycloakClient keycloakClient) {
         this.keycloakProvider = keycloakProvider;
@@ -513,16 +519,38 @@ public class PersonService {
 
         Map<String, String> rowErrors = new HashMap<>();
 
-        if (firstName == null || firstName.isBlank()) rowErrors.put("first_name", "First Name is required");
-        if (lastName == null || lastName.isBlank()) rowErrors.put("last_name", "Last Name is required");
-        if (fullName == null || fullName.isBlank()) rowErrors.put("full_name", "Full Name is required");
+        if (firstName == null || firstName.isBlank()) {
+            rowErrors.put("first_name", "First name is required");
+        } else if (!firstName.matches(NAME_REGEX)) {
+            rowErrors.put("first_name", "First name must contain only letters");
+        }
+
+        if (lastName == null || lastName.isBlank()) {
+            rowErrors.put("last_name", "Last name is required");
+        } else if (!lastName.matches(NAME_REGEX)) {
+            rowErrors.put("last_name", "Last name must contain only letters");
+        }
+
+        if (fullName == null || fullName.isBlank()) {
+            rowErrors.put("full_name", "Full name is required");
+        } else if (!fullName.matches(FULL_NAME_REGEX)) {
+            rowErrors.put("full_name", "Full name must contain only letters and spaces");
+        }
+
         if (phoneNumber == null || phoneNumber.isBlank()) {
             rowErrors.put("phone_number", "Phone number is required");
+        } else if (!phoneNumber.matches(PHONE_REGEX)) {
+            rowErrors.put("phone_number", "Phone number must be exactly 10 digits");
         } else {
-            if (!phoneNumbers.add(phoneNumber)) rowErrors.put("phone_number", "Duplicate phone number in file");
-            if (personMasterRepository.existsByPhoneNumberAndTenantId(phoneNumber, tenantId))
+            if (!phoneNumbers.add(phoneNumber)) {
+                rowErrors.put("phone_number", "Duplicate phone number in file");
+            }
+            if (personMasterRepository.existsByPhoneNumberAndTenantId(phoneNumber, tenantId)) {
                 rowErrors.put("phone_number", "Phone number already exists in system");
+            }
         }
+
+
         if (personTypeTitle == null || personTypeTitle.isBlank())
             rowErrors.put("person_type", "person_type is required");
         else if (!ALLOWED_PERSON_TYPE.equalsIgnoreCase(personTypeTitle.trim()))
