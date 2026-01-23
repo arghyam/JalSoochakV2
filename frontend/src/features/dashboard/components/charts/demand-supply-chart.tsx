@@ -19,10 +19,7 @@ export function DemandSupplyChart({ data, className, height = '400px' }: DemandS
 
     return {
       tooltip: {
-        trigger: 'axis',
-        axisPointer: {
-          type: 'line',
-        },
+        show: false,
       },
       legend: {
         data: ['Demand', 'Supply'],

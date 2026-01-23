@@ -31,6 +31,7 @@ export function CentralDashboard() {
   const [selectedVillage, setSelectedVillage] = useState('')
   const [selectedDuration, setSelectedDuration] = useState('')
   const [selectedScheme, setSelectedScheme] = useState('')
+  const [performanceState, setPerformanceState] = useState('')
   const [filterTabIndex, setFilterTabIndex] = useState(0)
 
   const emptyOptions: SearchableSelectOption[] = []
@@ -466,13 +467,24 @@ export function CentralDashboard() {
               color="neutral.400"
               placeholder="Select"
               appearance="none"
+              value={performanceState}
+              onChange={(event) => setPerformanceState(event.target.value)}
               _focus={{
                 borderColor: 'primary.500',
                 boxShadow: 'none',
               }}
-            />
+            >
+              <option value="Punjab">Punjab</option>
+            </Select>
           </Flex>
-          <AllStatesPerformanceChart data={data.mapData} height="400px" />
+          <AllStatesPerformanceChart
+            data={
+              performanceState
+                ? data.mapData.filter((state) => state.name === performanceState).slice(0, 1)
+                : data.mapData
+            }
+            height="400px"
+          />
         </Box>
         <Box bg="white" borderWidth="1px" borderRadius="lg" p={4}>
           <Text textStyle="bodyText3" fontWeight="400" mb={2}>

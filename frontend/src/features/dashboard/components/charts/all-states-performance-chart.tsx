@@ -24,10 +24,7 @@ export function AllStatesPerformanceChart({
 
     return {
       tooltip: {
-        trigger: 'axis',
-        axisPointer: {
-          type: 'shadow',
-        },
+        show: false,
       },
       legend: {
         data: ['Quantity', 'Regularity'],
