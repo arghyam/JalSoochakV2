@@ -220,6 +220,8 @@ export function IngestionMonitorPage() {
               width="160px"
               fontSize="14px"
               textColor="neutral.400"
+              primaryColor="neutral.400"
+              borderRadius="4px"
               height="32px"
             />
             <SearchableSelect
@@ -230,6 +232,8 @@ export function IngestionMonitorPage() {
               width="140px"
               fontSize="14px"
               textColor="neutral.400"
+              primaryColor="neutral.400"
+              borderRadius="4px"
               height="32px"
             />
           </HStack>

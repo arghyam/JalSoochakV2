@@ -169,7 +169,8 @@ export function ThresholdsPage() {
                   Continuity
                 </Text>
                 <Text fontSize="14px" mb={4}>
-                  Maximum number of consecutive days with no data before triggering alert.
+                  Maximum number of consecutive days for which water supply data is missing or no
+                  supply is recorded before a continuity alert is triggered.
                 </Text>
                 <SearchableSelect
                   options={CONTINUITY_OPTIONS}
@@ -194,7 +195,8 @@ export function ThresholdsPage() {
                   Quantity (per capita)
                 </Text>
                 <Text fontSize="14px" mb={4}>
-                  Minimum water supply to avoid an alert.
+                  Minimum per capita water supply (in LPCD) required per day. If the average
+                  supplied quantity falls below this value, a quantity alert will be triggered
                 </Text>
                 <SearchableSelect
                   options={QUANTITY_OPTIONS}
@@ -219,7 +221,8 @@ export function ThresholdsPage() {
                   Regularity Threshold
                 </Text>
                 <Text fontSize="14px" mb={4}>
-                  Minimum percentage of expected data points per day to avoid an alert.
+                  Minimum percentage of days water must be supplied during the selected period to
+                  avoid a regularity alert.
                 </Text>
                 <SearchableSelect
                   options={REGULARITY_OPTIONS}
