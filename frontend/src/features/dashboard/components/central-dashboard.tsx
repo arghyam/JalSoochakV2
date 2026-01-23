@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Box, Flex, Text, Heading, Grid, Icon, Image } from '@chakra-ui/react'
+import { Box, Flex, Text, Heading, Grid, Icon, Image, Select } from '@chakra-ui/react'
 import { useDashboardData } from '../hooks/use-dashboard-data'
 import { KPICard } from './kpi-card'
-import { IndiaMapChart, DemandSupplyChart, BarChart } from './charts'
+import { IndiaMapChart, DemandSupplyChart, BarChart, AllStatesPerformanceChart } from './charts'
 import { PerformanceTable } from './tables'
 import { LoadingSpinner, SearchableSelect } from '@/shared/components/common'
 import { MdOutlineWaterDrop, MdArrowUpward, MdArrowDownward } from 'react-icons/md'
@@ -31,6 +31,7 @@ export function CentralDashboard() {
   const [selectedVillage, setSelectedVillage] = useState('')
   const [selectedDuration, setSelectedDuration] = useState('')
   const [selectedScheme, setSelectedScheme] = useState('')
+  const [performanceState, setPerformanceState] = useState('')
   const [filterTabIndex, setFilterTabIndex] = useState(0)
 
   const emptyOptions: SearchableSelectOption[] = []
@@ -447,10 +448,51 @@ export function CentralDashboard() {
         </Box>
       </Grid>
 
-      {/* Demand vs Supply Chart */}
-      <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} mb={6}>
-        <DemandSupplyChart data={data.demandSupply} height="400px" />
-      </Box>
+      {/* Performance + Demand vs Supply Charts */}
+      <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
+        <Box bg="white" borderWidth="1px" borderRadius="lg" p={4}>
+          <Flex align="center" justify="space-between">
+            <Text textStyle="bodyText3" fontWeight="400">
+              All States/UTs Performance
+            </Text>
+            <Select
+              h="32px"
+              maxW="120px"
+              fontSize="14px"
+              fontWeight="600"
+              borderRadius="4px"
+              borderColor="neutral.400"
+              borderWidth="1px"
+              bg="white"
+              color="neutral.400"
+              placeholder="Select"
+              appearance="none"
+              value={performanceState}
+              onChange={(event) => setPerformanceState(event.target.value)}
+              _focus={{
+                borderColor: 'primary.500',
+                boxShadow: 'none',
+              }}
+            >
+              <option value="Punjab">Punjab</option>
+            </Select>
+          </Flex>
+          <AllStatesPerformanceChart
+            data={
+              performanceState
+                ? data.mapData.filter((state) => state.name === performanceState).slice(0, 1)
+                : data.mapData
+            }
+            height="400px"
+          />
+        </Box>
+        <Box bg="white" borderWidth="1px" borderRadius="lg" p={4}>
+          <Text textStyle="bodyText3" fontWeight="400" mb={2}>
+            Demand vs Supply
+          </Text>
+          <DemandSupplyChart data={data.demandSupply} height="400px" />
+        </Box>
+      </Grid>
 
       {/* Performance Tables */}
       <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>

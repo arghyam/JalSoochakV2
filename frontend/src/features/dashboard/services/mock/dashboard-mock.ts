@@ -312,12 +312,12 @@ const mockStates: EntityPerformance[] = [
 
 // Mock demand-supply data for financial year
 const mockDemandSupply: DemandSupplyData[] = [
-  { period: '2023-24 Q1', demand: 55, supply: 52 },
-  { period: '2023-24 Q2', demand: 58, supply: 55 },
-  { period: '2023-24 Q3', demand: 60, supply: 57 },
-  { period: '2023-24 Q4', demand: 62, supply: 59 },
-  { period: '2024-25 Q1', demand: 64, supply: 61 },
-  { period: '2024-25 Q2', demand: 66, supply: 63 },
+  { period: 'FY20', demand: 67, supply: 60 },
+  { period: 'FY21', demand: 75, supply: 82 },
+  { period: 'FY22', demand: 110, supply: 99 },
+  { period: 'FY23', demand: 80, supply: 65 },
+  { period: 'FY24', demand: 23, supply: 15 },
+  { period: 'FY25', demand: 75, supply: 73 },
 ]
 
 // Mock KPI data for central dashboard
