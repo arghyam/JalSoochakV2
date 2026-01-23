@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Box, Flex, Grid, Text, Icon, Stack, Button } from '@chakra-ui/react'
+import { useTranslation } from 'react-i18next'
 import { getMockSuperAdminOverviewData } from '../../services/mock-data'
 import { BarLineChart } from '@/shared/components/charts/bar-line-chart'
 import type { SuperAdminOverviewData } from '../../types/overview'
@@ -10,6 +11,7 @@ import { IoCloseCircleOutline } from 'react-icons/io5'
 import { ROUTES } from '@/shared/constants/routes'
 
 export function OverviewPage() {
+  const { t } = useTranslation(['super-admin', 'common'])
   const navigate = useNavigate()
   const [data, setData] = useState<SuperAdminOverviewData | null>(null)
 
@@ -34,28 +36,28 @@ export function OverviewPage() {
   if (!data) {
     return (
       <Flex h="64" align="center" justify="center">
-        <Text color="neutral.600">Loading...</Text>
+        <Text color="neutral.600">{t('common:loading')}</Text>
       </Flex>
     )
   }
 
   const statsCards = [
     {
-      title: 'Total States/UTs Managed',
+      title: t('overview.stats.totalStatesManaged'),
       value: data.stats.totalStatesManaged,
       icon: MdOutlinePlace,
       iconBg: '#EBF4FA',
       iconColor: '#3291D1',
     },
     {
-      title: 'Active States/UTs',
+      title: t('overview.stats.activeStates'),
       value: data.stats.activeStates,
       icon: BsCheck2Circle,
       iconBg: '#E1FFEA',
       iconColor: '#079455',
     },
     {
-      title: 'Inactive States/UTs',
+      title: t('overview.stats.inactiveStates'),
       value: data.stats.inactiveStates,
       icon: IoCloseCircleOutline,
       iconBg: '#FEE4E2',
@@ -67,14 +69,14 @@ export function OverviewPage() {
     <Box w="full">
       {/* Page Header with Add Button */}
       <Flex justify="space-between" align="center" mb={5} h={12}>
-        <Text textStyle="h5">Overview</Text>
+        <Text textStyle="h5">{t('overview.title')}</Text>
         <Button
           variant="secondary"
           size="sm"
           fontWeight="600"
           onClick={() => navigate(ROUTES.SUPER_ADMIN_STATES_UTS_ADD)}
         >
-          + Add New State/UT
+          {t('overview.addNewStateUt')}
         </Button>
       </Flex>
 
@@ -126,7 +128,7 @@ export function OverviewPage() {
           px={4}
         >
           <Text textStyle="h8" mb={4}>
-            Ingestion Success Rate Over Time
+            {t('overview.charts.ingestionSuccessRate')}
           </Text>
           <BarLineChart
             data={data.ingestionData}
@@ -136,8 +138,8 @@ export function OverviewPage() {
             barColor="#3291D1"
             lineColor="#FFA100"
             height="400px"
-            barLegendLabel="Successful Ingestions"
-            lineLegendLabel="Failed Ingestions"
+            barLegendLabel={t('overview.charts.successfulIngestions')}
+            lineLegendLabel={t('overview.charts.failedIngestions')}
           />
         </Box>
 
@@ -152,7 +154,7 @@ export function OverviewPage() {
           px={4}
         >
           <Text textStyle="h8" mb={4}>
-            Notifications
+            {t('overview.notifications')}
           </Text>
           <Stack gap={4}>
             {data.notifications.map((notification) => (
