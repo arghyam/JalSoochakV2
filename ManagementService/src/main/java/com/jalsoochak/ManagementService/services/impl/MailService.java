@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class MailService {
+
     @Value("${mailjet.api-key}")
     private String apiKey;
 
@@ -25,8 +26,9 @@ public class MailService {
     @Value("${mailjet.from-name}")
     private String fromName;
 
-    public void sendInviteMail(String recipientEmail, String inviteLink){
+    public void sendInviteMail(String recipientEmail, String inviteLink) {
         try {
+
             MailjetClient client = new MailjetClient(apiKey, secretKey);
 
             JSONObject message = new JSONObject()
@@ -34,8 +36,7 @@ public class MailService {
                             .put("Email", fromEmail)
                             .put("Name", fromName))
                     .put("To", new JSONArray()
-                            .put(new JSONObject()
-                                    .put("Email", recipientEmail)))
+                            .put(new JSONObject().put("Email", recipientEmail)))
                     .put("Subject", "You're invited to join the platform")
                     .put("HTMLPart", """
                             <p>Hello,</p>
@@ -50,19 +51,29 @@ public class MailService {
                               </a>
                             </p>
                             <p>This link expires in 24 hours.</p>
-                            """.formatted(inviteLink));
+                            """.formatted(inviteLink))
+                    .put("TextPart", "Hello,\n\nYou have been invited to join the Jalsoochak platform.\n"
+                            + "Click the link to set your password: " + inviteLink + "\n\nThis link expires in 24 hours.");
 
             MailjetRequest request = new MailjetRequest(Emailv31.resource)
                     .property(Emailv31.MESSAGES, new JSONArray().put(message));
 
             MailjetResponse response = client.post(request);
 
-            log.info("Mailjet email sent successfully. Status: {}", response.getStatus());
+            log.info("Mailjet response status: {}", response.getStatus());
+            log.info("Mailjet response data: {}", response.getData());
 
-        } catch (Exception e){
-            log.error("Failed to send invite email", e);
-            throw new RuntimeException("Failed to send invite email");
+            JSONArray messages = response.getData();
+            if (messages.length() > 0) {
+                JSONObject firstMessage = messages.getJSONObject(0);
+                String emailStatus = firstMessage.optString("Status", "unknown");
+                if (!"success".equalsIgnoreCase(emailStatus)) {
+                    log.warn("Email may not have been delivered. Status: {}", emailStatus);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Failed to send invite email to {}", recipientEmail, e);
+            throw new RuntimeException("Failed to send invite email", e);
         }
     }
-
 }
