@@ -69,9 +69,12 @@ export function WaterSupplyOutagesChart({
         name: 'Districts',
         nameLocation: 'middle',
         nameGap: 64,
-        fontSize: 12,
-        lineHeight: 16,
-        fontWeight: 400,
+        nameTextStyle: {
+          fontSize: 12,
+          lineHeight: 16,
+          fontWeight: 400,
+          color: '#1C1C1C',
+        },
       },
       yAxis: {
         type: 'value',
