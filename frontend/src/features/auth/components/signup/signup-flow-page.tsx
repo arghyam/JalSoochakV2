@@ -22,7 +22,7 @@ export function SignupFlowPage({ initialStep = 'signup' }: SignupFlowPageProps) 
     setStep(initialStep)
   }, [initialStep])
 
-  const showLogo = step !== 'createPassword'
+  const showLogo = true
   const contentHeight = step === 'credentials' ? 'auto' : '360px'
 
   const renderStep = () => {
