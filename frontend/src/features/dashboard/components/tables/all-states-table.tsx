@@ -8,12 +8,14 @@ interface AllStatesTableProps {
 }
 
 export function AllStatesTable({ data, maxItems }: AllStatesTableProps) {
-  const rows = typeof maxItems === 'number' ? data.slice(0, maxItems) : data
+  const safeMaxItems =
+    typeof maxItems === 'number' && Number.isFinite(maxItems) ? Math.max(0, maxItems) : undefined
+  const rows = typeof safeMaxItems === 'number' ? data.slice(0, safeMaxItems) : data
 
   return (
     <Box borderRadius="lg" overflow="hidden">
       <Box
-        maxH="400px"
+        maxH="416px"
         overflowY="auto"
         pr={2}
         sx={{
@@ -85,7 +87,7 @@ export function AllStatesTable({ data, maxItems }: AllStatesTableProps) {
                 <Td>{state.coverage.toFixed(0)}%</Td>
                 <Td>{state.quantity}</Td>
                 <Td>{state.regularity.toFixed(0)}%</Td>
-                <Td>{state.compositeScore.toFixed(0)}</Td>
+                <Td>{state.compositeScore.toFixed(0)}%</Td>
               </Tr>
             ))}
           </Tbody>

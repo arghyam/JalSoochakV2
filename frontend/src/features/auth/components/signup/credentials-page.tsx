@@ -141,7 +141,7 @@ export function CredentialsPage() {
         _loading={{ bg: 'primary.500', color: 'white' }}
         onClick={() => {
           setIsSubmitting(true)
-          setTimeout(() => navigate(ROUTES.LOGIN), 400)
+          navigate(ROUTES.LOGIN)
         }}
       >
         Sign up

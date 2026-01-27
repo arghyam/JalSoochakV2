@@ -1,29 +1,40 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Box, Flex, Image } from '@chakra-ui/react'
 import jalsoochakLogo from '@/assets/media/jalsoochak-logo.svg'
 import { AuthSideImage } from '@/features/auth/components/signup/auth-side-image'
 import { SignupPage } from '@/features/auth/components/signup/signup-page'
 import { CreatePasswordPage } from '@/features/auth/components/signup/create-password-page'
 import { CredentialsPage } from '@/features/auth/components/signup/credentials-page'
+import { ROUTES } from '@/shared/constants/routes'
 
 type SignupStep = 'signup' | 'createPassword' | 'credentials'
 
-export function SignupFlowPage() {
-  const [step, setStep] = useState<SignupStep>('signup')
+type SignupFlowPageProps = {
+  initialStep?: SignupStep
+}
+
+export function SignupFlowPage({ initialStep = 'signup' }: SignupFlowPageProps) {
+  const [step, setStep] = useState<SignupStep>(initialStep)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    setStep(initialStep)
+  }, [initialStep])
 
   const showLogo = true
   const contentHeight = step === 'credentials' ? 'auto' : '360px'
 
   const renderStep = () => {
     if (step === 'createPassword') {
-      return <CreatePasswordPage onNext={() => setStep('credentials')} />
+      return <CreatePasswordPage onNext={() => navigate(ROUTES.CREDENTIALS)} />
     }
 
     if (step === 'credentials') {
       return <CredentialsPage />
     }
 
-    return <SignupPage onSuccess={() => setStep('createPassword')} />
+    return <SignupPage onSuccess={() => navigate(ROUTES.CREATE_PASSWORD)} />
   }
 
   return (
