@@ -455,7 +455,7 @@ export function CentralDashboard() {
 
       {/* Performance + Demand vs Supply Charts */}
       <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
-        <Box bg="white" borderWidth="1px" borderRadius="lg" p={4}>
+        <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
           <Flex align="center" justify="space-between">
             <Text textStyle="bodyText3" fontWeight="400">
               All States/UTs Performance
@@ -488,26 +488,26 @@ export function CentralDashboard() {
                 ? data.mapData.filter((state) => state.name === performanceState).slice(0, 1)
                 : data.mapData
             }
-            height="400px"
+            height="416px"
           />
         </Box>
-        <Box bg="white" borderWidth="1px" borderRadius="lg" p={4}>
+        <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
           <Text textStyle="bodyText3" fontWeight="400" mb={2}>
             Demand vs Supply
           </Text>
-          <DemandSupplyChart data={data.demandSupply} height="400px" />
+          <DemandSupplyChart data={data.demandSupply} height="418px" />
         </Box>
       </Grid>
 
       {/* All States + Submission Rate */}
       <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-        <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6}>
+        <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
           <Text textStyle="bodyText3" fontWeight="400" mb="16px">
             All States/UTs
           </Text>
           <AllStatesTable data={data.mapData} />
         </Box>
-        <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6}>
+        <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
           <Text textStyle="bodyText3" fontWeight="400" mb={2}>
             Supply Data Submission Rate
           </Text>

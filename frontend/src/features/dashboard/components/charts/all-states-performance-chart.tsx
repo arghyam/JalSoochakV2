@@ -13,7 +13,7 @@ interface AllStatesPerformanceChartProps {
 export function AllStatesPerformanceChart({
   data,
   className,
-  height = '400px',
+  height = '536px',
   maxItems = 5,
 }: AllStatesPerformanceChartProps) {
   const option = useMemo<echarts.EChartsOption>(() => {
