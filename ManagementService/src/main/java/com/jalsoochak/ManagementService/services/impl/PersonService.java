@@ -2,21 +2,14 @@ package com.jalsoochak.ManagementService.services.impl;
 
 import com.jalsoochak.ManagementService.clients.KeycloakClient;
 import com.jalsoochak.ManagementService.config.KeycloakProvider;
+import com.jalsoochak.ManagementService.models.app.request.AcceptInviteRequest;
 import com.jalsoochak.ManagementService.models.app.request.InviteRequest;
 import com.jalsoochak.ManagementService.models.app.request.LoginRequest;
 import com.jalsoochak.ManagementService.models.app.request.RegisterRequest;
 import com.jalsoochak.ManagementService.models.app.response.TokenResponse;
-import com.jalsoochak.ManagementService.models.entity.PersonMaster;
-import com.jalsoochak.ManagementService.models.entity.PersonSchemeMapping;
-import com.jalsoochak.ManagementService.models.entity.PersonTypeMaster;
-import com.jalsoochak.ManagementService.models.entity.SchemeMaster;
-import com.jalsoochak.ManagementService.models.entity.TenantMaster;
+import com.jalsoochak.ManagementService.models.entity.*;
 import com.jalsoochak.ManagementService.models.enums.KeycloakRole;
-import com.jalsoochak.ManagementService.repositories.PersonMasterRepository;
-import com.jalsoochak.ManagementService.repositories.PersonSchemeMappingRepository;
-import com.jalsoochak.ManagementService.repositories.PersonTypeMasterRepository;
-import com.jalsoochak.ManagementService.repositories.SchemeMasterRepository;
-import com.jalsoochak.ManagementService.repositories.TenantMasterRepository;
+import com.jalsoochak.ManagementService.repositories.*;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import jakarta.ws.rs.BadRequestException;
@@ -32,6 +25,7 @@ import org.keycloak.TokenVerifier;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.common.VerificationException;
 import org.keycloak.representations.AccessToken;
+import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.resource.UsersResource;
@@ -54,19 +48,17 @@ import java.math.BigDecimal;
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Slf4j
 @Service
 public class PersonService {
     @Value("${keycloak.realm}")
     public String realm;
+
+    @Value("${frontend.base-url}")
+    private String frontendBaseUrl;
 
     @Value("${keycloak.auth-server-url}")
     private String authServerUrl;
@@ -89,6 +81,8 @@ public class PersonService {
     private final KeycloakProvider keycloakProvider;
     private final PersonTypeMasterRepository personTypeMasterRepository;
     private final PersonMasterRepository personMasterRepository;
+    private final InviteTokenRepository inviteTokenRepository;
+    private final MailService mailService;
     private final TenantMasterRepository tenantMasterRepository;
     private final PersonSchemeMappingRepository personSchemeMappingRepository;
     private final SchemeMasterRepository schemeMasterRepository;
@@ -105,77 +99,79 @@ public class PersonService {
 
 
     public PersonService(KeycloakProvider keycloakProvider, PersonTypeMasterRepository personTypeMasterRepository,
-                         PersonMasterRepository personMasterRepository, TenantMasterRepository tenantMasterRepository, PersonSchemeMappingRepository personSchemeMappingRepository, SchemeMasterRepository schemeMasterRepository, KeycloakClient keycloakClient) {
+                         PersonMasterRepository personMasterRepository, TenantMasterRepository tenantMasterRepository,
+                         PersonSchemeMappingRepository personSchemeMappingRepository, SchemeMasterRepository schemeMasterRepository,
+                         KeycloakClient keycloakClient, InviteTokenRepository inviteTokenRepository, MailService mailService) {
         this.keycloakProvider = keycloakProvider;
         this.personTypeMasterRepository = personTypeMasterRepository;
         this.personMasterRepository = personMasterRepository;
         this.tenantMasterRepository = tenantMasterRepository;
         this.personSchemeMappingRepository = personSchemeMappingRepository;
         this.schemeMasterRepository = schemeMasterRepository;
+        this.inviteTokenRepository = inviteTokenRepository;
         this.keycloakClient = keycloakClient;
+        this.mailService = mailService;
     }
 
     public void inviteUser(InviteRequest inviteRequest) {
-        if (personMasterRepository.findByEmail(inviteRequest.getEmail()).isPresent()) {
-            throw new BadRequestException("Invitation already sent to this user");
-        }
-
-        UsersResource users = keycloakProvider.getAdminInstance()
-                .realm(realm)
-                .users();
-
-//        List<UserRepresentation> existingUsers = users.search(inviteRequest.getEmail());
-//
-//        log.info("existingUser: {}", existingUsers);
-//
-//        if (!existingUsers.isEmpty()) {
-//            throw new BadRequestException("User already exists in Keycloak");
-//        }
-
-        UserRepresentation user = new UserRepresentation();
-        user.setUsername(inviteRequest.getEmail());
-        user.setEmail(inviteRequest.getEmail());
-        user.setEnabled(true);
-        user.setEmailVerified(true);
-        user.setRequiredActions(List.of("UPDATE_PASSWORD", "VERIFY_EMAIL"));
-
 
         Response response = null;
-        String responseBody = "";
+
         try {
+            if (personMasterRepository.findByEmail(inviteRequest.getEmail()).isPresent()) {
+                throw new BadRequestException("Invitation already sent to this user");
+            }
+
+            UsersResource users = keycloakProvider.getAdminInstance()
+                    .realm(realm)
+                    .users();
+
+            UserRepresentation user = new UserRepresentation();
+            user.setUsername(inviteRequest.getEmail());
+            user.setEmail(inviteRequest.getEmail());
+            user.setEnabled(true);
+            user.setEmailVerified(false);
+            user.setRequiredActions(List.of("UPDATE_PASSWORD"));
+
             response = users.create(user);
-            int status = response.getStatus();
 
-            try {
-                responseBody = response.readEntity(String.class);
-            } catch (Exception e) {
-                log.warn("Unable to read response body from Keycloak", e);
+            if (response.getStatus() != 201) {
+                throw new RuntimeException("Failed to create user in Keycloak");
             }
 
-            log.debug("Keycloak create user response: status={}, body={}", status, responseBody);
-
-            if (status != 201) {
-                throw new RuntimeException(
-                        "Failed to create new user in Keycloak: status=" + status + ", body=" + responseBody
-                );
-            }
-
-            String userId = response.getLocation().getPath().replaceAll(".*/", "");
-
-            users.get(userId).executeActionsEmail(List.of("UPDATE_PASSWORD", "VERIFY_EMAIL"));
+            String keycloakUserId =
+                    response.getLocation().getPath().replaceAll(".*/", "");
 
             PersonMaster person = PersonMaster.builder()
                     .email(inviteRequest.getEmail())
+                    .keycloakUserId(keycloakUserId)
                     .build();
 
             personMasterRepository.save(person);
 
+            String token = UUID.randomUUID().toString();
+
+            InviteToken inviteToken = InviteToken.builder()
+                    .email(inviteRequest.getEmail())
+                    .token(token)
+                    .expiresAt(LocalDateTime.now().plusHours(24))
+                    .senderId(inviteRequest.getSenderId())
+                    .used(false)
+                    .build();
+
+            inviteTokenRepository.save(inviteToken);
+
+            String inviteLink = frontendBaseUrl + "/reset-password?token=" + token;
+            mailService.sendInviteMail(inviteRequest.getEmail(), inviteLink);
+
         } catch (RuntimeException e) {
             log.error("Error during user creation in Keycloak", e);
             throw e;
+
         } catch (Exception e) {
             log.error("Unexpected error during Keycloak user creation", e);
             throw new RuntimeException("Failed to invite user: " + e.getMessage(), e);
+
         } finally {
             if (response != null) {
                 response.close();
@@ -184,11 +180,57 @@ public class PersonService {
     }
 
     @Transactional
-    public void completeProfile(RegisterRequest registerRequest, String token) throws VerificationException {
-        String email = extractEmailFromToken(token);
+    public void acceptInvite(AcceptInviteRequest request) {
+        InviteToken invite = inviteTokenRepository.findByToken(request.getToken())
+                .orElseThrow(() -> new BadRequestException("Invalid invite token"));
+
+        if (invite.isUsed()) {
+            throw new BadRequestException("Invite already used");
+        }
+
+        if (invite.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new BadRequestException("Invite expired");
+        }
 
         PersonMaster person = personMasterRepository
-                .findByEmail(email)
+                .findByEmail(invite.getEmail())
+                .orElseThrow(() -> new BadRequestException("User not found"));
+
+        CredentialRepresentation credential = new CredentialRepresentation();
+        credential.setType(CredentialRepresentation.PASSWORD);
+        credential.setValue(request.getPassword());
+        credential.setTemporary(false);
+
+        keycloakProvider.getAdminInstance()
+                .realm(realm)
+                .users()
+                .get(person.getKeycloakUserId())
+                .resetPassword(credential);
+
+        inviteTokenRepository.save(invite);
+    }
+
+    @Transactional
+    public void completeProfile(RegisterRequest registerRequest, String token) throws VerificationException {
+        InviteToken inviteToken = inviteTokenRepository.findByToken(token)
+                .orElseThrow(() -> new VerificationException("Invalid invite token"));
+
+        Long senderId = inviteToken.getSenderId();
+
+        PersonMaster sender = personMasterRepository.findById(senderId)
+                .orElseThrow(() -> new BadRequestException("Sender not found with ID: " + senderId));
+
+        if (inviteToken.isUsed()) {
+            throw new VerificationException("Token has already been used");
+        }
+
+        if (inviteToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new VerificationException("Token has expired");
+        }
+
+        String email = inviteToken.getEmail();
+
+        PersonMaster person = personMasterRepository.findByEmail(email)
                 .orElseThrow(() -> new BadRequestException("User with email not found"));
 
         if (person.isProfileCompleted()) {
@@ -200,12 +242,8 @@ public class PersonService {
                     "Phone number already exists: " + registerRequest.getPhoneNumber());
         }
 
-        TenantMaster tenant = tenantMasterRepository.findByTenantName(registerRequest.getTenantId().toLowerCase())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Invalid tenant_id: " + registerRequest.getTenantId()));
 
-        PersonTypeMaster personType = personTypeMasterRepository
-                .findBycName(registerRequest.getPersonType())
+        PersonTypeMaster personType = personTypeMasterRepository.findBycName(registerRequest.getPersonType())
                 .orElseThrow(() -> new BadRequestException("Invalid person type"));
 
         person.setFirstName(registerRequest.getFirstName());
@@ -213,18 +251,24 @@ public class PersonService {
         person.setFullName(registerRequest.getFirstName() + " " + registerRequest.getLastName());
         person.setPhoneNumber(registerRequest.getPhoneNumber());
         person.setPersonType(personType);
-        person.setTenantId(tenant.getTenantName());
+        person.setTenantId(sender.getTenantId());
         person.setProfileCompleted(true);
 
         personMasterRepository.save(person);
 
-        String userId = getKeycloakUserIdByEmail(email);
+        String userId = person.getKeycloakUserId();
         try {
             assignRoleToUser(userId, KeycloakRole.STATE_ADMIN.getRoleName());
         } catch (Exception e) {
-            log.error("Failed to assign Keycloak role, rolling back DB profile", e);
+            log.error("Failed to assign Keycloak role, rolling back profile update", e);
             throw new RuntimeException("Role assignment failed, profile update rolled back", e);
         }
+
+        inviteToken.setUsed(true);
+        inviteTokenRepository.save(inviteToken);
+
+        log.info("Profile completed successfully for user: {}", email);
+
     }
 
     public TokenResponse login(LoginRequest loginRequest) {

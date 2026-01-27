@@ -56,6 +56,9 @@ public class PersonMaster {
     @Column(unique = true)
     private String email;
 
+    @Column(name = "keycloak_user_id", unique = true)
+    private String keycloakUserId;
+
     @Column(name = "tenant_id", length = 50)
     private String tenantId;
 

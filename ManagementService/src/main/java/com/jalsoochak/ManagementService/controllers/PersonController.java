@@ -1,9 +1,6 @@
 package com.jalsoochak.ManagementService.controllers;
 
-import com.jalsoochak.ManagementService.models.app.request.InviteRequest;
-import com.jalsoochak.ManagementService.models.app.request.LoginRequest;
-import com.jalsoochak.ManagementService.models.app.request.RegisterRequest;
-import com.jalsoochak.ManagementService.models.app.request.TokenRequest;
+import com.jalsoochak.ManagementService.models.app.request.*;
 import com.jalsoochak.ManagementService.models.app.response.TokenResponse;
 import com.jalsoochak.ManagementService.services.impl.PersonService;
 import com.jalsoochak.ManagementService.exceptions.BadRequestException;
@@ -55,6 +52,13 @@ public class PersonController {
 
         personService.inviteUser(inviteRequest);
         return ResponseEntity.ok("Invitation sent");
+    }
+
+    @PostMapping("/accept-invite")
+    public ResponseEntity<?> acceptInvite(
+            @RequestBody AcceptInviteRequest request){
+        personService.acceptInvite(request);
+        return ResponseEntity.ok("Password set successfully");
     }
 
     @PostMapping("/complete/profile")
