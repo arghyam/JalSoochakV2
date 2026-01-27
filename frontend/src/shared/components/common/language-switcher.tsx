@@ -13,7 +13,11 @@ import { IoGlobeOutline } from 'react-icons/io5'
 import { useLanguageStore } from '@/app/store'
 import type { LanguageCode } from '@/app/i18n'
 
-export function LanguageSwitcher() {
+interface LanguageSwitcherProps {
+  isMobileHeader?: boolean
+}
+
+export function LanguageSwitcher({ isMobileHeader = false }: LanguageSwitcherProps) {
   const { currentLanguage, setLanguage, getSupportedLanguages } = useLanguageStore()
   const supportedLanguages = getSupportedLanguages()
 
@@ -24,7 +28,12 @@ export function LanguageSwitcher() {
   }
 
   return (
-    <Box position="fixed" top={2} right={12} zIndex={50}>
+    <Box
+      position={isMobileHeader ? 'relative' : 'fixed'}
+      top={isMobileHeader ? 'auto' : 2}
+      right={isMobileHeader ? 'auto' : { base: 4, lg: 12 }}
+      zIndex={50}
+    >
       <Menu placement="bottom-end">
         <MenuButton
           as={Button}
