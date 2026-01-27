@@ -13,7 +13,7 @@ export function AllStatesTable({ data, maxItems }: AllStatesTableProps) {
   return (
     <Box borderRadius="lg" overflow="hidden">
       <Box
-        maxH="360px"
+        maxH="400px"
         overflowY="auto"
         pr={2}
         sx={{

@@ -11,7 +11,7 @@ type SignupStep = 'signup' | 'createPassword' | 'credentials'
 export function SignupFlowPage() {
   const [step, setStep] = useState<SignupStep>('signup')
 
-  const showLogo = step !== 'createPassword'
+  const showLogo = true
   const contentHeight = step === 'credentials' ? 'auto' : '360px'
 
   const renderStep = () => {
