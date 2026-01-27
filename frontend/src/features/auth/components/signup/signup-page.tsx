@@ -39,7 +39,7 @@ export function SignupPage({ onSuccess }: SignupPageProps) {
     }
 
     setIsSubmitting(true)
-    setTimeout(() => onSuccess(), 400)
+    onSuccess()
   }
 
   return (
