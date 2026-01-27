@@ -8,6 +8,8 @@ import {
   DemandSupplyChart,
   AllStatesPerformanceChart,
   SupplySubmissionRateChart,
+  ImageSubmissionStatusChart,
+  WaterSupplyOutagesChart,
 } from './charts'
 import { AllStatesTable } from './tables'
 import { LoadingSpinner, SearchableSelect } from '@/shared/components/common'
@@ -96,6 +98,8 @@ export function CentralDashboard() {
     !data.kpis ||
     !data.mapData ||
     !data.demandSupply ||
+    !data.imageSubmissionStatus ||
+    !data.waterSupplyOutages ||
     !data.topPerformers ||
     !data.worstPerformers ||
     !data.regularityData ||
@@ -450,6 +454,42 @@ export function CentralDashboard() {
               )
             })}
           </Flex>
+        </Box>
+      </Grid>
+
+      {/* Submission + Outages Charts */}
+      <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
+        <Box
+          bg="white"
+          borderWidth="0.5px"
+          borderRadius="12px"
+          borderColor="#E4E4E7"
+          pt="24px"
+          pb="24px"
+          pl="16px"
+          pr="16px"
+          h="523px"
+        >
+          <Text textStyle="bodyText3" fontWeight="400" mb="0px">
+            Image Submission Status
+          </Text>
+          <ImageSubmissionStatusChart data={data.imageSubmissionStatus} height="406px" />
+        </Box>
+        <Box
+          bg="white"
+          borderWidth="0.5px"
+          borderRadius="12px"
+          borderColor="#E4E4E7"
+          pt="24px"
+          pb="24px"
+          pl="16px"
+          pr="16px"
+          h="523px"
+        >
+          <Text textStyle="bodyText3" fontWeight="400" mb={2}>
+            Water Supply Outages
+          </Text>
+          <WaterSupplyOutagesChart data={data.waterSupplyOutages} height="400px" />
         </Box>
       </Grid>
 

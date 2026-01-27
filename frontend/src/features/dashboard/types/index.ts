@@ -35,6 +35,20 @@ export interface DemandSupplyData {
   supply: number
 }
 
+export interface ImageSubmissionStatusData {
+  label: string
+  value: number
+}
+
+export interface WaterSupplyOutageData {
+  district: string
+  electricityFailure: number
+  pipelineLeak: number
+  pumpFailure: number
+  valveIssue: number
+  sourceDrying: number
+}
+
 export interface DashboardData {
   level: DashboardLevel
   entityId?: string
@@ -42,6 +56,8 @@ export interface DashboardData {
   kpis: KPIData
   mapData: EntityPerformance[]
   demandSupply: DemandSupplyData[]
+  imageSubmissionStatus: ImageSubmissionStatusData[]
+  waterSupplyOutages: WaterSupplyOutageData[]
   topPerformers: EntityPerformance[]
   worstPerformers: EntityPerformance[]
   regularityData: EntityPerformance[]

@@ -320,6 +320,54 @@ const mockDemandSupply: DemandSupplyData[] = [
   { period: 'FY25', demand: 75, supply: 73 },
 ]
 
+const mockImageSubmissionStatus = [
+  { label: 'Complaint Submission', value: 64 },
+  { label: 'Automated Submission', value: 36 },
+]
+
+const mockWaterSupplyOutages = [
+  {
+    district: 'Anand',
+    electricityFailure: 10,
+    pipelineLeak: 18,
+    pumpFailure: 14,
+    valveIssue: 22,
+    sourceDrying: 26,
+  },
+  {
+    district: 'Dahod',
+    electricityFailure: 12,
+    pipelineLeak: 16,
+    pumpFailure: 18,
+    valveIssue: 20,
+    sourceDrying: 22,
+  },
+  {
+    district: 'Bharuch',
+    electricityFailure: 20,
+    pipelineLeak: 14,
+    pumpFailure: 12,
+    valveIssue: 18,
+    sourceDrying: 26,
+  },
+  {
+    district: 'Patan',
+    electricityFailure: 14,
+    pipelineLeak: 12,
+    pumpFailure: 22,
+    valveIssue: 16,
+    sourceDrying: 20,
+  },
+  {
+    district: 'Vadodara',
+    electricityFailure: 18,
+    pipelineLeak: 20,
+    pumpFailure: 16,
+    valveIssue: 14,
+    sourceDrying: 12,
+  },
+]
+
 // Mock KPI data for central dashboard
 const mockCentralKPIs: KPIData = {
   totalSchemes: 650000,
@@ -345,6 +393,8 @@ export const dashboardMockService = {
         kpis: mockCentralKPIs,
         mapData: mockStates,
         demandSupply: mockDemandSupply,
+        imageSubmissionStatus: mockImageSubmissionStatus,
+        waterSupplyOutages: mockWaterSupplyOutages,
         topPerformers: sortedStates.slice(0, 5),
         worstPerformers: sortedStates.slice(-5).reverse(),
         regularityData: mockStates,
@@ -359,6 +409,8 @@ export const dashboardMockService = {
       kpis: mockCentralKPIs,
       mapData: [],
       demandSupply: mockDemandSupply,
+      imageSubmissionStatus: mockImageSubmissionStatus,
+      waterSupplyOutages: mockWaterSupplyOutages,
       topPerformers: [],
       worstPerformers: [],
       regularityData: [],
