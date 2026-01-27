@@ -26,5 +26,7 @@ export const ROUTES = {
   LOGIN: '/login',
   LOGOUT: '/logout',
   SIGNUP: '/signup',
+  CREATE_PASSWORD: '/createpassword',
+  CREDENTIALS: '/credentials',
   RESET_PASSWORD: '/resetpassword',
 } as const
