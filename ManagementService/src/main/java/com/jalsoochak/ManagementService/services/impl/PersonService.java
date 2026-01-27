@@ -83,7 +83,6 @@ public class PersonService {
     private final PersonMasterRepository personMasterRepository;
     private final InviteTokenRepository inviteTokenRepository;
     private final MailService mailService;
-    private final TenantMasterRepository tenantMasterRepository;
     private final PersonSchemeMappingRepository personSchemeMappingRepository;
     private final SchemeMasterRepository schemeMasterRepository;
     private final KeycloakClient keycloakClient;
@@ -99,13 +98,12 @@ public class PersonService {
 
 
     public PersonService(KeycloakProvider keycloakProvider, PersonTypeMasterRepository personTypeMasterRepository,
-                         PersonMasterRepository personMasterRepository, TenantMasterRepository tenantMasterRepository,
+                         PersonMasterRepository personMasterRepository,
                          PersonSchemeMappingRepository personSchemeMappingRepository, SchemeMasterRepository schemeMasterRepository,
                          KeycloakClient keycloakClient, InviteTokenRepository inviteTokenRepository, MailService mailService) {
         this.keycloakProvider = keycloakProvider;
         this.personTypeMasterRepository = personTypeMasterRepository;
         this.personMasterRepository = personMasterRepository;
-        this.tenantMasterRepository = tenantMasterRepository;
         this.personSchemeMappingRepository = personSchemeMappingRepository;
         this.schemeMasterRepository = schemeMasterRepository;
         this.inviteTokenRepository = inviteTokenRepository;
