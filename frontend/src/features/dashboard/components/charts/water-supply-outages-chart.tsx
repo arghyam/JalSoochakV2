@@ -95,6 +95,7 @@ export function WaterSupplyOutagesChart({
           barWidth: 66,
           itemStyle: {
             color: outageColors.sourceDrying,
+            borderRadius: [0, 0, 12, 12],
           },
         },
         {
@@ -135,6 +136,7 @@ export function WaterSupplyOutagesChart({
           barWidth: 66,
           itemStyle: {
             color: outageColors.electricityFailure,
+            borderRadius: [12, 12, 0, 0],
           },
         },
       ],

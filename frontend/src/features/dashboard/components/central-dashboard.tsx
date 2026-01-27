@@ -40,6 +40,7 @@ export function CentralDashboard() {
   const [selectedScheme, setSelectedScheme] = useState('')
   const [performanceState, setPerformanceState] = useState('')
   const [filterTabIndex, setFilterTabIndex] = useState(0)
+  const isStateSelected = Boolean(selectedState)
 
   const emptyOptions: SearchableSelectOption[] = []
   const isAdvancedEnabled = Boolean(selectedState && selectedDistrict)
@@ -458,40 +459,42 @@ export function CentralDashboard() {
       </Grid>
 
       {/* Submission + Outages Charts */}
-      <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
-        <Box
-          bg="white"
-          borderWidth="0.5px"
-          borderRadius="12px"
-          borderColor="#E4E4E7"
-          pt="24px"
-          pb="24px"
-          pl="16px"
-          pr="16px"
-          h="523px"
-        >
-          <Text textStyle="bodyText3" fontWeight="400" mb="0px">
-            Image Submission Status
-          </Text>
-          <ImageSubmissionStatusChart data={data.imageSubmissionStatus} height="406px" />
-        </Box>
-        <Box
-          bg="white"
-          borderWidth="0.5px"
-          borderRadius="12px"
-          borderColor="#E4E4E7"
-          pt="24px"
-          pb="24px"
-          pl="16px"
-          pr="16px"
-          h="523px"
-        >
-          <Text textStyle="bodyText3" fontWeight="400" mb={2}>
-            Water Supply Outages
-          </Text>
-          <WaterSupplyOutagesChart data={data.waterSupplyOutages} height="400px" />
-        </Box>
-      </Grid>
+      {isStateSelected ? (
+        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
+          <Box
+            bg="white"
+            borderWidth="0.5px"
+            borderRadius="12px"
+            borderColor="#E4E4E7"
+            pt="24px"
+            pb="24px"
+            pl="16px"
+            pr="16px"
+            h="523px"
+          >
+            <Text textStyle="bodyText3" fontWeight="400" mb="0px">
+              Image Submission Status
+            </Text>
+            <ImageSubmissionStatusChart data={data.imageSubmissionStatus} height="406px" />
+          </Box>
+          <Box
+            bg="white"
+            borderWidth="0.5px"
+            borderRadius="12px"
+            borderColor="#E4E4E7"
+            pt="24px"
+            pb="24px"
+            pl="16px"
+            pr="16px"
+            h="523px"
+          >
+            <Text textStyle="bodyText3" fontWeight="400" mb={2}>
+              Water Supply Outages
+            </Text>
+            <WaterSupplyOutagesChart data={data.waterSupplyOutages} height="400px" />
+          </Box>
+        </Grid>
+      ) : null}
 
       {/* Performance + Demand vs Supply Charts */}
       <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
