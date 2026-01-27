@@ -370,31 +370,6 @@ public class PersonService {
         }
     }
 
-    private String extractEmailFromToken(String token) throws VerificationException {
-        String publicKeyPemClean = publicKeyPem
-                .replace("-----BEGIN PUBLIC KEY-----", "")
-                .replace("-----END PUBLIC KEY-----", "")
-                .replaceAll("\\s+", "");
-
-        byte[] decoded = Base64.getDecoder().decode(publicKeyPemClean);
-        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decoded);
-        RSAPublicKey publicKey;
-        try {
-            KeyFactory kf = KeyFactory.getInstance("RSA");
-            publicKey = (RSAPublicKey) kf.generatePublic(keySpec);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to parse Keycloak public key", e);
-        }
-
-        AccessToken accessToken = TokenVerifier.create(token, AccessToken.class)
-                .publicKey(publicKey)
-                .withDefaultChecks()
-                .verify()
-                .getToken();
-
-        return accessToken.getEmail();
-    }
-
     private void assignRoleToUser(String userId, String roleName){
         RealmResource realmResource =
                 keycloakProvider.getAdminInstance()
@@ -411,20 +386,6 @@ public class PersonService {
                 .add(List.of(role));
 
         log.debug("Assigned role '{}' to Keycloak user with id '{}'", roleName, userId);
-    }
-
-    private String getKeycloakUserIdByEmail(String email) {
-        UsersResource users = keycloakProvider.getAdminInstance()
-                .realm(realm)
-                .users();
-
-        List<UserRepresentation> results = users.search(email, true);
-
-        if (results.isEmpty()) {
-            throw new RuntimeException("Keycloak user not found for email: " + email);
-        }
-
-        return results.get(0).getId();
     }
 
     @Transactional
