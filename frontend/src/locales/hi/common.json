@@ -54,7 +54,12 @@
     "apiIngestion": "API अंतर्ग्रहण",
     "operatorSync": "ऑपरेटर सिंक",
     "activity": "गतिविधि",
-    "logout": "लॉगआउट"
+    "logout": "लॉगआउट",
+    "skipToMain": "मुख्य सामग्री पर जाएं",
+    "openMenu": "मेनू खोलें",
+    "closeMenu": "मेनू बंद करें",
+    "logoAlt": "जलसूचक लोगो",
+    "mainNavigation": "मुख्य नेविगेशन"
   },
 
   "validation": {

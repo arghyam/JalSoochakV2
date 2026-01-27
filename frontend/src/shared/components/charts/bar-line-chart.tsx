@@ -1,5 +1,5 @@
 import ReactECharts from 'echarts-for-react'
-import { Box } from '@chakra-ui/react'
+import { Box, useBreakpointValue } from '@chakra-ui/react'
 
 interface BarLineChartProps<T extends object> {
   data: T[]
@@ -26,6 +26,11 @@ export function BarLineChart<T extends object>({
 }: BarLineChartProps<T>) {
   const legendData = [barLegendLabel || String(barKey), lineLegendLabel || String(lineKey)]
 
+  // Responsive settings
+  const fontSize = useBreakpointValue({ base: 10, md: 12 }) ?? 12
+  const labelRotate = useBreakpointValue({ base: 45, md: 0 }) ?? 0
+  const chartHeight = useBreakpointValue({ base: '280px', md: height }) ?? height
+
   const option = {
     tooltip: {
       trigger: 'axis',
@@ -38,14 +43,14 @@ export function BarLineChart<T extends object>({
       bottom: 0,
       icon: 'square',
       textStyle: {
-        fontSize: 12,
+        fontSize,
         color: '#1C1C1C',
       },
     },
     grid: {
       left: '3%',
       right: '4%',
-      bottom: '15%',
+      bottom: labelRotate > 0 ? '20%' : '15%',
       top: '10%',
       containLabel: true,
     },
@@ -62,8 +67,9 @@ export function BarLineChart<T extends object>({
         show: false,
       },
       axisLabel: {
-        fontSize: 12,
+        fontSize,
         color: '#1C1C1C',
+        rotate: labelRotate,
       },
     },
     yAxis: [
@@ -145,7 +151,12 @@ export function BarLineChart<T extends object>({
   }
 
   return (
-    <Box height={height} width="100%">
+    <Box
+      height={chartHeight}
+      width="100%"
+      role="img"
+      aria-label={`Chart showing ${barLegendLabel || String(barKey)} and ${lineLegendLabel || String(lineKey)}`}
+    >
       <ReactECharts option={option} style={{ height: '100%', width: '100%' }} />
     </Box>
   )

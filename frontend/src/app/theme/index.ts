@@ -173,6 +173,37 @@ const theme = extendTheme({
     active: '0px 0px 0px 4px rgba(50, 145, 209, 0.12)',
   },
   components: {
+    Heading: {
+      baseStyle: {
+        fontFamily: 'heading',
+        color: 'neutral.950',
+      },
+      sizes: {
+        h1: {
+          fontSize: '32px',
+          lineHeight: '48px',
+          fontWeight: '600',
+        },
+        h2: {
+          fontSize: '24px',
+          lineHeight: '36px',
+          fontWeight: '600',
+        },
+        h3: {
+          fontSize: '20px',
+          lineHeight: '30px',
+          fontWeight: '600',
+        },
+        h4: {
+          fontSize: '14px',
+          lineHeight: '20px',
+          fontWeight: '500',
+        },
+      },
+      defaultProps: {
+        size: 'h2',
+      },
+    },
     Input: {
       baseStyle: {
         field: {

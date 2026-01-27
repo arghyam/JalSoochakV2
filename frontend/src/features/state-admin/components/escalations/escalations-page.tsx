@@ -210,7 +210,7 @@ export function EscalationsPage() {
           </Flex>
 
           {/* Escalation Cards Grid */}
-          <Grid templateColumns="repeat(2, 1fr)" gap={4} w="full" maxW="1200px">
+          <Grid templateColumns="repeat(2, 1fr)" gap={7} w="full" maxW="1200px">
             {escalations.map((escalation) => (
               <Box
                 key={escalation.id}

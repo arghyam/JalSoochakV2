@@ -54,7 +54,12 @@
     "apiIngestion": "API Ingestion",
     "operatorSync": "Operator Sync",
     "activity": "Activity",
-    "logout": "Logout"
+    "logout": "Logout",
+    "skipToMain": "Skip to main content",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "logoAlt": "JalSoochak logo",
+    "mainNavigation": "Main navigation"
   },
 
   "validation": {
