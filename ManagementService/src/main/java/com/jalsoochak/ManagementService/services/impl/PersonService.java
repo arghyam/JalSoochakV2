@@ -242,7 +242,6 @@ public class PersonService {
                     "Phone number already exists: " + registerRequest.getPhoneNumber());
         }
 
-
         PersonTypeMaster personType = personTypeMasterRepository.findBycName(registerRequest.getPersonType())
                 .orElseThrow(() -> new BadRequestException("Invalid person type"));
 
