@@ -17,26 +17,28 @@ export function CredentialsPage() {
 
   return (
     <>
-      <Text textStyle="h5" mb={3}>
+      <Text textStyle="h5" mb={3} fontWeight="600">
         Profile
       </Text>
-      <Text textStyle="bodyText5" mb="2rem">
+      <Text textStyle="bodyText5" mb="2rem" fontWeight="400">
         Complete your profile information.
       </Text>
 
       <Flex gap="1rem" mb="1.5rem">
         <FormControl>
-          <FormLabel textStyle="bodyText6" mb="4px">
-            First name{' '}
-            <Text as="span" color="red.500">
-              *
+          <FormLabel>
+            <Text textStyle="bodyText6" mb="4px">
+              First name
+              <Text as="span" color="error.500">
+                *
+              </Text>
             </Text>
           </FormLabel>
           <Input
             placeholder="Enter"
             autoComplete="given-name"
             value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
+            onChange={(e) => setFirstName(e.target.value.replace(/[^A-Za-z]/g, ''))}
             h="36px"
             px="12px"
             py="8px"
@@ -49,14 +51,16 @@ export function CredentialsPage() {
         </FormControl>
 
         <FormControl>
-          <FormLabel textStyle="bodyText6" mb="4px">
-            Last name
+          <FormLabel>
+            <Text textStyle="bodyText6" mb="4px">
+              Last name
+            </Text>
           </FormLabel>
           <Input
             placeholder="Enter"
             autoComplete="family-name"
             value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
+            onChange={(e) => setLastName(e.target.value.replace(/[^A-Za-z]/g, ''))}
             h="36px"
             px="12px"
             py="8px"
@@ -70,10 +74,12 @@ export function CredentialsPage() {
       </Flex>
 
       <FormControl mb="1.5rem">
-        <FormLabel textStyle="bodyText6" mb="4px">
-          Email address{' '}
-          <Text as="span" color="red.500">
-            *
+        <FormLabel>
+          <Text textStyle="bodyText6" mb="4px">
+            Email address
+            <Text as="span" color="error.500">
+              *
+            </Text>
           </Text>
         </FormLabel>
         <Input
@@ -92,17 +98,19 @@ export function CredentialsPage() {
           focusBorderColor="primary.500"
         />
         {!isEmailValid && email ? (
-          <Text mt="6px" fontSize="sm" color="red.500">
+          <Text mt="6px" fontSize="sm" color="error.500">
             Enter a valid email address.
           </Text>
         ) : null}
       </FormControl>
 
       <FormControl>
-        <FormLabel textStyle="bodyText6" mb="4px">
-          Phone Number{' '}
-          <Text as="span" color="red.500">
-            *
+        <FormLabel>
+          <Text textStyle="bodyText6" mb="4px">
+            Phone Number
+            <Text as="span" color="error.500">
+              *
+            </Text>
           </Text>
         </FormLabel>
         <Input
@@ -124,7 +132,7 @@ export function CredentialsPage() {
           focusBorderColor="primary.500"
         />
         {!isPhoneValid && phoneNumber ? (
-          <Text mt="6px" fontSize="sm" color="red.500">
+          <Text mt="6px" fontSize="sm" color="error.500">
             Phone number must be 10 digits.
           </Text>
         ) : null}

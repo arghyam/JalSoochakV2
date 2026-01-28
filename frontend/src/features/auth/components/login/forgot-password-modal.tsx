@@ -48,7 +48,7 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
           <FormControl mt="20px">
             <FormLabel textStyle="bodyText6" mb="4px">
               Email{' '}
-              <Text as="span" color="red.500">
+              <Text as="span" color="error.500">
                 *
               </Text>
             </FormLabel>
