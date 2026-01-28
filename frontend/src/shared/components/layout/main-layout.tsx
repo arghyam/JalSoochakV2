@@ -77,6 +77,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       {/* Main Content Area */}
       <Box
         flex={1}
+        minW={0}
         ml={{ base: 0, lg: '224px' }}
         display="flex"
         flexDirection="column"
@@ -123,9 +124,10 @@ export function MainLayout({ children }: MainLayoutProps) {
           role="main"
           tabIndex={-1}
           flex={1}
-          overflowY="auto"
-          px={{ base: 4, md: 6, lg: 8 }}
-          py={{ base: 6, md: 8, lg: 10 }}
+          minW={0}
+          overflow="auto"
+          px={{ base: 3, sm: 4, md: 6, lg: 8 }}
+          py={{ base: 4, md: 8, lg: 10 }}
           _focus={{ outline: 'none' }}
         >
           {children || <Outlet />}

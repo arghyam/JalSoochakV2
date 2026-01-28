@@ -29,7 +29,6 @@ export function StatesUTsPage() {
   const [searchQuery, setSearchQuery] = useState('')
 
   // Responsive values
-  const searchInputWidth = useBreakpointValue({ base: 'full', md: '320px' }) ?? '320px'
   const showAddButtonText = useBreakpointValue({ base: false, sm: true }) ?? true
 
   useEffect(() => {
@@ -142,7 +141,7 @@ export function StatesUTsPage() {
         <Flex gap={1}>
           <IconButton
             aria-label={`${t('statesUts.aria.viewStateUt')} ${row.name}`}
-            icon={<FiEye />}
+            icon={<FiEye aria-hidden="true" />}
             variant="ghost"
             w={5}
             h={5}
@@ -152,7 +151,7 @@ export function StatesUTsPage() {
           />
           <IconButton
             aria-label={`${t('statesUts.aria.editStateUt')} ${row.name}`}
-            icon={<EditIcon />}
+            icon={<EditIcon aria-hidden="true" />}
             variant="ghost"
             w={5}
             h={5}
@@ -166,7 +165,7 @@ export function StatesUTsPage() {
   ]
 
   return (
-    <Box w="full">
+    <Box w="full" maxW="100%" minW={0}>
       {/* Page Header */}
       <Box mb={5}>
         <Heading as="h1" size={{ base: 'h2', md: 'h1' }}>
@@ -184,12 +183,12 @@ export function StatesUTsPage() {
         px={{ base: 3, md: 6 }}
         gap={{ base: 3, md: 4 }}
         flexDirection={{ base: 'column', md: 'row' }}
-        border="0.5px"
+        borderWidth="0.5px"
         borderColor="neutral.200"
         borderRadius="12px"
         bg="white"
       >
-        <InputGroup maxW={searchInputWidth} w="full">
+        <InputGroup w={{ base: 'full', md: '320px' }}>
           <InputLeftElement pointerEvents="none" h={8}>
             <SearchIcon color="neutral.300" aria-hidden="true" />
           </InputLeftElement>
@@ -197,10 +196,10 @@ export function StatesUTsPage() {
             placeholder={t('common:search')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            aria-label={t('apiCredentials.searchPlaceholder')}
+            aria-label={t('statesUts.searchPlaceholder')}
             bg="white"
             h={8}
-            border="1px"
+            borderWidth="1px"
             borderRadius="4px"
             borderColor="neutral.300"
             _placeholder={{ color: 'neutral.300' }}
@@ -221,20 +220,18 @@ export function StatesUTsPage() {
       </Flex>
 
       {/* Data Table */}
-      <Box overflowX="auto">
-        <DataTable<StateUT>
-          columns={columns}
-          data={filteredStates}
-          getRowKey={(row) => row.id}
-          emptyMessage={t('statesUts.messages.noStatesFound')}
-          isLoading={isLoading}
-          pagination={{
-            enabled: true,
-            pageSize: 10,
-            pageSizeOptions: [10, 25, 50],
-          }}
-        />
-      </Box>
+      <DataTable<StateUT>
+        columns={columns}
+        data={filteredStates}
+        getRowKey={(row) => row.id}
+        emptyMessage={t('statesUts.messages.noStatesFound')}
+        isLoading={isLoading}
+        pagination={{
+          enabled: true,
+          pageSize: 10,
+          pageSizeOptions: [10, 25, 50],
+        }}
+      />
     </Box>
   )
 }

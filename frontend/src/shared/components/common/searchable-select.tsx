@@ -33,6 +33,8 @@ export interface SearchableSelectProps {
   textStyle?: string
   required?: boolean
   isFilter?: boolean
+  id?: string
+  'aria-labelledby'?: string
 }
 
 export function SearchableSelect({
@@ -50,6 +52,8 @@ export function SearchableSelect({
   textStyle = 'h10',
   required = false,
   isFilter = false,
+  id,
+  'aria-labelledby': ariaLabelledBy,
 }: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -100,10 +104,12 @@ export function SearchableSelect({
       <Flex
         as="button"
         type="button"
+        id={id}
         role="combobox"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         aria-controls={listboxId}
+        aria-labelledby={ariaLabelledBy}
         aria-disabled={disabled}
         disabled={disabled}
         w="full"

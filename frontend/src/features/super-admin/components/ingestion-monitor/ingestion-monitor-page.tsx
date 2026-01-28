@@ -287,6 +287,7 @@ export function IngestionMonitorPage() {
             size="sm"
             leftIcon={<Icon as={FiDownload} boxSize={4} aria-hidden="true" />}
             w={{ base: 'full', md: 'auto' }}
+            aria-label={t('common:button.exportData')}
           >
             {showExportText ? t('common:button.exportData') : ''}
           </Button>

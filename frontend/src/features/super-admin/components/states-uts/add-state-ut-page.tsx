@@ -197,16 +197,16 @@ export function AddStateUTPage() {
               aria-labelledby="state-details-heading"
             >
               <FormControl isRequired>
-                <FormLabel fontSize="14px" fontWeight="500" mb={1}>
+                <FormLabel htmlFor="state-name-select" fontSize="14px" fontWeight="500" mb={1}>
                   {t('statesUts.details.name')}
                 </FormLabel>
                 <SearchableSelect
+                  id="state-name-select"
                   options={availableStates}
                   value={stateName}
                   onChange={handleStateChange}
                   placeholder={t('common:select')}
                   width="100%"
-                  aria-required="true"
                 />
               </FormControl>
               <FormControl>
