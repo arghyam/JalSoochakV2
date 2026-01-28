@@ -126,7 +126,7 @@ export function IngestionMonitorPage() {
   if (error) {
     return (
       <Flex h="64" align="center" justify="center" direction="column" gap={4}>
-        <Text color="red.500">{error}</Text>
+        <Text color="error.500">{error}</Text>
         <Button
           variant="secondary"
           size="sm"

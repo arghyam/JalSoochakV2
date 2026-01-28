@@ -47,15 +47,17 @@ export function SignupPage({ onSuccess }: SignupPageProps) {
       <Text textStyle="h5" mb={3}>
         Welcome
       </Text>
-      <Text textStyle="bodyText5" mb="3rem">
+      <Text textStyle="bodyText5" mb="3rem" fontWeight="400">
         Please enter your details.
       </Text>
 
       <FormControl>
-        <FormLabel textStyle="bodyText6" mb="4px" fontSize="16px">
-          User ID{' '}
-          <Text as="span" color="red.500">
-            *
+        <FormLabel>
+          <Text textStyle="bodyText6" mb="4px" fontWeight="500">
+            User ID
+            <Text as="span" color="error.500">
+              *
+            </Text>
           </Text>
         </FormLabel>
         <Input
@@ -75,12 +77,15 @@ export function SignupPage({ onSuccess }: SignupPageProps) {
       </FormControl>
 
       <FormControl mt="1.5rem">
-        <FormLabel textStyle="bodyText6" mb="4px">
-          Password sent via email{' '}
-          <Text as="span" color="red.500">
-            *
+        <FormLabel>
+          <Text textStyle="bodyText6" mb="4px" fontWeight="500">
+            Password sent via email
+            <Text as="span" color="error.500">
+              *
+            </Text>
           </Text>
         </FormLabel>
+
         <InputGroup>
           <Input
             type={showPassword ? 'text' : 'password'}
@@ -118,7 +123,7 @@ export function SignupPage({ onSuccess }: SignupPageProps) {
       </FormControl>
 
       {authError ? (
-        <Text mt="12px" fontSize="sm" color="red.500">
+        <Text mt="12px" fontSize="sm" color="error.500">
           {authError}
         </Text>
       ) : null}
