@@ -1,6 +1,18 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Box, Text, Flex, Grid, Input, Button, HStack } from '@chakra-ui/react'
+import {
+  Box,
+  Heading,
+  Text,
+  Flex,
+  SimpleGrid,
+  Input,
+  Button,
+  HStack,
+  FormControl,
+  FormLabel,
+} from '@chakra-ui/react'
+import { useTranslation } from 'react-i18next'
 import { SearchableSelect, ToastContainer } from '@/shared/components/common'
 import { useToast } from '@/shared/hooks/use-toast'
 import { createStateUT, getAssignedStateNames } from '../../services/mock-data'
@@ -8,8 +20,13 @@ import { INDIAN_STATES_UTS } from '../../types/states-uts'
 import { ROUTES } from '@/shared/constants/routes'
 
 export function AddStateUTPage() {
+  const { t } = useTranslation(['super-admin', 'common'])
   const navigate = useNavigate()
   const toast = useToast()
+
+  useEffect(() => {
+    document.title = `${t('statesUts.addTitle')} | JalSoochak`
+  }, [t])
 
   const [isSaving, setIsSaving] = useState(false)
   const [assignedStates, setAssignedStates] = useState<string[]>([])
@@ -84,7 +101,7 @@ export function AddStateUTPage() {
 
   const handleSubmit = async () => {
     if (!isFormValid) {
-      toast.addToast('Please fill all required fields correctly', 'error')
+      toast.addToast(t('common:toast.fillAllFieldsCorrectly'), 'error')
       return
     }
 
@@ -102,14 +119,14 @@ export function AddStateUTPage() {
           contactNumber: contactNumber.trim() || undefined,
         },
       })
-      toast.addToast('State/UT added successfully', 'success')
+      toast.addToast(t('statesUts.messages.addedSuccess'), 'success')
       // Navigate to view page after short delay to show toast
       setTimeout(() => {
         navigate(ROUTES.SUPER_ADMIN_STATES_UTS_VIEW.replace(':id', newState.id))
       }, 500)
     } catch (error) {
       console.error('Failed to create state:', error)
-      toast.addToast('Failed to add State/UT', 'error')
+      toast.addToast(t('statesUts.messages.failedToAdd'), 'error')
     } finally {
       setIsSaving(false)
     }
@@ -119,142 +136,156 @@ export function AddStateUTPage() {
     <Box w="full">
       {/* Page Header with Breadcrumb */}
       <Box mb={5}>
-        <Text textStyle="h5" mb={2}>
-          Add State/UT
-        </Text>
-        <Flex gap={2}>
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={2}>
+          {t('statesUts.addTitle')}
+        </Heading>
+        <Flex as="nav" aria-label="Breadcrumb" gap={2} flexWrap="wrap">
           <Text
+            as="a"
             fontSize="14px"
             color="neutral.500"
             cursor="pointer"
             _hover={{ textDecoration: 'underline' }}
             onClick={() => navigate(ROUTES.SUPER_ADMIN_STATES_UTS)}
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && navigate(ROUTES.SUPER_ADMIN_STATES_UTS)}
           >
-            Manage States/UTs
+            {t('statesUts.breadcrumb.manage')}
           </Text>
-          <Text fontSize="14px" color="neutral.500">
+          <Text fontSize="14px" color="neutral.500" aria-hidden="true">
             /
           </Text>
-          <Text fontSize="14px" color="#26272B">
-            Add New State/UT
+          <Text fontSize="14px" color="#26272B" aria-current="page">
+            {t('statesUts.breadcrumb.addNew')}
           </Text>
         </Flex>
       </Box>
 
       {/* Form Card */}
       <Box
+        as="form"
+        role="form"
+        aria-label={t('statesUts.addTitle')}
         bg="white"
         borderWidth="0.5px"
         borderColor="neutral.200"
         borderRadius="12px"
         w="full"
-        minH="calc(100vh - 180px)"
+        minH={{ base: 'auto', lg: 'calc(100vh - 180px)' }}
         py={6}
-        px={4}
+        px={{ base: 3, md: 4 }}
+        onSubmit={(e: React.FormEvent) => {
+          e.preventDefault()
+          handleSubmit()
+        }}
       >
-        <Flex direction="column" h="full" justify="space-between" minH="calc(100vh - 232px)">
+        <Flex
+          direction="column"
+          h="full"
+          justify="space-between"
+          minH={{ base: 'auto', lg: 'calc(100vh - 232px)' }}
+        >
           <Box>
             {/* State/UT Details Section */}
-            <Text textStyle="h8" mb={4}>
-              State/UT Details
-            </Text>
-            <Grid templateColumns="repeat(2, 1fr)" gap={6} mb={7}>
-              <Box>
-                <Text fontSize="14px" fontWeight="500" mb={1}>
-                  State/UT name
-                  <Text as="span" color="error.500">
-                    *
-                  </Text>
-                </Text>
+            <Heading as="h2" size="h3" fontWeight="400" mb={4} id="state-details-heading">
+              {t('statesUts.details.title')}
+            </Heading>
+            <SimpleGrid
+              columns={{ base: 1, lg: 2 }}
+              spacing={6}
+              mb={7}
+              aria-labelledby="state-details-heading"
+            >
+              <FormControl isRequired>
+                <FormLabel htmlFor="state-name-select" fontSize="14px" fontWeight="500" mb={1}>
+                  {t('statesUts.details.name')}
+                </FormLabel>
                 <SearchableSelect
+                  id="state-name-select"
                   options={availableStates}
                   value={stateName}
                   onChange={handleStateChange}
-                  placeholder="Select"
-                  width="486px"
+                  placeholder={t('common:select')}
+                  width="100%"
                 />
-              </Box>
-              <Box>
-                <Text fontSize="14px" fontWeight="500" mb={1}>
-                  State/UT code
-                </Text>
+              </FormControl>
+              <FormControl>
+                <FormLabel fontSize="14px" fontWeight="500" mb={1}>
+                  {t('statesUts.details.code')}
+                </FormLabel>
                 <Input
                   value={stateCode}
                   isReadOnly
                   bg="neutral.50"
                   h={9}
-                  maxW="486px"
+                  maxW={{ base: '100%', lg: '486px' }}
                   borderColor="neutral.200"
-                  _placeholder={{ color: 'neutral.400' }}
+                  aria-readonly="true"
                 />
-              </Box>
-            </Grid>
+              </FormControl>
+            </SimpleGrid>
 
             {/* State Admin Details Section */}
-            <Text textStyle="h8" mb={4}>
-              State Admin Details
-            </Text>
-            <Grid templateColumns="repeat(2, 1fr)" gap={3}>
-              <Box>
-                <Text fontSize="14px" fontWeight="500" mb={1}>
-                  First name
-                  <Text as="span" color="error.500">
-                    *
-                  </Text>
-                </Text>
+            <Heading as="h2" size="h3" fontWeight="400" mb={4} id="admin-details-heading">
+              {t('statesUts.adminDetails.title')}
+            </Heading>
+            <SimpleGrid
+              columns={{ base: 1, lg: 2 }}
+              spacing={3}
+              aria-labelledby="admin-details-heading"
+            >
+              <FormControl isRequired>
+                <FormLabel fontSize="14px" fontWeight="500" mb={1}>
+                  {t('statesUts.adminDetails.firstName')}
+                </FormLabel>
                 <Input
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  placeholder="Enter"
+                  placeholder={t('common:enter')}
                   h={9}
-                  maxW="486px"
+                  maxW={{ base: '100%', lg: '486px' }}
                   borderColor="neutral.200"
                   _placeholder={{ color: 'neutral.400' }}
+                  aria-required="true"
                 />
-              </Box>
-              <Box>
-                <Text fontSize="14px" fontWeight="500" mb={1}>
-                  Last name
-                  <Text as="span" color="error.500">
-                    *
-                  </Text>
-                </Text>
+              </FormControl>
+              <FormControl isRequired>
+                <FormLabel fontSize="14px" fontWeight="500" mb={1}>
+                  {t('statesUts.adminDetails.lastName')}
+                </FormLabel>
                 <Input
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  placeholder="Enter"
+                  placeholder={t('common:enter')}
                   h={9}
-                  maxW="486px"
+                  maxW={{ base: '100%', lg: '486px' }}
                   borderColor="neutral.200"
                   _placeholder={{ color: 'neutral.400' }}
+                  aria-required="true"
                 />
-              </Box>
-              <Box>
-                <Text fontSize="14px" fontWeight="500" mb={1}>
-                  Email address
-                  <Text as="span" color="error.500">
-                    *
-                  </Text>
-                </Text>
+              </FormControl>
+              <FormControl isRequired>
+                <FormLabel fontSize="14px" fontWeight="500" mb={1}>
+                  {t('statesUts.adminDetails.email')}
+                </FormLabel>
                 <Input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter"
+                  placeholder={t('common:enter')}
                   h={9}
-                  maxW="486px"
+                  maxW={{ base: '100%', lg: '486px' }}
                   borderColor="neutral.200"
                   _placeholder={{ color: 'neutral.400' }}
+                  aria-required="true"
                 />
-              </Box>
-              <Box>
-                <Text fontSize="14px" fontWeight="500" mb={1}>
-                  Phone number
-                  <Text as="span" color="error.500">
-                    *
-                  </Text>
-                </Text>
+              </FormControl>
+              <FormControl isRequired>
+                <FormLabel fontSize="14px" fontWeight="500" mb={1}>
+                  {t('statesUts.adminDetails.phone')}
+                </FormLabel>
                 <Input
+                  type="tel"
                   value={phone}
                   onChange={(e) => {
                     // Only allow digits
@@ -265,31 +296,34 @@ export function AddStateUTPage() {
                   }}
                   placeholder="+91"
                   h={9}
-                  maxW="486px"
+                  maxW={{ base: '100%', lg: '486px' }}
                   borderColor="neutral.200"
                   _placeholder={{ color: 'neutral.400' }}
+                  aria-required="true"
+                  inputMode="numeric"
                 />
-              </Box>
-              <Box>
-                <Text fontSize="14px" fontWeight="500" mb={1}>
-                  Secondary email address (optional)
-                </Text>
+              </FormControl>
+              <FormControl>
+                <FormLabel fontSize="14px" fontWeight="500" mb={1}>
+                  {t('statesUts.adminDetails.secondaryEmail')}
+                </FormLabel>
                 <Input
                   type="email"
                   value={secondaryEmail}
                   onChange={(e) => setSecondaryEmail(e.target.value)}
-                  placeholder="Enter"
+                  placeholder={t('common:enter')}
                   h={9}
-                  maxW="486px"
+                  maxW={{ base: '100%', lg: '486px' }}
                   borderColor="neutral.200"
                   _placeholder={{ color: 'neutral.400' }}
                 />
-              </Box>
-              <Box>
-                <Text fontSize="14px" fontWeight="500" mb={1}>
-                  Contact number (optional)
-                </Text>
+              </FormControl>
+              <FormControl>
+                <FormLabel fontSize="14px" fontWeight="500" mb={1}>
+                  {t('statesUts.adminDetails.contactNumber')}
+                </FormLabel>
                 <Input
+                  type="tel"
                   value={contactNumber}
                   onChange={(e) => {
                     // Only allow digits
@@ -298,36 +332,43 @@ export function AddStateUTPage() {
                       setContactNumber(value)
                     }
                   }}
-                  placeholder="Enter"
+                  placeholder={t('common:enter')}
                   h={9}
-                  maxW="486px"
+                  maxW={{ base: '100%', lg: '486px' }}
                   borderColor="neutral.200"
                   _placeholder={{ color: 'neutral.400' }}
+                  inputMode="numeric"
                 />
-              </Box>
-            </Grid>
+              </FormControl>
+            </SimpleGrid>
           </Box>
 
           {/* Action Buttons */}
-          <HStack spacing={3} justify="flex-end" mt={6}>
+          <HStack
+            spacing={3}
+            justify={{ base: 'stretch', sm: 'flex-end' }}
+            mt={6}
+            flexDirection={{ base: 'column-reverse', sm: 'row' }}
+          >
             <Button
               variant="secondary"
               size="md"
-              width="174px"
+              width={{ base: 'full', sm: '174px' }}
               onClick={handleCancel}
               isDisabled={isSaving}
             >
-              Cancel
+              {t('common:button.cancel')}
             </Button>
             <Button
+              type="submit"
               variant="primary"
               size="md"
-              maxWidth="275px"
-              onClick={handleSubmit}
+              width={{ base: 'full', sm: 'auto' }}
+              maxWidth={{ base: '100%', sm: '275px' }}
               isLoading={isSaving}
               isDisabled={!isFormValid}
             >
-              Add State & Send Link via Email
+              {t('statesUts.buttons.addAndSendLink')}
             </Button>
           </HStack>
         </Flex>

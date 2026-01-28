@@ -17,7 +17,7 @@ import { BarLineChart } from '@/shared/components/charts/bar-line-chart'
 import type { SuperAdminOverviewData } from '../../types/overview'
 import { MdOutlinePlace } from 'react-icons/md'
 import { BsCheck2Circle } from 'react-icons/bs'
-import { IoCloseCircleOutline } from 'react-icons/io5'
+import { IoCloseCircleOutline, IoAddOutline } from 'react-icons/io5'
 import { ROUTES } from '@/shared/constants/routes'
 import i18n from '@/app/i18n'
 
@@ -81,8 +81,8 @@ export function OverviewPage() {
       title: t('overview.stats.inactiveStates'),
       value: data.stats.inactiveStates,
       icon: IoCloseCircleOutline,
-      iconBg: '#FEE4E2',
-      iconColor: '#D92D20',
+      iconBg: '#FFFBD7',
+      iconColor: '#CA8A04',
     },
   ]
 
@@ -107,8 +107,9 @@ export function OverviewPage() {
           fontWeight="600"
           onClick={() => navigate(ROUTES.SUPER_ADMIN_STATES_UTS_ADD)}
           w={{ base: 'full', sm: 'auto' }}
+          gap={1}
         >
-          {t('overview.addNewStateUt')}
+          {<IoAddOutline size={24} />} {t('overview.addNewStateUt')}
         </Button>
       </Flex>
 
@@ -229,13 +230,14 @@ export function OverviewPage() {
                 borderColor="neutral.100"
                 _last={{ borderBottomWidth: 0 }}
               >
-                <Text fontSize={{ base: '13px', md: '14px' }} color="neutral.950">
+                <Text fontSize={{ base: '14px', md: '16px' }} color="neutral.950" fontWeight="400">
                   {notification.message}
                 </Text>
                 <Text
-                  fontSize={{ base: '12px', md: '14px' }}
+                  fontSize={{ base: '14px', md: '16px' }}
                   color="neutral.600"
                   whiteSpace="nowrap"
+                  fontWeight="400"
                 >
                   {formatTimestamp(notification.timestamp)}
                 </Text>

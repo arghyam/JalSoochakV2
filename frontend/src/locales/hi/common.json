@@ -71,5 +71,18 @@
   "time": {
     "am": "पूर्वाह्न",
     "pm": "अपराह्न"
+  },
+
+  "table": {
+    "itemsPerPage": "प्रति पृष्ठ आइटम",
+    "previous": "पिछला",
+    "next": "अगला",
+    "noResults": "कोई परिणाम नहीं मिला",
+    "goToPage": "पृष्ठ {{page}} पर जाएं"
+  },
+
+  "searchableSelect": {
+    "search": "खोजें",
+    "noResults": "कोई परिणाम नहीं मिला"
   }
 }
