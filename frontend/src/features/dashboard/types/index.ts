@@ -13,12 +13,9 @@ export type DashboardLevel =
 export type EntityStatus = 'good' | 'needs-attention' | 'critical'
 
 export interface KPIData {
-  nationalCoverage: number // %
-  regularity: number // %
-  continuity: number // 0-100 index
-  averageQuantity: number // LPCD
   totalSchemes: number
-  totalHouseholds: number
+  totalRuralHouseholds: number
+  functionalTapConnections: number
 }
 
 export interface EntityPerformance {
@@ -38,6 +35,20 @@ export interface DemandSupplyData {
   supply: number
 }
 
+export interface ImageSubmissionStatusData {
+  label: string
+  value: number
+}
+
+export interface WaterSupplyOutageData {
+  district: string
+  electricityFailure: number
+  pipelineLeak: number
+  pumpFailure: number
+  valveIssue: number
+  sourceDrying: number
+}
+
 export interface DashboardData {
   level: DashboardLevel
   entityId?: string
@@ -45,6 +56,8 @@ export interface DashboardData {
   kpis: KPIData
   mapData: EntityPerformance[]
   demandSupply: DemandSupplyData[]
+  imageSubmissionStatus: ImageSubmissionStatusData[]
+  waterSupplyOutages: WaterSupplyOutageData[]
   topPerformers: EntityPerformance[]
   worstPerformers: EntityPerformance[]
   regularityData: EntityPerformance[]

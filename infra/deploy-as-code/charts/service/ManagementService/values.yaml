@@ -6,7 +6,7 @@ labels:
 
 ingress:
   enabled: true
-  context: "api(/|$)(.*)"
+  context: "api/v2/auth(/|$)(.*)"
 # Init Containers Configs
 
 # Container Configs

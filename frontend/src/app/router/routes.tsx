@@ -87,6 +87,22 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    path: ROUTES.CREATE_PASSWORD,
+    element: (
+      <RedirectIfAuthenticated>
+        <SignupFlowPage initialStep="createPassword" />
+      </RedirectIfAuthenticated>
+    ),
+  },
+  {
+    path: ROUTES.CREDENTIALS,
+    element: (
+      <RedirectIfAuthenticated>
+        <SignupFlowPage initialStep="credentials" />
+      </RedirectIfAuthenticated>
+    ),
+  },
+  {
     path: ROUTES.RESET_PASSWORD,
     element: (
       <RedirectIfAuthenticated>

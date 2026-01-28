@@ -60,6 +60,14 @@ const theme = extendTheme({
     },
 
     //Body text
+
+    bodyText2: {
+      fontSize: '24px',
+      lineHeight: '36px',
+      fontWeight: '400',
+      letterSpacing: '0%',
+      color: 'neutral.950',
+    },
     bodyText3: {
       fontSize: '20px',
       lineHeight: '30px',
@@ -81,6 +89,12 @@ const theme = extendTheme({
       fontWeight: 'medium',
       fontSize: '14px',
       lineHeight: '21px',
+      color: 'neutral.950',
+    },
+    bodyText7: {
+      fontSize: '12px',
+      lineHeight: '16px',
+      fontWeight: '400',
       color: 'neutral.950',
     },
   },

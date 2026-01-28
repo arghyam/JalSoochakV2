@@ -312,22 +312,67 @@ const mockStates: EntityPerformance[] = [
 
 // Mock demand-supply data for financial year
 const mockDemandSupply: DemandSupplyData[] = [
-  { period: '2023-24 Q1', demand: 55, supply: 52 },
-  { period: '2023-24 Q2', demand: 58, supply: 55 },
-  { period: '2023-24 Q3', demand: 60, supply: 57 },
-  { period: '2023-24 Q4', demand: 62, supply: 59 },
-  { period: '2024-25 Q1', demand: 64, supply: 61 },
-  { period: '2024-25 Q2', demand: 66, supply: 63 },
+  { period: 'FY20', demand: 67, supply: 60 },
+  { period: 'FY21', demand: 75, supply: 82 },
+  { period: 'FY22', demand: 110, supply: 99 },
+  { period: 'FY23', demand: 80, supply: 65 },
+  { period: 'FY24', demand: 23, supply: 15 },
+  { period: 'FY25', demand: 75, supply: 73 },
+]
+
+const mockImageSubmissionStatus = [
+  { label: 'Complaint Submission', value: 64 },
+  { label: 'Automated Submission', value: 36 },
+]
+
+const mockWaterSupplyOutages = [
+  {
+    district: 'Anand',
+    electricityFailure: 10,
+    pipelineLeak: 18,
+    pumpFailure: 14,
+    valveIssue: 22,
+    sourceDrying: 26,
+  },
+  {
+    district: 'Dahod',
+    electricityFailure: 12,
+    pipelineLeak: 16,
+    pumpFailure: 18,
+    valveIssue: 20,
+    sourceDrying: 22,
+  },
+  {
+    district: 'Bharuch',
+    electricityFailure: 20,
+    pipelineLeak: 14,
+    pumpFailure: 12,
+    valveIssue: 18,
+    sourceDrying: 26,
+  },
+  {
+    district: 'Patan',
+    electricityFailure: 14,
+    pipelineLeak: 12,
+    pumpFailure: 22,
+    valveIssue: 16,
+    sourceDrying: 20,
+  },
+  {
+    district: 'Vadodara',
+    electricityFailure: 18,
+    pipelineLeak: 20,
+    pumpFailure: 16,
+    valveIssue: 14,
+    sourceDrying: 12,
+  },
 ]
 
 // Mock KPI data for central dashboard
 const mockCentralKPIs: KPIData = {
-  nationalCoverage: 65.8,
-  regularity: 72.5,
-  continuity: 68.3,
-  averageQuantity: 55.2,
-  totalSchemes: 12543,
-  totalHouseholds: 18567234,
+  totalSchemes: 650000,
+  totalRuralHouseholds: 193620012,
+  functionalTapConnections: 93620012,
 }
 
 export const dashboardMockService = {
@@ -348,6 +393,8 @@ export const dashboardMockService = {
         kpis: mockCentralKPIs,
         mapData: mockStates,
         demandSupply: mockDemandSupply,
+        imageSubmissionStatus: mockImageSubmissionStatus,
+        waterSupplyOutages: mockWaterSupplyOutages,
         topPerformers: sortedStates.slice(0, 5),
         worstPerformers: sortedStates.slice(-5).reverse(),
         regularityData: mockStates,
@@ -362,6 +409,8 @@ export const dashboardMockService = {
       kpis: mockCentralKPIs,
       mapData: [],
       demandSupply: mockDemandSupply,
+      imageSubmissionStatus: mockImageSubmissionStatus,
+      waterSupplyOutages: mockWaterSupplyOutages,
       topPerformers: [],
       worstPerformers: [],
       regularityData: [],

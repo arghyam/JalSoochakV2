@@ -81,7 +81,7 @@ export function LoginPage() {
                   <FormControl>
                     <FormLabel textStyle="bodyText6" mb="4px">
                       Phone Number{' '}
-                      <Text as="span" color="red.500">
+                      <Text as="span" color="error.500">
                         *
                       </Text>
                     </FormLabel>
@@ -108,7 +108,7 @@ export function LoginPage() {
                   <FormControl>
                     <FormLabel textStyle="bodyText6" mb="4px">
                       Password{' '}
-                      <Text as="span" color="red.500">
+                      <Text as="span" color="error.500">
                         *
                       </Text>
                     </FormLabel>
@@ -153,7 +153,7 @@ export function LoginPage() {
                   </FormControl>
 
                   {(localError || error) && (
-                    <Text fontSize="sm" color="red.500">
+                    <Text fontSize="sm" color="error.500">
                       {localError || error}
                     </Text>
                   )}
