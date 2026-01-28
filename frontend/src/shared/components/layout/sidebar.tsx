@@ -174,6 +174,7 @@ export function Sidebar({ onNavClick }: SidebarProps) {
         bg="white"
         borderRight="1px"
         borderColor="neutral.100"
+        py={10}
       >
         {/* Brand Section */}
         <Flex
@@ -184,7 +185,6 @@ export function Sidebar({ onNavClick }: SidebarProps) {
           borderBottom="1px"
           borderColor="neutral.100"
           px={7}
-          pt={2}
         >
           <Image src={jalsoochakLogo} alt={t('sidebar.logoAlt', 'JalSoochak logo')} />
         </Flex>

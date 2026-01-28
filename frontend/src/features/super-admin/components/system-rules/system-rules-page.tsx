@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Box, Text, Button, Flex, HStack, Grid } from '@chakra-ui/react'
+import { Box, Heading, Text, Button, Flex, HStack, SimpleGrid } from '@chakra-ui/react'
 import { useTranslation } from 'react-i18next'
 import {
   getMockSystemRulesConfiguration,
@@ -17,6 +17,10 @@ import { ToastContainer, SearchableSelect } from '@/shared/components/common'
 
 export function SystemRulesPage() {
   const { t } = useTranslation(['super-admin', 'common'])
+
+  useEffect(() => {
+    document.title = `${t('systemRules.title')} | JalSoochak`
+  }, [t])
   const [config, setConfig] = useState<SystemRulesConfiguration | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -96,8 +100,12 @@ export function SystemRulesPage() {
   if (isLoading) {
     return (
       <Box w="full">
-        <Text textStyle="h5">{t('systemRules.title')}</Text>
-        <Text color="neutral.600">{t('common:loading')}</Text>
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={5}>
+          {t('systemRules.title')}
+        </Heading>
+        <Flex role="status" aria-live="polite" align="center" justify="center" minH="200px">
+          <Text color="neutral.600">{t('common:loading')}</Text>
+        </Flex>
       </Box>
     )
   }
@@ -106,35 +114,43 @@ export function SystemRulesPage() {
     <Box w="full">
       {/* Page Header */}
       <Box mb={5}>
-        <Text textStyle="h5">{t('systemRules.title')}</Text>
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }}>
+          {t('systemRules.title')}
+        </Heading>
       </Box>
 
       {/* Configuration Card */}
       <Box
+        as="form"
+        role="form"
+        aria-label={t('systemRules.configurationSettings')}
         bg="white"
         borderWidth="0.5px"
         borderColor="neutral.200"
         borderRadius="12px"
         w="full"
-        minH="calc(100vh - 148px)"
+        minH={{ base: 'auto', lg: 'calc(100vh - 148px)' }}
         py={6}
-        px={4}
+        px={{ base: 3, md: 4 }}
       >
         <Flex
           direction="column"
           w="full"
           h="full"
           justify="space-between"
-          minH="calc(100vh - 200px)"
+          minH={{ base: 'auto', lg: 'calc(100vh - 200px)' }}
         >
           <Flex direction="column" gap={4}>
             {/* Card Header */}
-            <Text textStyle="h8">{t('systemRules.configurationSettings')}</Text>
+            <Heading as="h2" size="h3" fontWeight="400">
+              {t('systemRules.configurationSettings')}
+            </Heading>
 
-            {/* Form Fields Grid - 2x2 Layout */}
-            <Grid templateColumns="repeat(2, 1fr)" gap={7}>
+            {/* Form Fields Grid - Responsive Layout */}
+            <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={7}>
               {/* Coverage */}
               <Box
+                as="fieldset"
                 borderWidth="0.5px"
                 borderColor="neutral.200"
                 borderRadius="12px"
@@ -142,10 +158,10 @@ export function SystemRulesPage() {
                 py={6}
                 px={4}
               >
-                <Text textStyle="h8" mb={1}>
+                <Heading as="h2" size="h3" fontWeight="400" mb={1}>
                   {t('systemRules.coverage.title')}
-                </Text>
-                <Text fontSize="14px" mb={4}>
+                </Heading>
+                <Text fontSize="14px" mb={4} id="coverage-description">
                   {t('systemRules.coverage.description')}
                 </Text>
                 <SearchableSelect
@@ -154,11 +170,13 @@ export function SystemRulesPage() {
                   onChange={setCoverage}
                   placeholder={t('common:select')}
                   width="100%"
+                  aria-describedby="coverage-description"
                 />
               </Box>
 
               {/* Continuity */}
               <Box
+                as="fieldset"
                 borderWidth="0.5px"
                 borderColor="neutral.200"
                 borderRadius="12px"
@@ -166,10 +184,10 @@ export function SystemRulesPage() {
                 py={6}
                 px={4}
               >
-                <Text textStyle="h8" mb={1}>
+                <Heading as="h2" size="h3" fontWeight="400" mb={1}>
                   {t('systemRules.continuity.title')}
-                </Text>
-                <Text fontSize="14px" mb={4}>
+                </Heading>
+                <Text fontSize="14px" mb={4} id="continuity-description">
                   {t('systemRules.continuity.description')}
                 </Text>
                 <SearchableSelect
@@ -178,11 +196,13 @@ export function SystemRulesPage() {
                   onChange={setContinuity}
                   placeholder={t('common:select')}
                   width="100%"
+                  aria-describedby="continuity-description"
                 />
               </Box>
 
               {/* Quantity (per capita) */}
               <Box
+                as="fieldset"
                 borderWidth="0.5px"
                 borderColor="neutral.200"
                 borderRadius="12px"
@@ -190,10 +210,10 @@ export function SystemRulesPage() {
                 py={6}
                 px={4}
               >
-                <Text textStyle="h8" mb={1}>
+                <Heading as="h2" size="h3" fontWeight="400" mb={1}>
                   {t('systemRules.quantity.title')}
-                </Text>
-                <Text fontSize="14px" mb={4}>
+                </Heading>
+                <Text fontSize="14px" mb={4} id="quantity-description">
                   {t('systemRules.quantity.description')}
                 </Text>
                 <SearchableSelect
@@ -202,11 +222,13 @@ export function SystemRulesPage() {
                   onChange={setQuantity}
                   placeholder={t('common:select')}
                   width="100%"
+                  aria-describedby="quantity-description"
                 />
               </Box>
 
               {/* Regularity Threshold */}
               <Box
+                as="fieldset"
                 borderWidth="0.5px"
                 borderColor="neutral.200"
                 borderRadius="12px"
@@ -214,10 +236,10 @@ export function SystemRulesPage() {
                 py={6}
                 px={4}
               >
-                <Text textStyle="h8" mb={1}>
+                <Heading as="h2" size="h3" fontWeight="400" mb={1}>
                   {t('systemRules.regularity.title')}
-                </Text>
-                <Text fontSize="14px" mb={4}>
+                </Heading>
+                <Text fontSize="14px" mb={4} id="regularity-description">
                   {t('systemRules.regularity.description')}
                 </Text>
                 <SearchableSelect
@@ -226,17 +248,23 @@ export function SystemRulesPage() {
                   onChange={setRegularity}
                   placeholder={t('common:select')}
                   width="100%"
+                  aria-describedby="regularity-description"
                 />
               </Box>
-            </Grid>
+            </SimpleGrid>
           </Flex>
 
           {/* Action Buttons */}
-          <HStack spacing={3} justify="flex-end" mt={6}>
+          <HStack
+            spacing={3}
+            justify={{ base: 'stretch', sm: 'flex-end' }}
+            mt={6}
+            flexDirection={{ base: 'column', sm: 'row' }}
+          >
             <Button
               variant="secondary"
               size="md"
-              width="174px"
+              width={{ base: 'full', sm: '174px' }}
               onClick={handleCancel}
               isDisabled={isSaving || !hasChanges}
             >
@@ -245,7 +273,7 @@ export function SystemRulesPage() {
             <Button
               variant="primary"
               size="md"
-              width="174px"
+              width={{ base: 'full', sm: '174px' }}
               onClick={handleSave}
               isLoading={isSaving}
               isDisabled={!isFormValid || !hasChanges}

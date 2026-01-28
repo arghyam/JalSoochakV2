@@ -143,7 +143,7 @@ export function BarLineChart<T extends object>({
         data: data.map((item) => item[barKey]),
         itemStyle: {
           color: barColor,
-          borderRadius: [4, 4, 0, 0],
+          borderRadius: [12, 12, 12, 12],
         },
         barCategoryGap: '40%',
       },

@@ -1,7 +1,7 @@
 {
   "overview": {
     "title": "Overview",
-    "addNewStateUt": "+ Add New State/UT",
+    "addNewStateUt": "Add New State/UT",
     "stats": {
       "totalStatesManaged": "Total States/UTs Managed",
       "activeStates": "Active States/UTs",
@@ -41,7 +41,7 @@
     "addTitle": "Add State/UT",
     "viewTitle": "View State/UT",
     "editTitle": "Edit State/UT",
-    "addNewStateUt": "+ Add New State/UT",
+    "addNewStateUt": "Add New State/UT",
     "breadcrumb": {
       "manage": "Manage States/UTs",
       "addNew": "Add New State/UT",

@@ -9,6 +9,8 @@ import {
   useOutsideClick,
   Flex,
 } from '@chakra-ui/react'
+import type { ResponsiveValue } from '@chakra-ui/react'
+import type { Property } from 'csstype'
 import { SearchIcon, ChevronDownIcon } from '@chakra-ui/icons'
 
 export interface SearchableSelectOption {
@@ -22,7 +24,7 @@ export interface SearchableSelectProps {
   onChange: (value: string) => void
   placeholder?: string
   disabled?: boolean
-  width?: string
+  width?: ResponsiveValue<Property.Width>
   fontSize?: string
   textColor?: string
   height?: string
