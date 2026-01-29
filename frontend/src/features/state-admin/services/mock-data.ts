@@ -442,28 +442,55 @@ let mockNudgeTemplates: NudgeTemplate[] = [
     id: '1',
     name: 'No-Water Alert',
     type: 'no-water-alert',
-    language: 'english',
-    message:
-      'Dear {operator_name},\nThis is an urgent alert regarding the water point in {village_name}. It has been reported no water for {days} consecutive days. Please investigate and fix the issues immediately.\n\nJalSoochak',
     availableVariables: ['{operator_name}', '{village_name}', '{days}'],
+    messages: [
+      {
+        language: 'english',
+        message:
+          'Dear {operator_name},\nThis is an urgent alert regarding the water point in {village_name}. It has been reported no water for {days} consecutive days. Please investigate and report the status immediately.\n\nJalSoochak',
+      },
+      {
+        language: 'telugu',
+        message:
+          'ప్రియమైన {operator_name},\n{village_name}లో నీటి పాయింట్ గురించి ఇది అత్యవసర హెచ్చరిక. {days} వరుస రోజులు నీరు లేదని నివేదించబడింది. దయచేసి వెంటనే పరిశీలించి స్థితిని నివేదించండి.\n\nJalSoochak',
+      },
+    ],
   },
   {
     id: '2',
     name: 'Low Quantity Alert',
     type: 'low-quantity-alert',
-    language: 'english',
-    message:
-      'Dear {operator_name},\nWater Quantity at {village_name} is currently {LPCD} LPCD, which is below the threshold. Please check the supply and system functionality.\n\nJalSoochak',
     availableVariables: ['{operator_name}', '{village_name}', '{LPCD}'],
+    messages: [
+      {
+        language: 'english',
+        message:
+          'Dear {operator_name},\nWater Quantity at {village_name} is currently {LPCD} LPCD, which is below the threshold. Please check the supply and system functionality.\n\nJalSoochak',
+      },
+      {
+        language: 'telugu',
+        message:
+          'ప్రియమైన {operator_name},\n{village_name}లో నీటి పరిమాణం ప్రస్తుతం {LPCD} LPCD, ఇది పరిమితి కంటే తక్కువ. దయచేసి సరఫరా మరియు వ్యవస్థ పనితీరును తనిఖీ చేయండి.\n\nJalSoochak',
+      },
+    ],
   },
   {
     id: '3',
     name: 'Operator Inactivity',
     type: 'operator-inactivity',
-    language: 'english',
-    message:
-      'Dear {operator_name},\nWe have noticed that data has not been reported for {village_name} for the last {days} days. Please ensure regular updates.\n\nJalSoochak',
     availableVariables: ['{operator_name}', '{village_name}', '{days}', '{last_report_day}'],
+    messages: [
+      {
+        language: 'english',
+        message:
+          'Dear {operator_name},\nWe have noticed that data has not been reported for {village_name} for the last {days} days. Please ensure regular updates.\n\nJalSoochak',
+      },
+      {
+        language: 'telugu',
+        message:
+          'ప్రియమైన {operator_name},\n{village_name} కోసం గత {days} రోజులుగా డేటా నివేదించబడలేదని మేము గమనించాము. దయచేసి క్రమం తప్పకుండా అప్‌డేట్‌లను అందించండి.\n\nJalSoochak',
+      },
+    ],
   },
 ]
 
@@ -492,10 +519,12 @@ export const updateMockNudgeTemplate = (
     setTimeout(() => {
       const template = mockNudgeTemplates.find((t) => t.id === id)
       if (template) {
+        const updatedMessages = template.messages.map((m) =>
+          m.language === updates.language ? { ...m, message: updates.message } : m
+        )
         const updatedTemplate = {
           ...template,
-          language: updates.language,
-          message: updates.message,
+          messages: updatedMessages,
         }
         mockNudgeTemplates = mockNudgeTemplates.map((t) => (t.id === id ? updatedTemplate : t))
         resolve(updatedTemplate)

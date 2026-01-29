@@ -1,10 +1,14 @@
+export interface NudgeMessage {
+  language: string
+  message: string
+}
+
 export interface NudgeTemplate {
   id: string
   name: string
   type: string
-  language: string
-  message: string
   availableVariables: string[]
+  messages: NudgeMessage[]
 }
 
 export interface NudgeTemplateFormData {
