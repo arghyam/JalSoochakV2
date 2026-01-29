@@ -153,68 +153,62 @@ public class PersonService {
     @Transactional
     public void completeProfile(RegisterRequest registerRequest) {
 
-        Response response = null;
-
         InviteToken inviteToken = inviteTokenRepository.findByToken(registerRequest.getToken())
-                .orElseThrow(() -> new BadRequestException("Invalid invite token"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid invite token"));
 
         log.info("invite token: {}", inviteToken);
 
         if (inviteToken.isUsed()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token has been used");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invite token has already been used");
         }
 
         if (inviteToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token has been used");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invite token has expired");
         }
 
         PersonMaster person = personMasterRepository.findByEmail(inviteToken.getEmail())
-                .orElseThrow(() -> new BadRequestException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found for this invite"));
 
         log.info("person: {}", person);
 
-        if (person.isProfileCompleted())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile already completed");
+        if (person.isProfileCompleted()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile has already been completed");
+        }
 
-        if (personMasterRepository.existsByPhoneNumber(registerRequest.getPhoneNumber()))
+        if (personMasterRepository.existsByPhoneNumber(registerRequest.getPhoneNumber())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone number already exists");
+        }
 
         PersonTypeMaster personType = personTypeMasterRepository.findBycName(registerRequest.getPersonType())
-                .orElseThrow(() -> new BadRequestException("Invalid person type"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid person type"));
 
-
-        UsersResource users = keycloakProvider.getAdminInstance()
+        UsersResource usersResource = keycloakProvider.getAdminInstance()
                 .realm(realm)
                 .users();
 
-        UserRepresentation user = new UserRepresentation();
-        user.setUsername(registerRequest.getPhoneNumber());
-        user.setEmail(person.getEmail());
-        user.setEnabled(true);
-        user.setEmailVerified(false);
-        user.setRequiredActions(List.of("UPDATE_PASSWORD"));
+        UserRepresentation keycloakUser = new UserRepresentation();
+        keycloakUser.setUsername(registerRequest.getPhoneNumber());
+        keycloakUser.setEmail(person.getEmail());
+        keycloakUser.setFirstName(registerRequest.getFirstName());
+        keycloakUser.setLastName(registerRequest.getLastName());
+        keycloakUser.setEnabled(true);
+        keycloakUser.setEmailVerified(true);
+        keycloakUser.setRequiredActions(List.of("UPDATE_PASSWORD"));
 
-        response = users.create(user);
+        Response response = usersResource.create(keycloakUser);
 
         if (response.getStatus() != 201) {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Failed to create user in Keycloak");
         }
 
-        String keycloakUserId =
-                response.getLocation().getPath().replaceAll(".*/", "");
-
+        String keycloakUserId = response.getLocation().getPath().replaceAll(".*/", "");
 
         CredentialRepresentation credential = new CredentialRepresentation();
         credential.setType(CredentialRepresentation.PASSWORD);
         credential.setValue(registerRequest.getPassword());
         credential.setTemporary(false);
 
-        keycloakProvider.getAdminInstance()
-                .realm(realm)
-                .users()
-                .get(person.getKeycloakUserId())
-                .resetPassword(credential);
-
+        usersResource.get(keycloakUserId).resetPassword(credential);
 
         person.setFirstName(registerRequest.getFirstName());
         person.setLastName(registerRequest.getLastName());
@@ -230,12 +224,15 @@ public class PersonService {
         try {
             assignRoleToUser(person.getKeycloakUserId(), "STATE_ADMIN");
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to assign role to user: {}", e.getMessage(), e);
         }
 
         inviteToken.setUsed(true);
         inviteTokenRepository.save(inviteToken);
+
+        log.info("Profile completed successfully for user: {}", person.getEmail());
     }
+
 
     public TokenResponse login(LoginRequest loginRequest) {
         Map<String, Object> tokenMap = keycloakClient.obtainToken(
@@ -243,75 +240,66 @@ public class PersonService {
         );
 
         PersonMaster person = personMasterRepository.findByPhoneNumber(loginRequest.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "User not found with this phone number"
+                ));
 
         log.debug("User '{}' logged in with tenant '{}'", person.getPhoneNumber(), person.getTenantId());
 
         TokenResponse tokenResponse = new TokenResponse();
         tokenResponse.setAccessToken((String) tokenMap.get("access_token"));
         tokenResponse.setRefreshToken((String) tokenMap.get("refresh_token"));
-
-        tokenResponse.setExpiresIn(
-                tokenMap.get("expires_in") instanceof Number
-                        ? ((Number) tokenMap.get("expires_in")).intValue()
-                        : 0
-        );
-
-        tokenResponse.setRefreshExpiresIn(
-                tokenMap.get("refresh_expires_in") instanceof Number
-                        ? ((Number) tokenMap.get("refresh_expires_in")).intValue()
-                        : 0
-        );
-
+        tokenResponse.setExpiresIn(tokenMap.get("expires_in") instanceof Number ? ((Number) tokenMap.get("expires_in")).intValue() : 0);
+        tokenResponse.setRefreshExpiresIn(tokenMap.get("refresh_expires_in") instanceof Number ? ((Number) tokenMap.get("refresh_expires_in")).intValue() : 0);
         tokenResponse.setTokenType((String) tokenMap.get("token_type"));
         tokenResponse.setIdToken((String) tokenMap.get("id_token"));
         tokenResponse.setSessionState((String) tokenMap.get("session_state"));
         tokenResponse.setScope((String) tokenMap.get("scope"));
 
-
         return tokenResponse;
     }
 
+
     public TokenResponse refreshToken(String refreshToken) {
-        Map<String, Object> tokenMap = keycloakClient.refreshToken(refreshToken);
+        if (refreshToken == null || refreshToken.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Refresh token must be provided");
+        }
+
+        Map<String, Object> tokenMap;
+        try {
+            tokenMap = keycloakClient.refreshToken(refreshToken);
+        } catch (Exception e) {
+            log.error("Failed to refresh token", e);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid refresh token");
+        }
 
         String accessToken = (String) tokenMap.get("access_token");
         Map<String, Object> userInfo = keycloakClient.getUserInfo(accessToken);
 
         String username = (String) userInfo.get("preferred_username");
         if (username == null || username.isBlank()) {
-            throw new RuntimeException("Unable to extract username from token");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to extract username from token");
         }
 
         PersonMaster person = personMasterRepository.findByPhoneNumber(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
 
-        log.debug("User '{}' logged in with tenant '{}'", person.getPhoneNumber(), person.getTenantId());
+        log.debug("User '{}' refreshed token with tenant '{}'", person.getPhoneNumber(), person.getTenantId());
 
         TokenResponse tokenResponse = new TokenResponse();
         tokenResponse.setAccessToken(accessToken);
         tokenResponse.setRefreshToken((String) tokenMap.get("refresh_token"));
 
-        tokenResponse.setExpiresIn(
-                tokenMap.get("expires_in") instanceof Number
-                        ? ((Number) tokenMap.get("expires_in")).intValue()
-                        : 0
-        );
-
-        tokenResponse.setRefreshExpiresIn(
-                tokenMap.get("refresh_expires_in") instanceof Number
-                        ? ((Number) tokenMap.get("refresh_expires_in")).intValue()
-                        : 0
-        );
-
+        tokenResponse.setExpiresIn(tokenMap.get("expires_in") instanceof Number ? ((Number) tokenMap.get("expires_in")).intValue() : 0);
+        tokenResponse.setRefreshExpiresIn(tokenMap.get("refresh_expires_in") instanceof Number ? ((Number) tokenMap.get("refresh_expires_in")).intValue() : 0);
         tokenResponse.setTokenType((String) tokenMap.get("token_type"));
         tokenResponse.setIdToken((String) tokenMap.get("id_token"));
         tokenResponse.setSessionState((String) tokenMap.get("session_state"));
         tokenResponse.setScope((String) tokenMap.get("scope"));
 
-
         return tokenResponse;
     }
+
 
 
     public boolean logout(String refreshToken) {

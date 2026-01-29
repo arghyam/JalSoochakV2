@@ -70,44 +70,17 @@ public class PersonController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        try {
-            TokenResponse response = personService.login(request);
-            return ResponseEntity.ok(response);
-
-        } catch (RuntimeException e) {
-            log.warn("Login failed due to invalid credentials or input", e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "Invalid username or password"));
-
-        } catch (Exception e) {
-            log.error("Unexpected error during login", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "An unexpected error occurred. Please try again later."));
-        }
+    public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest request) {
+        TokenResponse response = personService.login(request);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(@RequestBody TokenRequest tokenRequest) {
-        if (tokenRequest.getRefreshToken() == null || tokenRequest.getRefreshToken().isBlank()) {
-            log.warn("Refresh token is missing or blank");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "Refresh token must be provided"));
-        }
-
-        try {
-            TokenResponse response = personService.refreshToken(tokenRequest.getRefreshToken());
-            return ResponseEntity.ok(response);
-        } catch (BadRequestException e) {
-            log.warn("Invalid refresh token: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "Invalid refresh token"));
-        } catch (Exception e) {
-            log.error("Unexpected error during token refresh", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "An unexpected error occurred. Please try again later."));
-        }
+    public ResponseEntity<TokenResponse> refresh(@RequestBody TokenRequest tokenRequest) {
+        TokenResponse response = personService.refreshToken(tokenRequest.getRefreshToken());
+        return ResponseEntity.ok(response);
     }
+
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestParam String refreshToken) {
