@@ -219,22 +219,12 @@ export function ResetPasswordPage() {
                         borderColor: 'neutral.400',
                         borderRadius: '4px',
                         overflow: 'hidden',
-                        _checked: {
-                          bg: 'primary.500',
-                          borderColor: 'primary.500',
-                          color: 'white',
-                        },
-                        _hover: {
-                          bg: 'primary.500',
-                          borderColor: 'primary.500',
-                        },
-                        _focusVisible: {
-                          boxShadow: 'none',
-                        },
                       },
                     }}
                   >
-                    Remember me
+                    <Text textStyle="bodyText5" fontWeight="400" color="neutral.950">
+                      Remember me
+                    </Text>
                   </Checkbox>
 
                   <Button
