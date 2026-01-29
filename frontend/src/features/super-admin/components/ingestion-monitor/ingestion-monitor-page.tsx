@@ -100,8 +100,8 @@ export function IngestionMonitorPage() {
         label: t('common:status.successful'),
       },
       warning: {
-        bg: '#FFF3CD',
-        color: '#CC8800',
+        bg: '#FFF0DB',
+        color: '#F79009',
         label: t('common:status.warning'),
       },
       failed: {
@@ -298,6 +298,7 @@ export function IngestionMonitorPage() {
           columns={statsColumns}
           spacing={7}
           mb={1}
+          height={{ base: 'auto', md: '200px' }}
           as="section"
           aria-label={t('ingestionMonitor.stats.totalIngestions')}
         >
@@ -350,6 +351,7 @@ export function IngestionMonitorPage() {
           borderColor="neutral.200"
           borderRadius="16px"
           boxShadow="default"
+          height={{ base: 'auto', md: '420px' }}
           py={6}
           px={4}
           mb={1}
@@ -364,7 +366,7 @@ export function IngestionMonitorPage() {
             lineKey="failedIngestions"
             barColor="#3291D1"
             lineColor="#FFA100"
-            height="400px"
+            height="326px"
             barLegendLabel={t('overview.charts.successfulIngestions')}
             lineLegendLabel={t('overview.charts.failedIngestions')}
           />
@@ -379,6 +381,7 @@ export function IngestionMonitorPage() {
           borderColor="neutral.200"
           borderRadius="12px"
           boxShadow="default"
+          height={{ base: 'auto', md: '395px' }}
           py={4}
           px={{ base: 3, md: 4 }}
         >
@@ -420,7 +423,7 @@ export function IngestionMonitorPage() {
                   gap={4}
                   flexDirection={{ base: 'column', md: 'row' }}
                 >
-                  <Box minW={0} flex={1}>
+                  <Box width={{ base: 'auto', lg: '694px' }}>
                     <Text fontSize="16px" fontWeight="400" color="neutral.950" mb={0.5}>
                       {log.title}
                       {log.status === 'successful' && log.recordsProcessed && (
@@ -457,12 +460,16 @@ export function IngestionMonitorPage() {
                   </Box>
                   <Flex
                     align="center"
-                    gap={4}
                     flexDirection={{ base: 'row', md: 'row' }}
-                    justify={{ base: 'space-between', md: 'flex-end' }}
                     w={{ base: 'full', md: 'auto' }}
                   >
                     {getStatusBadge(log.status)}
+                  </Flex>
+                  <Flex
+                    align="center"
+                    flexDirection={{ base: 'row', md: 'row' }}
+                    w={{ base: 'full', md: 'auto' }}
+                  >
                     <Text fontSize="16px" color="neutral.600" whiteSpace="nowrap">
                       {formatTimestamp(log.timestamp)}
                     </Text>

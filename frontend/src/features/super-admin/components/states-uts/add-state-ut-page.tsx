@@ -206,6 +206,7 @@ export function AddStateUTPage() {
                   value={stateName}
                   onChange={handleStateChange}
                   placeholder={t('common:select')}
+                  placeholderColor="neutral.300"
                   width="100%"
                 />
               </FormControl>
@@ -245,7 +246,7 @@ export function AddStateUTPage() {
                   h={9}
                   maxW={{ base: '100%', lg: '486px' }}
                   borderColor="neutral.200"
-                  _placeholder={{ color: 'neutral.400' }}
+                  _placeholder={{ color: 'neutral.300' }}
                   aria-required="true"
                 />
               </FormControl>
@@ -260,7 +261,7 @@ export function AddStateUTPage() {
                   h={9}
                   maxW={{ base: '100%', lg: '486px' }}
                   borderColor="neutral.200"
-                  _placeholder={{ color: 'neutral.400' }}
+                  _placeholder={{ color: 'neutral.300' }}
                   aria-required="true"
                 />
               </FormControl>
@@ -276,7 +277,7 @@ export function AddStateUTPage() {
                   h={9}
                   maxW={{ base: '100%', lg: '486px' }}
                   borderColor="neutral.200"
-                  _placeholder={{ color: 'neutral.400' }}
+                  _placeholder={{ color: 'neutral.300' }}
                   aria-required="true"
                 />
               </FormControl>
@@ -298,7 +299,7 @@ export function AddStateUTPage() {
                   h={9}
                   maxW={{ base: '100%', lg: '486px' }}
                   borderColor="neutral.200"
-                  _placeholder={{ color: 'neutral.400' }}
+                  _placeholder={{ color: 'neutral.300' }}
                   aria-required="true"
                   inputMode="numeric"
                 />
@@ -315,7 +316,7 @@ export function AddStateUTPage() {
                   h={9}
                   maxW={{ base: '100%', lg: '486px' }}
                   borderColor="neutral.200"
-                  _placeholder={{ color: 'neutral.400' }}
+                  _placeholder={{ color: 'neutral.300' }}
                 />
               </FormControl>
               <FormControl>
@@ -336,7 +337,7 @@ export function AddStateUTPage() {
                   h={9}
                   maxW={{ base: '100%', lg: '486px' }}
                   borderColor="neutral.200"
-                  _placeholder={{ color: 'neutral.400' }}
+                  _placeholder={{ color: 'neutral.300' }}
                   inputMode="numeric"
                 />
               </FormControl>

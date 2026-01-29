@@ -141,21 +141,25 @@ export function StatesUTsPage() {
         <Flex gap={1}>
           <IconButton
             aria-label={`${t('statesUts.aria.viewStateUt')} ${row.name}`}
-            icon={<FiEye aria-hidden="true" />}
+            icon={<FiEye aria-hidden="true" size={20} />}
             variant="ghost"
-            w={5}
-            h={5}
-            size="sm"
+            width={5}
+            minW={5}
+            height={5}
+            color="neutral.950"
+            fontWeight="400"
             onClick={() => handleView(row.id)}
             _hover={{ color: 'primary.500', bg: 'transparent' }}
           />
           <IconButton
             aria-label={`${t('statesUts.aria.editStateUt')} ${row.name}`}
-            icon={<EditIcon aria-hidden="true" />}
+            icon={<EditIcon aria-hidden="true" w={5} h={5} />}
             variant="ghost"
-            w={5}
-            h={5}
-            size="sm"
+            width={5}
+            minW={5}
+            height={5}
+            color="neutral.950"
+            fontWeight="400"
             onClick={() => handleEdit(row.id)}
             _hover={{ color: 'primary.500', bg: 'transparent' }}
           />
