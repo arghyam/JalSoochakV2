@@ -27,6 +27,7 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
   const [emailError, setEmailError] = useState('')
 
   const handleClose = () => {
+    setEmail('')
     setEmailError('')
     onClose()
   }
@@ -45,6 +46,7 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
       return
     }
 
+    setEmail('')
     setEmailError('')
     onClose()
     navigate(ROUTES.RESET_PASSWORD)
