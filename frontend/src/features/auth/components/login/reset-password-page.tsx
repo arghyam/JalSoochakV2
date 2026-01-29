@@ -64,7 +64,7 @@ export function ResetPasswordPage() {
                   <FormControl>
                     <FormLabel textStyle="bodyText6" mb="4px">
                       Password sent via email{' '}
-                      <Text as="span" color="red.500">
+                      <Text as="span" color="error.500">
                         *
                       </Text>
                     </FormLabel>
@@ -111,7 +111,7 @@ export function ResetPasswordPage() {
                   <FormControl>
                     <FormLabel textStyle="bodyText6" mb="4px">
                       Create new password{' '}
-                      <Text as="span" color="red.500">
+                      <Text as="span" color="error.500">
                         *
                       </Text>
                     </FormLabel>
@@ -158,7 +158,7 @@ export function ResetPasswordPage() {
                   <FormControl>
                     <FormLabel textStyle="bodyText6" mb="4px">
                       Rewrite password{' '}
-                      <Text as="span" color="red.500">
+                      <Text as="span" color="error.500">
                         *
                       </Text>
                     </FormLabel>
@@ -203,7 +203,7 @@ export function ResetPasswordPage() {
                   </FormControl>
 
                   {!isPasswordMatch && confirmPassword ? (
-                    <Text mt="-8px" fontSize="sm" color="red.500">
+                    <Text mt="-8px" fontSize="sm" color="error.500">
                       Passwords do not match.
                     </Text>
                   ) : null}

@@ -174,6 +174,7 @@ export function Sidebar({ onNavClick }: SidebarProps) {
         bg="white"
         borderRight="1px"
         borderColor="neutral.100"
+        py={10}
       >
         {/* Brand Section */}
         <Flex
@@ -184,7 +185,6 @@ export function Sidebar({ onNavClick }: SidebarProps) {
           borderBottom="1px"
           borderColor="neutral.100"
           px={7}
-          pt={2}
         >
           <Image src={jalsoochakLogo} alt={t('sidebar.logoAlt', 'JalSoochak logo')} />
         </Flex>
@@ -199,7 +199,11 @@ export function Sidebar({ onNavClick }: SidebarProps) {
         >
           <Stack gap={4} px={7} py={4}>
             {visibleNavItems.map((item) => {
-              const isActive = location.pathname === item.path
+              const isActive =
+                location.pathname === item.path ||
+                (item.path !== ROUTES.SUPER_ADMIN_OVERVIEW &&
+                  item.path !== ROUTES.STATE_ADMIN_OVERVIEW &&
+                  location.pathname.startsWith(item.path + '/'))
               const ItemIcon = item.icon
 
               return (

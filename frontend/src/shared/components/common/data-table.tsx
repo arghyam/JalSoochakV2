@@ -15,9 +15,11 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  useBreakpointValue,
 } from '@chakra-ui/react'
 import { ChevronUpIcon, ChevronDownIcon } from '@chakra-ui/icons'
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa'
+import { useTranslation } from 'react-i18next'
 
 export interface DataTableColumn<T> {
   key: string
@@ -47,16 +49,21 @@ export function DataTable<T extends object>({
   columns,
   data,
   getRowKey,
-  emptyMessage = 'No data available',
+  emptyMessage,
   isLoading = false,
   pagination,
 }: DataTableProps<T>) {
+  const { t } = useTranslation('common')
   const [sortColumn, setSortColumn] = useState<string | null>(null)
   const [sortDirection, setSortDirection] = useState<SortDirection>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(pagination?.pageSize ?? 10)
 
+  // Responsive values
+  const showPaginationText = useBreakpointValue({ base: false, md: true }) ?? true
+
   const pageSizeOptions = pagination?.pageSizeOptions ?? [10, 25, 50]
+  const displayEmptyMessage = emptyMessage ?? t('noDataAvailable')
 
   const handleSort = (columnKey: string, sortable?: boolean) => {
     if (!sortable) return
@@ -185,8 +192,11 @@ export function DataTable<T extends object>({
         pb="24px"
         pl="16px"
         textAlign="center"
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
       >
-        <Text color="neutral.600">Loading...</Text>
+        <Text color="neutral.600">{t('loading')}</Text>
       </Box>
     )
   }
@@ -204,98 +214,153 @@ export function DataTable<T extends object>({
         pb="24px"
         pl="16px"
         textAlign="center"
+        role="status"
       >
-        <Text color="neutral.600">{emptyMessage}</Text>
+        <Text color="neutral.600">{displayEmptyMessage}</Text>
       </Box>
     )
   }
 
   return (
-    <Box
-      bg="white"
-      borderWidth="0.5px"
-      borderColor="neutral.100"
-      borderRadius="12px"
-      w="full"
-      overflow="hidden"
-      pt="24px"
-      pr="16px"
-      pb="24px"
-      pl="16px"
-    >
-      <Table size="sm" variant="simple">
-        <Thead>
-          <Tr>
-            {columns.map((column) => (
-              <Th
-                key={column.key}
-                cursor={column.sortable ? 'pointer' : 'default'}
-                onClick={() => handleSort(column.key, column.sortable)}
-                userSelect="none"
-                _hover={column.sortable ? { bg: 'neutral.50' } : undefined}
-                bg="transparent"
-                h={10}
-                px={5}
-                py={3}
-                textTransform="none"
-              >
-                <Flex align="center" gap={2} textStyle="h10">
-                  <Text>{column.header}</Text>
-                  {column.sortable && (
-                    <Box>
-                      {sortColumn === column.key ? (
-                        sortDirection === 'asc' ? (
-                          <ChevronUpIcon boxSize={4} />
-                        ) : (
-                          <ChevronDownIcon boxSize={4} />
-                        )
-                      ) : (
-                        <Box opacity={0.3}>
-                          <ChevronUpIcon boxSize={4} />
-                        </Box>
-                      )}
-                    </Box>
-                  )}
-                </Flex>
-              </Th>
-            ))}
-          </Tr>
-        </Thead>
-        <Tbody>
-          {paginatedData.map((row) => (
-            <Tr key={getRowKey(row)} _hover={{ bg: 'neutral.25' }}>
-              {columns.map((column) => (
-                <Td
-                  key={column.key}
-                  borderTop="1px"
-                  borderBottom="none"
-                  borderColor="neutral.200"
-                  px={5}
-                  py={3}
-                  h={12}
-                >
-                  {column.render
-                    ? column.render(row)
-                    : String((row as Record<string, unknown>)[column.key] ?? '')}
-                </Td>
-              ))}
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
+    <Box w="full" maxW="100%">
+      {/* Table Container */}
+      <Box
+        bg="white"
+        borderWidth="0.5px"
+        borderColor="neutral.100"
+        borderRadius={pagination?.enabled ? '12px 12px 0 0' : '12px'}
+        overflow="hidden"
+        pt="24px"
+        pb="24px"
+      >
+        <Box
+          overflowX="auto"
+          px={{ base: 2, md: 4 }}
+          pb={2}
+          sx={{
+            WebkitOverflowScrolling: 'touch',
+            '&::-webkit-scrollbar': {
+              height: '8px',
+            },
+            '&::-webkit-scrollbar-track': {
+              bg: 'neutral.50',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              bg: 'neutral.300',
+              borderRadius: '4px',
+            },
+          }}
+        >
+          <Table size="sm" variant="simple" w="max-content" minW="100%">
+            <Thead>
+              <Tr>
+                {columns.map((column) => {
+                  const isSorted = sortColumn === column.key
+                  const ariaSortValue = isSorted
+                    ? sortDirection === 'asc'
+                      ? 'ascending'
+                      : 'descending'
+                    : undefined
 
-      {/* Pagination Controls */}
+                  return (
+                    <Th
+                      key={column.key}
+                      scope="col"
+                      cursor={column.sortable ? 'pointer' : 'default'}
+                      onClick={() => handleSort(column.key, column.sortable)}
+                      onKeyDown={(e) => {
+                        if (column.sortable && (e.key === 'Enter' || e.key === ' ')) {
+                          e.preventDefault()
+                          handleSort(column.key, column.sortable)
+                        }
+                      }}
+                      tabIndex={column.sortable ? 0 : undefined}
+                      userSelect="none"
+                      _hover={column.sortable ? { bg: 'neutral.50' } : undefined}
+                      bg="transparent"
+                      h={10}
+                      px={{ base: 3, md: 5 }}
+                      py={3}
+                      textTransform="none"
+                      whiteSpace="nowrap"
+                      aria-sort={column.sortable ? ariaSortValue : undefined}
+                    >
+                      <Flex align="center" gap={2} textStyle="h10">
+                        <Text whiteSpace="nowrap">{column.header}</Text>
+                        {column.sortable && (
+                          <Box aria-hidden="true">
+                            {isSorted ? (
+                              sortDirection === 'asc' ? (
+                                <ChevronUpIcon boxSize={4} />
+                              ) : (
+                                <ChevronDownIcon boxSize={4} />
+                              )
+                            ) : (
+                              <Box opacity={0.3}>
+                                <ChevronUpIcon boxSize={4} />
+                              </Box>
+                            )}
+                          </Box>
+                        )}
+                      </Flex>
+                    </Th>
+                  )
+                })}
+              </Tr>
+            </Thead>
+            <Tbody>
+              {paginatedData.map((row) => (
+                <Tr key={getRowKey(row)} _hover={{ bg: 'neutral.25' }}>
+                  {columns.map((column) => (
+                    <Td
+                      key={column.key}
+                      borderTop="1px"
+                      borderBottom="none"
+                      borderColor="neutral.200"
+                      px={{ base: 3, md: 5 }}
+                      py={3}
+                      h={12}
+                      whiteSpace="nowrap"
+                    >
+                      {column.render
+                        ? column.render(row)
+                        : String((row as Record<string, unknown>)[column.key] ?? '')}
+                    </Td>
+                  ))}
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </Box>
+      </Box>
+
+      {/* Pagination Controls - Outside the table box */}
       {pagination?.enabled && totalPages > 0 && (
-        <Flex justify="space-between" align="center" mt={6} px={4} h="42px">
+        <Flex
+          as="nav"
+          aria-label="Pagination"
+          justify="space-between"
+          align="center"
+          px={{ base: 2, md: 4 }}
+          py={4}
+          h={{ base: 'auto', md: '66px' }}
+          flexDirection={{ base: 'column', md: 'row' }}
+          gap={{ base: 3, md: 0 }}
+          bg="neutral.50"
+          borderRadius="0 0 12px 12px"
+        >
           {/* Items per page selector */}
-          <HStack spacing="10px">
-            <Text>Items per Page</Text>
+          <HStack spacing={{ base: '6px', md: '10px' }}>
+            {showPaginationText && (
+              <Text fontSize={{ base: 'sm', md: 'md' }}>{t('table.itemsPerPage')}</Text>
+            )}
             <Menu>
               <MenuButton
                 as={Button}
                 variant="outline"
                 size="sm"
-                rightIcon={<ChevronDownIcon />}
+                rightIcon={<ChevronDownIcon aria-hidden="true" />}
                 fontWeight="400"
                 borderColor="#E9EAEB"
                 borderRadius="8px"
@@ -304,8 +369,9 @@ export function DataTable<T extends object>({
                 px="15px"
                 maxW="72px"
                 bg="neutral.100"
-                _hover={{ bg: 'neutral.50' }}
+                _hover={{ bg: 'white' }}
                 _active={{ bg: 'neutral.100' }}
+                aria-label={`${t('table.itemsPerPage')}: ${itemsPerPage}`}
               >
                 {itemsPerPage}
               </MenuButton>
@@ -324,26 +390,27 @@ export function DataTable<T extends object>({
           </HStack>
 
           {/* Page navigation */}
-          <HStack spacing={2} h={8}>
+          <HStack spacing={{ base: 1, md: 2 }} h={8}>
             {/* Previous button */}
             <Button
               variant="ghost"
               size="sm"
               onClick={() => handlePageChange(effectiveCurrentPage - 1)}
               isDisabled={effectiveCurrentPage === 1}
-              leftIcon={<FaArrowLeft />}
+              leftIcon={<FaArrowLeft aria-hidden="true" />}
               fontWeight="400"
               color="neutral.600"
-              _hover={{ bg: 'neutral.50' }}
+              _hover={{ bg: 'white' }}
+              aria-label={t('table.previous')}
             >
-              Previous
+              {showPaginationText && t('table.previous')}
             </Button>
 
-            {/* Page numbers */}
-            <HStack spacing={2}>
+            {/* Page numbers - hidden on mobile */}
+            <HStack spacing={{ base: 1, md: 2 }} display={{ base: 'none', sm: 'flex' }}>
               {getPageNumbers().map((page, index) =>
                 page === 'ellipsis' ? (
-                  <Text key={`ellipsis-${index}`} px={2} color="neutral.400">
+                  <Text key={`ellipsis-${index}`} px={2} color="neutral.400" aria-hidden="true">
                     ...
                   </Text>
                 ) : (
@@ -361,8 +428,10 @@ export function DataTable<T extends object>({
                     bg={effectiveCurrentPage === page ? 'primary.500' : 'transparent'}
                     color={effectiveCurrentPage === page ? 'white' : 'neutral.600'}
                     _hover={{
-                      bg: effectiveCurrentPage === page ? 'primary.600' : 'neutral.50',
+                      bg: effectiveCurrentPage === page ? 'primary.600' : 'white',
                     }}
+                    aria-label={t('table.goToPage', { page })}
+                    aria-current={effectiveCurrentPage === page ? 'page' : undefined}
                   >
                     {page}
                   </Button>
@@ -370,18 +439,24 @@ export function DataTable<T extends object>({
               )}
             </HStack>
 
+            {/* Mobile page indicator */}
+            <Text display={{ base: 'block', sm: 'none' }} fontSize="sm" color="neutral.600" px={2}>
+              {effectiveCurrentPage} / {totalPages}
+            </Text>
+
             {/* Next button */}
             <Button
               variant="ghost"
               size="sm"
               onClick={() => handlePageChange(effectiveCurrentPage + 1)}
               isDisabled={effectiveCurrentPage === totalPages}
-              rightIcon={<FaArrowRight />}
+              rightIcon={<FaArrowRight aria-hidden="true" />}
               fontWeight="400"
               color="neutral.600"
-              _hover={{ bg: 'neutral.50' }}
+              _hover={{ bg: 'white' }}
+              aria-label={t('table.next')}
             >
-              Next
+              {showPaginationText && t('table.next')}
             </Button>
           </HStack>
         </Flex>

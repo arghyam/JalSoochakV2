@@ -10,6 +10,8 @@ import {
   useOutsideClick,
   Flex,
 } from '@chakra-ui/react'
+import type { ResponsiveValue } from '@chakra-ui/react'
+import type { Property } from 'csstype'
 import { SearchIcon, ChevronDownIcon } from '@chakra-ui/icons'
 
 export interface SearchableSelectOption {
@@ -23,7 +25,7 @@ export interface SearchableSelectProps {
   onChange: (value: string) => void
   placeholder?: string
   disabled?: boolean
-  width?: ResponsiveValue<string>
+  width?: ResponsiveValue<Property.Width>
   fontSize?: string
   textColor?: string
   height?: string
@@ -32,6 +34,9 @@ export interface SearchableSelectProps {
   textStyle?: string
   required?: boolean
   isFilter?: boolean
+  id?: string
+  'aria-labelledby'?: string
+  placeholderColor?: string
 }
 
 export function SearchableSelect({
@@ -49,6 +54,9 @@ export function SearchableSelect({
   textStyle = 'h10',
   required = false,
   isFilter = false,
+  id,
+  'aria-labelledby': ariaLabelledBy,
+  placeholderColor = 'neutral.500',
 }: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -89,8 +97,8 @@ export function SearchableSelect({
   const displayColor = isFilter
     ? selectedOption
       ? 'primary.500'
-      : textColor || 'neutral.500'
-    : textColor || (selectedOption ? 'neutral.950' : 'neutral.500')
+      : textColor || placeholderColor
+    : textColor || (selectedOption ? 'neutral.950' : placeholderColor)
   const displayBorderColor = isFilter ? (selectedOption ? 'primary.500' : borderColor) : borderColor
 
   return (
@@ -99,10 +107,12 @@ export function SearchableSelect({
       <Flex
         as="button"
         type="button"
+        id={id}
         role="combobox"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         aria-controls={listboxId}
+        aria-labelledby={ariaLabelledBy}
         aria-disabled={disabled}
         disabled={disabled}
         w="full"
@@ -128,7 +138,6 @@ export function SearchableSelect({
       >
         <Text
           fontSize={fontSize}
-          // color={textColor || (selectedOption ? 'neutral.950' : 'neutral.500')}
           color={displayColor}
           textStyle={textStyle}
           fontWeight={isFilter ? 'semibold' : '400'}
