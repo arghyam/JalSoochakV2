@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   Button,
   Flex,
@@ -11,7 +12,9 @@ import {
   Text,
   Box,
 } from '@chakra-ui/react'
+import { useNavigate } from 'react-router-dom'
 import { HiOutlineMail } from 'react-icons/hi'
+import { ROUTES } from '@/shared/constants/routes'
 
 type ForgotPasswordModalProps = {
   isOpen: boolean
@@ -19,8 +22,36 @@ type ForgotPasswordModalProps = {
 }
 
 export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProps) {
+  const navigate = useNavigate()
+  const [email, setEmail] = useState('')
+  const [emailError, setEmailError] = useState('')
+
+  const handleClose = () => {
+    setEmailError('')
+    onClose()
+  }
+
+  const handleSendResetLink = () => {
+    const trimmedEmail = email.trim()
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)
+
+    if (!trimmedEmail) {
+      setEmailError('Email is required.')
+      return
+    }
+
+    if (!isValidEmail) {
+      setEmailError('Enter a valid email address.')
+      return
+    }
+
+    setEmailError('')
+    onClose()
+    navigate(ROUTES.RESET_PASSWORD)
+  }
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} isCentered>
+    <Modal isOpen={isOpen} onClose={handleClose} isCentered>
       <ModalOverlay bg="#101828B3" />
       <ModalContent maxW="408px" h="328px" borderRadius="12px" p="24px">
         <ModalBody p="0">
@@ -56,6 +87,13 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
               type="email"
               placeholder="Enter your email"
               autoComplete="email"
+              value={email}
+              onChange={(event) => {
+                setEmail(event.target.value)
+                if (emailError) {
+                  setEmailError('')
+                }
+              }}
               h="36px"
               px="12px"
               py="8px"
@@ -65,13 +103,23 @@ export function ForgotPasswordModal({ isOpen, onClose }: ForgotPasswordModalProp
               fontSize="sm"
               focusBorderColor="primary.500"
             />
+            {emailError ? (
+              <Text mt="4px" fontSize="xs" color="error.500">
+                {emailError}
+              </Text>
+            ) : null}
           </FormControl>
 
-          <Flex mt="32px" gap="20px" justify="space-between">
-            <Button variant="secondary" w="full" onClick={onClose}>
+          <Flex mt={emailError ? '0' : '32px'} gap="20px" justify="space-between">
+            <Button variant="secondary" w="full" onClick={handleClose}>
               Cancel
             </Button>
-            <Button variant="primary" w="full" _hover={{ bg: 'primary.600' }}>
+            <Button
+              variant="primary"
+              w="full"
+              _hover={{ bg: 'primary.600' }}
+              onClick={handleSendResetLink}
+            >
               Send Reset Link
             </Button>
           </Flex>

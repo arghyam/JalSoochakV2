@@ -64,7 +64,13 @@ export function LoginPage() {
       >
         <Flex w="full" direction="column">
           <Box w="full" maxW="420px">
-            <Image src={jalsoochakLogo} alt="JalSoochak logo" h="50px" mb={{ base: 10, md: 12 }} />
+            <Image
+              src={jalsoochakLogo}
+              alt="JalSoochak logo"
+              w="117.61px"
+              h="68.55px"
+              mb={{ base: 10, md: 12 }}
+            />
           </Box>
 
           <Flex flex="1" align="center" justify="center">
@@ -94,6 +100,8 @@ export function LoginPage() {
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
                       maxLength={10}
+                      textStyle="bodyText5"
+                      color="neutral.950"
                       h="36px"
                       px="12px"
                       py="8px"
@@ -119,6 +127,8 @@ export function LoginPage() {
                         autoComplete="current-password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        textStyle="bodyText5"
+                        color="neutral.950"
                         h="36px"
                         px="12px"
                         py="8px"
@@ -171,7 +181,15 @@ export function LoginPage() {
                         },
                       }}
                     >
-                      Remember me
+                      <Text
+                        textStyle="bodyText5"
+                        fontWeight="400"
+                        color="neutral.950"
+                        w="94px"
+                        h="18px"
+                      >
+                        Remember me
+                      </Text>
                     </Checkbox>
 
                     <Link
