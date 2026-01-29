@@ -181,13 +181,7 @@ export function LoginPage() {
                         },
                       }}
                     >
-                      <Text
-                        textStyle="bodyText5"
-                        fontWeight="400"
-                        color="neutral.950"
-                        w="94px"
-                        h="18px"
-                      >
+                      <Text textStyle="bodyText5" fontWeight="400" color="neutral.950">
                         Remember me
                       </Text>
                     </Checkbox>
