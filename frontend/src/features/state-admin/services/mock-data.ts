@@ -16,12 +16,12 @@ export const mockOverviewData: OverviewData = {
     activeIntegrations: 8,
   },
   demandSupplyData: [
-    { period: 'FY20', demand: 450, supply: 380 },
-    { period: 'FY21', demand: 480, supply: 420 },
-    { period: 'FY22', demand: 520, supply: 460 },
-    { period: 'FY23', demand: 490, supply: 440 },
-    { period: 'FY24', demand: 510, supply: 470 },
-    { period: 'FY25', demand: 530, supply: 490 },
+    { period: 'FY20', Demand: 450, Supply: 380 },
+    { period: 'FY21', Demand: 480, Supply: 420 },
+    { period: 'FY22', Demand: 520, Supply: 460 },
+    { period: 'FY23', Demand: 490, Supply: 440 },
+    { period: 'FY24', Demand: 510, Supply: 470 },
+    { period: 'FY25', Demand: 530, Supply: 490 },
   ],
   dailyIngestionData: [
     { day: 'Day 1', count: 2100 },

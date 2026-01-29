@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Box, Text, Button, Flex, HStack, Input, IconButton } from '@chakra-ui/react'
-import { EditIcon, DeleteIcon } from '@chakra-ui/icons'
+import { EditIcon } from '@chakra-ui/icons'
+import { MdDeleteOutline } from 'react-icons/md'
 import {
   getMockWaterNormsConfiguration,
   saveMockWaterNormsConfiguration,
@@ -235,7 +236,10 @@ export function WaterNormsPage() {
                 {/* State Quantity Input */}
                 <Box mb={6}>
                   <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
-                    Current quantity (LPCD)*
+                    Current quantity (LPCD){''}
+                    <Text as="span" color="error.500">
+                      *
+                    </Text>
                   </Text>
                   <Input
                     placeholder="Enter"
@@ -287,31 +291,33 @@ export function WaterNormsPage() {
                         <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
                           Quantity (LPCD)
                         </Text>
-                        <Input
-                          placeholder="Enter"
-                          value={override.quantity || ''}
-                          onChange={(e) =>
-                            handleDistrictChange(override.id, 'quantity', Number(e.target.value))
-                          }
-                          type="number"
-                          w="486px"
-                          h="36px"
-                          borderColor="neutral.300"
-                          borderRadius="6px"
-                          _hover={{ borderColor: 'neutral.400' }}
-                          _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
-                        />
+                        <Flex gap={2}>
+                          <Input
+                            placeholder="Enter"
+                            value={override.quantity || ''}
+                            onChange={(e) =>
+                              handleDistrictChange(override.id, 'quantity', Number(e.target.value))
+                            }
+                            type="number"
+                            w="486px"
+                            h="36px"
+                            borderColor="neutral.300"
+                            borderRadius="6px"
+                            _hover={{ borderColor: 'neutral.400' }}
+                            _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
+                          />
+                          <IconButton
+                            aria-label="Delete district"
+                            icon={<MdDeleteOutline size={24} />}
+                            variant="ghost"
+                            size="sm"
+                            color="neutral.400"
+                            onClick={() => handleRemoveDistrict(override.id)}
+                            h="36px"
+                            _hover={{ bg: 'error.50', color: 'error.500' }}
+                          />
+                        </Flex>
                       </Box>
-                      <IconButton
-                        aria-label="Delete district"
-                        icon={<DeleteIcon h={5} w={5} />}
-                        variant="ghost"
-                        size="sm"
-                        color="neutral.400"
-                        onClick={() => handleRemoveDistrict(override.id)}
-                        h="36px"
-                        _hover={{ bg: 'error.50', color: 'error.500' }}
-                      />
                     </Flex>
                   ))}
 
@@ -323,17 +329,15 @@ export function WaterNormsPage() {
 
               {/* Action Buttons */}
               <HStack spacing={3} justify="flex-end">
-                {config?.isConfigured && (
-                  <Button
-                    variant="secondary"
-                    size="md"
-                    width="174px"
-                    onClick={handleCancel}
-                    isDisabled={isSaving}
-                  >
-                    Cancel
-                  </Button>
-                )}
+                <Button
+                  variant="secondary"
+                  size="md"
+                  width="174px"
+                  onClick={handleCancel}
+                  isDisabled={isSaving}
+                >
+                  Cancel
+                </Button>
                 <Button
                   variant="primary"
                   size="md"

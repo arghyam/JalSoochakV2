@@ -326,7 +326,10 @@ export function EscalationsPage() {
             {/* Alert Type Selection */}
             <Box>
               <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
-                Type of Alert*
+                Type of Alert{''}
+                <Text as="span" color="error.500">
+                  *
+                </Text>
               </Text>
               <SearchableSelect
                 options={AVAILABLE_ALERT_TYPES}
@@ -338,16 +341,24 @@ export function EscalationsPage() {
             </Box>
 
             {/* Escalation Levels */}
-            <Box>
-              <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
-                Level of Escalation*
-              </Text>
-
-              <VStack align="stretch">
-                {levels.map((level, index) => (
-                  <Flex key={level.id} w="full" justify="space-between">
-                    <Box>
-                      <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
+            <Flex justify="space-between" align="flex-start">
+              {/* Left Group: Level of Escalation */}
+              <Box>
+                <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
+                  Level of Escalation{''}
+                  <Text as="span" color="error.500">
+                    *
+                  </Text>
+                </Text>
+                <VStack align="stretch" spacing={3}>
+                  {levels.map((level, index) => (
+                    <HStack key={level.id} spacing={3} align="center">
+                      <Text
+                        fontSize="sm"
+                        fontWeight="medium"
+                        color="neutral.950"
+                        whiteSpace="nowrap"
+                      >
                         Level {index + 1}
                       </Text>
                       <SearchableSelect
@@ -355,41 +366,49 @@ export function EscalationsPage() {
                         value={level.targetRole}
                         onChange={(value) => handleLevelChange(level.id, 'targetRole', value)}
                         placeholder="Select"
-                        width="486px"
+                        width="420px"
                       />
-                    </Box>
+                    </HStack>
+                  ))}
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={handleAddLevel}
+                    w="152px"
+                    fontSize="14px"
+                    fontWeight="400"
+                    h="32px"
+                    mt={1}
+                  >
+                    + Add New Level
+                  </Button>
+                </VStack>
+              </Box>
 
-                    <Box>
-                      <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
-                        Escalate after (hours)*
-                      </Text>
-                      <SearchableSelect
-                        options={AVAILABLE_HOURS}
-                        value={String(level.escalateAfterHours)}
-                        onChange={(value) =>
-                          handleLevelChange(level.id, 'escalateAfterHours', Number(value))
-                        }
-                        placeholder="Select"
-                        width="486px"
-                      />
-                    </Box>
-                  </Flex>
-                ))}
-
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={handleAddLevel}
-                  w="152px"
-                  fontSize="14px"
-                  fontWeight="400"
-                  h="32px"
-                  mt={1}
-                >
-                  + Add New Level
-                </Button>
-              </VStack>
-            </Box>
+              {/* Right Group: Escalate after (hours) */}
+              <Box>
+                <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
+                  Escalate after (hours)
+                  <Text as="span" color="error.500">
+                    *
+                  </Text>
+                </Text>
+                <VStack align="stretch" spacing={3}>
+                  {levels.map((level) => (
+                    <SearchableSelect
+                      key={level.id}
+                      options={AVAILABLE_HOURS}
+                      value={String(level.escalateAfterHours)}
+                      onChange={(value) =>
+                        handleLevelChange(level.id, 'escalateAfterHours', Number(value))
+                      }
+                      placeholder="Select"
+                      width="486px"
+                    />
+                  ))}
+                </VStack>
+              </Box>
+            </Flex>
           </Flex>
 
           {/* Action Buttons */}

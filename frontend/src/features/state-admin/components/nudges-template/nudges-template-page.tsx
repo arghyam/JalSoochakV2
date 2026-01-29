@@ -164,7 +164,8 @@ export function NudgesTemplatePage() {
                       placeholder="Enter message template"
                       fontSize="14px"
                       fontWeight="400"
-                      minH="120px"
+                      width="486px"
+                      height="124px"
                       borderColor="neutral.300"
                       borderRadius="6px"
                       _hover={{ borderColor: 'neutral.400' }}
@@ -179,7 +180,7 @@ export function NudgesTemplatePage() {
                     <Button
                       variant="outline"
                       size="md"
-                      width="140px"
+                      width="174px"
                       onClick={handleTestSend}
                       borderColor="primary.500"
                       color="primary.500"
@@ -190,7 +191,7 @@ export function NudgesTemplatePage() {
                     <Button
                       variant="primary"
                       size="md"
-                      width="140px"
+                      width="174px"
                       onClick={handleSave}
                       isLoading={isSaving}
                       isDisabled={!message || !hasChanges}
