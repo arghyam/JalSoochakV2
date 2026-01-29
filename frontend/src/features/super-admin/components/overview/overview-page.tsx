@@ -126,6 +126,7 @@ export function OverviewPage() {
                 borderColor="neutral.200"
                 borderRadius="12px"
                 boxShadow="default"
+                height={{ base: 'auto', md: '172px' }}
                 px={4}
                 py={{ base: 4, md: 6 }}
               >
@@ -166,6 +167,7 @@ export function OverviewPage() {
           bg="white"
           borderWidth="0.5px"
           borderColor="neutral.200"
+          height={{ base: 'auto', md: '420px' }}
           borderRadius={{ base: '12px', md: '16px' }}
           boxShadow="default"
           py={{ base: 4, md: 6 }}
@@ -188,7 +190,7 @@ export function OverviewPage() {
             lineKey="failedIngestions"
             barColor="#3291D1"
             lineColor="#FFA100"
-            height="400px"
+            height="326px"
             barLegendLabel={t('overview.charts.successfulIngestions')}
             lineLegendLabel={t('overview.charts.failedIngestions')}
           />
@@ -203,6 +205,7 @@ export function OverviewPage() {
           borderColor="neutral.200"
           borderRadius="12px"
           boxShadow="default"
+          height={{ base: 'auto', md: '237px' }}
           py={{ base: 4, md: 6 }}
           px={4}
         >

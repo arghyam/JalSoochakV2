@@ -35,6 +35,7 @@ export interface SearchableSelectProps {
   isFilter?: boolean
   id?: string
   'aria-labelledby'?: string
+  placeholderColor?: string
 }
 
 export function SearchableSelect({
@@ -54,6 +55,7 @@ export function SearchableSelect({
   isFilter = false,
   id,
   'aria-labelledby': ariaLabelledBy,
+  placeholderColor = 'neutral.500',
 }: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -94,8 +96,8 @@ export function SearchableSelect({
   const displayColor = isFilter
     ? selectedOption
       ? 'primary.500'
-      : textColor || 'neutral.500'
-    : textColor || (selectedOption ? 'neutral.950' : 'neutral.500')
+      : textColor || placeholderColor
+    : textColor || (selectedOption ? 'neutral.950' : placeholderColor)
   const displayBorderColor = isFilter ? (selectedOption ? 'primary.500' : borderColor) : borderColor
 
   return (
@@ -135,7 +137,6 @@ export function SearchableSelect({
       >
         <Text
           fontSize={fontSize}
-          // color={textColor || (selectedOption ? 'neutral.950' : 'neutral.500')}
           color={displayColor}
           textStyle={textStyle}
           fontWeight={isFilter ? 'semibold' : '400'}

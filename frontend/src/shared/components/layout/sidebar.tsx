@@ -199,7 +199,11 @@ export function Sidebar({ onNavClick }: SidebarProps) {
         >
           <Stack gap={4} px={7} py={4}>
             {visibleNavItems.map((item) => {
-              const isActive = location.pathname === item.path
+              const isActive =
+                location.pathname === item.path ||
+                (item.path !== ROUTES.SUPER_ADMIN_OVERVIEW &&
+                  item.path !== ROUTES.STATE_ADMIN_OVERVIEW &&
+                  location.pathname.startsWith(item.path + '/'))
               const ItemIcon = item.icon
 
               return (
