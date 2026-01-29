@@ -1,5 +1,4 @@
 import { useState, useRef, useId } from 'react'
-import type { ResponsiveValue } from '@chakra-ui/react'
 import {
   Box,
   Input,
