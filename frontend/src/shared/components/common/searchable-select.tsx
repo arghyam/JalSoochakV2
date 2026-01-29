@@ -1,4 +1,5 @@
 import { useState, useRef, useId } from 'react'
+import type { ResponsiveValue } from '@chakra-ui/react'
 import {
   Box,
   Input,
@@ -22,7 +23,7 @@ export interface SearchableSelectProps {
   onChange: (value: string) => void
   placeholder?: string
   disabled?: boolean
-  width?: string
+  width?: ResponsiveValue<string>
   fontSize?: string
   textColor?: string
   height?: string
@@ -167,7 +168,7 @@ export function SearchableSelect({
           borderColor="neutral.100"
           borderRadius="8px"
           boxShadow="0px 4px 6px -2px rgba(10, 13, 18, 0.03)"
-          w={width}
+          w="full"
           maxH="240px"
           overflow="hidden"
         >
