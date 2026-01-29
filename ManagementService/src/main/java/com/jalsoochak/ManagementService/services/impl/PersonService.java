@@ -166,7 +166,7 @@ public class PersonService {
 
             inviteTokenRepository.save(inviteToken);
 
-            String inviteLink = frontendBaseUrl + "/reset-password?token=" + token;
+            String inviteLink = frontendBaseUrl + "?token=" + token;
             mailService.sendInviteMail(inviteRequest.getEmail(), inviteLink);
 
         } catch (RuntimeException e) {
