@@ -2,7 +2,6 @@ package com.jalsoochak.ManagementService.services.impl;
 
 import com.jalsoochak.ManagementService.clients.KeycloakClient;
 import com.jalsoochak.ManagementService.config.KeycloakProvider;
-import com.jalsoochak.ManagementService.models.app.request.AcceptInviteRequest;
 import com.jalsoochak.ManagementService.models.app.request.InviteRequest;
 import com.jalsoochak.ManagementService.models.app.request.LoginRequest;
 import com.jalsoochak.ManagementService.models.app.request.RegisterRequest;
@@ -64,24 +63,6 @@ public class PersonService {
 
     @Value("${frontend.base-url}")
     private String frontendBaseUrl;
-
-    @Value("${keycloak.auth-server-url}")
-    private String authServerUrl;
-
-    @Value("${keycloak.resource}")
-    private String clientId;
-
-    @Value("${keycloak.credentials.secret}")
-    private String clientSecret;
-
-    @Value("${keycloak.admin-client-id}")
-    private String adminClientId;
-
-    @Value("${keycloak.admin-client-secret}")
-    private String adminClientSecret;
-
-    @Value("${keycloak.public-key}")
-    private String publicKeyPem;
 
     private final KeycloakProvider keycloakProvider;
     private final PersonTypeMasterRepository personTypeMasterRepository;
@@ -233,7 +214,6 @@ public class PersonService {
         log.info("Profile completed successfully for user: {}", person.getEmail());
     }
 
-
     public TokenResponse login(LoginRequest loginRequest) {
         Map<String, Object> tokenMap = keycloakClient.obtainToken(
                 loginRequest.getUsername(), loginRequest.getPassword()
@@ -299,8 +279,6 @@ public class PersonService {
 
         return tokenResponse;
     }
-
-
 
     public boolean logout(String refreshToken) {
         return keycloakClient.logout(refreshToken);
