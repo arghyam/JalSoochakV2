@@ -401,11 +401,7 @@ export function CentralDashboard() {
       </FilterLayout>
 
       {/* KPI Cards */}
-      <Grid
-        templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }}
-        gap={4}
-        mb={6}
-      >
+      <Grid templateColumns={{ base: '1fr', lg: 'repeat(3, 1fr)' }} gap={4} mb={6}>
         <KPICard
           title="Number of schemes"
           value={data.kpis.totalSchemes}
