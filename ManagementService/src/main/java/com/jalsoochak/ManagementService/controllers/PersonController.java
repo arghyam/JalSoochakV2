@@ -34,75 +34,39 @@ public class PersonController {
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
         if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Missing or invalid Authorization header");
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Missing or invalid Authorization header"
+            );
         }
 
         String token = authHeader.substring(7).trim();
 
         if (token.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Authorization token is empty");
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Authorization token is empty"
+            );
         }
 
         if (!personService.isSuperAdmin(token)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Only super admin can invite user");
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Only super admin can invite user"
+            );
         }
 
         personService.inviteUser(inviteRequest);
-        return ResponseEntity.ok("Invitation sent");
-    }
-
-    @PostMapping("/accept-invite")
-    public ResponseEntity<?> acceptInvite(
-            @RequestBody AcceptInviteRequest request){
-        personService.acceptInvite(request);
-        return ResponseEntity.ok("Password set successfully");
+        return ResponseEntity.ok(Map.of("message", "Invitation sent"));
     }
 
     @PostMapping("/complete/profile")
-    public ResponseEntity<?> completeProfile(
-            @RequestBody RegisterRequest registerRequest,
-            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public ResponseEntity<String> completeProfile(
+            @RequestBody RegisterRequest registerRequest) {
 
-        if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Missing or invalid Authorization header");
-        }
+        personService.completeProfile(registerRequest);
 
-        String token = authHeader.substring(7).trim();
-
-        if (token.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Authorization token is empty");
-        }
-
-        try {
-            personService.completeProfile(registerRequest, token);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body("User registered successfully");
-
-        } catch (VerificationException e) {
-            log.warn("Token verification failed", e);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Invalid or expired token");
-
-        } catch (ResponseStatusException e) {
-            log.warn("Business validation error: {}", e.getReason());
-            return ResponseEntity.status(e.getStatusCode())
-                    .body(e.getReason());
-
-        } catch (BadRequestException e) {
-            log.warn("Bad request while completing profile", e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Invalid request data");
-
-        } catch (Exception e) {
-            log.error("Unexpected error while completing profile", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred. Please try again later.");
-        }
+        return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
     }
 
     @PostMapping("/login")
