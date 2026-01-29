@@ -35,7 +35,13 @@ export function FilterLayout({
       borderWidth="0.5px"
       borderColor="neutral.200"
     >
-      <Flex w="full" align="center" justify="space-between">
+      <Flex
+        w="full"
+        align={{ base: 'flex-start', sm: 'center' }}
+        justify="space-between"
+        direction={{ base: 'column', sm: 'row' }}
+        gap={{ base: 2, sm: 0 }}
+      >
         <Tabs index={activeTab} onChange={onTabChange}>
           <TabList>
             {tabs.map((tab) => (
@@ -61,6 +67,7 @@ export function FilterLayout({
               variant="link"
               size="sm"
               onClick={onClear}
+              alignSelf={{ base: 'flex-start' }}
               _hover={{ textDecoration: 'underline', textDecorationColor: 'neutral.300' }}
             >
               <Text textStyle="h10" fontWeight="600" color="neutral.300">
@@ -70,13 +77,25 @@ export function FilterLayout({
           ) : null)}
       </Flex>
 
-      <Flex w="full" align="center" gap={3} wrap="wrap">
-        <Flex align="center" gap="8px" wrap="wrap">
-          <div style={{ display: 'flex', gap: '4px' }}>
+      <Flex w="full" align="start" gap={3} wrap="wrap">
+        <Flex
+          align={{ base: 'flex-start', lg: 'center' }}
+          direction={{ base: 'column', lg: 'row' }}
+          gap={{ base: 2, md: '8px' }}
+          w="full"
+        >
+          <Flex align="center" gap="4px">
             {filtersIcon ?? <FiFilter size="16px" />}
             <Text textStyle="bodyText6">Filters</Text>
-          </div>
-          {children}
+          </Flex>
+          <Flex
+            w={{ base: 'full', md: 'auto' }}
+            flex={{ base: 'initial', md: '1' }}
+            wrap="wrap"
+            gap={3}
+          >
+            {children}
+          </Flex>
         </Flex>
       </Flex>
     </Flex>

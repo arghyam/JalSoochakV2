@@ -159,7 +159,13 @@ export function CentralDashboard() {
               onChange={setSelectedState}
               placeholder="States/UTs"
               required
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -173,7 +179,13 @@ export function CentralDashboard() {
               onChange={setSelectedDistrict}
               placeholder="District"
               required
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -186,7 +198,13 @@ export function CentralDashboard() {
               value={selectedBlock}
               onChange={setSelectedBlock}
               placeholder="Block"
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -200,7 +218,13 @@ export function CentralDashboard() {
               value={selectedGramPanchayat}
               onChange={setSelectedGramPanchayat}
               placeholder="Gram Panchayat"
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -214,7 +238,13 @@ export function CentralDashboard() {
               value={selectedVillage}
               onChange={setSelectedVillage}
               placeholder="Village"
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -228,7 +258,13 @@ export function CentralDashboard() {
               value={selectedDuration}
               onChange={setSelectedDuration}
               placeholder="Duration"
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -242,7 +278,13 @@ export function CentralDashboard() {
               value={selectedScheme}
               onChange={setSelectedScheme}
               placeholder="Scheme"
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -259,7 +301,13 @@ export function CentralDashboard() {
               value=""
               onChange={() => {}}
               placeholder="Zone"
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -273,7 +321,13 @@ export function CentralDashboard() {
               value=""
               onChange={() => {}}
               placeholder="Circle"
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -287,7 +341,13 @@ export function CentralDashboard() {
               value=""
               onChange={() => {}}
               placeholder="Division"
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -301,7 +361,13 @@ export function CentralDashboard() {
               value=""
               onChange={() => {}}
               placeholder="Subdivision"
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -315,7 +381,13 @@ export function CentralDashboard() {
               value=""
               onChange={() => {}}
               placeholder="Village"
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -329,11 +401,7 @@ export function CentralDashboard() {
       </FilterLayout>
 
       {/* KPI Cards */}
-      <Grid
-        templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }}
-        gap={4}
-        mb={6}
-      >
+      <Grid templateColumns={{ base: '1fr', lg: 'repeat(3, 1fr)' }} gap={4} mb={6}>
         <KPICard
           title="Number of schemes"
           value={data.kpis.totalSchemes}
