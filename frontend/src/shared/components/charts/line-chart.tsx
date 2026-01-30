@@ -52,6 +52,7 @@ export function LineChart<T extends object>({
     xAxis: {
       type: 'category',
       data: data.map((item) => item[xKey]),
+      boundaryGap: false,
       axisLine: {
         lineStyle: {
           color: '#E5E7EB',
