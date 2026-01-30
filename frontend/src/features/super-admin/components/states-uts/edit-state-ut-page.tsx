@@ -207,6 +207,7 @@ export function EditStateUTPage() {
           <Text
             as="a"
             fontSize="14px"
+            lineHeight="21px"
             color="neutral.500"
             cursor="pointer"
             _hover={{ textDecoration: 'underline' }}
@@ -216,10 +217,10 @@ export function EditStateUTPage() {
           >
             {t('statesUts.breadcrumb.manage')}
           </Text>
-          <Text fontSize="14px" color="neutral.500" aria-hidden="true">
+          <Text fontSize="14px" lineHeight="21px" color="neutral.500" aria-hidden="true">
             /
           </Text>
-          <Text fontSize="14px" color="#26272B" aria-current="page">
+          <Text fontSize="14px" lineHeight="21px" color="#26272B" aria-current="page">
             {t('statesUts.breadcrumb.edit')}
           </Text>
         </Flex>
@@ -264,7 +265,7 @@ export function EditStateUTPage() {
               aria-labelledby="state-details-heading"
             >
               <FormControl>
-                <FormLabel fontSize="14px" color="neutral.400" mb={1}>
+                <FormLabel textStyle="h10" color="neutral.400" mb={1}>
                   {t('statesUts.details.name')}
                 </FormLabel>
                 <Input
@@ -280,7 +281,7 @@ export function EditStateUTPage() {
                 />
               </FormControl>
               <FormControl>
-                <FormLabel fontSize="14px" color="neutral.400" mb={1}>
+                <FormLabel textStyle="h10" color="neutral.400" mb={1}>
                   {t('statesUts.details.code')}
                 </FormLabel>
                 <Input
@@ -308,7 +309,7 @@ export function EditStateUTPage() {
               aria-labelledby="admin-details-heading"
             >
               <FormControl isRequired>
-                <FormLabel fontSize="14px" fontWeight="500" mb={1}>
+                <FormLabel textStyle="h10" mb={1}>
                   {t('statesUts.adminDetails.firstName')}
                 </FormLabel>
                 <Input
@@ -323,7 +324,7 @@ export function EditStateUTPage() {
                 />
               </FormControl>
               <FormControl isRequired>
-                <FormLabel fontSize="14px" fontWeight="500" mb={1}>
+                <FormLabel textStyle="h10" mb={1}>
                   {t('statesUts.adminDetails.lastName')}
                 </FormLabel>
                 <Input
@@ -338,7 +339,7 @@ export function EditStateUTPage() {
                 />
               </FormControl>
               <FormControl>
-                <FormLabel fontSize="14px" color="neutral.400" mb={1}>
+                <FormLabel textStyle="h10" color="neutral.400" mb={1}>
                   {t('statesUts.adminDetails.email')}
                 </FormLabel>
                 <Input
@@ -354,7 +355,7 @@ export function EditStateUTPage() {
                 />
               </FormControl>
               <FormControl isRequired>
-                <FormLabel fontSize="14px" fontWeight="500" mb={1}>
+                <FormLabel textStyle="h10" mb={1}>
                   {t('statesUts.adminDetails.phone')}
                 </FormLabel>
                 <Input
@@ -377,7 +378,7 @@ export function EditStateUTPage() {
                 />
               </FormControl>
               <FormControl>
-                <FormLabel fontSize="14px" fontWeight="500" mb={1}>
+                <FormLabel textStyle="h10" mb={1}>
                   {t('statesUts.adminDetails.secondaryEmail')}
                 </FormLabel>
                 <Input
@@ -392,7 +393,7 @@ export function EditStateUTPage() {
                 />
               </FormControl>
               <FormControl>
-                <FormLabel fontSize="14px" fontWeight="500" mb={1}>
+                <FormLabel textStyle="h10" mb={1}>
                   {t('statesUts.adminDetails.contactNumber')}
                 </FormLabel>
                 <Input
@@ -420,7 +421,7 @@ export function EditStateUTPage() {
               {t('statesUts.statusSection.title')}
             </Heading>
             <Flex align="center" gap={2} h={6} aria-labelledby="status-heading">
-              <Text fontSize="14px" fontWeight="500" id="activated-label">
+              <Text textStyle="h10" id="activated-label">
                 {t('statesUts.statusSection.activated')}
               </Text>
               <Toggle
