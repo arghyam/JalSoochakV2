@@ -38,10 +38,13 @@ export function AreaChart<T extends object>({
             },
           ],
           bottom: 0,
-          icon: 'square',
+          icon: 'roundRect',
+          itemWidth: 8,
+          itemHeight: 8,
           textStyle: {
             fontSize: 12,
             color: '#1C1C1C',
+            padding: [0, 0, 0, 4],
           },
         }
       : undefined,
