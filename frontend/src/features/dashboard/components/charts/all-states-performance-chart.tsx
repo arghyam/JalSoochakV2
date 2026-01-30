@@ -1,6 +1,8 @@
 import { useMemo } from 'react'
+import { useTheme } from '@chakra-ui/react'
 import * as echarts from 'echarts'
 import { EChartsWrapper } from './echarts-wrapper'
+import { getBodyText7Style } from './chart-text-style'
 import type { EntityPerformance } from '../../types'
 
 interface AllStatesPerformanceChartProps {
@@ -16,6 +18,9 @@ export function AllStatesPerformanceChart({
   height = '536px',
   maxItems = 5,
 }: AllStatesPerformanceChartProps) {
+  const theme = useTheme()
+  const bodyText7 = getBodyText7Style(theme)
+
   const option = useMemo<echarts.EChartsOption>(() => {
     const sortedData = [...data].sort((a, b) => b.quantity - a.quantity).slice(0, maxItems)
     const entities = sortedData.map((d) => d.name)
@@ -25,14 +30,6 @@ export function AllStatesPerformanceChart({
     return {
       tooltip: {
         show: false,
-      },
-      legend: {
-        data: ['Quantity', 'Regularity'],
-        bottom: 8,
-        left: 'center',
-        icon: 'rect',
-        itemWidth: 10,
-        itemHeight: 10,
       },
       grid: {
         left: '10%',
@@ -48,10 +45,10 @@ export function AllStatesPerformanceChart({
           bottom: 36,
           style: {
             text: 'States/UTs',
-            fill: '#70707B',
-            fontSize: 12,
+            fill: bodyText7.color,
+            fontSize: bodyText7.fontSize,
             fontWeight: 400,
-            lineHeight: 18,
+            lineHeight: bodyText7.lineHeight,
           },
         },
       ],
@@ -65,6 +62,10 @@ export function AllStatesPerformanceChart({
           rotate: 0,
           interval: 0,
           margin: 20,
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          color: bodyText7.color,
         },
       },
       yAxis: {
@@ -72,6 +73,18 @@ export function AllStatesPerformanceChart({
         name: 'Quantity & Regularity',
         nameLocation: 'middle',
         nameGap: 40,
+        nameTextStyle: {
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          color: bodyText7.color,
+        },
+        axisLabel: {
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          color: bodyText7.color,
+        },
         max: 100,
         interval: 25,
         splitLine: {
@@ -104,7 +117,61 @@ export function AllStatesPerformanceChart({
         },
       ],
     }
-  }, [data, maxItems])
+  }, [data, maxItems, bodyText7])
 
-  return <EChartsWrapper option={option} className={className} height={height} />
+  const containerHeight = typeof height === 'number' ? `${height}px` : height
+  const legendItems = [
+    { label: 'Quantity', color: '#3291D1' },
+    { label: 'Regularity', color: '#ADD3ED' },
+  ]
+
+  return (
+    <div
+      className={className}
+      style={{
+        width: '100%',
+        height: containerHeight,
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <div style={{ flex: 1, minHeight: 0 }}>
+        <EChartsWrapper option={option} height="100%" />
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '16px',
+          paddingTop: '8px',
+        }}
+      >
+        {legendItems.map((item) => (
+          <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span
+              aria-hidden="true"
+              style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '2px',
+                backgroundColor: item.color,
+                display: 'inline-block',
+              }}
+            />
+            <span
+              style={{
+                fontSize: bodyText7.fontSize,
+                lineHeight: `${bodyText7.lineHeight}px`,
+                fontWeight: 400,
+                color: bodyText7.color,
+              }}
+            >
+              {item.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 }

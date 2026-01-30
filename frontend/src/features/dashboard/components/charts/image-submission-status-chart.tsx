@@ -1,6 +1,8 @@
 import { useMemo } from 'react'
+import { useTheme } from '@chakra-ui/react'
 import * as echarts from 'echarts'
 import { EChartsWrapper } from './echarts-wrapper'
+import { getBodyText7Style } from './chart-text-style'
 import type { ImageSubmissionStatusData } from '../../types'
 
 interface ImageSubmissionStatusChartProps {
@@ -16,23 +18,13 @@ export function ImageSubmissionStatusChart({
   className,
   height = '406px',
 }: ImageSubmissionStatusChartProps) {
+  const theme = useTheme()
+  const bodyText7 = getBodyText7Style(theme)
+
   const option = useMemo<echarts.EChartsOption>(() => {
     return {
       tooltip: {
         show: false,
-      },
-      legend: {
-        bottom: 0,
-        left: 'center',
-        icon: 'rect',
-        itemWidth: 10,
-        itemHeight: 10,
-        itemGap: 16,
-        textStyle: {
-          fontSize: 12,
-          fontWeight: 400,
-          color: '#1C1C1C',
-        },
       },
       series: [
         {
@@ -56,7 +48,57 @@ export function ImageSubmissionStatusChart({
         },
       ],
     }
-  }, [data])
+  }, [data, bodyText7])
 
-  return <EChartsWrapper option={option} className={className} height={height} />
+  const containerHeight = typeof height === 'number' ? `${height}px` : height
+
+  return (
+    <div
+      className={className}
+      style={{
+        width: '100%',
+        height: containerHeight,
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <div style={{ flex: 1, minHeight: 0 }}>
+        <EChartsWrapper option={option} height="100%" />
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '16px',
+          paddingTop: '8px',
+        }}
+      >
+        {data.map((entry, index) => (
+          <div key={entry.label} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span
+              aria-hidden="true"
+              style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '2px',
+                backgroundColor: defaultColors[index % defaultColors.length],
+                display: 'inline-block',
+              }}
+            />
+            <span
+              style={{
+                fontSize: bodyText7.fontSize,
+                lineHeight: `${bodyText7.lineHeight}px`,
+                fontWeight: 400,
+                color: bodyText7.color,
+              }}
+            >
+              {entry.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 }

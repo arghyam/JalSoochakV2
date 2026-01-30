@@ -460,7 +460,7 @@ export function CentralDashboard() {
           borderRadius="12px"
           borderColor="#E4E4E7"
           pt="24px"
-          pb="24px"
+          pb="10px"
           pl="16px"
           pr="16px"
           w="full"
