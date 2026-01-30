@@ -30,12 +30,18 @@ export function LineChart<T extends object>({
     legend: {
       data: yKeys.map(String),
       bottom: 0,
-      icon: 'square',
+      icon: 'roundRect',
+      itemWidth: 8,
+      itemHeight: 8,
+      itemGap: 16,
       textStyle: {
         fontSize: 12,
         color: '#1C1C1C',
+        padding: [0, 0, 0, 4],
       },
+      padding: [0, 0, 16, 0],
     },
+
     grid: {
       left: '3%',
       right: '4%',
@@ -46,7 +52,6 @@ export function LineChart<T extends object>({
     xAxis: {
       type: 'category',
       data: data.map((item) => item[xKey]),
-      boundaryGap: false,
       axisLine: {
         lineStyle: {
           color: '#E5E7EB',

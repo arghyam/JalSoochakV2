@@ -1,5 +1,18 @@
 import { useEffect, useState } from 'react'
-import { Box, Flex, Grid, Text, Icon, Stack, Select } from '@chakra-ui/react'
+import {
+  Box,
+  Flex,
+  Grid,
+  Text,
+  Icon,
+  Stack,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Button,
+} from '@chakra-ui/react'
+import { ChevronDownIcon } from '@chakra-ui/icons'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/app/store'
 import { getMockOverviewData } from '../../services/mock-data'
@@ -14,6 +27,7 @@ export function OverviewPage() {
   const { t } = useTranslation(['state-admin', 'common'])
   const user = useAuthStore((state) => state.user)
   const [data, setData] = useState<OverviewData | null>(null)
+  const [value, setValue] = useState('December')
 
   useEffect(() => {
     getMockOverviewData().then(setData)
@@ -70,6 +84,8 @@ export function OverviewPage() {
     },
   ]
 
+  const options = ['December', 'November']
+
   return (
     <Box w="full">
       {/* Page Header */}
@@ -92,6 +108,7 @@ export function OverviewPage() {
                 bg="white"
                 borderWidth="1px"
                 borderColor="neutral.100"
+                height={{ base: 'auto', md: '200px' }}
                 borderRadius="lg"
                 boxShadow="default"
                 p={4}
@@ -102,7 +119,7 @@ export function OverviewPage() {
                     w="40px"
                     align="center"
                     justify="center"
-                    borderRadius="lg"
+                    borderRadius="100px"
                     bg={stat.iconBg}
                   >
                     <Icon as={StatIcon} boxSize={5} color={stat.iconColor} />
@@ -125,6 +142,7 @@ export function OverviewPage() {
           borderColor="neutral.100"
           borderRadius="lg"
           boxShadow="default"
+          height={{ base: 'auto', md: '534px' }}
           py={6}
           px={4}
         >
@@ -134,9 +152,9 @@ export function OverviewPage() {
           <LineChart
             data={data.demandSupplyData}
             xKey="period"
-            yKeys={['demand', 'supply']}
+            yKeys={['Demand', 'Supply']}
             colors={['#3291D1', '#ADD3EB']}
-            height="440px"
+            height="416px"
             xAxisLabel="Year"
             yAxisLabel="Quantity (units)"
           />
@@ -148,30 +166,66 @@ export function OverviewPage() {
           borderWidth="1px"
           borderColor="neutral.100"
           borderRadius="lg"
+          height={{ base: 'auto', md: '454px' }}
           boxShadow="default"
           py={6}
           px={4}
         >
           <Flex align="center" justify="space-between" mb={4}>
             <Text textStyle="h8">{t('overview.charts.dailyIngestionMonitor')}</Text>
-            <Select
-              h="32px"
-              maxW="162px"
-              fontSize="14px"
-              fontWeight="600"
-              borderRadius="4px"
-              borderColor="primary.500"
-              borderWidth="1px"
-              bg="white"
-              color="primary.500"
-              appearance="none"
-              _focus={{
-                borderColor: 'primary.500',
-                boxShadow: 'none',
-              }}
-            >
-              <option value="december">December</option>
-            </Select>
+            <Menu matchWidth>
+              <MenuButton
+                as={Button}
+                h="32px"
+                w="162px"
+                px="12px"
+                fontSize="14px"
+                fontWeight="600"
+                borderRadius="4px"
+                borderColor="primary.500"
+                borderWidth="1px"
+                bg="white"
+                color="primary.500"
+                variant="outline"
+                rightIcon={<ChevronDownIcon w={5} h={5} />}
+                _hover={{ bg: 'neutral.50' }}
+                _active={{ bg: 'neutral.100' }}
+                _focusVisible={{ boxShadow: 'outline' }}
+                sx={{
+                  '& svg': {
+                    color: 'primary.500',
+                  },
+                }}
+              >
+                {value}
+              </MenuButton>
+              <MenuList p={0} minW="162px" borderRadius="4px" borderColor="primary.500">
+                {options.map((option) => {
+                  const isSelected = option === value
+
+                  return (
+                    <MenuItem
+                      key={option}
+                      h="32px"
+                      px="12px"
+                      fontSize="14px"
+                      fontWeight={isSelected ? '600' : '400'}
+                      color="neutral.950"
+                      bg={isSelected ? 'primary.50' : 'white'}
+                      _hover={{
+                        bg: 'primary.50',
+                      }}
+                      _focus={{
+                        bg: 'primary.50',
+                      }}
+                      onClick={() => setValue(option)}
+                    >
+                      {option}
+                    </MenuItem>
+                  )
+                })}
+              </MenuList>
+            </Menu>
           </Flex>
           <AreaChart
             data={data.dailyIngestionData}

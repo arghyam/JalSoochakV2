@@ -170,7 +170,11 @@ export function LanguagePage() {
               <Flex gap={6} justify="space-between">
                 <Box w="486px">
                   <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
-                    {t('language.primaryLanguage')}*
+                    {t('language.primaryLanguage')}
+                    {''}
+                    <Text as="span" color="error.500">
+                      *
+                    </Text>
                   </Text>
                   <SearchableSelect
                     options={AVAILABLE_LANGUAGES}
@@ -196,17 +200,15 @@ export function LanguagePage() {
 
               {/* Action Buttons*/}
               <HStack spacing={3} justify="flex-end">
-                {config?.isConfigured && (
-                  <Button
-                    variant="secondary"
-                    size="md"
-                    width="174px"
-                    onClick={handleCancel}
-                    isDisabled={isSaving}
-                  >
-                    {t('common:button.cancel')}
-                  </Button>
-                )}
+                <Button
+                  variant="secondary"
+                  size="md"
+                  width="174px"
+                  onClick={handleCancel}
+                  isDisabled={isSaving}
+                >
+                  {t('common:button.cancel')}
+                </Button>
                 <Button
                   variant="primary"
                   size="md"

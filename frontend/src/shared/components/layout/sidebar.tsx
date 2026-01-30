@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next'
 import { MdOutlineMoving, MdOutlinePlace } from 'react-icons/md'
 import { AiOutlineEye, AiOutlineSetting, AiOutlineWarning, AiOutlineApi } from 'react-icons/ai'
 import { BiKey } from 'react-icons/bi'
+import { FiLogOut } from 'react-icons/fi'
 import { IoLanguageOutline, IoWaterOutline } from 'react-icons/io5'
 import { HiOutlineTemplate } from 'react-icons/hi'
 import { BsPerson, BsListUl } from 'react-icons/bs'
@@ -178,7 +179,7 @@ export function Sidebar({ onNavClick }: SidebarProps) {
       >
         {/* Brand Section */}
         <Flex
-          h="80px"
+          h="84px"
           align="center"
           justify="center"
           gap={2}
@@ -186,7 +187,12 @@ export function Sidebar({ onNavClick }: SidebarProps) {
           borderColor="neutral.100"
           px={7}
         >
-          <Image src={jalsoochakLogo} alt={t('sidebar.logoAlt', 'JalSoochak logo')} />
+          <Image
+            src={jalsoochakLogo}
+            alt={t('sidebar.logoAlt', 'JalSoochak logo')}
+            height="84px"
+            width="168px"
+          />
         </Flex>
 
         {/* Navigation Section */}
@@ -274,8 +280,13 @@ export function Sidebar({ onNavClick }: SidebarProps) {
               </Flex>
             </Flex>
           </MenuButton>
-          <MenuList>
-            <MenuItem onClick={handleLogout}>{t('sidebar.logout')}</MenuItem>
+          <MenuList height="36px" px={7}>
+            <MenuItem px={3} py={2} gap={2} onClick={handleLogout}>
+              <FiLogOut />
+              <Text fontSize="16px" fontWeight="500">
+                {t('sidebar.logout')}
+              </Text>
+            </MenuItem>
           </MenuList>
         </Menu>
       </Flex>
