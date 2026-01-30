@@ -19,31 +19,17 @@ export function AllStatesPerformanceChart({
   maxItems = 5,
 }: AllStatesPerformanceChartProps) {
   const theme = useTheme()
+  const bodyText7 = getBodyText7Style(theme)
 
   const option = useMemo<echarts.EChartsOption>(() => {
     const sortedData = [...data].sort((a, b) => b.quantity - a.quantity).slice(0, maxItems)
     const entities = sortedData.map((d) => d.name)
     const quantity = sortedData.map((d) => d.quantity)
     const regularity = sortedData.map((d) => d.regularity)
-    const bodyText7 = getBodyText7Style(theme)
 
     return {
       tooltip: {
         show: false,
-      },
-      legend: {
-        data: ['Quantity', 'Regularity'],
-        bottom: 8,
-        left: 'center',
-        icon: 'rect',
-        itemWidth: 10,
-        itemHeight: 10,
-        textStyle: {
-          fontSize: bodyText7.fontSize,
-          lineHeight: bodyText7.lineHeight,
-          fontWeight: 400,
-          color: bodyText7.color,
-        },
       },
       grid: {
         left: '10%',
@@ -131,7 +117,61 @@ export function AllStatesPerformanceChart({
         },
       ],
     }
-  }, [data, maxItems, theme])
+  }, [data, maxItems, bodyText7])
 
-  return <EChartsWrapper option={option} className={className} height={height} />
+  const containerHeight = typeof height === 'number' ? `${height}px` : height
+  const legendItems = [
+    { label: 'Quantity', color: '#3291D1' },
+    { label: 'Regularity', color: '#ADD3ED' },
+  ]
+
+  return (
+    <div
+      className={className}
+      style={{
+        width: '100%',
+        height: containerHeight,
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <div style={{ flex: 1, minHeight: 0 }}>
+        <EChartsWrapper option={option} height="100%" />
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '16px',
+          paddingTop: '8px',
+        }}
+      >
+        {legendItems.map((item) => (
+          <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span
+              aria-hidden="true"
+              style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '2px',
+                backgroundColor: item.color,
+                display: 'inline-block',
+              }}
+            />
+            <span
+              style={{
+                fontSize: bodyText7.fontSize,
+                lineHeight: `${bodyText7.lineHeight}px`,
+                fontWeight: 400,
+                color: bodyText7.color,
+              }}
+            >
+              {item.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 }

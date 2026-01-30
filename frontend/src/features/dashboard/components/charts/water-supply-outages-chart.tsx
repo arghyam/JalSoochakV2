@@ -25,34 +25,14 @@ export function WaterSupplyOutagesChart({
   height = '300px',
 }: WaterSupplyOutagesChartProps) {
   const theme = useTheme()
+  const bodyText7 = getBodyText7Style(theme)
 
   const option = useMemo<echarts.EChartsOption>(() => {
     const districts = data.map((entry) => entry.district)
-    const bodyText7 = getBodyText7Style(theme)
 
     return {
       tooltip: {
         show: false,
-      },
-      legend: {
-        data: [
-          'Electricity failure',
-          'Pipeline leak',
-          'Pump failure',
-          'Valve issue',
-          'Source drying',
-        ],
-        bottom: 0,
-        left: 'center',
-        icon: 'rect',
-        itemWidth: 10,
-        itemHeight: 10,
-        textStyle: {
-          fontSize: bodyText7.fontSize,
-          lineHeight: bodyText7.lineHeight,
-          fontWeight: 400,
-          color: bodyText7.color,
-        },
       },
       grid: {
         left: '8%',
@@ -167,7 +147,65 @@ export function WaterSupplyOutagesChart({
         },
       ],
     }
-  }, [data, theme])
+  }, [data, bodyText7])
 
-  return <EChartsWrapper option={option} className={className} height={height} />
+  const containerHeight = typeof height === 'number' ? `${height}px` : height
+  const legendItems = [
+    { label: 'Electricity failure', color: outageColors.electricityFailure },
+    { label: 'Pipeline leak', color: outageColors.pipelineLeak },
+    { label: 'Pump failure', color: outageColors.pumpFailure },
+    { label: 'Valve issue', color: outageColors.valveIssue },
+    { label: 'Source drying', color: outageColors.sourceDrying },
+  ]
+
+  return (
+    <div
+      className={className}
+      style={{
+        width: '100%',
+        height: containerHeight,
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <div style={{ flex: 1, minHeight: 0 }}>
+        <EChartsWrapper option={option} height="100%" />
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '16px',
+          paddingTop: '8px',
+          flexWrap: 'wrap',
+        }}
+      >
+        {legendItems.map((item) => (
+          <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span
+              aria-hidden="true"
+              style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '2px',
+                backgroundColor: item.color,
+                display: 'inline-block',
+              }}
+            />
+            <span
+              style={{
+                fontSize: bodyText7.fontSize,
+                lineHeight: `${bodyText7.lineHeight}px`,
+                fontWeight: 400,
+                color: bodyText7.color,
+              }}
+            >
+              {item.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 }
