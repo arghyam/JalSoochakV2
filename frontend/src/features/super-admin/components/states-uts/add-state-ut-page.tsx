@@ -143,6 +143,7 @@ export function AddStateUTPage() {
           <Text
             as="a"
             fontSize="14px"
+            lineHeight="21px"
             color="neutral.500"
             cursor="pointer"
             _hover={{ textDecoration: 'underline' }}
@@ -152,10 +153,10 @@ export function AddStateUTPage() {
           >
             {t('statesUts.breadcrumb.manage')}
           </Text>
-          <Text fontSize="14px" color="neutral.500" aria-hidden="true">
+          <Text fontSize="14px" lineHeight="21px" color="neutral.500" aria-hidden="true">
             /
           </Text>
-          <Text fontSize="14px" color="#26272B" aria-current="page">
+          <Text fontSize="14px" lineHeight="21px" color="#26272B" aria-current="page">
             {t('statesUts.breadcrumb.addNew')}
           </Text>
         </Flex>
@@ -197,7 +198,7 @@ export function AddStateUTPage() {
               aria-labelledby="state-details-heading"
             >
               <FormControl isRequired>
-                <FormLabel htmlFor="state-name-select" fontSize="14px" fontWeight="500" mb={1}>
+                <FormLabel htmlFor="state-name-select" textStyle="h10" mb={1}>
                   {t('statesUts.details.name')}
                 </FormLabel>
                 <SearchableSelect
@@ -211,7 +212,7 @@ export function AddStateUTPage() {
                 />
               </FormControl>
               <FormControl>
-                <FormLabel fontSize="14px" fontWeight="500" mb={1}>
+                <FormLabel textStyle="h10" mb={1}>
                   {t('statesUts.details.code')}
                 </FormLabel>
                 <Input
@@ -236,7 +237,7 @@ export function AddStateUTPage() {
               aria-labelledby="admin-details-heading"
             >
               <FormControl isRequired>
-                <FormLabel fontSize="14px" fontWeight="500" mb={1}>
+                <FormLabel textStyle="h10" mb={1}>
                   {t('statesUts.adminDetails.firstName')}
                 </FormLabel>
                 <Input
@@ -251,7 +252,7 @@ export function AddStateUTPage() {
                 />
               </FormControl>
               <FormControl isRequired>
-                <FormLabel fontSize="14px" fontWeight="500" mb={1}>
+                <FormLabel textStyle="h10" mb={1}>
                   {t('statesUts.adminDetails.lastName')}
                 </FormLabel>
                 <Input
@@ -266,7 +267,7 @@ export function AddStateUTPage() {
                 />
               </FormControl>
               <FormControl isRequired>
-                <FormLabel fontSize="14px" fontWeight="500" mb={1}>
+                <FormLabel textStyle="h10" mb={1}>
                   {t('statesUts.adminDetails.email')}
                 </FormLabel>
                 <Input
@@ -282,7 +283,7 @@ export function AddStateUTPage() {
                 />
               </FormControl>
               <FormControl isRequired>
-                <FormLabel fontSize="14px" fontWeight="500" mb={1}>
+                <FormLabel textStyle="h10" mb={1}>
                   {t('statesUts.adminDetails.phone')}
                 </FormLabel>
                 <Input
@@ -305,7 +306,7 @@ export function AddStateUTPage() {
                 />
               </FormControl>
               <FormControl>
-                <FormLabel fontSize="14px" fontWeight="500" mb={1}>
+                <FormLabel textStyle="h10" mb={1}>
                   {t('statesUts.adminDetails.secondaryEmail')}
                 </FormLabel>
                 <Input
@@ -320,7 +321,7 @@ export function AddStateUTPage() {
                 />
               </FormControl>
               <FormControl>
-                <FormLabel fontSize="14px" fontWeight="500" mb={1}>
+                <FormLabel textStyle="h10" mb={1}>
                   {t('statesUts.adminDetails.contactNumber')}
                 </FormLabel>
                 <Input

@@ -86,7 +86,7 @@ export function StatesUTsPage() {
     {
       key: 'name',
       header: t('statesUts.table.stateUt'),
-      sortable: true,
+      sortable: false,
       render: (row) => (
         <Text textStyle="h10" fontWeight="400">
           {row.name}
@@ -96,7 +96,7 @@ export function StatesUTsPage() {
     {
       key: 'status',
       header: t('statesUts.table.status'),
-      sortable: true,
+      sortable: false,
       render: (row) => (
         <Box
           as="span"

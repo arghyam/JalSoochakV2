@@ -114,6 +114,7 @@ export function ViewStateUTPage() {
           <Text
             as="a"
             fontSize="14px"
+            lineHeight="21px"
             color="neutral.500"
             cursor="pointer"
             _hover={{ textDecoration: 'underline' }}
@@ -123,10 +124,10 @@ export function ViewStateUTPage() {
           >
             {t('statesUts.breadcrumb.manage')}
           </Text>
-          <Text fontSize="14px" color="neutral.500" aria-hidden="true">
+          <Text fontSize="14px" lineHeight="21px" color="neutral.500" aria-hidden="true">
             /
           </Text>
-          <Text fontSize="14px" color="#26272B" aria-current="page">
+          <Text fontSize="14px" lineHeight="21px" color="#26272B" aria-current="page">
             {t('statesUts.breadcrumb.view')}
           </Text>
         </Flex>
@@ -165,18 +166,18 @@ export function ViewStateUTPage() {
           aria-labelledby="state-details-heading"
         >
           <Box>
-            <Text fontSize="14px" fontWeight="500" mb={1}>
+            <Text textStyle="h10" fontWeight="500" mb={1}>
               {t('statesUts.details.name')}
             </Text>
-            <Text fontSize="14px" fontWeight="400">
+            <Text textStyle="h10" fontWeight="400">
               {state.name}
             </Text>
           </Box>
           <Box>
-            <Text fontSize="14px" fontWeight="500" mb={1}>
+            <Text textStyle="h10" mb={1}>
               {t('statesUts.details.code')}
             </Text>
-            <Text fontSize="14px" fontWeight="400">
+            <Text textStyle="h10" fontWeight="400">
               {state.code}
             </Text>
           </Box>
@@ -193,50 +194,50 @@ export function ViewStateUTPage() {
           aria-labelledby="admin-details-heading"
         >
           <Box>
-            <Text fontSize="14px" fontWeight="500" mb={1}>
+            <Text textStyle="h10" mb={1}>
               {t('statesUts.adminDetails.firstName')}
             </Text>
-            <Text fontSize="14px" fontWeight="400">
+            <Text textStyle="h10" fontWeight="400">
               {state.admin.firstName}
             </Text>
           </Box>
           <Box>
-            <Text fontSize="14px" fontWeight="500" mb={1}>
+            <Text textStyle="h10" mb={1}>
               {t('statesUts.adminDetails.lastName')}
             </Text>
-            <Text fontSize="14px" fontWeight="400">
+            <Text textStyle="h10" fontWeight="400">
               {state.admin.lastName}
             </Text>
           </Box>
           <Box>
-            <Text fontSize="14px" fontWeight="500" mb={1}>
+            <Text textStyle="h10" mb={1}>
               {t('statesUts.adminDetails.email')}
             </Text>
-            <Text fontSize="14px" fontWeight="400">
+            <Text textStyle="h10" fontWeight="400">
               {state.admin.email}
             </Text>
           </Box>
           <Box>
-            <Text fontSize="14px" fontWeight="500" mb={1}>
+            <Text textStyle="h10" mb={1}>
               {t('statesUts.adminDetails.phone')}
             </Text>
-            <Text fontSize="14px" fontWeight="400">
+            <Text textStyle="h10" fontWeight="400">
               +91 {state.admin.phone.replace(/(\d{5})(\d{5})/, '$1-$2')}
             </Text>
           </Box>
           <Box>
-            <Text fontSize="14px" fontWeight="500" mb={1}>
+            <Text textStyle="h10" mb={1}>
               {t('statesUts.adminDetails.secondaryEmail')}
             </Text>
-            <Text fontSize="14px" fontWeight="400">
+            <Text textStyle="h10" fontWeight="400">
               {state.admin.secondaryEmail || t('common:na')}
             </Text>
           </Box>
           <Box>
-            <Text fontSize="14px" fontWeight="500" mb={1}>
+            <Text textStyle="h10" mb={1}>
               {t('statesUts.adminDetails.contactNumber')}
             </Text>
-            <Text fontSize="14px" fontWeight="400">
+            <Text textStyle="h10" fontWeight="400">
               {state.admin.contactNumber || t('common:na')}
             </Text>
           </Box>
@@ -247,7 +248,7 @@ export function ViewStateUTPage() {
           {t('statesUts.statusSection.title')}
         </Heading>
         <Flex align="center" gap={2} h={6} aria-labelledby="status-heading">
-          <Text fontSize="14px" fontWeight="500" id="activated-label">
+          <Text textStyle="h10" id="activated-label">
             {t('statesUts.statusSection.activated')}
           </Text>
           <Toggle
