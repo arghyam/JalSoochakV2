@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Box, Text, Button, Flex, Grid, IconButton, HStack, VStack } from '@chakra-ui/react'
-import { EditIcon, DeleteIcon } from '@chakra-ui/icons'
+import { FiEdit } from 'react-icons/fi'
+import { MdDeleteOutline } from 'react-icons/md'
 import {
   getMockEscalations,
   getMockEscalationById,
@@ -12,6 +13,7 @@ import type { Escalation, EscalationLevel } from '../../types/escalations'
 import { AVAILABLE_ALERT_TYPES, AVAILABLE_ROLES, AVAILABLE_HOURS } from '../../types/escalations'
 import { useToast } from '@/shared/hooks/use-toast'
 import { ToastContainer, SearchableSelect } from '@/shared/components/common'
+import { IoAddOutline } from 'react-icons/io5'
 
 type ViewMode = 'list' | 'add' | 'edit'
 
@@ -204,8 +206,9 @@ export function EscalationsPage() {
               h="32px"
               px="12px"
               py="8px"
+              gap={1}
             >
-              + Add New Escalation Type
+              {<IoAddOutline size={24} />} Add New Escalation Type
             </Button>
           </Flex>
 
@@ -230,27 +233,27 @@ export function EscalationsPage() {
                   <HStack spacing={1}>
                     <IconButton
                       aria-label="Edit escalation"
-                      icon={<EditIcon h={5} w={5} />}
+                      icon={<FiEdit size={20} />}
                       variant="ghost"
                       size="sm"
                       color="neutral.400"
                       _hover={{ bg: 'primary.50', color: 'primary.500' }}
                       onClick={() => handleEditClick(escalation.id)}
-                      h={6}
-                      w={6}
-                      minW={6}
+                      h={5}
+                      w={5}
+                      minW={5}
                     />
                     <IconButton
                       aria-label="Delete escalation"
-                      icon={<DeleteIcon h={5} w={5} />}
+                      icon={<MdDeleteOutline size={20} />}
                       variant="ghost"
                       size="sm"
                       color="neutral.400"
                       _hover={{ bg: 'error.50', color: 'error.500' }}
                       onClick={() => handleDeleteClick(escalation.id)}
-                      h={6}
-                      w={6}
-                      minW={6}
+                      h={5}
+                      w={5}
+                      minW={5}
                     />
                   </HStack>
                 </Flex>
@@ -310,7 +313,7 @@ export function EscalationsPage() {
               {viewMode === 'edit' && (
                 <IconButton
                   aria-label="Edit mode"
-                  icon={<EditIcon h={5} w={5} />}
+                  icon={<FiEdit size={20} />}
                   variant="ghost"
                   size="sm"
                   color="neutral.950"

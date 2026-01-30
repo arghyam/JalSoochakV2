@@ -93,6 +93,16 @@ export function WaterNormsPage() {
   }
 
   const handleAddDistrict = () => {
+    // Check if there's any unfilled district override
+    const hasUnfilledOverride = districtOverrides.some(
+      (override) => !override.districtName || override.quantity <= 0
+    )
+
+    if (hasUnfilledOverride) {
+      toast.addToast('Please fill the existing', 'error')
+      return
+    }
+
     const newOverride: DistrictOverride = {
       id: `district-${Date.now()}`,
       districtName: '',

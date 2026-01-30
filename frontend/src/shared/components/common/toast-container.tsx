@@ -14,7 +14,7 @@ interface ToastContainerProps {
 
 export function ToastContainer({ toasts, onRemove }: ToastContainerProps) {
   return (
-    <Box position="fixed" top={4} right={4} zIndex={50}>
+    <Box position="fixed" bottom={28} right={12} zIndex={50}>
       <Stack spacing={2}>
         {toasts.map((toast) => (
           <Toast
