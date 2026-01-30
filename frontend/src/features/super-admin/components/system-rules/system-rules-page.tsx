@@ -1,19 +1,26 @@
 import { useState, useEffect } from 'react'
-import { Box, Heading, Text, Button, Flex, HStack, SimpleGrid } from '@chakra-ui/react'
+import {
+  Box,
+  Heading,
+  Text,
+  Button,
+  Flex,
+  HStack,
+  SimpleGrid,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+} from '@chakra-ui/react'
 import { useTranslation } from 'react-i18next'
 import {
   getMockSystemRulesConfiguration,
   saveMockSystemRulesConfiguration,
 } from '../../services/mock-data'
 import type { SystemRulesConfiguration } from '../../types/system-rules'
-import {
-  COVERAGE_OPTIONS,
-  CONTINUITY_OPTIONS,
-  QUANTITY_OPTIONS,
-  REGULARITY_OPTIONS,
-} from '../../types/system-rules'
 import { useToast } from '@/shared/hooks/use-toast'
-import { ToastContainer, SearchableSelect } from '@/shared/components/common'
+import { ToastContainer } from '@/shared/components/common'
 
 export function SystemRulesPage() {
   const { t } = useTranslation(['super-admin', 'common'])
@@ -157,21 +164,35 @@ export function SystemRulesPage() {
                 bg="neutral.50"
                 py={6}
                 px={4}
+                height={{ base: 'auto', md: '174px' }}
               >
                 <Heading as="h2" size="h3" fontWeight="400" mb={1}>
                   {t('systemRules.coverage.title')}
                 </Heading>
-                <Text fontSize="14px" mb={4} id="coverage-description">
+                <Text fontSize="14px" lineHeight="20px" mb={4} id="coverage-description">
                   {t('systemRules.coverage.description')}
                 </Text>
-                <SearchableSelect
-                  options={COVERAGE_OPTIONS}
+                <NumberInput
                   value={coverage}
-                  onChange={setCoverage}
-                  placeholder={t('common:select')}
-                  width="100%"
-                  aria-describedby="coverage-description"
-                />
+                  onChange={(valueString) => setCoverage(valueString)}
+                  min={0}
+                  w={{ base: 'full', lg: '490px' }}
+                >
+                  <NumberInputField
+                    placeholder={t('common:enter')}
+                    h="36px"
+                    borderRadius="6px"
+                    borderWidth="1px"
+                    borderColor="neutral.200"
+                    pr="32px"
+                    pl="16px"
+                    aria-describedby="coverage-description"
+                  />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
               </Box>
 
               {/* Continuity */}
@@ -183,21 +204,35 @@ export function SystemRulesPage() {
                 bg="neutral.50"
                 py={6}
                 px={4}
+                height={{ base: 'auto', md: '174px' }}
               >
                 <Heading as="h2" size="h3" fontWeight="400" mb={1}>
                   {t('systemRules.continuity.title')}
                 </Heading>
-                <Text fontSize="14px" mb={4} id="continuity-description">
+                <Text fontSize="14px" lineHeight="20px" mb={4} id="continuity-description">
                   {t('systemRules.continuity.description')}
                 </Text>
-                <SearchableSelect
-                  options={CONTINUITY_OPTIONS}
+                <NumberInput
                   value={continuity}
-                  onChange={setContinuity}
-                  placeholder={t('common:select')}
-                  width="100%"
-                  aria-describedby="continuity-description"
-                />
+                  onChange={(valueString) => setContinuity(valueString)}
+                  min={0}
+                  w={{ base: 'full', lg: '490px' }}
+                >
+                  <NumberInputField
+                    placeholder={t('common:enter')}
+                    h="36px"
+                    borderRadius="6px"
+                    borderWidth="1px"
+                    borderColor="neutral.200"
+                    pr="32px"
+                    pl="16px"
+                    aria-describedby="continuity-description"
+                  />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
               </Box>
 
               {/* Quantity (per capita) */}
@@ -209,21 +244,35 @@ export function SystemRulesPage() {
                 bg="neutral.50"
                 py={6}
                 px={4}
+                height={{ base: 'auto', md: '174px' }}
               >
                 <Heading as="h2" size="h3" fontWeight="400" mb={1}>
                   {t('systemRules.quantity.title')}
                 </Heading>
-                <Text fontSize="14px" mb={4} id="quantity-description">
+                <Text fontSize="14px" lineHeight="20px" mb={4} id="quantity-description">
                   {t('systemRules.quantity.description')}
                 </Text>
-                <SearchableSelect
-                  options={QUANTITY_OPTIONS}
+                <NumberInput
                   value={quantity}
-                  onChange={setQuantity}
-                  placeholder={t('common:select')}
-                  width="100%"
-                  aria-describedby="quantity-description"
-                />
+                  onChange={(valueString) => setQuantity(valueString)}
+                  min={0}
+                  w={{ base: 'full', lg: '490px' }}
+                >
+                  <NumberInputField
+                    placeholder={t('common:enter')}
+                    h="36px"
+                    borderRadius="6px"
+                    borderWidth="1px"
+                    borderColor="neutral.200"
+                    pr="32px"
+                    pl="16px"
+                    aria-describedby="quantity-description"
+                  />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
               </Box>
 
               {/* Regularity Threshold */}
@@ -235,21 +284,35 @@ export function SystemRulesPage() {
                 bg="neutral.50"
                 py={6}
                 px={4}
+                height={{ base: 'auto', md: '174px' }}
               >
                 <Heading as="h2" size="h3" fontWeight="400" mb={1}>
                   {t('systemRules.regularity.title')}
                 </Heading>
-                <Text fontSize="14px" mb={4} id="regularity-description">
+                <Text fontSize="14px" lineHeight="20px" mb={4} id="regularity-description">
                   {t('systemRules.regularity.description')}
                 </Text>
-                <SearchableSelect
-                  options={REGULARITY_OPTIONS}
+                <NumberInput
                   value={regularity}
-                  onChange={setRegularity}
-                  placeholder={t('common:select')}
-                  width="100%"
-                  aria-describedby="regularity-description"
-                />
+                  onChange={(valueString) => setRegularity(valueString)}
+                  min={0}
+                  w={{ base: 'full', lg: '490px' }}
+                >
+                  <NumberInputField
+                    placeholder={t('common:enter')}
+                    h="36px"
+                    borderRadius="6px"
+                    borderWidth="1px"
+                    borderColor="neutral.200"
+                    pr="32px"
+                    pl="16px"
+                    aria-describedby="regularity-description"
+                  />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
               </Box>
             </SimpleGrid>
           </Flex>

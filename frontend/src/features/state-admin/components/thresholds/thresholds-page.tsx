@@ -1,18 +1,24 @@
 import { useState, useEffect } from 'react'
-import { Box, Text, Button, Flex, HStack, Grid } from '@chakra-ui/react'
+import {
+  Box,
+  Text,
+  Button,
+  Flex,
+  HStack,
+  Grid,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+} from '@chakra-ui/react'
 import {
   getMockThresholdConfiguration,
   saveMockThresholdConfiguration,
 } from '../../services/mock-data'
 import type { ThresholdConfiguration } from '../../types/thresholds'
-import {
-  COVERAGE_OPTIONS,
-  CONTINUITY_OPTIONS,
-  QUANTITY_OPTIONS,
-  REGULARITY_OPTIONS,
-} from '../../types/thresholds'
 import { useToast } from '@/shared/hooks/use-toast'
-import { ToastContainer, SearchableSelect } from '@/shared/components/common'
+import { ToastContainer } from '@/shared/components/common'
 
 export function ThresholdsPage() {
   const [config, setConfig] = useState<ThresholdConfiguration | null>(null)
@@ -142,17 +148,30 @@ export function ThresholdsPage() {
                 <Text textStyle="h8" mb={1}>
                   Coverage
                 </Text>
-                <Text fontSize="14px" mb={4}>
+                <Text fontSize="14px" lineHeight="20px" mb={4}>
                   Minimum percentage of households that must have Functional Household Tap
                   Connections (FHTC) to avoid a coverage alert.
                 </Text>
-                <SearchableSelect
-                  options={COVERAGE_OPTIONS}
+                <NumberInput
                   value={coverage}
-                  onChange={setCoverage}
-                  placeholder="Select"
-                  width="486px"
-                />
+                  onChange={(valueString) => setCoverage(valueString)}
+                  min={0}
+                  w={{ base: 'full', lg: '490px' }}
+                >
+                  <NumberInputField
+                    placeholder="Enter"
+                    h="36px"
+                    borderRadius="6px"
+                    borderWidth="1px"
+                    borderColor="neutral.200"
+                    pr="32px"
+                    pl="16px"
+                  />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
               </Box>
 
               {/* Continuity */}
@@ -168,17 +187,30 @@ export function ThresholdsPage() {
                 <Text textStyle="h8" mb={1}>
                   Continuity
                 </Text>
-                <Text fontSize="14px" mb={4}>
+                <Text fontSize="14px" lineHeight="20px" mb={4}>
                   Maximum number of consecutive days for which water supply data is missing or no
                   supply is recorded before a continuity alert is triggered.
                 </Text>
-                <SearchableSelect
-                  options={CONTINUITY_OPTIONS}
+                <NumberInput
                   value={continuity}
-                  onChange={setContinuity}
-                  placeholder="Select"
-                  width="486px"
-                />
+                  onChange={(valueString) => setContinuity(valueString)}
+                  min={0}
+                  w={{ base: 'full', lg: '490px' }}
+                >
+                  <NumberInputField
+                    placeholder="Enter"
+                    h="36px"
+                    borderRadius="6px"
+                    borderWidth="1px"
+                    borderColor="neutral.200"
+                    pr="32px"
+                    pl="16px"
+                  />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
               </Box>
 
               {/* Quantity (per capita) */}
@@ -194,17 +226,30 @@ export function ThresholdsPage() {
                 <Text textStyle="h8" mb={1}>
                   Quantity (per capita)
                 </Text>
-                <Text fontSize="14px" mb={4}>
+                <Text fontSize="14px" lineHeight="20px" mb={4}>
                   Minimum per capita water supply (in LPCD) required per day. If the average
                   supplied quantity falls below this value, a quantity alert will be triggered
                 </Text>
-                <SearchableSelect
-                  options={QUANTITY_OPTIONS}
+                <NumberInput
                   value={quantity}
-                  onChange={setQuantity}
-                  placeholder="Select"
-                  width="486px"
-                />
+                  onChange={(valueString) => setQuantity(valueString)}
+                  min={0}
+                  w={{ base: 'full', lg: '490px' }}
+                >
+                  <NumberInputField
+                    placeholder="Enter"
+                    h="36px"
+                    borderRadius="6px"
+                    borderWidth="1px"
+                    borderColor="neutral.200"
+                    pr="32px"
+                    pl="16px"
+                  />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
               </Box>
 
               {/* Regularity Threshold */}
@@ -220,17 +265,30 @@ export function ThresholdsPage() {
                 <Text textStyle="h8" mb={1}>
                   Regularity Threshold
                 </Text>
-                <Text fontSize="14px" mb={4}>
+                <Text fontSize="14px" lineHeight="20px" mb={4}>
                   Minimum percentage of days water must be supplied during the selected period to
                   avoid a regularity alert.
                 </Text>
-                <SearchableSelect
-                  options={REGULARITY_OPTIONS}
+                <NumberInput
                   value={regularity}
-                  onChange={setRegularity}
-                  placeholder="Select"
-                  width="486px"
-                />
+                  onChange={(valueString) => setRegularity(valueString)}
+                  min={0}
+                  w={{ base: 'full', lg: '490px' }}
+                >
+                  <NumberInputField
+                    placeholder="Enter"
+                    h="36px"
+                    borderRadius="6px"
+                    borderWidth="1px"
+                    borderColor="neutral.200"
+                    pr="32px"
+                    pl="16px"
+                  />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
               </Box>
             </Grid>
           </Flex>
