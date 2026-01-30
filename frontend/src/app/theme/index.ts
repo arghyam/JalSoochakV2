@@ -211,6 +211,10 @@ const theme = extendTheme({
             borderColor: 'primary.500',
             boxShadow: '0 0 0 1px var(--chakra-colors-primary-500)',
           },
+          _autofill: {
+            boxShadow: '0 0 0 1000px #ffffff inset',
+            WebkitTextFillColor: 'var(--chakra-colors-neutral-950)',
+          },
         },
       },
     },
@@ -309,6 +313,15 @@ const theme = extendTheme({
         lineHeight: '24px',
         fontFamily: 'Geist, sans-serif',
       },
+      'input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill': {
+        boxShadow: '0 0 0 1000px #ffffff inset',
+        WebkitTextFillColor: 'var(--chakra-colors-neutral-950)',
+      },
+      'input:-webkit-autofill:focus, textarea:-webkit-autofill:focus, select:-webkit-autofill:focus':
+        {
+          boxShadow: '0 0 0 1000px #ffffff inset',
+          WebkitTextFillColor: 'var(--chakra-colors-neutral-950)',
+        },
     },
   },
 })
