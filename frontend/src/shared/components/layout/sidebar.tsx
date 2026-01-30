@@ -280,8 +280,17 @@ export function Sidebar({ onNavClick }: SidebarProps) {
               </Flex>
             </Flex>
           </MenuButton>
-          <MenuList height="36px" px={7}>
-            <MenuItem px={3} py={2} gap={2} onClick={handleLogout}>
+          <MenuList height="44px" px={7} py={0}>
+            <MenuItem
+              height="full"
+              width="167px"
+              px={3}
+              py={0}
+              gap={2}
+              borderRadius={2}
+              onClick={handleLogout}
+              _hover={{ bg: 'neutral.100' }}
+            >
               <FiLogOut />
               <Text fontSize="16px" fontWeight="500">
                 {t('sidebar.logout')}

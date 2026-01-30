@@ -120,9 +120,14 @@ export function IngestionMonitorPage() {
         py={0.5}
         borderRadius="16px"
         fontSize="12px"
+        lineHeight="16px"
         fontWeight="500"
         textTransform="capitalize"
         height="24px"
+        width="71px"
+        alignItems="center"
+        display="flex"
+        justifyContent="center"
       >
         {config.label}
       </Badge>
