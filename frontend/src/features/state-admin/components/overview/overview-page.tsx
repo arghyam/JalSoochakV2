@@ -190,7 +190,7 @@ export function OverviewPage() {
                 rightIcon={<ChevronDownIcon w={5} h={5} />}
                 _hover={{ bg: 'neutral.50' }}
                 _active={{ bg: 'neutral.100' }}
-                _focus={{ boxShadow: 'none' }}
+                _focusVisible={{ boxShadow: 'outline' }}
                 sx={{
                   '& svg': {
                     color: 'primary.500',

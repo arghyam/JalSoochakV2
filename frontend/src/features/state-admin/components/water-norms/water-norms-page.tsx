@@ -262,7 +262,7 @@ export function WaterNormsPage() {
                   </Text>
 
                   {districtOverrides.map((override) => (
-                    <Flex key={override.id} gap={6} mb={3} align="flex-end">
+                    <Flex key={override.id} gap={6} mb={3} align="flex-end" justify="space-between">
                       <Box w="486px">
                         <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
                           District Name
@@ -287,7 +287,7 @@ export function WaterNormsPage() {
                           width="486px"
                         />
                       </Box>
-                      <Box w="486px">
+                      <Box>
                         <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
                           Quantity (LPCD)
                         </Text>
