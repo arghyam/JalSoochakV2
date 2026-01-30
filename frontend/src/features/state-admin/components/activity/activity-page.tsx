@@ -54,7 +54,7 @@ export function ActivityPage() {
     {
       key: 'action',
       header: t('activity.table.action'),
-      sortable: true,
+      sortable: false,
       render: (row) => (
         <Text textStyle="h10" fontWeight="400">
           {row.action}
@@ -64,7 +64,7 @@ export function ActivityPage() {
     {
       key: 'status',
       header: t('activity.table.status'),
-      sortable: true,
+      sortable: false,
       render: (row) => (
         <Box
           as="span"
