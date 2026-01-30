@@ -1,6 +1,8 @@
 import { useMemo } from 'react'
+import { useTheme } from '@chakra-ui/react'
 import * as echarts from 'echarts'
 import { EChartsWrapper } from './echarts-wrapper'
+import { getBodyText7Style } from './chart-text-style'
 import type { ImageSubmissionStatusData } from '../../types'
 
 interface ImageSubmissionStatusChartProps {
@@ -16,7 +18,11 @@ export function ImageSubmissionStatusChart({
   className,
   height = '406px',
 }: ImageSubmissionStatusChartProps) {
+  const theme = useTheme()
+
   const option = useMemo<echarts.EChartsOption>(() => {
+    const bodyText7 = getBodyText7Style(theme)
+
     return {
       tooltip: {
         show: false,
@@ -29,9 +35,10 @@ export function ImageSubmissionStatusChart({
         itemHeight: 10,
         itemGap: 16,
         textStyle: {
-          fontSize: 12,
+          fontSize: bodyText7.fontSize,
           fontWeight: 400,
-          color: '#1C1C1C',
+          lineHeight: bodyText7.lineHeight,
+          color: bodyText7.color,
         },
       },
       series: [
@@ -56,7 +63,7 @@ export function ImageSubmissionStatusChart({
         },
       ],
     }
-  }, [data])
+  }, [data, theme])
 
   return <EChartsWrapper option={option} className={className} height={height} />
 }

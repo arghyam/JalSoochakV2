@@ -1,6 +1,8 @@
 import { useMemo } from 'react'
+import { useTheme } from '@chakra-ui/react'
 import * as echarts from 'echarts'
 import { EChartsWrapper } from './echarts-wrapper'
+import { getBodyText7Style } from './chart-text-style'
 import type { DemandSupplyData } from '../../types'
 
 interface DemandSupplyChartProps {
@@ -10,10 +12,13 @@ interface DemandSupplyChartProps {
 }
 
 export function DemandSupplyChart({ data, className, height = '400px' }: DemandSupplyChartProps) {
+  const theme = useTheme()
+
   const option = useMemo<echarts.EChartsOption>(() => {
     const periods = data.map((d) => d.period)
     const demand = data.map((d) => d.demand)
     const supply = data.map((d) => d.supply)
+    const bodyText7 = getBodyText7Style(theme)
 
     return {
       tooltip: {
@@ -26,6 +31,12 @@ export function DemandSupplyChart({ data, className, height = '400px' }: DemandS
         icon: 'rect',
         itemWidth: 10,
         itemHeight: 10,
+        textStyle: {
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          color: bodyText7.color,
+        },
       },
       grid: {
         left: '8%',
@@ -43,6 +54,16 @@ export function DemandSupplyChart({ data, className, height = '400px' }: DemandS
         nameGap: 28,
         axisLabel: {
           rotate: 0,
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          color: bodyText7.color,
+        },
+        nameTextStyle: {
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          color: bodyText7.color,
         },
       },
       yAxis: {
@@ -50,6 +71,18 @@ export function DemandSupplyChart({ data, className, height = '400px' }: DemandS
         name: 'Quantity (units)',
         nameLocation: 'middle',
         nameGap: 40,
+        nameTextStyle: {
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          color: bodyText7.color,
+        },
+        axisLabel: {
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          color: bodyText7.color,
+        },
         interval: 25,
         max: 125,
       },
@@ -82,7 +115,7 @@ export function DemandSupplyChart({ data, className, height = '400px' }: DemandS
         },
       ],
     }
-  }, [data])
+  }, [data, theme])
 
   return <EChartsWrapper option={option} className={className} height={height} />
 }

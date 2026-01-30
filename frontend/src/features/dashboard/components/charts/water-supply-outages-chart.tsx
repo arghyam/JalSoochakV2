@@ -1,6 +1,8 @@
 import { useMemo } from 'react'
+import { useTheme } from '@chakra-ui/react'
 import * as echarts from 'echarts'
 import { EChartsWrapper } from './echarts-wrapper'
+import { getBodyText7Style } from './chart-text-style'
 import type { WaterSupplyOutageData } from '../../types'
 
 interface WaterSupplyOutagesChartProps {
@@ -22,8 +24,11 @@ export function WaterSupplyOutagesChart({
   className,
   height = '300px',
 }: WaterSupplyOutagesChartProps) {
+  const theme = useTheme()
+
   const option = useMemo<echarts.EChartsOption>(() => {
     const districts = data.map((entry) => entry.district)
+    const bodyText7 = getBodyText7Style(theme)
 
     return {
       tooltip: {
@@ -42,6 +47,12 @@ export function WaterSupplyOutagesChart({
         icon: 'rect',
         itemWidth: 10,
         itemHeight: 10,
+        textStyle: {
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          color: bodyText7.color,
+        },
       },
       grid: {
         left: '8%',
@@ -61,26 +72,38 @@ export function WaterSupplyOutagesChart({
           rotate: 45,
           interval: 0,
           margin: 8,
-          fontSize: 12,
-          lineHeight: 16,
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
           fontWeight: 400,
-          color: '#1C1C1C',
+          color: bodyText7.color,
         },
         name: 'Districts',
         nameLocation: 'middle',
         nameGap: 64,
         nameTextStyle: {
-          fontSize: 12,
-          lineHeight: 16,
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
           fontWeight: 400,
-          color: '#1C1C1C',
+          color: bodyText7.color,
         },
       },
       yAxis: {
         type: 'value',
-        name: 'No. of Outages',
+        name: 'No. of days',
         nameLocation: 'middle',
         nameGap: 40,
+        nameTextStyle: {
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          color: bodyText7.color,
+        },
+        axisLabel: {
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          color: bodyText7.color,
+        },
         max: 100,
         interval: 25,
         splitLine: {
@@ -144,7 +167,7 @@ export function WaterSupplyOutagesChart({
         },
       ],
     }
-  }, [data])
+  }, [data, theme])
 
   return <EChartsWrapper option={option} className={className} height={height} />
 }

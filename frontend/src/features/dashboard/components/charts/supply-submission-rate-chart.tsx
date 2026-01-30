@@ -1,6 +1,8 @@
 import { useMemo } from 'react'
+import { useTheme } from '@chakra-ui/react'
 import * as echarts from 'echarts'
 import { EChartsWrapper } from './echarts-wrapper'
+import { getBodyText7Style } from './chart-text-style'
 import type { EntityPerformance } from '../../types'
 
 interface SupplySubmissionRateChartProps {
@@ -16,10 +18,13 @@ export function SupplySubmissionRateChart({
   height = '500px',
   maxItems = 5,
 }: SupplySubmissionRateChartProps) {
+  const theme = useTheme()
+
   const option = useMemo<echarts.EChartsOption>(() => {
     const chartData = data.slice(0, maxItems)
     const entities = chartData.map((d) => d.name)
     const rates = chartData.map((d) => d.regularity)
+    const bodyText7 = getBodyText7Style(theme)
 
     return {
       tooltip: {
@@ -43,10 +48,10 @@ export function SupplySubmissionRateChart({
           rotate: 45,
           interval: 0,
           margin: 8,
-          fontSize: 12,
-          lineHeight: 16,
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
           fontWeight: 400,
-          color: '#1C1C1C',
+          color: bodyText7.color,
         },
       },
       yAxis: {
@@ -54,6 +59,18 @@ export function SupplySubmissionRateChart({
         name: 'Percentage',
         nameLocation: 'middle',
         nameGap: 40,
+        nameTextStyle: {
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          color: bodyText7.color,
+        },
+        axisLabel: {
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          color: bodyText7.color,
+        },
         max: 100,
         interval: 25,
         splitLine: {
@@ -84,15 +101,15 @@ export function SupplySubmissionRateChart({
           bottom: 2,
           style: {
             text: 'States/UTs',
-            fill: '#1C1C1C',
-            fontSize: 12,
+            fill: bodyText7.color,
+            fontSize: bodyText7.fontSize,
             fontWeight: 400,
-            lineHeight: 16,
+            lineHeight: bodyText7.lineHeight,
           },
         },
       ],
     }
-  }, [data, maxItems])
+  }, [data, maxItems, theme])
 
   return <EChartsWrapper option={option} className={className} height={height} />
 }

@@ -1,6 +1,8 @@
 import { useMemo } from 'react'
+import { useTheme } from '@chakra-ui/react'
 import * as echarts from 'echarts'
 import { EChartsWrapper } from './echarts-wrapper'
+import { getBodyText7Style } from './chart-text-style'
 import type { EntityPerformance } from '../../types'
 
 interface AllStatesPerformanceChartProps {
@@ -16,11 +18,14 @@ export function AllStatesPerformanceChart({
   height = '536px',
   maxItems = 5,
 }: AllStatesPerformanceChartProps) {
+  const theme = useTheme()
+
   const option = useMemo<echarts.EChartsOption>(() => {
     const sortedData = [...data].sort((a, b) => b.quantity - a.quantity).slice(0, maxItems)
     const entities = sortedData.map((d) => d.name)
     const quantity = sortedData.map((d) => d.quantity)
     const regularity = sortedData.map((d) => d.regularity)
+    const bodyText7 = getBodyText7Style(theme)
 
     return {
       tooltip: {
@@ -33,6 +38,12 @@ export function AllStatesPerformanceChart({
         icon: 'rect',
         itemWidth: 10,
         itemHeight: 10,
+        textStyle: {
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          color: bodyText7.color,
+        },
       },
       grid: {
         left: '10%',
@@ -48,10 +59,10 @@ export function AllStatesPerformanceChart({
           bottom: 36,
           style: {
             text: 'States/UTs',
-            fill: '#70707B',
-            fontSize: 12,
+            fill: bodyText7.color,
+            fontSize: bodyText7.fontSize,
             fontWeight: 400,
-            lineHeight: 18,
+            lineHeight: bodyText7.lineHeight,
           },
         },
       ],
@@ -65,6 +76,10 @@ export function AllStatesPerformanceChart({
           rotate: 0,
           interval: 0,
           margin: 20,
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          color: bodyText7.color,
         },
       },
       yAxis: {
@@ -72,6 +87,18 @@ export function AllStatesPerformanceChart({
         name: 'Quantity & Regularity',
         nameLocation: 'middle',
         nameGap: 40,
+        nameTextStyle: {
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          color: bodyText7.color,
+        },
+        axisLabel: {
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          color: bodyText7.color,
+        },
         max: 100,
         interval: 25,
         splitLine: {
@@ -104,7 +131,7 @@ export function AllStatesPerformanceChart({
         },
       ],
     }
-  }, [data, maxItems])
+  }, [data, maxItems, theme])
 
   return <EChartsWrapper option={option} className={className} height={height} />
 }
