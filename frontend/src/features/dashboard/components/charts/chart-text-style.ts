@@ -17,7 +17,7 @@ type ThemeLike = {
 const toNumber = (value: string | number | undefined, fallback: number) => {
   if (typeof value === 'number') return value
   if (typeof value === 'string') {
-    const parsed = Number.parseInt(value, 10)
+    const parsed = Number.parseFloat(value)
     return Number.isNaN(parsed) ? fallback : parsed
   }
   return fallback
