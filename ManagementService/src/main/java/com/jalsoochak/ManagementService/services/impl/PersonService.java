@@ -38,6 +38,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -110,11 +112,9 @@ public class PersonService {
         PersonMaster person = PersonMaster.builder()
                 .email(inviteRequest.getEmail())
                 .build();
-
         personMasterRepository.save(person);
 
         String token = UUID.randomUUID().toString();
-
         InviteToken inviteToken = InviteToken.builder()
                 .email(inviteRequest.getEmail())
                 .token(token)
@@ -122,12 +122,22 @@ public class PersonService {
                 .senderId(inviteRequest.getSenderId())
                 .used(false)
                 .build();
-
         inviteTokenRepository.save(inviteToken);
 
         String inviteLink = frontendBaseUrl + "?token=" + token;
-        mailService.sendInviteMail(inviteRequest.getEmail(), inviteLink);
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                try {
+                    mailService.sendInviteMail(inviteRequest.getEmail(), inviteLink);
+                } catch (Exception e) {
+                    log.error("Failed to send invite email to {}", inviteRequest.getEmail(), e);
+                }
+            }
+        });
     }
+
 
     @Transactional
     public void completeProfile(RegisterRequest registerRequest) {
@@ -180,39 +190,47 @@ public class PersonService {
                 );
             }
 
-            keycloakUserId = response.getLocation()
-                    .getPath()
-                    .replaceAll(".*/", "");
+            keycloakUserId = response.getLocation().getPath().replaceAll(".*/", "");
         }
 
         CredentialRepresentation credential = new CredentialRepresentation();
         credential.setType(CredentialRepresentation.PASSWORD);
         credential.setValue(registerRequest.getPassword());
         credential.setTemporary(false);
-
         usersResource.get(keycloakUserId).resetPassword(credential);
 
-        person.setFirstName(registerRequest.getFirstName());
-        person.setLastName(registerRequest.getLastName());
-        person.setFullName(registerRequest.getFirstName() + " " + registerRequest.getLastName());
-        person.setPhoneNumber(registerRequest.getPhoneNumber());
-        person.setPersonType(personType);
-        person.setKeycloakUserId(keycloakUserId);
-        person.setTenantId(registerRequest.getTenantId());
-        person.setProfileCompleted(true);
-
-        personMasterRepository.save(person);
-
         try {
-            assignRoleToUser(person.getKeycloakUserId(), "STATE_ADMIN");
+            person.setFirstName(registerRequest.getFirstName());
+            person.setLastName(registerRequest.getLastName());
+            person.setFullName(registerRequest.getFirstName() + " " + registerRequest.getLastName());
+            person.setPhoneNumber(registerRequest.getPhoneNumber());
+            person.setPersonType(personType);
+            person.setKeycloakUserId(keycloakUserId);
+            person.setTenantId(registerRequest.getTenantId());
+            person.setProfileCompleted(true);
+
+            personMasterRepository.save(person);
+
+            try {
+                assignRoleToUser(keycloakUserId, "STATE_ADMIN");
+            } catch (Exception e) {
+                log.error("Failed to assign role to user: {}", e.getMessage(), e);
+            }
+
+            inviteToken.setUsed(true);
+            inviteTokenRepository.save(inviteToken);
+
+            log.info("Profile completed successfully for user: {}", person.getEmail());
+
         } catch (Exception e) {
-            log.error("Failed to assign role to user: {}", e.getMessage(), e);
+            log.error("Failed to complete profile, deleting Keycloak user to avoid orphaned account", e);
+            try {
+                usersResource.delete(keycloakUserId);
+            } catch (Exception kcEx) {
+                log.error("Failed to delete Keycloak user {} after DB failure", keycloakUserId, kcEx);
+            }
+            throw e;
         }
-
-        inviteToken.setUsed(true);
-        inviteTokenRepository.save(inviteToken);
-
-        log.info("Profile completed successfully for user: {}", person.getEmail());
     }
 
     public TokenResponse login(LoginRequest loginRequest) {
