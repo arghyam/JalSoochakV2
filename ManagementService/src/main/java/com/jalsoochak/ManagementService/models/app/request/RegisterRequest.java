@@ -23,6 +23,12 @@ public class RegisterRequest {
     @NotBlank(message = "Person type is required")
     private String personType;
 
+    @NotBlank(message = "Token is required")
+    private String token;
+
+    @NotBlank(message = "Password is required")
+    private String password;
+
     @NotBlank(message = "Tenant ID is required e.g asam")
     private String tenantId;
 }

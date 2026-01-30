@@ -56,9 +56,6 @@ public class SchemeMaster {
     @Column(name = "house_hold_count")
     private Integer houseHoldCount;
 
-    @Column(columnDefinition = "GEOMETRY")
-    private String geolocation;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scheme_type_id")
     private SchemeTypeMaster schemeType;
