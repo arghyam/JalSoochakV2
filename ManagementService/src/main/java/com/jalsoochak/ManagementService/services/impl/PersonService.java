@@ -97,38 +97,36 @@ public class PersonService {
         this.mailService = mailService;
     }
 
+    @Transactional
     public void inviteUser(InviteRequest inviteRequest) {
 
-        try {
-            if (personMasterRepository.findByEmail(inviteRequest.getEmail()).isPresent()) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Invitation already sent to this user");
-            }
-
-            PersonMaster person = PersonMaster.builder()
-                    .email(inviteRequest.getEmail())
-                    .build();
-
-            personMasterRepository.save(person);
-
-            String token = UUID.randomUUID().toString();
-
-            InviteToken inviteToken = InviteToken.builder()
-                    .email(inviteRequest.getEmail())
-                    .token(token)
-                    .expiresAt(LocalDateTime.now().plusHours(24))
-                    .senderId(inviteRequest.getSenderId())
-                    .used(false)
-                    .build();
-
-            inviteTokenRepository.save(inviteToken);
-
-            String inviteLink = frontendBaseUrl + "?token=" + token;
-            mailService.sendInviteMail(inviteRequest.getEmail(), inviteLink);
-
-        } catch (Exception e) {
-            log.error("Error inviting user: {}", e.getMessage(), e);
-            throw e;
+        if (personMasterRepository.findByEmail(inviteRequest.getEmail()).isPresent()) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Invitation already sent to this user"
+            );
         }
+
+        PersonMaster person = PersonMaster.builder()
+                .email(inviteRequest.getEmail())
+                .build();
+
+        personMasterRepository.save(person);
+
+        String token = UUID.randomUUID().toString();
+
+        InviteToken inviteToken = InviteToken.builder()
+                .email(inviteRequest.getEmail())
+                .token(token)
+                .expiresAt(LocalDateTime.now().plusHours(24))
+                .senderId(inviteRequest.getSenderId())
+                .used(false)
+                .build();
+
+        inviteTokenRepository.save(inviteToken);
+
+        String inviteLink = frontendBaseUrl + "?token=" + token;
+        mailService.sendInviteMail(inviteRequest.getEmail(), inviteLink);
     }
 
     @Transactional
@@ -136,8 +134,6 @@ public class PersonService {
 
         InviteToken inviteToken = inviteTokenRepository.findByToken(registerRequest.getToken())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid invite token"));
-
-        log.info("invite token: {}", inviteToken);
 
         if (inviteToken.isUsed()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invite token has already been used");
@@ -149,8 +145,6 @@ public class PersonService {
 
         PersonMaster person = personMasterRepository.findByEmail(inviteToken.getEmail())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found for this invite"));
-
-        log.info("person: {}", person);
 
         if (person.isProfileCompleted()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profile has already been completed");
@@ -176,13 +170,20 @@ public class PersonService {
         keycloakUser.setEmailVerified(true);
         keycloakUser.setRequiredActions(List.of("UPDATE_PASSWORD"));
 
-        Response response = usersResource.create(keycloakUser);
+        String keycloakUserId;
+        try (Response response = usersResource.create(keycloakUser)) {
 
-        if (response.getStatus() != 201) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Failed to create user in Keycloak");
+            if (response.getStatus() != Response.Status.CREATED.getStatusCode()) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_GATEWAY,
+                        "Failed to create user in Keycloak"
+                );
+            }
+
+            keycloakUserId = response.getLocation()
+                    .getPath()
+                    .replaceAll(".*/", "");
         }
-
-        String keycloakUserId = response.getLocation().getPath().replaceAll(".*/", "");
 
         CredentialRepresentation credential = new CredentialRepresentation();
         credential.setType(CredentialRepresentation.PASSWORD);

@@ -2,6 +2,7 @@ package com.jalsoochak.ManagementService.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -15,8 +16,12 @@ public class MailService {
 
     private final JavaMailSender mailSender;
 
-    private final String fromEmail = "otonye.amietubodie@beehyv.com";
-    private final String fromName = "Jalsoochak";
+    @Value("${mail.from.email}")
+    private String fromEmail;
+
+    @Value("${mail.from.name}")
+    private String fromName;
+
 
     public void sendInviteMail(String recipientEmail, String inviteLink) {
         try {
