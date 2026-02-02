@@ -8,15 +8,22 @@ import {
   DemandSupplyChart,
   AllStatesPerformanceChart,
   SupplySubmissionRateChart,
+  PumpOperatorsChart,
   ImageSubmissionStatusChart,
   WaterSupplyOutagesChart,
 } from './charts'
-import { AllStatesTable } from './tables'
+import {
+  AllBlocksTable,
+  AllDistrictsTable,
+  AllStatesTable,
+  PumpOperatorsPerformanceTable,
+} from './tables'
 import { LoadingSpinner, SearchableSelect } from '@/shared/components/common'
 import { MdOutlineWaterDrop, MdArrowUpward, MdArrowDownward } from 'react-icons/md'
 import { AiOutlineHome, AiOutlineInfoCircle } from 'react-icons/ai'
 import waterTapIcon from '@/assets/media/water-tap_1822589 1.svg'
 import type { SearchableSelectOption } from '@/shared/components/common'
+import type { EntityPerformance } from '../types'
 import { SearchLayout, FilterLayout } from '@/shared/components/layout'
 import {
   mockFilterStates,
@@ -26,6 +33,8 @@ import {
   mockFilterVillages,
   mockFilterDuration,
   mockFilterSchemes,
+  mockDistrictPerformanceByState,
+  mockBlockPerformanceByDistrict,
 } from '../services/mock/dashboard-mock'
 
 export function CentralDashboard() {
@@ -41,9 +50,13 @@ export function CentralDashboard() {
   const [performanceState, setPerformanceState] = useState('')
   const [filterTabIndex, setFilterTabIndex] = useState(0)
   const isStateSelected = Boolean(selectedState)
-
+  const isDistrictSelected = Boolean(selectedDistrict)
   const emptyOptions: SearchableSelectOption[] = []
   const isAdvancedEnabled = Boolean(selectedState && selectedDistrict)
+  const districtTableData =
+    mockDistrictPerformanceByState[selectedState] ?? ([] as EntityPerformance[])
+  const blockTableData =
+    mockBlockPerformanceByDistrict[selectedDistrict] ?? ([] as EntityPerformance[])
   const districtOptions = selectedState ? (mockFilterDistricts[selectedState] ?? []) : emptyOptions
   const blockOptions = selectedDistrict ? (mockFilterBlocks[selectedDistrict] ?? []) : emptyOptions
   const gramPanchayatOptions = selectedBlock
@@ -52,6 +65,28 @@ export function CentralDashboard() {
   const villageOptions = selectedGramPanchayat
     ? (mockFilterVillages[selectedGramPanchayat] ?? [])
     : emptyOptions
+  const handleStateChange = (value: string) => {
+    setSelectedState(value)
+    setSelectedDistrict('')
+    setSelectedBlock('')
+    setSelectedGramPanchayat('')
+    setSelectedVillage('')
+  }
+  const handleDistrictChange = (value: string) => {
+    setSelectedDistrict(value)
+    setSelectedBlock('')
+    setSelectedGramPanchayat('')
+    setSelectedVillage('')
+  }
+  const handleBlockChange = (value: string) => {
+    setSelectedBlock(value)
+    setSelectedGramPanchayat('')
+    setSelectedVillage('')
+  }
+  const handleGramPanchayatChange = (value: string) => {
+    setSelectedGramPanchayat(value)
+    setSelectedVillage('')
+  }
   const handleClearFilters = () => {
     setSelectedState('')
     setSelectedDistrict('')
@@ -100,6 +135,7 @@ export function CentralDashboard() {
     !data.mapData ||
     !data.demandSupply ||
     !data.imageSubmissionStatus ||
+    !data.pumpOperators ||
     !data.waterSupplyOutages ||
     !data.topPerformers ||
     !data.worstPerformers ||
@@ -143,6 +179,10 @@ export function CentralDashboard() {
     },
   ] as const
 
+  const pumpOperatorsTotal = data.pumpOperators.reduce((total, item) => total + item.value, 0)
+  const leadingPumpOperators = data.leadingPumpOperators ?? []
+  const bottomPumpOperators = data.bottomPumpOperators ?? []
+
   return (
     <Box>
       <SearchLayout />
@@ -156,7 +196,7 @@ export function CentralDashboard() {
             <SearchableSelect
               options={mockFilterStates}
               value={selectedState}
-              onChange={setSelectedState}
+              onChange={handleStateChange}
               placeholder="States/UTs"
               required
               width={{
@@ -176,7 +216,7 @@ export function CentralDashboard() {
             <SearchableSelect
               options={districtOptions}
               value={selectedDistrict}
-              onChange={setSelectedDistrict}
+              onChange={handleDistrictChange}
               placeholder="District"
               required
               width={{
@@ -196,7 +236,7 @@ export function CentralDashboard() {
             <SearchableSelect
               options={blockOptions}
               value={selectedBlock}
-              onChange={setSelectedBlock}
+              onChange={handleBlockChange}
               placeholder="Block"
               width={{
                 base: '100%',
@@ -216,7 +256,7 @@ export function CentralDashboard() {
             <SearchableSelect
               options={gramPanchayatOptions}
               value={selectedGramPanchayat}
-              onChange={setSelectedGramPanchayat}
+              onChange={handleGramPanchayatChange}
               placeholder="Gram Panchayat"
               width={{
                 base: '100%',
@@ -610,13 +650,37 @@ export function CentralDashboard() {
         </Box>
       </Grid>
 
-      {/* All States + Submission Rate */}
+      {/* All States/Districts/Pump Operators + Submission Rate */}
       <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
         <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
-          <Text textStyle="bodyText3" fontWeight="400" mb="16px">
-            All States/UTs
-          </Text>
-          <AllStatesTable data={data.mapData} />
+          {isDistrictSelected ? (
+            <>
+              <Flex align="center" justify="space-between" mb="40px">
+                <Text textStyle="bodyText3" fontWeight="400">
+                  Pump Operators
+                </Text>
+                <Text textStyle="bodyText3" fontWeight="400">
+                  Total: {pumpOperatorsTotal}
+                </Text>
+              </Flex>
+              <PumpOperatorsChart
+                data={data.pumpOperators}
+                height="360px"
+                note="Note: Active pump operators submit readings at least 30 days in a month."
+              />
+            </>
+          ) : (
+            <>
+              <Text textStyle="bodyText3" fontWeight="400" mb="16px">
+                {isStateSelected ? 'All Districts' : 'All States/UTs'}
+              </Text>
+              {isStateSelected ? (
+                <AllDistrictsTable data={districtTableData} />
+              ) : (
+                <AllStatesTable data={data.mapData} />
+              )}
+            </>
+          )}
         </Box>
         <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
           <Text textStyle="bodyText3" fontWeight="400" mb={2}>
@@ -625,6 +689,46 @@ export function CentralDashboard() {
           <SupplySubmissionRateChart data={data.mapData} height="383px" />
         </Box>
       </Grid>
+
+      {/* Pump Operator Performance Tables */}
+      {isDistrictSelected ? (
+        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="350px">
+            <PumpOperatorsPerformanceTable
+              title="Leading Pump Operators Performance"
+              data={leadingPumpOperators}
+            />
+          </Box>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="350px">
+            <PumpOperatorsPerformanceTable
+              title="Bottom Pump Operators Performance"
+              data={bottomPumpOperators}
+            />
+          </Box>
+        </Grid>
+      ) : null}
+
+      {/* All Blocks */}
+      {isDistrictSelected ? (
+        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="430px">
+            <Text textStyle="bodyText3" fontWeight="400" mb="16px">
+              All Blocks
+            </Text>
+            <AllBlocksTable data={blockTableData} />
+          </Box>
+          <Box
+            display={{ base: 'none', lg: 'block' }}
+            borderRadius="12px"
+            borderWidth="0.5px"
+            borderColor="transparent"
+            bg="transparent"
+            h="430px"
+          />
+        </Grid>
+      ) : null}
+
+      {/* Pump Operators now lives beside Submission Rate when district is selected */}
     </Box>
   )
 }

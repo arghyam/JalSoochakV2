@@ -40,6 +40,20 @@ export interface ImageSubmissionStatusData {
   value: number
 }
 
+export interface PumpOperatorsData {
+  label: string
+  value: number
+}
+
+export interface PumpOperatorPerformanceData {
+  id: string
+  name: string
+  village: string
+  reportingRate: number
+  photoCompliance: number
+  waterSupplied: number
+}
+
 export interface WaterSupplyOutageData {
   district: string
   electricityFailure: number
@@ -57,11 +71,14 @@ export interface DashboardData {
   mapData: EntityPerformance[]
   demandSupply: DemandSupplyData[]
   imageSubmissionStatus: ImageSubmissionStatusData[]
+  pumpOperators: PumpOperatorsData[]
   waterSupplyOutages: WaterSupplyOutageData[]
   topPerformers: EntityPerformance[]
   worstPerformers: EntityPerformance[]
   regularityData: EntityPerformance[]
   continuityData: EntityPerformance[]
+  leadingPumpOperators?: PumpOperatorPerformanceData[]
+  bottomPumpOperators?: PumpOperatorPerformanceData[]
 }
 
 // For map hover/click interactions
