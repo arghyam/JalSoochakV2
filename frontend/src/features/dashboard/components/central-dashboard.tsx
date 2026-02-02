@@ -12,12 +12,13 @@ import {
   ImageSubmissionStatusChart,
   WaterSupplyOutagesChart,
 } from './charts'
-import { AllStatesTable } from './tables'
+import { AllDistrictsTable, AllStatesTable } from './tables'
 import { LoadingSpinner, SearchableSelect } from '@/shared/components/common'
 import { MdOutlineWaterDrop, MdArrowUpward, MdArrowDownward } from 'react-icons/md'
 import { AiOutlineHome, AiOutlineInfoCircle } from 'react-icons/ai'
 import waterTapIcon from '@/assets/media/water-tap_1822589 1.svg'
 import type { SearchableSelectOption } from '@/shared/components/common'
+import type { EntityPerformance } from '../types'
 import { SearchLayout, FilterLayout } from '@/shared/components/layout'
 import {
   mockFilterStates,
@@ -27,6 +28,7 @@ import {
   mockFilterVillages,
   mockFilterDuration,
   mockFilterSchemes,
+  mockDistrictPerformanceByState,
 } from '../services/mock/dashboard-mock'
 
 export function CentralDashboard() {
@@ -45,6 +47,8 @@ export function CentralDashboard() {
   const isDistrictSelected = Boolean(selectedDistrict)
   const emptyOptions: SearchableSelectOption[] = []
   const isAdvancedEnabled = Boolean(selectedState && selectedDistrict)
+  const districtTableData =
+    mockDistrictPerformanceByState[selectedState] ?? ([] as EntityPerformance[])
   const districtOptions = selectedState ? (mockFilterDistricts[selectedState] ?? []) : emptyOptions
   const blockOptions = selectedDistrict ? (mockFilterBlocks[selectedDistrict] ?? []) : emptyOptions
   const gramPanchayatOptions = selectedBlock
@@ -614,13 +618,37 @@ export function CentralDashboard() {
         </Box>
       </Grid>
 
-      {/* All States + Submission Rate */}
+      {/* All States/Districts/Pump Operators + Submission Rate */}
       <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
         <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
-          <Text textStyle="bodyText3" fontWeight="400" mb="16px">
-            All States/UTs
-          </Text>
-          <AllStatesTable data={data.mapData} />
+          {isDistrictSelected ? (
+            <>
+              <Flex align="center" justify="space-between" mb="40px">
+                <Text textStyle="bodyText3" fontWeight="400">
+                  Pump Operators
+                </Text>
+                <Text textStyle="bodyText3" fontWeight="400">
+                  Total: {pumpOperatorsTotal}
+                </Text>
+              </Flex>
+              <PumpOperatorsChart
+                data={data.pumpOperators}
+                height="360px"
+                note="Note: Active pump operators are who submit reading at least 30 days in a month"
+              />
+            </>
+          ) : (
+            <>
+              <Text textStyle="bodyText3" fontWeight="400" mb="16px">
+                {isStateSelected ? 'All Districts' : 'All States/UTs'}
+              </Text>
+              {isStateSelected ? (
+                <AllDistrictsTable data={districtTableData} />
+              ) : (
+                <AllStatesTable data={data.mapData} />
+              )}
+            </>
+          )}
         </Box>
         <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
           <Text textStyle="bodyText3" fontWeight="400" mb={2}>
@@ -630,45 +658,7 @@ export function CentralDashboard() {
         </Box>
       </Grid>
 
-      {/* Pump Operators */}
-
-      {isDistrictSelected ? (
-        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-          <Box
-            bg="white"
-            borderWidth="0.5px"
-            borderRadius="12px"
-            borderColor="#E4E4E7"
-            pt="24px"
-            pb="24px"
-            pl="16px"
-            pr="16px"
-            h="510px"
-          >
-            <Flex align="center" justify="space-between" mb="40px">
-              <Text textStyle="bodyText3" fontWeight="400">
-                Pump Operators
-              </Text>
-              <Text textStyle="bodyText3" fontWeight="400">
-                Total: {pumpOperatorsTotal}
-              </Text>
-            </Flex>
-            <PumpOperatorsChart
-              data={data.pumpOperators}
-              height="360px"
-              note="Note: Active pump operators are who submit reading at least 30 days in a month"
-            />
-          </Box>
-          <Box
-            display={{ base: 'none', lg: 'block' }}
-            borderRadius="12px"
-            borderWidth="0.5px"
-            borderColor="transparent"
-            bg="transparent"
-            h="462px"
-          />
-        </Grid>
-      ) : null}
+      {/* Pump Operators now lives beside Submission Rate when district is selected */}
     </Box>
   )
 }
