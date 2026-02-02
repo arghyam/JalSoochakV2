@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Box, Text } from '@chakra-ui/react'
+import { Box, Text, Heading } from '@chakra-ui/react'
 import { useTranslation } from 'react-i18next'
 import { DataTable, type DataTableColumn } from '@/shared/components/common'
 import { getMockActivityData } from '../../services/mock-data'
@@ -9,6 +9,10 @@ export function ActivityPage() {
   const { t } = useTranslation(['state-admin', 'common'])
   const [activities, setActivities] = useState<ActivityLog[]>([])
   const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    document.title = `${t('activity.title')} | JalSoochak`
+  }, [t])
 
   useEffect(() => {
     const fetchActivities = async () => {
@@ -89,17 +93,21 @@ export function ActivityPage() {
     <Box w="full">
       {/* Page Header */}
       <Box mb={5}>
-        <Text textStyle="h5">{t('activity.title')}</Text>
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }}>
+          {t('activity.title')}
+        </Heading>
       </Box>
 
       {/* Activity Table */}
-      <DataTable
-        columns={columns}
-        data={activities}
-        getRowKey={(row) => row.id}
-        emptyMessage={t('activity.messages.noActivitiesFound')}
-        isLoading={isLoading}
-      />
+      <Box as="section" aria-label={t('activity.aria.tableSection')}>
+        <DataTable
+          columns={columns}
+          data={activities}
+          getRowKey={(row) => row.id}
+          emptyMessage={t('activity.messages.noActivitiesFound')}
+          isLoading={isLoading}
+        />
+      </Box>
     </Box>
   )
 }

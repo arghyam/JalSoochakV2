@@ -5,13 +5,16 @@ import {
   Button,
   Flex,
   HStack,
-  Grid,
+  SimpleGrid,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
+  Heading,
+  Spinner,
 } from '@chakra-ui/react'
+import { useTranslation } from 'react-i18next'
 import {
   getMockThresholdConfiguration,
   saveMockThresholdConfiguration,
@@ -21,6 +24,7 @@ import { useToast } from '@/shared/hooks/use-toast'
 import { ToastContainer } from '@/shared/components/common'
 
 export function ThresholdsPage() {
+  const { t } = useTranslation(['state-admin', 'common'])
   const [config, setConfig] = useState<ThresholdConfiguration | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -32,6 +36,10 @@ export function ThresholdsPage() {
   const [regularity, setRegularity] = useState('')
 
   const toast = useToast()
+
+  useEffect(() => {
+    document.title = `${t('thresholds.title')} | JalSoochak`
+  }, [t])
 
   useEffect(() => {
     fetchConfiguration()
@@ -48,7 +56,7 @@ export function ThresholdsPage() {
       setRegularity(data.regularity)
     } catch (error) {
       console.error('Failed to fetch threshold configuration:', error)
-      toast.addToast('Failed to load configuration', 'error')
+      toast.addToast(t('thresholds.messages.failedToLoad'), 'error')
     } finally {
       setIsLoading(false)
     }
@@ -65,7 +73,7 @@ export function ThresholdsPage() {
 
   const handleSave = async () => {
     if (!coverage || !continuity || !quantity || !regularity) {
-      toast.addToast('Please fill all required fields', 'error')
+      toast.addToast(t('common:toast.fillAllFields'), 'error')
       return
     }
 
@@ -79,10 +87,10 @@ export function ThresholdsPage() {
         isConfigured: true,
       })
       setConfig(savedConfig)
-      toast.addToast('Changes saved successfully', 'success')
+      toast.addToast(t('common:toast.changesSavedShort'), 'success')
     } catch (error) {
       console.error('Failed to save threshold configuration:', error)
-      toast.addToast('Failed to save changes', 'error')
+      toast.addToast(t('thresholds.messages.failedToSave'), 'error')
     } finally {
       setIsSaving(false)
     }
@@ -98,8 +106,13 @@ export function ThresholdsPage() {
   if (isLoading) {
     return (
       <Box w="full">
-        <Text textStyle="h5">Alert Thresholds</Text>
-        <Text color="neutral.600">Loading...</Text>
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={6}>
+          {t('thresholds.title')}
+        </Heading>
+        <Flex align="center" role="status" aria-live="polite" aria-busy="true">
+          <Spinner size="md" color="primary.500" mr={3} />
+          <Text color="neutral.600">{t('common:loading')}</Text>
+        </Flex>
       </Box>
     )
   }
@@ -108,49 +121,72 @@ export function ThresholdsPage() {
     <Box w="full">
       {/* Page Header */}
       <Box mb={5}>
-        <Text textStyle="h5">Alert Thresholds</Text>
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }}>
+          {t('thresholds.title')}
+        </Heading>
       </Box>
 
       {/* Configuration Card */}
       <Box
+        as="section"
+        aria-labelledby="thresholds-heading"
         bg="white"
         borderWidth="0.5px"
         borderColor="neutral.100"
-        borderRadius="12px"
+        borderRadius={{ base: 'lg', md: 'xl' }}
         w="full"
-        minH="calc(100vh - 148px)"
-        py={6}
+        minH={{ base: 'auto', lg: 'calc(100vh - 148px)' }}
+        py={{ base: 4, md: 6 }}
         px={4}
       >
         <Flex
+          as="form"
+          role="form"
+          aria-label={t('thresholds.aria.formLabel')}
           direction="column"
           w="full"
           h="full"
           justify="space-between"
-          minH="calc(100vh - 200px)"
+          minH={{ base: 'auto', lg: 'calc(100vh - 200px)' }}
+          gap={{ base: 6, lg: 0 }}
         >
           <Flex direction="column" gap={4}>
             {/* Card Header */}
-            <Text textStyle="h8">Configuration Settings</Text>
+            <Heading
+              as="h2"
+              id="thresholds-heading"
+              size="h3"
+              fontWeight="400"
+              fontSize={{ base: 'md', md: 'xl' }}
+            >
+              {t('thresholds.configurationSettings')}
+            </Heading>
 
             {/* Form Fields Grid - 2x2 Layout */}
-            <Grid templateColumns="repeat(2, 1fr)" gap={7} maxW="1200px">
+            <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={{ base: 4, md: 7 }} maxW="1200px">
               {/* Coverage */}
               <Box
+                as="article"
+                aria-label={t('thresholds.aria.coverageCard')}
                 borderWidth="0.5px"
                 borderColor="neutral.200"
-                borderRadius="12px"
+                borderRadius={{ base: 'lg', md: 'xl' }}
                 bg="neutral.50"
-                py={6}
+                py={{ base: 4, md: 6 }}
                 px={4}
-                h="174px"
+                minH={{ base: 'auto', lg: '174px' }}
               >
-                <Text textStyle="h8" mb={1}>
-                  Coverage
-                </Text>
-                <Text fontSize="14px" lineHeight="20px" mb={4}>
-                  Minimum percentage of households that must have Functional Household Tap
-                  Connections (FHTC) to avoid a coverage alert.
+                <Heading
+                  as="h3"
+                  size="h3"
+                  fontWeight="400"
+                  fontSize={{ base: 'md', md: 'xl' }}
+                  mb={1}
+                >
+                  {t('thresholds.coverage.title')}
+                </Heading>
+                <Text fontSize={{ base: '12px', md: '14px' }} lineHeight="20px" mb={4}>
+                  {t('thresholds.coverage.description')}
                 </Text>
                 <NumberInput
                   value={coverage}
@@ -159,13 +195,15 @@ export function ThresholdsPage() {
                   w={{ base: 'full', lg: '490px' }}
                 >
                   <NumberInputField
-                    placeholder="Enter"
+                    placeholder={t('common:enter')}
                     h="36px"
+                    fontSize="md"
                     borderRadius="6px"
                     borderWidth="1px"
                     borderColor="neutral.200"
                     pr="32px"
                     pl="16px"
+                    aria-label={t('thresholds.aria.enterCoverage')}
                   />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
@@ -176,20 +214,27 @@ export function ThresholdsPage() {
 
               {/* Continuity */}
               <Box
+                as="article"
+                aria-label={t('thresholds.aria.continuityCard')}
                 borderWidth="0.5px"
                 borderColor="neutral.200"
-                borderRadius="12px"
+                borderRadius={{ base: 'lg', md: 'xl' }}
                 bg="neutral.50"
-                py={6}
+                py={{ base: 4, md: 6 }}
                 px={4}
-                h="174px"
+                minH={{ base: 'auto', lg: '174px' }}
               >
-                <Text textStyle="h8" mb={1}>
-                  Continuity
-                </Text>
-                <Text fontSize="14px" lineHeight="20px" mb={4}>
-                  Maximum number of consecutive days for which water supply data is missing or no
-                  supply is recorded before a continuity alert is triggered.
+                <Heading
+                  as="h3"
+                  size="h3"
+                  fontWeight="400"
+                  fontSize={{ base: 'md', md: 'xl' }}
+                  mb={1}
+                >
+                  {t('thresholds.continuity.title')}
+                </Heading>
+                <Text fontSize={{ base: '12px', md: '14px' }} lineHeight="20px" mb={4}>
+                  {t('thresholds.continuity.description')}
                 </Text>
                 <NumberInput
                   value={continuity}
@@ -198,13 +243,15 @@ export function ThresholdsPage() {
                   w={{ base: 'full', lg: '490px' }}
                 >
                   <NumberInputField
-                    placeholder="Enter"
+                    placeholder={t('common:enter')}
                     h="36px"
+                    fontSize="md"
                     borderRadius="6px"
                     borderWidth="1px"
                     borderColor="neutral.200"
                     pr="32px"
                     pl="16px"
+                    aria-label={t('thresholds.aria.enterContinuity')}
                   />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
@@ -215,20 +262,27 @@ export function ThresholdsPage() {
 
               {/* Quantity (per capita) */}
               <Box
+                as="article"
+                aria-label={t('thresholds.aria.quantityCard')}
                 borderWidth="0.5px"
                 borderColor="neutral.200"
-                borderRadius="12px"
+                borderRadius={{ base: 'lg', md: 'xl' }}
                 bg="neutral.50"
-                py={6}
+                py={{ base: 4, md: 6 }}
                 px={4}
-                h="174px"
+                minH={{ base: 'auto', lg: '174px' }}
               >
-                <Text textStyle="h8" mb={1}>
-                  Quantity (per capita)
-                </Text>
-                <Text fontSize="14px" lineHeight="20px" mb={4}>
-                  Minimum per capita water supply (in LPCD) required per day. If the average
-                  supplied quantity falls below this value, a quantity alert will be triggered
+                <Heading
+                  as="h3"
+                  size="h3"
+                  fontWeight="400"
+                  fontSize={{ base: 'md', md: 'xl' }}
+                  mb={1}
+                >
+                  {t('thresholds.quantity.title')}
+                </Heading>
+                <Text fontSize={{ base: '12px', md: '14px' }} lineHeight="20px" mb={4}>
+                  {t('thresholds.quantity.description')}
                 </Text>
                 <NumberInput
                   value={quantity}
@@ -237,13 +291,15 @@ export function ThresholdsPage() {
                   w={{ base: 'full', lg: '490px' }}
                 >
                   <NumberInputField
-                    placeholder="Enter"
+                    placeholder={t('common:enter')}
                     h="36px"
+                    fontSize="md"
                     borderRadius="6px"
                     borderWidth="1px"
                     borderColor="neutral.200"
                     pr="32px"
                     pl="16px"
+                    aria-label={t('thresholds.aria.enterQuantity')}
                   />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
@@ -254,20 +310,27 @@ export function ThresholdsPage() {
 
               {/* Regularity Threshold */}
               <Box
+                as="article"
+                aria-label={t('thresholds.aria.regularityCard')}
                 borderWidth="0.5px"
                 borderColor="neutral.200"
-                borderRadius="12px"
+                borderRadius={{ base: 'lg', md: 'xl' }}
                 bg="neutral.50"
-                py={6}
+                py={{ base: 4, md: 6 }}
                 px={4}
-                h="174px"
+                minH={{ base: 'auto', lg: '174px' }}
               >
-                <Text textStyle="h8" mb={1}>
-                  Regularity Threshold
-                </Text>
-                <Text fontSize="14px" lineHeight="20px" mb={4}>
-                  Minimum percentage of days water must be supplied during the selected period to
-                  avoid a regularity alert.
+                <Heading
+                  as="h3"
+                  size="h3"
+                  fontWeight="400"
+                  fontSize={{ base: 'md', md: 'xl' }}
+                  mb={1}
+                >
+                  {t('thresholds.regularity.title')}
+                </Heading>
+                <Text fontSize={{ base: '12px', md: '14px' }} lineHeight="20px" mb={4}>
+                  {t('thresholds.regularity.description')}
                 </Text>
                 <NumberInput
                   value={regularity}
@@ -276,13 +339,15 @@ export function ThresholdsPage() {
                   w={{ base: 'full', lg: '490px' }}
                 >
                   <NumberInputField
-                    placeholder="Enter"
+                    placeholder={t('common:enter')}
                     h="36px"
+                    fontSize="md"
                     borderRadius="6px"
                     borderWidth="1px"
                     borderColor="neutral.200"
                     pr="32px"
                     pl="16px"
+                    aria-label={t('thresholds.aria.enterRegularity')}
                   />
                   <NumberInputStepper>
                     <NumberIncrementStepper />
@@ -290,29 +355,34 @@ export function ThresholdsPage() {
                   </NumberInputStepper>
                 </NumberInput>
               </Box>
-            </Grid>
+            </SimpleGrid>
           </Flex>
 
           {/* Action Buttons */}
-          <HStack spacing={3} justify="flex-end" mt={6}>
+          <HStack
+            spacing={3}
+            justify={{ base: 'stretch', sm: 'flex-end' }}
+            flexDirection={{ base: 'column-reverse', sm: 'row' }}
+            mt={{ base: 4, lg: 6 }}
+          >
             <Button
               variant="secondary"
               size="md"
-              width="174px"
+              width={{ base: 'full', sm: '174px' }}
               onClick={handleCancel}
               isDisabled={isSaving || !hasChanges}
             >
-              Cancel
+              {t('common:button.cancel')}
             </Button>
             <Button
               variant="primary"
               size="md"
-              width="174px"
+              width={{ base: 'full', sm: '174px' }}
               onClick={handleSave}
               isLoading={isSaving}
               isDisabled={!coverage || !continuity || !quantity || !regularity || !hasChanges}
             >
-              Save
+              {t('common:button.save')}
             </Button>
           </HStack>
         </Flex>

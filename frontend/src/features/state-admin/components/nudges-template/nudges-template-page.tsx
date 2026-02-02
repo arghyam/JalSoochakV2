@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Box, Text, Button, Flex, VStack, Textarea, Tag } from '@chakra-ui/react'
+import { Box, Text, Button, Flex, Textarea, Tag, Heading, Spinner, Stack } from '@chakra-ui/react'
 import { ChevronDownIcon } from '@chakra-ui/icons'
+import { useTranslation } from 'react-i18next'
 import { getMockNudgeTemplates, updateMockNudgeTemplate } from '../../services/mock-data'
 import type { NudgeTemplate } from '../../types/nudges'
 import { useToast } from '@/shared/hooks/use-toast'
@@ -23,6 +24,7 @@ interface TemplateState {
 }
 
 export function NudgesTemplatePage() {
+  const { t } = useTranslation(['state-admin', 'common'])
   const [templates, setTemplates] = useState<NudgeTemplate[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [savingTemplateId, setSavingTemplateId] = useState<string | null>(null)
@@ -30,6 +32,10 @@ export function NudgesTemplatePage() {
   const [templateStates, setTemplateStates] = useState<Record<string, TemplateState>>({})
 
   const toast = useToast()
+
+  useEffect(() => {
+    document.title = `${t('nudges.title')} | JalSoochak`
+  }, [t])
 
   useEffect(() => {
     fetchTemplates()
@@ -59,7 +65,7 @@ export function NudgesTemplatePage() {
       setTemplateStates(initialStates)
     } catch (error) {
       console.error('Failed to fetch nudge templates:', error)
-      toast.addToast('Failed to load templates', 'error')
+      toast.addToast(t('nudges.messages.failedToLoad'), 'error')
     } finally {
       setIsLoading(false)
     }
@@ -98,7 +104,7 @@ export function NudgesTemplatePage() {
   const handleSave = async (templateId: string) => {
     const state = templateStates[templateId]
     if (!state?.message) {
-      toast.addToast('Please enter a message', 'error')
+      toast.addToast(t('nudges.messages.enterMessage'), 'error')
       return
     }
 
@@ -121,10 +127,10 @@ export function NudgesTemplatePage() {
         },
       }))
 
-      toast.addToast('Changes saved successfully', 'success')
+      toast.addToast(t('common:toast.changesSavedShort'), 'success')
     } catch (error) {
       console.error('Failed to save nudge template:', error)
-      toast.addToast('Failed to save changes', 'error')
+      toast.addToast(t('nudges.messages.failedToSave'), 'error')
     } finally {
       setSavingTemplateId(null)
     }
@@ -134,7 +140,7 @@ export function NudgesTemplatePage() {
     const state = templateStates[templateId]
     if (!state) return
     // TODO: Implement actual test-send functionality when api is ready
-    toast.addToast('Test message sent successfully', 'success')
+    toast.addToast(t('nudges.messages.testSent'), 'success')
   }
 
   const hasChanges = (templateId: string): boolean => {
@@ -149,8 +155,13 @@ export function NudgesTemplatePage() {
   if (isLoading) {
     return (
       <Box w="full">
-        <Text textStyle="h5">Nudges Template</Text>
-        <Text color="neutral.600">Loading...</Text>
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={6}>
+          {t('nudges.title')}
+        </Heading>
+        <Flex align="center" role="status" aria-live="polite" aria-busy="true">
+          <Spinner size="md" color="primary.500" mr={3} />
+          <Text color="neutral.600">{t('common:loading')}</Text>
+        </Flex>
       </Box>
     )
   }
@@ -159,43 +170,67 @@ export function NudgesTemplatePage() {
     <Box w="full">
       {/* Page Header */}
       <Box mb={5}>
-        <Text textStyle="h5">Nudges Template</Text>
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }}>
+          {t('nudges.title')}
+        </Heading>
       </Box>
 
       {/* Templates Container */}
       <Box
+        as="section"
+        aria-label={t('nudges.aria.formLabel')}
         bg="white"
         borderWidth="0.5px"
         borderColor="neutral.100"
-        borderRadius="12px"
+        borderRadius={{ base: 'lg', md: 'xl' }}
         w="full"
-        minH="calc(100vh - 148px)"
-        py={6}
+        minH={{ base: 'auto', lg: 'calc(100vh - 148px)' }}
+        py={{ base: 4, md: 6 }}
         px={4}
       >
-        <VStack align="stretch" spacing={7}>
+        <Stack spacing={{ base: 6, md: 7 }}>
           {templates.map((template) => {
             const state = templateStates[template.id]
             const availableLanguages = getAvailableLanguages(template)
             const isSaving = savingTemplateId === template.id
 
             return (
-              <Box key={template.id}>
+              <Box
+                key={template.id}
+                as="article"
+                aria-label={t('nudges.aria.templateCard', { name: template.name })}
+              >
                 <Flex direction="column" gap={4}>
                   {/* Template Header */}
-                  <Text textStyle="h8" color="neutral.950">
+                  <Heading
+                    as="h2"
+                    size="h3"
+                    fontWeight="400"
+                    fontSize={{ base: 'md', md: 'xl' }}
+                    color="neutral.950"
+                  >
                     {template.name}
-                  </Text>
+                  </Heading>
 
                   {/* Content Section */}
-                  <Flex gap={6} justify="space-between">
+                  <Flex
+                    gap={{ base: 4, lg: 6 }}
+                    justify="space-between"
+                    direction={{ base: 'column', lg: 'row' }}
+                  >
                     {/* Left Side - Language Select and Variables */}
-                    <Box flex="0 0 auto" w="486px">
+                    <Box flex={{ base: 'none', lg: '0 0 auto' }} w={{ base: 'full', lg: '486px' }}>
                       {/* Language Select */}
                       <Box mb={3}>
-                        <Text textStyle="h10" mb={1}>
-                          Language
-                          <Text as="span" color="error.500">
+                        <Text
+                          as="label"
+                          textStyle="h10"
+                          fontSize={{ base: 'xs', md: 'sm' }}
+                          mb={1}
+                          display="block"
+                        >
+                          {t('nudges.language')}
+                          <Text as="span" color="error.500" ml={1}>
                             *
                           </Text>
                         </Text>
@@ -203,18 +238,19 @@ export function NudgesTemplatePage() {
                           options={availableLanguages}
                           value={state?.selectedLanguage || ''}
                           onChange={(value) => handleLanguageChange(template.id, value)}
-                          placeholder="Select language"
-                          width="486px"
+                          placeholder={t('nudges.selectLanguage')}
+                          width={{ base: '100%', lg: '486px' }}
                           textStyle="h10"
                           borderColor="neutral.300"
                           borderRadius="4px"
+                          ariaLabel={t('nudges.aria.selectLanguage', { name: template.name })}
                         />
                       </Box>
 
                       {/* Available Variables */}
                       <Box>
-                        <Text textStyle="h10" mb={1}>
-                          Available Variables
+                        <Text textStyle="h10" fontSize={{ base: 'xs', md: 'sm' }} mb={1}>
+                          {t('nudges.availableVariables')}
                         </Text>
                         <Flex gap={2} wrap="wrap">
                           {template.availableVariables.map((variable) => (
@@ -224,7 +260,7 @@ export function NudgesTemplatePage() {
                               borderRadius="16px"
                               bg="primary.50"
                               color="primary.500"
-                              fontSize="12px"
+                              fontSize={{ base: '10px', md: '12px' }}
                               fontWeight="400"
                               px={2}
                               py={1}
@@ -237,24 +273,31 @@ export function NudgesTemplatePage() {
                     </Box>
 
                     {/* Right Side - Message */}
-                    <Box width="486px">
-                      <Text textStyle="h10" mb={1}>
-                        Message
+                    <Box w={{ base: 'full', lg: '486px' }}>
+                      <Text
+                        as="label"
+                        textStyle="h10"
+                        fontSize={{ base: 'xs', md: 'sm' }}
+                        mb={1}
+                        display="block"
+                      >
+                        {t('nudges.message')}
                       </Text>
-                      <Box position="relative" width="486px">
+                      <Box position="relative" w={{ base: 'full', lg: '486px' }}>
                         <Textarea
                           value={state?.message || ''}
                           onChange={(e) => handleMessageChange(template.id, e.target.value)}
                           onFocus={() => setSelectedTemplateId(template.id)}
-                          placeholder="Enter message template"
-                          fontSize="14px"
+                          placeholder={t('nudges.messagePlaceholder')}
+                          fontSize={{ base: '12px', md: '14px' }}
                           fontWeight="400"
-                          width="486px"
-                          height="124px"
+                          w="full"
+                          height={{ base: '100px', md: '124px' }}
                           borderColor="neutral.300"
                           borderRadius="6px"
                           resize="none"
                           pr={8}
+                          aria-label={t('nudges.aria.enterMessage', { name: template.name })}
                           _hover={{ borderColor: 'neutral.400' }}
                           _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
                           sx={{
@@ -273,32 +316,38 @@ export function NudgesTemplatePage() {
                           boxSize={5}
                           color="neutral.400"
                           pointerEvents="none"
+                          aria-hidden="true"
                         />
                       </Box>
 
                       {/* Action Buttons - Only show for selected template */}
                       {selectedTemplateId === template.id && (
-                        <Flex justify="flex-end" gap={3} mt={2}>
+                        <Flex
+                          justify={{ base: 'stretch', sm: 'flex-end' }}
+                          gap={3}
+                          mt={5}
+                          direction={{ base: 'column-reverse', sm: 'row' }}
+                        >
                           <Button
                             variant="outline"
                             size="md"
-                            width="174px"
+                            width={{ base: 'full', sm: '174px' }}
                             onClick={() => handleTestSend(template.id)}
                             borderColor="primary.500"
                             color="primary.500"
                             _hover={{ bg: 'primary.50' }}
                           >
-                            Test-Send
+                            {t('nudges.testSend')}
                           </Button>
                           <Button
                             variant="primary"
                             size="md"
-                            width="174px"
+                            width={{ base: 'full', sm: '174px' }}
                             onClick={() => handleSave(template.id)}
                             isLoading={isSaving}
                             isDisabled={!state?.message || !hasChanges(template.id)}
                           >
-                            Save
+                            {t('common:button.save')}
                           </Button>
                         </Flex>
                       )}
@@ -308,7 +357,7 @@ export function NudgesTemplatePage() {
               </Box>
             )
           })}
-        </VStack>
+        </Stack>
       </Box>
 
       {/* Toast Container */}

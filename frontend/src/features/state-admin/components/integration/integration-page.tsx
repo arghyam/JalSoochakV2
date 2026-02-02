@@ -9,7 +9,10 @@ import {
   HStack,
   FormControl,
   FormLabel,
+  Heading,
+  Spinner,
 } from '@chakra-ui/react'
+import { useTranslation } from 'react-i18next'
 import {
   getMockIntegrationConfiguration,
   saveMockIntegrationConfiguration,
@@ -19,6 +22,7 @@ import { useToast } from '@/shared/hooks/use-toast'
 import { ToastContainer } from '@/shared/components/common'
 
 export function IntegrationPage() {
+  const { t } = useTranslation(['state-admin', 'common'])
   const [config, setConfig] = useState<IntegrationConfiguration | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -31,6 +35,10 @@ export function IntegrationPage() {
   const toast = useToast()
 
   useEffect(() => {
+    document.title = `${t('integration.title')} | JalSoochak`
+  }, [t])
+
+  useEffect(() => {
     const fetchConfig = async () => {
       try {
         const data = await getMockIntegrationConfiguration()
@@ -41,13 +49,14 @@ export function IntegrationPage() {
         setApiAccessToken(data.apiAccessToken)
       } catch (error) {
         console.error('Failed to fetch integration configuration:', error)
-        toast.addToast('Failed to load configuration', 'error')
+        toast.addToast(t('integration.messages.failedToLoad'), 'error')
       } finally {
         setIsLoading(false)
       }
     }
 
     fetchConfig()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleCancel = () => {
@@ -66,7 +75,7 @@ export function IntegrationPage() {
       !whatsappBusinessAccountId ||
       !apiAccessToken
     ) {
-      toast.addToast('Please fill all required fields', 'error')
+      toast.addToast(t('common:toast.fillAllFields'), 'error')
       return
     }
 
@@ -79,10 +88,10 @@ export function IntegrationPage() {
         apiAccessToken,
       })
       setConfig(savedConfig)
-      toast.addToast('Changes saved', 'success')
+      toast.addToast(t('common:toast.changesSavedShort'), 'success')
     } catch (error) {
       console.error('Failed to save integration configuration:', error)
-      toast.addToast('Failed to save changes', 'error')
+      toast.addToast(t('common:toast.failedToSave'), 'error')
     } finally {
       setIsSaving(false)
     }
@@ -98,10 +107,13 @@ export function IntegrationPage() {
   if (isLoading) {
     return (
       <Box w="full">
-        <Text fontSize="2xl" fontWeight="semibold" color="neutral.950" mb={6}>
-          Integration
-        </Text>
-        <Text color="neutral.600">Loading...</Text>
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={6}>
+          {t('integration.title')}
+        </Heading>
+        <Flex align="center" role="status" aria-live="polite" aria-busy="true">
+          <Spinner size="md" color="primary.500" mr={3} />
+          <Text color="neutral.600">{t('common:loading')}</Text>
+        </Flex>
       </Box>
     )
   }
@@ -110,103 +122,122 @@ export function IntegrationPage() {
     <Box w="full">
       {/* Page Header */}
       <Box mb={5}>
-        <Text textStyle="h5">Integrations</Text>
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }}>
+          {t('integration.title')}
+        </Heading>
       </Box>
 
       {/* Integration Configuration Card */}
       <Box
+        as="section"
+        aria-labelledby="integration-heading"
         bg="white"
         borderWidth="0.5px"
         borderColor="neutral.100"
-        borderRadius="12px"
+        borderRadius={{ base: 'lg', md: 'xl' }}
         w="full"
-        minH="calc(100vh - 148px)"
-        py={6}
+        minH={{ base: 'auto', lg: 'calc(100vh - 148px)' }}
+        py={{ base: 4, md: 6 }}
         px={4}
       >
         <Flex
+          as="form"
+          role="form"
+          aria-label={t('integration.aria.formLabel')}
           direction="column"
           w="full"
           h="full"
           justify="space-between"
-          minH="calc(100vh - 200px)"
+          minH={{ base: 'auto', lg: 'calc(100vh - 200px)' }}
+          gap={{ base: 6, lg: 0 }}
         >
           <Flex direction="column" gap={4}>
-            <Text textStyle="h8">Whatsapp Details</Text>
+            <Heading
+              as="h2"
+              id="integration-heading"
+              size="h3"
+              fontWeight="400"
+              fontSize={{ base: 'md', md: 'xl' }}
+            >
+              {t('integration.whatsappDetails')}
+            </Heading>
             {/* Form Fields */}
             <VStack align="stretch" spacing={3} flex={1}>
               <FormControl isRequired>
-                <FormLabel textStyle="h10" mb={1}>
-                  Whatsapp Business Account Name
+                <FormLabel textStyle="h10" fontSize={{ base: 'xs', md: 'sm' }} mb={1}>
+                  {t('integration.fields.businessAccountName')}
                 </FormLabel>
                 <Input
-                  placeholder="Example: State Water Authority"
+                  placeholder={t('integration.fields.businessAccountNamePlaceholder')}
                   fontSize="14px"
                   fontWeight="400"
                   value={whatsappBusinessAccountName}
                   onChange={(e) => setWhatsappBusinessAccountName(e.target.value)}
                   size="md"
                   h="36px"
-                  maxW="486px"
+                  maxW={{ base: '100%', lg: '486px' }}
                   px={3}
                   py={2}
                   borderColor="neutral.300"
                   borderRadius="4px"
+                  aria-label={t('integration.aria.enterBusinessAccountName')}
                   _hover={{ borderColor: 'neutral.400' }}
                   _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
                 />
               </FormControl>
 
               <FormControl isRequired>
-                <FormLabel textStyle="h10" mb={1}>
-                  Sender Phone Number
+                <FormLabel textStyle="h10" fontSize={{ base: 'xs', md: 'sm' }} mb={1}>
+                  {t('integration.fields.senderPhoneNumber')}
                 </FormLabel>
                 <Input
-                  placeholder="+91"
+                  placeholder={t('integration.fields.senderPhoneNumberPlaceholder')}
                   fontSize="14px"
                   fontWeight="400"
                   value={senderPhoneNumber}
                   onChange={(e) => setSenderPhoneNumber(e.target.value)}
                   size="md"
                   h="36px"
-                  maxW="486px"
+                  maxW={{ base: '100%', lg: '486px' }}
                   px={3}
                   py={2}
                   borderColor="neutral.300"
                   borderRadius="4px"
+                  aria-label={t('integration.aria.enterPhoneNumber')}
                   _hover={{ borderColor: 'neutral.400' }}
                   _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
                 />
               </FormControl>
 
               <FormControl isRequired>
-                <FormLabel textStyle="h10" mb={1}>
-                  Whatsapp Business Account ID
+                <FormLabel textStyle="h10" fontSize={{ base: 'xs', md: 'sm' }} mb={1}>
+                  {t('integration.fields.businessAccountId')}
                 </FormLabel>
                 <Input
-                  placeholder="Enter"
+                  placeholder={t('common:enter')}
                   fontSize="14px"
                   fontWeight="400"
                   value={whatsappBusinessAccountId}
                   onChange={(e) => setWhatsappBusinessAccountId(e.target.value)}
                   size="md"
                   h="36px"
-                  maxW="486px"
+                  maxW={{ base: '100%', lg: '486px' }}
                   px={3}
                   py={2}
                   borderColor="neutral.300"
                   borderRadius="4px"
+                  aria-label={t('integration.aria.enterAccountId')}
                   _hover={{ borderColor: 'neutral.400' }}
                   _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
                 />
               </FormControl>
 
               <FormControl isRequired>
-                <FormLabel textStyle="h10" mb={1}>
-                  API Access Token/ API Key
+                <FormLabel textStyle="h10" fontSize={{ base: 'xs', md: 'sm' }} mb={1}>
+                  {t('integration.fields.apiAccessToken')}
                 </FormLabel>
                 <Input
-                  placeholder="Enter"
+                  placeholder={t('common:enter')}
                   fontSize="14px"
                   fontWeight="400"
                   type="password"
@@ -214,11 +245,12 @@ export function IntegrationPage() {
                   onChange={(e) => setApiAccessToken(e.target.value)}
                   size="md"
                   h="36px"
-                  maxW="486px"
+                  maxW={{ base: '100%', lg: '486px' }}
                   px={3}
                   py={2}
                   borderColor="neutral.300"
                   borderRadius="4px"
+                  aria-label={t('integration.aria.enterApiToken')}
                   _hover={{ borderColor: 'neutral.400' }}
                   _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
                 />
@@ -227,20 +259,25 @@ export function IntegrationPage() {
           </Flex>
 
           {/* Action Buttons */}
-          <HStack spacing={3} justify="flex-end" mt={4}>
+          <HStack
+            spacing={3}
+            justify={{ base: 'stretch', sm: 'flex-end' }}
+            flexDirection={{ base: 'column-reverse', sm: 'row' }}
+            mt={4}
+          >
             <Button
               variant="secondary"
               size="md"
-              width="174px"
+              width={{ base: 'full', sm: '174px' }}
               onClick={handleCancel}
               isDisabled={isSaving}
             >
-              Cancel
+              {t('common:button.cancel')}
             </Button>
             <Button
               variant="primary"
               size="md"
-              width="174px"
+              width={{ base: 'full', sm: '174px' }}
               onClick={handleSave}
               isLoading={isSaving}
               isDisabled={
@@ -251,7 +288,7 @@ export function IntegrationPage() {
                 !hasChanges
               }
             >
-              Save
+              {t('common:button.save')}
             </Button>
           </HStack>
         </Flex>

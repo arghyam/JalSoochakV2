@@ -35,6 +35,7 @@ export interface SearchableSelectProps {
   isFilter?: boolean
   id?: string
   'aria-labelledby'?: string
+  ariaLabel?: string
   placeholderColor?: string
 }
 
@@ -45,7 +46,7 @@ export function SearchableSelect({
   placeholder = 'Select',
   disabled = false,
   width = '486px',
-  fontSize = 'md',
+  fontSize = 'sm',
   textColor,
   height = '36px',
   borderRadius = '6px',
@@ -55,6 +56,7 @@ export function SearchableSelect({
   isFilter = false,
   id,
   'aria-labelledby': ariaLabelledBy,
+  ariaLabel,
   placeholderColor = 'neutral.500',
 }: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false)
@@ -112,6 +114,7 @@ export function SearchableSelect({
         aria-haspopup="listbox"
         aria-controls={listboxId}
         aria-labelledby={ariaLabelledBy}
+        aria-label={ariaLabel}
         aria-disabled={disabled}
         disabled={disabled}
         w="full"
