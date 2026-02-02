@@ -73,3 +73,13 @@ env: |
         name: jalsoochak
   - name: SPRING_MAIL_PROPERTIES_MAIL_SMTP_DEBUG
     value: "true"
+  - name: KEYCLOAK_REALM
+    valueFrom:
+      secretKeyRef:
+        key: keycloak-realm
+        name: jalsoochak
+  - name: KEYCLOAK_PUBLIC_KEY
+    valueFrom:
+      secretKeyRef:
+        key: keycloak-public-key
+        name: jalsoochak
