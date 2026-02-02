@@ -1,15 +1,11 @@
 package com.jalsoochak.ManagementService.controllers;
 
-import com.jalsoochak.ManagementService.models.app.request.InviteRequest;
-import com.jalsoochak.ManagementService.models.app.request.LoginRequest;
-import com.jalsoochak.ManagementService.models.app.request.RegisterRequest;
-import com.jalsoochak.ManagementService.models.app.request.TokenRequest;
+import com.jalsoochak.ManagementService.models.app.request.*;
 import com.jalsoochak.ManagementService.models.app.response.TokenResponse;
 import com.jalsoochak.ManagementService.services.impl.PersonService;
 import com.jalsoochak.ManagementService.exceptions.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.keycloak.common.VerificationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,109 +33,53 @@ public class PersonController {
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
         if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Missing or invalid Authorization header");
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Missing or invalid Authorization header"
+            );
         }
 
         String token = authHeader.substring(7).trim();
 
         if (token.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Authorization token is empty");
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Authorization token is empty"
+            );
         }
 
         if (!personService.isSuperAdmin(token)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Only super admin can invite user");
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Only super admin can invite user"
+            );
         }
 
         personService.inviteUser(inviteRequest);
-        return ResponseEntity.ok("Invitation sent");
+        return ResponseEntity.ok(Map.of("message", "Invitation sent"));
     }
 
     @PostMapping("/complete/profile")
-    public ResponseEntity<?> completeProfile(
-            @RequestBody RegisterRequest registerRequest,
-            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+    public ResponseEntity<String> completeProfile(
+            @RequestBody RegisterRequest registerRequest) {
 
-        if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Missing or invalid Authorization header");
-        }
+        personService.completeProfile(registerRequest);
 
-        String token = authHeader.substring(7).trim();
-
-        if (token.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Authorization token is empty");
-        }
-
-        try {
-            personService.completeProfile(registerRequest, token);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body("User registered successfully");
-
-        } catch (VerificationException e) {
-            log.warn("Token verification failed", e);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Invalid or expired token");
-
-        } catch (ResponseStatusException e) {
-            log.warn("Business validation error: {}", e.getReason());
-            return ResponseEntity.status(e.getStatusCode())
-                    .body(e.getReason());
-
-        } catch (BadRequestException e) {
-            log.warn("Bad request while completing profile", e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Invalid request data");
-
-        } catch (Exception e) {
-            log.error("Unexpected error while completing profile", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred. Please try again later.");
-        }
+        return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        try {
-            TokenResponse response = personService.login(request);
-            return ResponseEntity.ok(response);
-
-        } catch (RuntimeException e) {
-            log.warn("Login failed due to invalid credentials or input", e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "Invalid username or password"));
-
-        } catch (Exception e) {
-            log.error("Unexpected error during login", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "An unexpected error occurred. Please try again later."));
-        }
+    public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest request) {
+        TokenResponse response = personService.login(request);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(@RequestBody TokenRequest tokenRequest) {
-        if (tokenRequest.getRefreshToken() == null || tokenRequest.getRefreshToken().isBlank()) {
-            log.warn("Refresh token is missing or blank");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "Refresh token must be provided"));
-        }
-
-        try {
-            TokenResponse response = personService.refreshToken(tokenRequest.getRefreshToken());
-            return ResponseEntity.ok(response);
-        } catch (BadRequestException e) {
-            log.warn("Invalid refresh token: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "Invalid refresh token"));
-        } catch (Exception e) {
-            log.error("Unexpected error during token refresh", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "An unexpected error occurred. Please try again later."));
-        }
+    public ResponseEntity<TokenResponse> refresh(@RequestBody TokenRequest tokenRequest) {
+        TokenResponse response = personService.refreshToken(tokenRequest.getRefreshToken());
+        return ResponseEntity.ok(response);
     }
+
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestParam String refreshToken) {
