@@ -1,8 +1,12 @@
 package com.jalsoochak.water_supply_calculation_service.controllers;
 
+import com.jalsoochak.water_supply_calculation_service.models.app.requests.ClosingRequest;
 import com.jalsoochak.water_supply_calculation_service.models.app.requests.GlificWebhookRequest;
+import com.jalsoochak.water_supply_calculation_service.models.app.requests.IntroRequest;
+import com.jalsoochak.water_supply_calculation_service.models.app.responses.ClosingResponse;
 import com.jalsoochak.water_supply_calculation_service.models.app.responses.CreateReadingResponse;
 import com.jalsoochak.water_supply_calculation_service.models.app.responses.ImageAnalysisResponse;
+import com.jalsoochak.water_supply_calculation_service.models.app.responses.IntroResponse;
 import com.jalsoochak.water_supply_calculation_service.services.GlificWebhookService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -46,6 +50,18 @@ public class GlificWebhookController {
             return ResponseEntity.ok(errorResponse);
         }
 
+    }
+
+    @PostMapping("/intro")
+    public ResponseEntity<IntroResponse> sendIntro(@RequestBody @Valid IntroRequest introRequest) {
+        IntroResponse response = glificWebhookService.introMessage(introRequest);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/closing")
+    public ResponseEntity<ClosingResponse> closinngMessage(@RequestBody @Valid ClosingRequest closingRequest) {
+        ClosingResponse response = glificWebhookService.closingMessage(closingRequest);
+        return ResponseEntity.ok(response);
     }
 
 }
