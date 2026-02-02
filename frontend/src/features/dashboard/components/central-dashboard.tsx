@@ -65,6 +65,28 @@ export function CentralDashboard() {
   const villageOptions = selectedGramPanchayat
     ? (mockFilterVillages[selectedGramPanchayat] ?? [])
     : emptyOptions
+  const handleStateChange = (value: string) => {
+    setSelectedState(value)
+    setSelectedDistrict('')
+    setSelectedBlock('')
+    setSelectedGramPanchayat('')
+    setSelectedVillage('')
+  }
+  const handleDistrictChange = (value: string) => {
+    setSelectedDistrict(value)
+    setSelectedBlock('')
+    setSelectedGramPanchayat('')
+    setSelectedVillage('')
+  }
+  const handleBlockChange = (value: string) => {
+    setSelectedBlock(value)
+    setSelectedGramPanchayat('')
+    setSelectedVillage('')
+  }
+  const handleGramPanchayatChange = (value: string) => {
+    setSelectedGramPanchayat(value)
+    setSelectedVillage('')
+  }
   const handleClearFilters = () => {
     setSelectedState('')
     setSelectedDistrict('')
@@ -174,7 +196,7 @@ export function CentralDashboard() {
             <SearchableSelect
               options={mockFilterStates}
               value={selectedState}
-              onChange={setSelectedState}
+              onChange={handleStateChange}
               placeholder="States/UTs"
               required
               width={{
@@ -194,7 +216,7 @@ export function CentralDashboard() {
             <SearchableSelect
               options={districtOptions}
               value={selectedDistrict}
-              onChange={setSelectedDistrict}
+              onChange={handleDistrictChange}
               placeholder="District"
               required
               width={{
@@ -214,7 +236,7 @@ export function CentralDashboard() {
             <SearchableSelect
               options={blockOptions}
               value={selectedBlock}
-              onChange={setSelectedBlock}
+              onChange={handleBlockChange}
               placeholder="Block"
               width={{
                 base: '100%',
@@ -234,7 +256,7 @@ export function CentralDashboard() {
             <SearchableSelect
               options={gramPanchayatOptions}
               value={selectedGramPanchayat}
-              onChange={setSelectedGramPanchayat}
+              onChange={handleGramPanchayatChange}
               placeholder="Gram Panchayat"
               width={{
                 base: '100%',
