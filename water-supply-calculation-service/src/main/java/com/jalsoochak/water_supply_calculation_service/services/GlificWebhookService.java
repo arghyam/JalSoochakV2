@@ -27,7 +27,6 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 
 @Slf4j
 @Service
@@ -41,7 +40,6 @@ public class GlificWebhookService {
     private final StateAdminConfigRepository stateAdminConfigRepository;
     private final MessageTemplateRepository messageTemplateRepository;
 
-    //temporary for now
     private static final String GLIFIC_API_TOKEN = "hhhvbfrrrtbbbb";
 
     public GlificWebhookService(MinioService minioService,
@@ -138,7 +136,7 @@ public class GlificWebhookService {
             log.warn("User error for contactId {}: {}", glificWebhookRequest.getContactId(), ae.getMessage());
             return CreateReadingResponse.builder()
                     .success(false)
-                    .message(ae.getMessage()) // Already localized or can be customized
+                    .message(ae.getMessage())
                     .qualityStatus("REJECTED")
                     .correlationId(glificWebhookRequest.getContactId())
                     .build();
