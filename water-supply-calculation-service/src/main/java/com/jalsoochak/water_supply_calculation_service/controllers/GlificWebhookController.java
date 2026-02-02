@@ -1,8 +1,12 @@
 package com.jalsoochak.water_supply_calculation_service.controllers;
 
+import com.jalsoochak.water_supply_calculation_service.models.app.requests.ClosingRequest;
 import com.jalsoochak.water_supply_calculation_service.models.app.requests.GlificWebhookRequest;
+import com.jalsoochak.water_supply_calculation_service.models.app.requests.IntroRequest;
+import com.jalsoochak.water_supply_calculation_service.models.app.responses.ClosingResponse;
 import com.jalsoochak.water_supply_calculation_service.models.app.responses.CreateReadingResponse;
 import com.jalsoochak.water_supply_calculation_service.models.app.responses.ImageAnalysisResponse;
+import com.jalsoochak.water_supply_calculation_service.models.app.responses.IntroResponse;
 import com.jalsoochak.water_supply_calculation_service.services.GlificWebhookService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -46,6 +50,40 @@ public class GlificWebhookController {
             return ResponseEntity.ok(errorResponse);
         }
 
+    }
+
+    @PostMapping("/intro")
+    public ResponseEntity<IntroResponse> sendIntro(@RequestBody @Valid IntroRequest introRequest) {
+        try {
+            IntroResponse response = glificWebhookService.introMessage(introRequest);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Error sending intro message for contactId {}: {}", introRequest.getContactId(), e.getMessage(), e);
+
+            IntroResponse fallbackResponse = IntroResponse.builder()
+                    .success(false)
+                    .message("Something went wrong. Please try again.")
+                    .build();
+
+            return ResponseEntity.ok(fallbackResponse);
+        }
+    }
+
+    @PostMapping("/closing")
+    public ResponseEntity<ClosingResponse> closingMessage(@RequestBody @Valid ClosingRequest closingRequest) {
+        try {
+            ClosingResponse response = glificWebhookService.closingMessage(closingRequest);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Error sending closing message for contactId {}: {}", closingRequest.getContactId(), e.getMessage(), e);
+
+            ClosingResponse fallbackResponse = ClosingResponse.builder()
+                    .success(false)
+                    .message("Something went wrong. Please try again.")
+                    .build();
+
+            return ResponseEntity.ok(fallbackResponse);
+        }
     }
 
 }
