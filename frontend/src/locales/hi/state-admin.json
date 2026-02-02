@@ -50,6 +50,9 @@
     },
     "messages": {
       "noActivitiesFound": "कोई गतिविधि नहीं मिली"
+    },
+    "aria": {
+      "tableSection": "गतिविधि लॉग तालिका"
     }
   },
 
@@ -172,17 +175,43 @@
     "regularity": {
       "title": "नियमितता सीमा",
       "description": "नियमितता अलर्ट से बचने के लिए चयनित अवधि के दौरान जल आपूर्ति किए जाने वाले दिनों का न्यूनतम प्रतिशत।"
+    },
+    "messages": {
+      "failedToLoad": "कॉन्फ़िगरेशन लोड करने में विफल",
+      "failedToSave": "परिवर्तन सहेजने में विफल"
+    },
+    "aria": {
+      "formLabel": "अलर्ट सीमाएं कॉन्फ़िगरेशन फ़ॉर्म",
+      "coverageCard": "कवरेज सीमा कॉन्फ़िगरेशन",
+      "continuityCard": "निरंतरता सीमा कॉन्फ़िगरेशन",
+      "quantityCard": "मात्रा सीमा कॉन्फ़िगरेशन",
+      "regularityCard": "नियमितता सीमा कॉन्फ़िगरेशन",
+      "enterCoverage": "कवरेज सीमा प्रतिशत दर्ज करें",
+      "enterContinuity": "निरंतरता सीमा दिन दर्ज करें",
+      "enterQuantity": "LPCD में मात्रा सीमा दर्ज करें",
+      "enterRegularity": "नियमितता सीमा प्रतिशत दर्ज करें"
     }
   },
 
   "nudges": {
     "title": "नज टेम्पलेट",
+    "language": "भाषा",
+    "selectLanguage": "भाषा चुनें",
     "availableVariables": "उपलब्ध चर",
     "message": "संदेश",
     "messagePlaceholder": "संदेश टेम्पलेट दर्ज करें",
+    "testSend": "परीक्षण-भेजें",
     "messages": {
       "enterMessage": "कृपया एक संदेश दर्ज करें",
-      "testSent": "परीक्षण संदेश सफलतापूर्वक भेजा गया"
+      "testSent": "परीक्षण संदेश सफलतापूर्वक भेजा गया",
+      "failedToLoad": "टेम्पलेट लोड करने में विफल",
+      "failedToSave": "परिवर्तन सहेजने में विफल"
+    },
+    "aria": {
+      "formLabel": "नज टेम्पलेट कॉन्फ़िगरेशन फ़ॉर्म",
+      "templateCard": "{{name}} के लिए नज टेम्पलेट कॉन्फ़िगरेशन",
+      "selectLanguage": "{{name}} टेम्पलेट के लिए भाषा चुनें",
+      "enterMessage": "{{name}} टेम्पलेट के लिए संदेश दर्ज करें"
     }
   }
 }

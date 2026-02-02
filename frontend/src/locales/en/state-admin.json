@@ -50,6 +50,9 @@
     },
     "messages": {
       "noActivitiesFound": "No activities found"
+    },
+    "aria": {
+      "tableSection": "Activity log table"
     }
   },
 
@@ -172,17 +175,43 @@
     "regularity": {
       "title": "Regularity Threshold",
       "description": "Minimum percentage of days water must be supplied during the selected period to avoid a regularity alert."
+    },
+    "messages": {
+      "failedToLoad": "Failed to load configuration",
+      "failedToSave": "Failed to save changes"
+    },
+    "aria": {
+      "formLabel": "Alert thresholds configuration form",
+      "coverageCard": "Coverage threshold configuration",
+      "continuityCard": "Continuity threshold configuration",
+      "quantityCard": "Quantity threshold configuration",
+      "regularityCard": "Regularity threshold configuration",
+      "enterCoverage": "Enter coverage threshold percentage",
+      "enterContinuity": "Enter continuity threshold days",
+      "enterQuantity": "Enter quantity threshold in LPCD",
+      "enterRegularity": "Enter regularity threshold percentage"
     }
   },
 
   "nudges": {
     "title": "Nudges Template",
+    "language": "Language",
+    "selectLanguage": "Select language",
     "availableVariables": "Available Variables",
     "message": "Message",
     "messagePlaceholder": "Enter message template",
+    "testSend": "Test-Send",
     "messages": {
       "enterMessage": "Please enter a message",
-      "testSent": "Test message sent successfully"
+      "testSent": "Test message sent successfully",
+      "failedToLoad": "Failed to load templates",
+      "failedToSave": "Failed to save changes"
+    },
+    "aria": {
+      "formLabel": "Nudge template configuration form",
+      "templateCard": "Nudge template configuration for {{name}}",
+      "selectLanguage": "Select language for {{name}} template",
+      "enterMessage": "Enter message for {{name}} template"
     }
   }
 }
