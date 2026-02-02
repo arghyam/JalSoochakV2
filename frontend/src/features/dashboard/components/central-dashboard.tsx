@@ -8,6 +8,7 @@ import {
   DemandSupplyChart,
   AllStatesPerformanceChart,
   SupplySubmissionRateChart,
+  PumpOperatorsChart,
   ImageSubmissionStatusChart,
   WaterSupplyOutagesChart,
 } from './charts'
@@ -41,7 +42,7 @@ export function CentralDashboard() {
   const [performanceState, setPerformanceState] = useState('')
   const [filterTabIndex, setFilterTabIndex] = useState(0)
   const isStateSelected = Boolean(selectedState)
-
+  const isDistrictSelected = Boolean(selectedDistrict)
   const emptyOptions: SearchableSelectOption[] = []
   const isAdvancedEnabled = Boolean(selectedState && selectedDistrict)
   const districtOptions = selectedState ? (mockFilterDistricts[selectedState] ?? []) : emptyOptions
@@ -100,6 +101,7 @@ export function CentralDashboard() {
     !data.mapData ||
     !data.demandSupply ||
     !data.imageSubmissionStatus ||
+    !data.pumpOperators ||
     !data.waterSupplyOutages ||
     !data.topPerformers ||
     !data.worstPerformers ||
@@ -142,6 +144,8 @@ export function CentralDashboard() {
       trend: { direction: 'down', text: '-3% vs last month' },
     },
   ] as const
+
+  const pumpOperatorsTotal = data.pumpOperators.reduce((total, item) => total + item.value, 0)
 
   return (
     <Box>
@@ -625,6 +629,46 @@ export function CentralDashboard() {
           <SupplySubmissionRateChart data={data.mapData} height="383px" />
         </Box>
       </Grid>
+
+      {/* Pump Operators */}
+
+      {isDistrictSelected ? (
+        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+          <Box
+            bg="white"
+            borderWidth="0.5px"
+            borderRadius="12px"
+            borderColor="#E4E4E7"
+            pt="24px"
+            pb="24px"
+            pl="16px"
+            pr="16px"
+            h="510px"
+          >
+            <Flex align="center" justify="space-between" mb="40px">
+              <Text textStyle="bodyText3" fontWeight="400">
+                Pump Operators
+              </Text>
+              <Text textStyle="bodyText3" fontWeight="400">
+                Total: {pumpOperatorsTotal}
+              </Text>
+            </Flex>
+            <PumpOperatorsChart
+              data={data.pumpOperators}
+              height="360px"
+              note="Note: Active pump operators are who submit reading at least 30 days in a month"
+            />
+          </Box>
+          <Box
+            display={{ base: 'none', lg: 'block' }}
+            borderRadius="12px"
+            borderWidth="0.5px"
+            borderColor="transparent"
+            bg="transparent"
+            h="462px"
+          />
+        </Grid>
+      ) : null}
     </Box>
   )
 }

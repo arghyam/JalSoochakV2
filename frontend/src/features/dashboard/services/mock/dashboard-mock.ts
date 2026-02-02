@@ -325,6 +325,11 @@ const mockImageSubmissionStatus = [
   { label: 'Automated Submission', value: 36 },
 ]
 
+const mockPumpOperators = [
+  { label: 'Active pump operators', value: 10 },
+  { label: 'Non-active pump operators', value: 5 },
+]
+
 const mockWaterSupplyOutages = [
   {
     district: 'Anand',
@@ -394,6 +399,7 @@ export const dashboardMockService = {
         mapData: mockStates,
         demandSupply: mockDemandSupply,
         imageSubmissionStatus: mockImageSubmissionStatus,
+        pumpOperators: mockPumpOperators,
         waterSupplyOutages: mockWaterSupplyOutages,
         topPerformers: sortedStates.slice(0, 5),
         worstPerformers: sortedStates.slice(-5).reverse(),
@@ -410,6 +416,7 @@ export const dashboardMockService = {
       mapData: [],
       demandSupply: mockDemandSupply,
       imageSubmissionStatus: mockImageSubmissionStatus,
+      pumpOperators: mockPumpOperators,
       waterSupplyOutages: mockWaterSupplyOutages,
       topPerformers: [],
       worstPerformers: [],
