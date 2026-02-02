@@ -31,4 +31,6 @@ public class TokenResponse {
 
     @JsonProperty("scope")
     private String scope;
+
+    private Long personId;
 }
