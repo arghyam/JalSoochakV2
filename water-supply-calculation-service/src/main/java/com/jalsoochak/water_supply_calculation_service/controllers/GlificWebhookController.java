@@ -54,14 +54,36 @@ public class GlificWebhookController {
 
     @PostMapping("/intro")
     public ResponseEntity<IntroResponse> sendIntro(@RequestBody @Valid IntroRequest introRequest) {
-        IntroResponse response = glificWebhookService.introMessage(introRequest);
-        return ResponseEntity.ok(response);
+        try {
+            IntroResponse response = glificWebhookService.introMessage(introRequest);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Error sending intro message for contactId {}: {}", introRequest.getContactId(), e.getMessage(), e);
+
+            IntroResponse fallbackResponse = IntroResponse.builder()
+                    .success(false)
+                    .message("Something went wrong. Please try again.")
+                    .build();
+
+            return ResponseEntity.ok(fallbackResponse);
+        }
     }
 
     @PostMapping("/closing")
-    public ResponseEntity<ClosingResponse> closinngMessage(@RequestBody @Valid ClosingRequest closingRequest) {
-        ClosingResponse response = glificWebhookService.closingMessage(closingRequest);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ClosingResponse> closingMessage(@RequestBody @Valid ClosingRequest closingRequest) {
+        try {
+            ClosingResponse response = glificWebhookService.closingMessage(closingRequest);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Error sending closing message for contactId {}: {}", closingRequest.getContactId(), e.getMessage(), e);
+
+            ClosingResponse fallbackResponse = ClosingResponse.builder()
+                    .success(false)
+                    .message("Something went wrong. Please try again.")
+                    .build();
+
+            return ResponseEntity.ok(fallbackResponse);
+        }
     }
 
 }

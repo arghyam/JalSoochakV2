@@ -40,7 +40,7 @@ public class GlificWebhookService {
     private final StateAdminConfigRepository stateAdminConfigRepository;
     private final MessageTemplateRepository messageTemplateRepository;
 
-    private static final String GLIFIC_API_TOKEN = "hhhvbfrrrtbbbb";
+    private static final String GLIFIC_API_TOKEN = "";
 
     public GlificWebhookService(MinioService minioService,
                                 PersonSchemeRepository personSchemeRepository,
@@ -152,46 +152,66 @@ public class GlificWebhookService {
         }
     }
 
-    public IntroResponse introMessage(IntroRequest introRequest){
+    public IntroResponse introMessage(IntroRequest introRequest) {
         log.info("intro request received: {}", introRequest.getContactId());
+        try {
+            StateAdminConfig config = stateAdminConfigRepository.findByPhoneNumber(introRequest.getContactId())
+                    .orElseThrow(() -> new ApiException(
+                            "Config not found for user with phone number: " + introRequest.getContactId(),
+                            HttpStatus.NOT_FOUND));
 
-        StateAdminConfig config = stateAdminConfigRepository.findByPhoneNumber(introRequest.getContactId())
-                .orElseThrow(() -> new ApiException( "config not found for user with phone number: " + introRequest.getContactId(),
-                        HttpStatus.NOT_FOUND));
+            String languageCode = config.getLanguageCode();
+            MessageTemplate messageTemplate = messageTemplateRepository.findByFlowNameAndLanguageCode("IntroMessage", languageCode)
+                    .orElseThrow(() -> new ApiException(
+                            "Message template not found for flow type and language code: " + languageCode,
+                            HttpStatus.NOT_FOUND));
 
-        String languageCode = config.getLanguageCode();
-        MessageTemplate messageTemplate = messageTemplateRepository.findByFlowNameAndLanguageCode("IntroMessage", languageCode)
-                .orElseThrow(() -> new ApiException("Message template not found for flow type and language code " + languageCode,
-                        HttpStatus.NOT_FOUND));
+            String formattedMessage = formatTemplate(messageTemplate.getTemplateText());
 
-        String formattedMessage = formatTemplate(messageTemplate.getTemplateText());
+            return IntroResponse.builder()
+                    .success(true)
+                    .message(formattedMessage)
+                    .build();
 
-        return IntroResponse.builder()
-                .success(true)
-                .message(formattedMessage)
-                .build();
+        } catch (Exception e) {
+            log.error("Error sending intro message for contactId {}: {}", introRequest.getContactId(), e.getMessage(), e);
+            return IntroResponse.builder()
+                    .success(false)
+                    .message("Something went wrong. Please try again.")
+                    .build();
+        }
     }
 
-    public ClosingResponse closingMessage(ClosingRequest closingRequest){
+    public ClosingResponse closingMessage(ClosingRequest closingRequest) {
         log.info("closing request received: {}", closingRequest.getContactId());
+        try {
+            StateAdminConfig config = stateAdminConfigRepository.findByPhoneNumber(closingRequest.getContactId())
+                    .orElseThrow(() -> new ApiException(
+                            "Config not found for user with phone number: " + closingRequest.getContactId(),
+                            HttpStatus.NOT_FOUND));
 
-        StateAdminConfig config = stateAdminConfigRepository.findByPhoneNumber(closingRequest.getContactId())
-                .orElseThrow(() -> new ApiException( "config not found for user with phone number: " + closingRequest.getContactId(),
-                        HttpStatus.NOT_FOUND));
+            String languageCode = config.getLanguageCode();
+            MessageTemplate messageTemplate = messageTemplateRepository.findByFlowNameAndLanguageCode("ThankYouMessage", languageCode)
+                    .orElseThrow(() -> new ApiException(
+                            "Message template not found for flow type and language code: " + languageCode,
+                            HttpStatus.NOT_FOUND));
 
-        String languageCode = config.getLanguageCode();
+            String formattedMessage = formatTemplate(messageTemplate.getTemplateText());
 
-        MessageTemplate messageTemplate = messageTemplateRepository.findByFlowNameAndLanguageCode("ThankYouMessage", languageCode)
-                .orElseThrow(() -> new ApiException("Message template not found for flow type and language code " + languageCode,
-                        HttpStatus.NOT_FOUND));
+            return ClosingResponse.builder()
+                    .success(true)
+                    .message(formattedMessage)
+                    .build();
 
-        String formattedMessage = formatTemplate(messageTemplate.getTemplateText());
-
-        return ClosingResponse.builder()
-                .success(true)
-                .message(formattedMessage)
-                .build();
+        } catch (Exception e) {
+            log.error("Error sending closing message for contactId {}: {}", closingRequest.getContactId(), e.getMessage(), e);
+            return ClosingResponse.builder()
+                    .success(false)
+                    .message("Something went wrong. Please try again.")
+                    .build();
+        }
     }
+
 
     private String formatTemplate(String templateText) {
         if (templateText == null || templateText.isBlank()) {
