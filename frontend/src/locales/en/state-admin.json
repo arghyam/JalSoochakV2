@@ -18,6 +18,26 @@
       "demandVsSupply": "Demand vs Supply",
       "dailyIngestionMonitor": "Daily Ingestion Monitor",
       "successRate": "Success Rate"
+    },
+    "months": {
+      "january": "January",
+      "february": "February",
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
+    },
+    "aria": {
+      "selectMonth": "Select month for chart",
+      "statsSection": "Statistics overview",
+      "demandSupplyChart": "Demand versus Supply chart",
+      "ingestionChart": "Daily Ingestion Monitor chart"
     }
   },
 
@@ -39,7 +59,9 @@
     "primaryLanguage": "Primary Language",
     "secondaryLanguage": "Secondary Language (optional)",
     "aria": {
-      "editConfiguration": "Edit language configuration"
+      "editConfiguration": "Edit language configuration",
+      "selectPrimaryLanguage": "Select primary language",
+      "selectSecondaryLanguage": "Select secondary language"
     }
   },
 
@@ -50,15 +72,26 @@
       "businessAccountName": "Whatsapp Business Account Name",
       "businessAccountNamePlaceholder": "Example: State Water Authority",
       "senderPhoneNumber": "Sender Phone Number",
+      "senderPhoneNumberPlaceholder": "+91",
       "businessAccountId": "Whatsapp Business Account ID",
       "apiAccessToken": "API Access Token/ API Key"
+    },
+    "messages": {
+      "failedToLoad": "Failed to load configuration"
+    },
+    "aria": {
+      "formLabel": "WhatsApp integration configuration form",
+      "enterBusinessAccountName": "Enter WhatsApp business account name",
+      "enterPhoneNumber": "Enter sender phone number",
+      "enterAccountId": "Enter WhatsApp business account ID",
+      "enterApiToken": "Enter API access token"
     }
   },
 
   "waterNorms": {
     "title": "Water Norms",
     "stateUtWaterNorms": "State/UT Water Norms",
-    "currentQuantity": "Current quantity (LPCD)*",
+    "currentQuantity": "Current quantity (LPCD)",
     "districtOverrides": {
       "title": "District-Level Overrides",
       "districtName": "District Name",
@@ -69,11 +102,15 @@
       "quantityRequired": "State quantity is required",
       "invalidQuantity": "Please enter a valid quantity",
       "invalidOverrides": "All district overrides must have valid values",
-      "failedToLoad": "Failed to load configuration. Please try again later."
+      "failedToLoad": "Failed to load configuration. Please try again later.",
+      "fillExisting": "Please fill the existing district override first"
     },
     "aria": {
       "editConfiguration": "Edit water norms configuration",
-      "deleteDistrict": "Delete district"
+      "deleteDistrict": "Delete district {{name}}",
+      "enterQuantity": "Enter state water quantity in LPCD",
+      "selectDistrict": "Select district name",
+      "enterDistrictQuantity": "Enter district water quantity in LPCD"
     }
   },
 
@@ -81,13 +118,15 @@
     "title": "Escalations",
     "allEscalations": "All Escalations",
     "escalationRules": "Escalations Rules",
-    "addNewEscalationType": "+ Add New Escalation Type",
-    "typeOfAlert": "Type of Alert*",
-    "levelOfEscalation": "Level of Escalation*",
+    "addNewEscalationType": "Add New Escalation Type",
+    "addNewShort": "Add New",
+    "typeOfAlert": "Type of Alert",
+    "levelOfEscalation": "Level of Escalation",
     "level": "Level {{number}}",
-    "escalateAfter": "Escalate after (hours)*",
+    "levelDisplay": "Level {{number}}: {{role}}",
+    "escalateAfter": "Escalate after (hours)",
     "escalateAfterHours": "Escalate after {{hours}} hours",
-    "addNewLevel": "+ Add New Level",
+    "addNewLevel": "Add New Level",
     "buttons": {
       "addEscalation": "Add Escalation"
     },
@@ -97,15 +136,21 @@
       "addedSuccess": "Escalation added successfully",
       "deletedSuccess": "Escalation deleted successfully",
       "notFound": "Escalation not found",
-      "failedToLoad": "Failed to load escalation",
+      "failedToLoad": "Failed to load escalations",
+      "failedToLoadSingle": "Failed to load escalation",
       "failedToDelete": "Failed to delete escalation",
       "failedToSave": "Failed to save escalation",
       "confirmDelete": "Are you sure you want to delete this escalation?"
     },
     "aria": {
-      "editEscalation": "Edit escalation",
-      "deleteEscalation": "Delete escalation",
-      "editMode": "Edit mode"
+      "editEscalation": "Edit escalation {{name}}",
+      "deleteEscalation": "Delete escalation {{name}}",
+      "editMode": "Edit mode",
+      "selectAlertType": "Select alert type",
+      "selectRole": "Select role for level {{number}}",
+      "selectHours": "Select escalation hours for level {{number}}",
+      "escalationCard": "Escalation configuration for {{name}}",
+      "formLabel": "Escalation rules configuration form"
     }
   },
 

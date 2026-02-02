@@ -18,6 +18,26 @@
       "demandVsSupply": "मांग बनाम आपूर्ति",
       "dailyIngestionMonitor": "दैनिक अंतर्ग्रहण मॉनिटर",
       "successRate": "सफलता दर"
+    },
+    "months": {
+      "january": "जनवरी",
+      "february": "फ़रवरी",
+      "march": "मार्च",
+      "april": "अप्रैल",
+      "may": "मई",
+      "june": "जून",
+      "july": "जुलाई",
+      "august": "अगस्त",
+      "september": "सितंबर",
+      "october": "अक्टूबर",
+      "november": "नवंबर",
+      "december": "दिसंबर"
+    },
+    "aria": {
+      "selectMonth": "चार्ट के लिए महीना चुनें",
+      "statsSection": "सांख्यिकी अवलोकन",
+      "demandSupplyChart": "मांग बनाम आपूर्ति चार्ट",
+      "ingestionChart": "दैनिक अंतर्ग्रहण मॉनिटर चार्ट"
     }
   },
 
@@ -39,26 +59,39 @@
     "primaryLanguage": "प्राथमिक भाषा",
     "secondaryLanguage": "द्वितीयक भाषा (वैकल्पिक)",
     "aria": {
-      "editConfiguration": "भाषा कॉन्फ़िगरेशन संपादित करें"
+      "editConfiguration": "भाषा कॉन्फ़िगरेशन संपादित करें",
+      "selectPrimaryLanguage": "प्राथमिक भाषा चुनें",
+      "selectSecondaryLanguage": "द्वितीयक भाषा चुनें"
     }
   },
 
   "integration": {
     "title": "एकीकरण",
-    "whatsappDetails": "WhatsApp विवरण",
+    "whatsappDetails": "Whatsapp विवरण",
     "fields": {
-      "businessAccountName": "WhatsApp व्यवसाय खाता नाम",
+      "businessAccountName": "Whatsapp व्यवसाय खाता नाम",
       "businessAccountNamePlaceholder": "उदाहरण: राज्य जल प्राधिकरण",
       "senderPhoneNumber": "प्रेषक फ़ोन नंबर",
-      "businessAccountId": "WhatsApp व्यवसाय खाता ID",
+      "senderPhoneNumberPlaceholder": "+91",
+      "businessAccountId": "Whatsapp व्यवसाय खाता ID",
       "apiAccessToken": "API एक्सेस टोकन/ API कुंजी"
+    },
+    "messages": {
+      "failedToLoad": "कॉन्फ़िगरेशन लोड करने में विफल"
+    },
+    "aria": {
+      "formLabel": "Whatsapp एकीकरण कॉन्फ़िगरेशन फ़ॉर्म",
+      "enterBusinessAccountName": "Whatsapp व्यवसाय खाता नाम दर्ज करें",
+      "enterPhoneNumber": "प्रेषक फ़ोन नंबर दर्ज करें",
+      "enterAccountId": "Whatsapp व्यवसाय खाता ID दर्ज करें",
+      "enterApiToken": "API एक्सेस टोकन दर्ज करें"
     }
   },
 
   "waterNorms": {
     "title": "जल मानक",
     "stateUtWaterNorms": "राज्य/केंद्र शासित प्रदेश जल मानक",
-    "currentQuantity": "वर्तमान मात्रा (LPCD)*",
+    "currentQuantity": "वर्तमान मात्रा (LPCD)",
     "districtOverrides": {
       "title": "जिला-स्तरीय ओवरराइड",
       "districtName": "जिले का नाम",
@@ -69,11 +102,15 @@
       "quantityRequired": "राज्य मात्रा आवश्यक है",
       "invalidQuantity": "कृपया एक वैध मात्रा दर्ज करें",
       "invalidOverrides": "सभी जिला ओवरराइड में वैध मान होने चाहिए",
-      "failedToLoad": "कॉन्फ़िगरेशन लोड करने में विफल। कृपया बाद में पुनः प्रयास करें।"
+      "failedToLoad": "कॉन्फ़िगरेशन लोड करने में विफल। कृपया बाद में पुनः प्रयास करें।",
+      "fillExisting": "कृपया पहले मौजूदा जिला ओवरराइड भरें"
     },
     "aria": {
       "editConfiguration": "जल मानक कॉन्फ़िगरेशन संपादित करें",
-      "deleteDistrict": "जिला हटाएं"
+      "deleteDistrict": "{{name}} जिला हटाएं",
+      "enterQuantity": "राज्य जल मात्रा LPCD में दर्ज करें",
+      "selectDistrict": "जिले का नाम चुनें",
+      "enterDistrictQuantity": "जिला जल मात्रा LPCD में दर्ज करें"
     }
   },
 
@@ -82,10 +119,12 @@
     "allEscalations": "सभी वृद्धि",
     "escalationRules": "वृद्धि नियम",
     "addNewEscalationType": "+ नया वृद्धि प्रकार जोड़ें",
-    "typeOfAlert": "अलर्ट का प्रकार*",
-    "levelOfEscalation": "वृद्धि का स्तर*",
+    "addNewShort": "नया जोड़ें",
+    "typeOfAlert": "अलर्ट का प्रकार",
+    "levelOfEscalation": "वृद्धि का स्तर",
     "level": "स्तर {{number}}",
-    "escalateAfter": "इसके बाद वृद्धि (घंटे)*",
+    "levelDisplay": "स्तर {{number}}: {{role}}",
+    "escalateAfter": "इसके बाद वृद्धि (घंटे)",
     "escalateAfterHours": "{{hours}} घंटे बाद वृद्धि",
     "addNewLevel": "+ नया स्तर जोड़ें",
     "buttons": {
@@ -98,14 +137,20 @@
       "deletedSuccess": "वृद्धि सफलतापूर्वक हटाई गई",
       "notFound": "वृद्धि नहीं मिली",
       "failedToLoad": "वृद्धि लोड करने में विफल",
+      "failedToLoadSingle": "वृद्धि लोड करने में विफल",
       "failedToDelete": "वृद्धि हटाने में विफल",
       "failedToSave": "वृद्धि सहेजने में विफल",
       "confirmDelete": "क्या आप वाकई इस वृद्धि को हटाना चाहते हैं?"
     },
     "aria": {
-      "editEscalation": "वृद्धि संपादित करें",
-      "deleteEscalation": "वृद्धि हटाएं",
-      "editMode": "संपादन मोड"
+      "editEscalation": "{{name}} वृद्धि संपादित करें",
+      "deleteEscalation": "{{name}} वृद्धि हटाएं",
+      "editMode": "संपादन मोड",
+      "selectAlertType": "अलर्ट प्रकार चुनें",
+      "selectRole": "स्तर {{number}} के लिए भूमिका चुनें",
+      "selectHours": "स्तर {{number}} के लिए वृद्धि घंटे चुनें",
+      "escalationCard": "{{name}} के लिए वृद्धि कॉन्फ़िगरेशन",
+      "formLabel": "वृद्धि नियम कॉन्फ़िगरेशन फ़ॉर्म"
     }
   },
 
