@@ -6,6 +6,7 @@ labels:
 
 ingress:
   enabled: true
+  zuul: true
   context: "api/pump-operators(/|$)(.*)"
 # Init Containers Configs
 
