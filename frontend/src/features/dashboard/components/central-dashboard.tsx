@@ -666,7 +666,7 @@ export function CentralDashboard() {
               <PumpOperatorsChart
                 data={data.pumpOperators}
                 height="360px"
-                note="Note: Active pump operators are who submit reading at least 30 days in a month"
+                note="Note: Active pump operators submit readings at least 30 days in a month."
               />
             </>
           ) : (

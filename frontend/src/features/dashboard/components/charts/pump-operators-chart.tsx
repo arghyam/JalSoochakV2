@@ -102,7 +102,10 @@ export function PumpOperatorsChart({
           }}
         >
           {data.map((entry, index) => (
-            <div key={entry.label} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <div
+              key={`${entry.label}-${index}`}
+              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+            >
               <span
                 aria-hidden="true"
                 style={{

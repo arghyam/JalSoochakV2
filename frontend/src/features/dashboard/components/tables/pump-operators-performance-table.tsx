@@ -1,5 +1,4 @@
-import { Box, Flex, Icon, Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
-import { BiSortAlt2 } from 'react-icons/bi'
+import { Box, Flex, Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
 import type { PumpOperatorPerformanceData } from '../../types'
 
 interface PumpOperatorsPerformanceTableProps {
@@ -45,19 +44,16 @@ export function PumpOperatorsPerformanceTable({
               <Th>
                 <Flex align="center">
                   <Box as="span">Reporting Rate (%)</Box>
-                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" />
                 </Flex>
               </Th>
               <Th>
                 <Flex align="center">
-                  <Box as="span">Photo Compliance (%)</Box>
-                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" />
+                  <Box as="span">Photo Compliance</Box>
                 </Flex>
               </Th>
               <Th>
                 <Flex align="center">
-                  <Box as="span">Water Supplied (LPCD)</Box>
-                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" />
+                  <Box as="span">Water Supplied</Box>
                 </Flex>
               </Th>
             </Tr>

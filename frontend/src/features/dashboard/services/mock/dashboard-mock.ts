@@ -641,7 +641,7 @@ export const mockBlockPerformanceByDistrict: Record<string, EntityPerformance[]>
       status: 'good',
     },
     {
-      id: 'TG-RR-MA',
+      id: 'TG-RR-MN',
       name: 'Manchal',
       coverage: 59,
       regularity: 69,
