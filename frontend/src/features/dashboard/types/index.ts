@@ -45,6 +45,15 @@ export interface PumpOperatorsData {
   value: number
 }
 
+export interface PumpOperatorPerformanceData {
+  id: string
+  name: string
+  village: string
+  reportingRate: number
+  photoCompliance: number
+  waterSupplied: number
+}
+
 export interface WaterSupplyOutageData {
   district: string
   electricityFailure: number
@@ -68,6 +77,8 @@ export interface DashboardData {
   worstPerformers: EntityPerformance[]
   regularityData: EntityPerformance[]
   continuityData: EntityPerformance[]
+  leadingPumpOperators?: PumpOperatorPerformanceData[]
+  bottomPumpOperators?: PumpOperatorPerformanceData[]
 }
 
 // For map hover/click interactions

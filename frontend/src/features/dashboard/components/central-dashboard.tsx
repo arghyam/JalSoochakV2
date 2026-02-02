@@ -12,7 +12,12 @@ import {
   ImageSubmissionStatusChart,
   WaterSupplyOutagesChart,
 } from './charts'
-import { AllDistrictsTable, AllStatesTable } from './tables'
+import {
+  AllBlocksTable,
+  AllDistrictsTable,
+  AllStatesTable,
+  PumpOperatorsPerformanceTable,
+} from './tables'
 import { LoadingSpinner, SearchableSelect } from '@/shared/components/common'
 import { MdOutlineWaterDrop, MdArrowUpward, MdArrowDownward } from 'react-icons/md'
 import { AiOutlineHome, AiOutlineInfoCircle } from 'react-icons/ai'
@@ -29,6 +34,7 @@ import {
   mockFilterDuration,
   mockFilterSchemes,
   mockDistrictPerformanceByState,
+  mockBlockPerformanceByDistrict,
 } from '../services/mock/dashboard-mock'
 
 export function CentralDashboard() {
@@ -49,6 +55,8 @@ export function CentralDashboard() {
   const isAdvancedEnabled = Boolean(selectedState && selectedDistrict)
   const districtTableData =
     mockDistrictPerformanceByState[selectedState] ?? ([] as EntityPerformance[])
+  const blockTableData =
+    mockBlockPerformanceByDistrict[selectedDistrict] ?? ([] as EntityPerformance[])
   const districtOptions = selectedState ? (mockFilterDistricts[selectedState] ?? []) : emptyOptions
   const blockOptions = selectedDistrict ? (mockFilterBlocks[selectedDistrict] ?? []) : emptyOptions
   const gramPanchayatOptions = selectedBlock
@@ -150,6 +158,8 @@ export function CentralDashboard() {
   ] as const
 
   const pumpOperatorsTotal = data.pumpOperators.reduce((total, item) => total + item.value, 0)
+  const leadingPumpOperators = data.leadingPumpOperators ?? []
+  const bottomPumpOperators = data.bottomPumpOperators ?? []
 
   return (
     <Box>
@@ -657,6 +667,44 @@ export function CentralDashboard() {
           <SupplySubmissionRateChart data={data.mapData} height="383px" />
         </Box>
       </Grid>
+
+      {/* Pump Operator Performance Tables */}
+      {isDistrictSelected ? (
+        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="350px">
+            <PumpOperatorsPerformanceTable
+              title="Leading Pump Operators Performance"
+              data={leadingPumpOperators}
+            />
+          </Box>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="350px">
+            <PumpOperatorsPerformanceTable
+              title="Bottom Pump Operators Performance"
+              data={bottomPumpOperators}
+            />
+          </Box>
+        </Grid>
+      ) : null}
+
+      {/* All Blocks */}
+      {isDistrictSelected ? (
+        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="430px">
+            <Text textStyle="bodyText3" fontWeight="400" mb="16px">
+              All Blocks
+            </Text>
+            <AllBlocksTable data={blockTableData} />
+          </Box>
+          <Box
+            display={{ base: 'none', lg: 'block' }}
+            borderRadius="12px"
+            borderWidth="0.5px"
+            borderColor="transparent"
+            bg="transparent"
+            h="430px"
+          />
+        </Grid>
+      ) : null}
 
       {/* Pump Operators now lives beside Submission Rate when district is selected */}
     </Box>
