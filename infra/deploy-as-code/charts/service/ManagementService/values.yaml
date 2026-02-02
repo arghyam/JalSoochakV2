@@ -71,3 +71,5 @@ env: |
       secretKeyRef:
         key: mail-id
         name: jalsoochak
+  - name: SPRING_MAIL_PROPERTIES_MAIL_SMTP_DEBUG
+    value: "true"
