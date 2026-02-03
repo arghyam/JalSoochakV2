@@ -7,6 +7,8 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  List,
+  ListItem,
   Text,
 } from '@chakra-ui/react'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
@@ -138,11 +140,14 @@ export function CreatePasswordPage({ onNext }: CreatePasswordPageProps) {
         ) : null}
       </FormControl>
 
-      {!isPasswordValid && password ? (
-        <Text mt="10px" fontSize="sm" color="error.500">
-          Password must include 1 lowercase, 1 uppercase, 1 number, 1 special character, and be at
-          least 8 characters.
-        </Text>
+      {password.length > 0 && !isPasswordValid ? (
+        <List mt="10px" spacing="0.5px" fontSize="sm" color="error.500" pl="18px" styleType="disc">
+          <ListItem>Include at least 1 lowercase letter.</ListItem>
+          <ListItem>Include at least 1 uppercase letter.</ListItem>
+          <ListItem>Include at least 1 number.</ListItem>
+          <ListItem>Include at least 1 special character.</ListItem>
+          <ListItem>Be at least 8 characters long.</ListItem>
+        </List>
       ) : null}
 
       <Checkbox
