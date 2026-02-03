@@ -76,4 +76,6 @@ public class PersonMaster {
 
     @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
     private List<BfmReading> bfmReadings;
+
 }
+
