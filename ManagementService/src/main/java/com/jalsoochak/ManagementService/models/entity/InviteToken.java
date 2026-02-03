@@ -12,6 +12,7 @@ import lombok.Setter;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -35,6 +36,10 @@ public class InviteToken {
 
     @Column(nullable = false)
     private LocalDateTime expiresAt;
+
+    @Column(nullable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
     @Column(nullable = false)
     private Long senderId;

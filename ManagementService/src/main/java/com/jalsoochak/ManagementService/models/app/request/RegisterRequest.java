@@ -2,6 +2,8 @@ package com.jalsoochak.ManagementService.models.app.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +20,8 @@ public class RegisterRequest {
     private String email;
 
     @NotBlank(message = "Phone number is required")
+    @Size(min = 10, message = "Phone number should not be less than 10 characters")
+    @Pattern(regexp = "\\d+", message = "Phone number should contain only digits")
     private String phoneNumber;
 
     @NotBlank(message = "Person type is required")
@@ -29,6 +33,6 @@ public class RegisterRequest {
     @NotBlank(message = "Password is required")
     private String password;
 
-    @NotBlank(message = "Tenant ID is required e.g asam")
+    @NotBlank(message = "Tenant ID is required e.g assam")
     private String tenantId;
 }

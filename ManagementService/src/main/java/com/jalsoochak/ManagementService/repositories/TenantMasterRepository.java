@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface TenantMasterRepository extends JpaRepository<TenantMaster, Long> {
     Optional<TenantMaster> findByTenantCode(String tenantCode);
     Optional<TenantMaster> findByTenantName(String tenantName);
+    boolean existsByTenantName(String tenantName);
 }

@@ -102,6 +102,30 @@ public class PersonService {
     @Transactional
     public String inviteUser(InviteRequest inviteRequest) {
 
+        if (inviteRequest.getSenderId() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Sender ID is required"
+            );
+        }
+
+        PersonMaster sender = personMasterRepository
+                .findById(inviteRequest.getSenderId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Sender does not exist"
+                ));
+
+        if (sender.getPersonType() == null ||
+                sender.getPersonType().getCName() == null ||
+                !sender.getPersonType().getCName().equalsIgnoreCase("super_user")) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Only super user can send invitations"
+            );
+        }
+
         if (personMasterRepository.findByEmail(inviteRequest.getEmail()).isPresent()) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
@@ -145,6 +169,10 @@ public class PersonService {
 
         InviteToken inviteToken = inviteTokenRepository.findByToken(registerRequest.getToken())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid invite token"));
+
+        if (!inviteToken.getEmail().equalsIgnoreCase(registerRequest.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token does not belong to this user");
+        }
 
         if (inviteToken.isUsed()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invite token has already been used");
