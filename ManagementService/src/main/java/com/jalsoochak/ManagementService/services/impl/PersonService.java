@@ -77,7 +77,7 @@ public class PersonService {
     private static final String ALLOWED_PERSON_TYPE = "Pump Operator";
 
 
-    private static final String SUPER_ADMIN_ROLE = "super_user";
+    private static final String SUPER_USER_ROLE = "super_user";
 
     private static final String NAME_REGEX = "^[A-Za-z]+$";
     private static final String FULL_NAME_REGEX = "^[A-Za-z]+(\\s[A-Za-z]+)*$";
@@ -100,7 +100,7 @@ public class PersonService {
     }
 
     @Transactional
-    public void inviteUser(InviteRequest inviteRequest) {
+    public String inviteUser(InviteRequest inviteRequest) {
 
         if (personMasterRepository.findByEmail(inviteRequest.getEmail()).isPresent()) {
             throw new ResponseStatusException(
@@ -136,6 +136,7 @@ public class PersonService {
                 }
             }
         });
+        return token;
     }
 
 
@@ -256,6 +257,8 @@ public class PersonService {
         tokenResponse.setScope((String) tokenMap.get("scope"));
 
         tokenResponse.setPersonId(person.getId());
+        tokenResponse.setTenantId(person.getTenantId());
+        tokenResponse.setRole(person.getPersonType() != null ? person.getPersonType().getCName() : null);
 
         return tokenResponse;
     }
@@ -297,6 +300,9 @@ public class PersonService {
         tokenResponse.setIdToken((String) tokenMap.get("id_token"));
         tokenResponse.setSessionState((String) tokenMap.get("session_state"));
         tokenResponse.setScope((String) tokenMap.get("scope"));
+        tokenResponse.setPersonId(person.getId());
+        tokenResponse.setTenantId(person.getTenantId());
+        tokenResponse.setRole(person.getPersonType() != null ? person.getPersonType().getCName() : null);
 
         return tokenResponse;
     }
@@ -318,7 +324,7 @@ public class PersonService {
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             return person.getPersonType() != null
-                    && SUPER_ADMIN_ROLE.equals(person.getPersonType().getCName());
+                    && SUPER_USER_ROLE.equals(person.getPersonType().getCName());
 
         } catch (Exception e) {
             log.error("Error verifying super admin", e);

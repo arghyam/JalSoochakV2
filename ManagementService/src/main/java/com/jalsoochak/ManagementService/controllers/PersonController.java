@@ -1,6 +1,7 @@
 package com.jalsoochak.ManagementService.controllers;
 
 import com.jalsoochak.ManagementService.models.app.request.*;
+import com.jalsoochak.ManagementService.models.app.response.InviteToken;
 import com.jalsoochak.ManagementService.models.app.response.TokenResponse;
 import com.jalsoochak.ManagementService.services.impl.PersonService;
 import com.jalsoochak.ManagementService.exceptions.BadRequestException;
@@ -28,7 +29,7 @@ public class PersonController {
     private final PersonService personService;
 
     @PostMapping("/invite/user")
-    public ResponseEntity<?> inviteUser(
+    public ResponseEntity<InviteToken> inviteUser(
             @RequestBody InviteRequest inviteRequest,
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
@@ -55,8 +56,8 @@ public class PersonController {
             );
         }
 
-        personService.inviteUser(inviteRequest);
-        return ResponseEntity.ok(Map.of("message", "Invitation sent"));
+        String inviteToken = personService.inviteUser(inviteRequest);
+        return ResponseEntity.ok(new InviteToken(inviteToken));
     }
 
     @PostMapping("/complete/profile")
