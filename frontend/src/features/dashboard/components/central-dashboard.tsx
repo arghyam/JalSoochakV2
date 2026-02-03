@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Box, Flex, Text, Heading, Grid, Icon, Image, Select } from '@chakra-ui/react'
 import { useDashboardData } from '../hooks/use-dashboard-data'
@@ -17,6 +17,8 @@ import {
   AllDistrictsTable,
   AllStatesTable,
   PumpOperatorsPerformanceTable,
+  PhotoEvidenceComplianceTable,
+  AllGramPanchayatsTable,
 } from './tables'
 import { LoadingSpinner, SearchableSelect } from '@/shared/components/common'
 import { MdOutlineWaterDrop, MdArrowUpward, MdArrowDownward } from 'react-icons/md'
@@ -35,28 +37,70 @@ import {
   mockFilterSchemes,
   mockDistrictPerformanceByState,
   mockBlockPerformanceByDistrict,
+  mockGramPanchayatPerformanceByBlock,
+  mockVillagePerformanceByGramPanchayat,
 } from '../services/mock/dashboard-mock'
+
+const storageKey = 'central-dashboard-filters'
+
+type StoredFilters = {
+  selectedState?: string
+  selectedDistrict?: string
+  selectedBlock?: string
+  selectedGramPanchayat?: string
+  selectedVillage?: string
+  selectedDuration?: string
+  selectedScheme?: string
+  filterTabIndex?: number
+}
+
+const getStoredFilters = (): StoredFilters => {
+  if (typeof window === 'undefined') return {}
+  try {
+    const saved = window.localStorage.getItem(storageKey)
+    if (!saved) return {}
+    const parsed = JSON.parse(saved) as StoredFilters
+    return parsed && typeof parsed === 'object' ? parsed : {}
+  } catch {
+    try {
+      window.localStorage.removeItem(storageKey)
+    } catch {
+      // Ignore storage errors (quota/private mode)
+    }
+    return {}
+  }
+}
 
 export function CentralDashboard() {
   const navigate = useNavigate()
   const { data, isLoading, error } = useDashboardData('central')
-  const [selectedState, setSelectedState] = useState('')
-  const [selectedDistrict, setSelectedDistrict] = useState('')
-  const [selectedBlock, setSelectedBlock] = useState('')
-  const [selectedGramPanchayat, setSelectedGramPanchayat] = useState('')
-  const [selectedVillage, setSelectedVillage] = useState('')
-  const [selectedDuration, setSelectedDuration] = useState('')
-  const [selectedScheme, setSelectedScheme] = useState('')
+  const [storedFilters] = useState(() => getStoredFilters())
+  const [selectedState, setSelectedState] = useState(storedFilters.selectedState ?? '')
+  const [selectedDistrict, setSelectedDistrict] = useState(storedFilters.selectedDistrict ?? '')
+  const [selectedBlock, setSelectedBlock] = useState(storedFilters.selectedBlock ?? '')
+  const [selectedGramPanchayat, setSelectedGramPanchayat] = useState(
+    storedFilters.selectedGramPanchayat ?? ''
+  )
+  const [selectedVillage, setSelectedVillage] = useState(storedFilters.selectedVillage ?? '')
+  const [selectedDuration, setSelectedDuration] = useState(storedFilters.selectedDuration ?? '')
+  const [selectedScheme, setSelectedScheme] = useState(storedFilters.selectedScheme ?? '')
   const [performanceState, setPerformanceState] = useState('')
-  const [filterTabIndex, setFilterTabIndex] = useState(0)
+  const [filterTabIndex, setFilterTabIndex] = useState(
+    typeof storedFilters.filterTabIndex === 'number' ? storedFilters.filterTabIndex : 0
+  )
   const isStateSelected = Boolean(selectedState)
   const isDistrictSelected = Boolean(selectedDistrict)
+  const isBlockSelected = Boolean(selectedBlock)
   const emptyOptions: SearchableSelectOption[] = []
   const isAdvancedEnabled = Boolean(selectedState && selectedDistrict)
   const districtTableData =
     mockDistrictPerformanceByState[selectedState] ?? ([] as EntityPerformance[])
   const blockTableData =
     mockBlockPerformanceByDistrict[selectedDistrict] ?? ([] as EntityPerformance[])
+  const gramPanchayatTableData =
+    mockGramPanchayatPerformanceByBlock[selectedBlock] ?? ([] as EntityPerformance[])
+  const villageTableData =
+    mockVillagePerformanceByGramPanchayat[selectedGramPanchayat] ?? ([] as EntityPerformance[])
   const districtOptions = selectedState ? (mockFilterDistricts[selectedState] ?? []) : emptyOptions
   const blockOptions = selectedDistrict ? (mockFilterBlocks[selectedDistrict] ?? []) : emptyOptions
   const gramPanchayatOptions = selectedBlock
@@ -97,6 +141,34 @@ export function CentralDashboard() {
     setSelectedScheme('')
   }
 
+  useEffect(() => {
+    const payload = {
+      selectedState,
+      selectedDistrict,
+      selectedBlock,
+      selectedGramPanchayat,
+      selectedVillage,
+      selectedDuration,
+      selectedScheme,
+      filterTabIndex,
+    }
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(payload))
+    } catch {
+      // Ignore storage errors (quota/private mode)
+    }
+  }, [
+    filterTabIndex,
+    selectedBlock,
+    selectedDistrict,
+    selectedDuration,
+    selectedGramPanchayat,
+    selectedScheme,
+    selectedState,
+    selectedVillage,
+    storageKey,
+  ])
+
   const handleStateClick = (stateId: string, _stateName: string) => {
     navigate(`/states/${stateId}`)
   }
@@ -136,6 +208,7 @@ export function CentralDashboard() {
     !data.demandSupply ||
     !data.imageSubmissionStatus ||
     !data.pumpOperators ||
+    !data.photoEvidenceCompliance ||
     !data.waterSupplyOutages ||
     !data.topPerformers ||
     !data.worstPerformers ||
@@ -609,37 +682,71 @@ export function CentralDashboard() {
         <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
           <Flex align="center" justify="space-between">
             <Text textStyle="bodyText3" fontWeight="400">
-              All States/UTs Performance
+              {selectedGramPanchayat
+                ? 'All Villages Performance'
+                : isBlockSelected
+                  ? 'All Gram Panchayats Performance'
+                  : isDistrictSelected
+                    ? 'All Blocks Performance'
+                    : isStateSelected
+                      ? 'All Districts Performance'
+                      : 'All States/UTs Performance'}
             </Text>
-            <Select
-              h="32px"
-              maxW="120px"
-              fontSize="14px"
-              fontWeight="600"
-              borderRadius="4px"
-              borderColor="neutral.400"
-              borderWidth="1px"
-              bg="white"
-              color="neutral.400"
-              placeholder="Select"
-              appearance="none"
-              value={performanceState}
-              onChange={(event) => setPerformanceState(event.target.value)}
-              _focus={{
-                borderColor: 'primary.500',
-                boxShadow: 'none',
-              }}
-            >
-              <option value="Punjab">Punjab</option>
-            </Select>
+            {!isStateSelected &&
+            !isDistrictSelected &&
+            !isBlockSelected &&
+            !selectedGramPanchayat ? (
+              <Select
+                h="32px"
+                maxW="120px"
+                fontSize="14px"
+                fontWeight="600"
+                borderRadius="4px"
+                borderColor="neutral.400"
+                borderWidth="1px"
+                bg="white"
+                color="neutral.400"
+                placeholder="Select"
+                appearance="none"
+                value={performanceState}
+                onChange={(event) => setPerformanceState(event.target.value)}
+                _focus={{
+                  borderColor: 'primary.500',
+                  boxShadow: 'none',
+                }}
+              >
+                <option value="Punjab">Punjab</option>
+              </Select>
+            ) : null}
           </Flex>
           <AllStatesPerformanceChart
             data={
-              performanceState
-                ? data.mapData.filter((state) => state.name === performanceState).slice(0, 1)
-                : data.mapData
+              selectedGramPanchayat
+                ? villageTableData
+                : isBlockSelected
+                  ? gramPanchayatTableData
+                  : isDistrictSelected
+                    ? blockTableData
+                    : isStateSelected
+                      ? districtTableData
+                      : performanceState
+                        ? data.mapData
+                            .filter((state) => state.name === performanceState)
+                            .slice(0, 1)
+                        : data.mapData
             }
             height="416px"
+            entityLabel={
+              selectedGramPanchayat
+                ? 'Villages'
+                : isBlockSelected
+                  ? 'Gram Panchayats'
+                  : isDistrictSelected
+                    ? 'Blocks'
+                    : isStateSelected
+                      ? 'Districts'
+                      : 'States/UTs'
+            }
           />
         </Box>
         <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
@@ -651,10 +758,29 @@ export function CentralDashboard() {
       </Grid>
 
       {/* All States/Districts/Pump Operators + Submission Rate */}
-      <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-        <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
-          {isDistrictSelected ? (
-            <>
+      {isBlockSelected ? (
+        <>
+          <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="526px">
+              <PhotoEvidenceComplianceTable data={data.photoEvidenceCompliance} />
+            </Box>
+            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="526px">
+              <Text textStyle="bodyText3" fontWeight="400" mb={2}>
+                Supply Data Submission Rate
+              </Text>
+              <SupplySubmissionRateChart data={data.mapData} height="383px" />
+            </Box>
+          </Grid>
+          <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
+              <Text textStyle="bodyText3" fontWeight="400" mb="16px">
+                {selectedGramPanchayat ? 'All Villages' : 'All Gram Panchayats'}
+              </Text>
+              <AllGramPanchayatsTable
+                data={selectedGramPanchayat ? villageTableData : gramPanchayatTableData}
+              />
+            </Box>
+            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
               <Flex align="center" justify="space-between" mb="40px">
                 <Text textStyle="bodyText3" fontWeight="400">
                   Pump Operators
@@ -668,27 +794,49 @@ export function CentralDashboard() {
                 height="360px"
                 note="Note: Active pump operators submit readings at least 30 days in a month."
               />
-            </>
-          ) : (
-            <>
-              <Text textStyle="bodyText3" fontWeight="400" mb="16px">
-                {isStateSelected ? 'All Districts' : 'All States/UTs'}
-              </Text>
-              {isStateSelected ? (
-                <AllDistrictsTable data={districtTableData} />
-              ) : (
-                <AllStatesTable data={data.mapData} />
-              )}
-            </>
-          )}
-        </Box>
-        <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
-          <Text textStyle="bodyText3" fontWeight="400" mb={2}>
-            Supply Data Submission Rate
-          </Text>
-          <SupplySubmissionRateChart data={data.mapData} height="383px" />
-        </Box>
-      </Grid>
+            </Box>
+          </Grid>
+        </>
+      ) : (
+        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
+            {isDistrictSelected ? (
+              <>
+                <Flex align="center" justify="space-between" mb="40px">
+                  <Text textStyle="bodyText3" fontWeight="400">
+                    Pump Operators
+                  </Text>
+                  <Text textStyle="bodyText3" fontWeight="400">
+                    Total: {pumpOperatorsTotal}
+                  </Text>
+                </Flex>
+                <PumpOperatorsChart
+                  data={data.pumpOperators}
+                  height="360px"
+                  note="Note: Active pump operators submit readings at least 30 days in a month."
+                />
+              </>
+            ) : (
+              <>
+                <Text textStyle="bodyText3" fontWeight="400" mb="16px">
+                  {isStateSelected ? 'All Districts' : 'All States/UTs'}
+                </Text>
+                {isStateSelected ? (
+                  <AllDistrictsTable data={districtTableData} />
+                ) : (
+                  <AllStatesTable data={data.mapData} />
+                )}
+              </>
+            )}
+          </Box>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
+            <Text textStyle="bodyText3" fontWeight="400" mb={2}>
+              Supply Data Submission Rate
+            </Text>
+            <SupplySubmissionRateChart data={data.mapData} height="383px" />
+          </Box>
+        </Grid>
+      )}
 
       {/* Pump Operator Performance Tables */}
       {isDistrictSelected ? (
@@ -709,7 +857,7 @@ export function CentralDashboard() {
       ) : null}
 
       {/* All Blocks */}
-      {isDistrictSelected ? (
+      {isDistrictSelected && !isBlockSelected ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
           <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="430px">
             <Text textStyle="bodyText3" fontWeight="400" mb="16px">
