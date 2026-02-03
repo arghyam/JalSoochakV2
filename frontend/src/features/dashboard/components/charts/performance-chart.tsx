@@ -10,6 +10,7 @@ interface AllStatesPerformanceChartProps {
   className?: string
   height?: string | number
   maxItems?: number
+  entityLabel?: string
 }
 
 export function AllStatesPerformanceChart({
@@ -17,6 +18,7 @@ export function AllStatesPerformanceChart({
   className,
   height = '536px',
   maxItems = 5,
+  entityLabel = 'States/UTs',
 }: AllStatesPerformanceChartProps) {
   const theme = useTheme()
   const bodyText7 = getBodyText7Style(theme)
@@ -44,7 +46,7 @@ export function AllStatesPerformanceChart({
           left: 'center',
           bottom: 36,
           style: {
-            text: 'States/UTs',
+            text: entityLabel,
             fill: bodyText7.color,
             fontSize: bodyText7.fontSize,
             fontWeight: 400,
@@ -59,7 +61,7 @@ export function AllStatesPerformanceChart({
           show: false,
         },
         axisLabel: {
-          rotate: 0,
+          rotate: 45,
           interval: 0,
           margin: 20,
           fontSize: bodyText7.fontSize,
@@ -117,7 +119,7 @@ export function AllStatesPerformanceChart({
         },
       ],
     }
-  }, [data, maxItems, bodyText7])
+  }, [data, maxItems, bodyText7, entityLabel])
 
   const containerHeight = typeof height === 'number' ? `${height}px` : height
   const legendItems = [

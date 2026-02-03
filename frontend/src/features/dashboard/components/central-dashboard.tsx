@@ -37,6 +37,8 @@ import {
   mockFilterSchemes,
   mockDistrictPerformanceByState,
   mockBlockPerformanceByDistrict,
+  mockGramPanchayatPerformanceByBlock,
+  mockVillagePerformanceByGramPanchayat,
 } from '../services/mock/dashboard-mock'
 
 const storageKey = 'central-dashboard-filters'
@@ -91,6 +93,10 @@ export function CentralDashboard() {
     mockDistrictPerformanceByState[selectedState] ?? ([] as EntityPerformance[])
   const blockTableData =
     mockBlockPerformanceByDistrict[selectedDistrict] ?? ([] as EntityPerformance[])
+  const gramPanchayatTableData =
+    mockGramPanchayatPerformanceByBlock[selectedBlock] ?? ([] as EntityPerformance[])
+  const villageTableData =
+    mockVillagePerformanceByGramPanchayat[selectedGramPanchayat] ?? ([] as EntityPerformance[])
   const districtOptions = selectedState ? (mockFilterDistricts[selectedState] ?? []) : emptyOptions
   const blockOptions = selectedDistrict ? (mockFilterBlocks[selectedDistrict] ?? []) : emptyOptions
   const gramPanchayatOptions = selectedBlock
@@ -667,37 +673,71 @@ export function CentralDashboard() {
         <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
           <Flex align="center" justify="space-between">
             <Text textStyle="bodyText3" fontWeight="400">
-              All States/UTs Performance
+              {selectedGramPanchayat
+                ? 'All Villages Performance'
+                : isBlockSelected
+                  ? 'All Gram Panchayats Performance'
+                  : isDistrictSelected
+                    ? 'All Blocks Performance'
+                    : isStateSelected
+                      ? 'All Districts Performance'
+                      : 'All States/UTs Performance'}
             </Text>
-            <Select
-              h="32px"
-              maxW="120px"
-              fontSize="14px"
-              fontWeight="600"
-              borderRadius="4px"
-              borderColor="neutral.400"
-              borderWidth="1px"
-              bg="white"
-              color="neutral.400"
-              placeholder="Select"
-              appearance="none"
-              value={performanceState}
-              onChange={(event) => setPerformanceState(event.target.value)}
-              _focus={{
-                borderColor: 'primary.500',
-                boxShadow: 'none',
-              }}
-            >
-              <option value="Punjab">Punjab</option>
-            </Select>
+            {!isStateSelected &&
+            !isDistrictSelected &&
+            !isBlockSelected &&
+            !selectedGramPanchayat ? (
+              <Select
+                h="32px"
+                maxW="120px"
+                fontSize="14px"
+                fontWeight="600"
+                borderRadius="4px"
+                borderColor="neutral.400"
+                borderWidth="1px"
+                bg="white"
+                color="neutral.400"
+                placeholder="Select"
+                appearance="none"
+                value={performanceState}
+                onChange={(event) => setPerformanceState(event.target.value)}
+                _focus={{
+                  borderColor: 'primary.500',
+                  boxShadow: 'none',
+                }}
+              >
+                <option value="Punjab">Punjab</option>
+              </Select>
+            ) : null}
           </Flex>
           <AllStatesPerformanceChart
             data={
-              performanceState
-                ? data.mapData.filter((state) => state.name === performanceState).slice(0, 1)
-                : data.mapData
+              selectedGramPanchayat
+                ? villageTableData
+                : isBlockSelected
+                  ? gramPanchayatTableData
+                  : isDistrictSelected
+                    ? blockTableData
+                    : isStateSelected
+                      ? districtTableData
+                      : performanceState
+                        ? data.mapData
+                            .filter((state) => state.name === performanceState)
+                            .slice(0, 1)
+                        : data.mapData
             }
             height="416px"
+            entityLabel={
+              selectedGramPanchayat
+                ? 'Villages'
+                : isBlockSelected
+                  ? 'Gram Panchayats'
+                  : isDistrictSelected
+                    ? 'Blocks'
+                    : isStateSelected
+                      ? 'Districts'
+                      : 'States/UTs'
+            }
           />
         </Box>
         <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
@@ -725,9 +765,11 @@ export function CentralDashboard() {
           <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
             <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
               <Text textStyle="bodyText3" fontWeight="400" mb="16px">
-                All Gram Panchayats
+                {selectedGramPanchayat ? 'All Villages' : 'All Gram Panchayats'}
               </Text>
-              <AllGramPanchayatsTable data={blockTableData} />
+              <AllGramPanchayatsTable
+                data={selectedGramPanchayat ? villageTableData : blockTableData}
+              />
             </Box>
             <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
               <Flex align="center" justify="space-between" mb="40px">
