@@ -255,6 +255,8 @@ public class PersonService {
         tokenResponse.setSessionState((String) tokenMap.get("session_state"));
         tokenResponse.setScope((String) tokenMap.get("scope"));
 
+        tokenResponse.setPersonId(person.getId());
+
         return tokenResponse;
     }
 
