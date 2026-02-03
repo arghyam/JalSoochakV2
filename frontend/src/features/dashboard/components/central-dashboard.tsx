@@ -56,13 +56,17 @@ type StoredFilters = {
 
 const getStoredFilters = (): StoredFilters => {
   if (typeof window === 'undefined') return {}
-  const saved = window.localStorage.getItem(storageKey)
-  if (!saved) return {}
   try {
+    const saved = window.localStorage.getItem(storageKey)
+    if (!saved) return {}
     const parsed = JSON.parse(saved) as StoredFilters
     return parsed && typeof parsed === 'object' ? parsed : {}
   } catch {
-    window.localStorage.removeItem(storageKey)
+    try {
+      window.localStorage.removeItem(storageKey)
+    } catch {
+      // Ignore storage errors (quota/private mode)
+    }
     return {}
   }
 }
@@ -148,7 +152,11 @@ export function CentralDashboard() {
       selectedScheme,
       filterTabIndex,
     }
-    localStorage.setItem(storageKey, JSON.stringify(payload))
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(payload))
+    } catch {
+      // Ignore storage errors (quota/private mode)
+    }
   }, [
     filterTabIndex,
     selectedBlock,
@@ -768,7 +776,7 @@ export function CentralDashboard() {
                 {selectedGramPanchayat ? 'All Villages' : 'All Gram Panchayats'}
               </Text>
               <AllGramPanchayatsTable
-                data={selectedGramPanchayat ? villageTableData : blockTableData}
+                data={selectedGramPanchayat ? villageTableData : gramPanchayatTableData}
               />
             </Box>
             <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
