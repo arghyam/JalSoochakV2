@@ -208,6 +208,7 @@ export function CentralDashboard() {
     !data.demandSupply ||
     !data.imageSubmissionStatus ||
     !data.pumpOperators ||
+    !data.photoEvidenceCompliance ||
     !data.waterSupplyOutages ||
     !data.topPerformers ||
     !data.worstPerformers ||
