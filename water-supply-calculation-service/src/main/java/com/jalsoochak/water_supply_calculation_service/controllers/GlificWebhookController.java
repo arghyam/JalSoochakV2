@@ -30,8 +30,7 @@ public class GlificWebhookController {
             consumes = "application/json",
             produces = "application/json"
     )
-    public ResponseEntity<CreateReadingResponse> receive(@RequestBody GlificWebhookRequest glificWebhookRequest,
-                                                          @RequestHeader(value = "X-Tenant-ID", required = false) String tenantId) {
+    public ResponseEntity<CreateReadingResponse> receive(@RequestBody GlificWebhookRequest glificWebhookRequest) {
         try {
             CreateReadingResponse response = glificWebhookService.processImage(glificWebhookRequest);
             return ResponseEntity.ok(response);
