@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Box, Flex, Text, Heading, Grid, Icon, Image, Select } from '@chakra-ui/react'
 import { useDashboardData } from '../hooks/use-dashboard-data'
@@ -39,18 +39,49 @@ import {
   mockBlockPerformanceByDistrict,
 } from '../services/mock/dashboard-mock'
 
+const storageKey = 'central-dashboard-filters'
+
+type StoredFilters = {
+  selectedState?: string
+  selectedDistrict?: string
+  selectedBlock?: string
+  selectedGramPanchayat?: string
+  selectedVillage?: string
+  selectedDuration?: string
+  selectedScheme?: string
+  filterTabIndex?: number
+}
+
+const getStoredFilters = (): StoredFilters => {
+  if (typeof window === 'undefined') return {}
+  const saved = window.localStorage.getItem(storageKey)
+  if (!saved) return {}
+  try {
+    const parsed = JSON.parse(saved) as StoredFilters
+    return parsed && typeof parsed === 'object' ? parsed : {}
+  } catch {
+    window.localStorage.removeItem(storageKey)
+    return {}
+  }
+}
+
 export function CentralDashboard() {
   const navigate = useNavigate()
   const { data, isLoading, error } = useDashboardData('central')
-  const [selectedState, setSelectedState] = useState('')
-  const [selectedDistrict, setSelectedDistrict] = useState('')
-  const [selectedBlock, setSelectedBlock] = useState('')
-  const [selectedGramPanchayat, setSelectedGramPanchayat] = useState('')
-  const [selectedVillage, setSelectedVillage] = useState('')
-  const [selectedDuration, setSelectedDuration] = useState('')
-  const [selectedScheme, setSelectedScheme] = useState('')
+  const [storedFilters] = useState(() => getStoredFilters())
+  const [selectedState, setSelectedState] = useState(storedFilters.selectedState ?? '')
+  const [selectedDistrict, setSelectedDistrict] = useState(storedFilters.selectedDistrict ?? '')
+  const [selectedBlock, setSelectedBlock] = useState(storedFilters.selectedBlock ?? '')
+  const [selectedGramPanchayat, setSelectedGramPanchayat] = useState(
+    storedFilters.selectedGramPanchayat ?? ''
+  )
+  const [selectedVillage, setSelectedVillage] = useState(storedFilters.selectedVillage ?? '')
+  const [selectedDuration, setSelectedDuration] = useState(storedFilters.selectedDuration ?? '')
+  const [selectedScheme, setSelectedScheme] = useState(storedFilters.selectedScheme ?? '')
   const [performanceState, setPerformanceState] = useState('')
-  const [filterTabIndex, setFilterTabIndex] = useState(0)
+  const [filterTabIndex, setFilterTabIndex] = useState(
+    typeof storedFilters.filterTabIndex === 'number' ? storedFilters.filterTabIndex : 0
+  )
   const isStateSelected = Boolean(selectedState)
   const isDistrictSelected = Boolean(selectedDistrict)
   const isBlockSelected = Boolean(selectedBlock)
@@ -99,6 +130,30 @@ export function CentralDashboard() {
     setSelectedDuration('')
     setSelectedScheme('')
   }
+
+  useEffect(() => {
+    const payload = {
+      selectedState,
+      selectedDistrict,
+      selectedBlock,
+      selectedGramPanchayat,
+      selectedVillage,
+      selectedDuration,
+      selectedScheme,
+      filterTabIndex,
+    }
+    localStorage.setItem(storageKey, JSON.stringify(payload))
+  }, [
+    filterTabIndex,
+    selectedBlock,
+    selectedDistrict,
+    selectedDuration,
+    selectedGramPanchayat,
+    selectedScheme,
+    selectedState,
+    selectedVillage,
+    storageKey,
+  ])
 
   const handleStateClick = (stateId: string, _stateName: string) => {
     navigate(`/states/${stateId}`)
