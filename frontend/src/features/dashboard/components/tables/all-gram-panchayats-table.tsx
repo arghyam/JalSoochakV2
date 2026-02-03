@@ -46,7 +46,7 @@ export function AllGramPanchayatsTable({ data, maxItems }: AllGramPanchayatsTabl
             }}
           >
             <Tr>
-              <Th>District</Th>
+              <Th>Gram Panchayat</Th>
               <Th>
                 <Flex align="center">
                   <Box as="span">Coverage (%)</Box>
