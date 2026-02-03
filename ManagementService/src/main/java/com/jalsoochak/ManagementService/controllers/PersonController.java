@@ -77,7 +77,7 @@ public class PersonController {
 
     @PostMapping("/complete/profile")
     public ResponseEntity<String> completeProfile(
-            @RequestBody RegisterRequest registerRequest) {
+            @Valid @RequestBody RegisterRequest registerRequest) {
 
         if (!tenantMasterRepository.existsByTenantName(registerRequest.getTenantId())) {
             log.warn("Invalid tenant ID provided: {}", registerRequest.getTenantId());
@@ -93,7 +93,7 @@ public class PersonController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
         TokenResponse response = personService.login(request);
         return ResponseEntity.ok(response);
     }
