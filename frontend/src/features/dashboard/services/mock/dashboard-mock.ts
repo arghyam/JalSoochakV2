@@ -7,6 +7,7 @@ import type {
   DemandSupplyData,
   KPIData,
   PumpOperatorPerformanceData,
+  PhotoEvidenceComplianceData,
 } from '../../types'
 import type { SearchableSelectOption } from '@/shared/components/common'
 
@@ -822,6 +823,149 @@ const mockWaterSupplyOutages = [
   },
 ]
 
+const mockPhotoEvidenceCompliance: PhotoEvidenceComplianceData[] = [
+  {
+    id: 'pec-1',
+    name: 'Vikash',
+    village: 'Asaihpura',
+    lastSubmission: '09-08-2025, 3:00pm',
+    readingValue: '017848',
+  },
+  {
+    id: 'pec-2',
+    name: 'Arjun',
+    village: 'Bhedoura',
+    lastSubmission: '11-02-2025, 1:00pm',
+    readingValue: '026537',
+  },
+  {
+    id: 'pec-3',
+    name: 'Shashwat',
+    village: 'Bispur',
+    lastSubmission: '03-19-2025, 9:00am',
+    readingValue: '034982',
+  },
+  {
+    id: 'pec-4',
+    name: 'Karan',
+    village: 'Chaturpur Kalan',
+    lastSubmission: '06-22-2025, 1:00am',
+    readingValue: '067375',
+  },
+  {
+    id: 'pec-5',
+    name: 'Abhini',
+    village: 'Dhablan',
+    lastSubmission: '06-02-2025, 4:00pm',
+    readingValue: '065392',
+  },
+  {
+    id: 'pec-6',
+    name: 'Aayush',
+    village: 'Dhano Majra',
+    lastSubmission: '06-18-2025, 10:00am',
+    readingValue: '068537',
+  },
+  {
+    id: 'pec-7',
+    name: 'Tizreen',
+    village: 'Bilaspur',
+    lastSubmission: '06-08-2025, 2:00pm',
+    readingValue: '067539',
+  },
+  {
+    id: 'pec-8',
+    name: 'Nipun',
+    village: 'Harkapur',
+    lastSubmission: '07-14-2025, 8:00am',
+    readingValue: '096732',
+  },
+  {
+    id: 'pec-9',
+    name: 'Pranab',
+    village: 'Kheri Malan',
+    lastSubmission: '06-29-2025, 6:00pm',
+    readingValue: '027593',
+  },
+  {
+    id: 'pec-10',
+    name: 'Riya',
+    village: 'Kakralia',
+    lastSubmission: '07-02-2025, 11:15am',
+    readingValue: '043126',
+  },
+  {
+    id: 'pec-11',
+    name: 'Naveen',
+    village: 'Madanpur',
+    lastSubmission: '07-05-2025, 5:40pm',
+    readingValue: '058214',
+  },
+  {
+    id: 'pec-12',
+    name: 'Shreya',
+    village: 'Rampur',
+    lastSubmission: '07-08-2025, 9:30am',
+    readingValue: '061905',
+  },
+  {
+    id: 'pec-13',
+    name: 'Danish',
+    village: 'Kalyanpur',
+    lastSubmission: '07-11-2025, 6:20pm',
+    readingValue: '072441',
+  },
+  {
+    id: 'pec-14',
+    name: 'Meera',
+    village: 'Jaitpur',
+    lastSubmission: '07-14-2025, 10:10am',
+    readingValue: '083762',
+  },
+  {
+    id: 'pec-15',
+    name: 'Sahil',
+    village: 'Bordol',
+    lastSubmission: '07-17-2025, 4:05pm',
+    readingValue: '091337',
+  },
+  {
+    id: 'pec-16',
+    name: 'Kriti',
+    village: 'Nandgaon',
+    lastSubmission: '07-20-2025, 8:50am',
+    readingValue: '104598',
+  },
+  {
+    id: 'pec-17',
+    name: 'Aman',
+    village: 'Sultanpur',
+    lastSubmission: '07-23-2025, 1:25pm',
+    readingValue: '116204',
+  },
+  {
+    id: 'pec-18',
+    name: 'Pooja',
+    village: 'Harsinghpur',
+    lastSubmission: '07-26-2025, 3:45pm',
+    readingValue: '129877',
+  },
+  {
+    id: 'pec-19',
+    name: 'Vivek',
+    village: 'Dhanori',
+    lastSubmission: '07-29-2025, 7:10am',
+    readingValue: '141563',
+  },
+  {
+    id: 'pec-20',
+    name: 'Neha',
+    village: 'Kheda',
+    lastSubmission: '08-01-2025, 12:30pm',
+    readingValue: '153204',
+  },
+]
+
 // Mock KPI data for central dashboard
 const mockCentralKPIs: KPIData = {
   totalSchemes: 650000,
@@ -848,6 +992,7 @@ export const dashboardMockService = {
         mapData: mockStates,
         demandSupply: mockDemandSupply,
         imageSubmissionStatus: mockImageSubmissionStatus,
+        photoEvidenceCompliance: mockPhotoEvidenceCompliance,
         pumpOperators: mockPumpOperators,
         waterSupplyOutages: mockWaterSupplyOutages,
         topPerformers: sortedStates.slice(0, 5),
@@ -867,6 +1012,7 @@ export const dashboardMockService = {
       mapData: [],
       demandSupply: mockDemandSupply,
       imageSubmissionStatus: mockImageSubmissionStatus,
+      photoEvidenceCompliance: mockPhotoEvidenceCompliance,
       pumpOperators: mockPumpOperators,
       waterSupplyOutages: mockWaterSupplyOutages,
       topPerformers: [],

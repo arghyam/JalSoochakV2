@@ -17,6 +17,8 @@ import {
   AllDistrictsTable,
   AllStatesTable,
   PumpOperatorsPerformanceTable,
+  PhotoEvidenceComplianceTable,
+  AllGramPanchayatsTable,
 } from './tables'
 import { LoadingSpinner, SearchableSelect } from '@/shared/components/common'
 import { MdOutlineWaterDrop, MdArrowUpward, MdArrowDownward } from 'react-icons/md'
@@ -51,6 +53,7 @@ export function CentralDashboard() {
   const [filterTabIndex, setFilterTabIndex] = useState(0)
   const isStateSelected = Boolean(selectedState)
   const isDistrictSelected = Boolean(selectedDistrict)
+  const isBlockSelected = Boolean(selectedBlock)
   const emptyOptions: SearchableSelectOption[] = []
   const isAdvancedEnabled = Boolean(selectedState && selectedDistrict)
   const districtTableData =
@@ -651,10 +654,27 @@ export function CentralDashboard() {
       </Grid>
 
       {/* All States/Districts/Pump Operators + Submission Rate */}
-      <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-        <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
-          {isDistrictSelected ? (
-            <>
+      {isBlockSelected ? (
+        <>
+          <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="526px">
+              <PhotoEvidenceComplianceTable data={data.photoEvidenceCompliance} />
+            </Box>
+            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="526px">
+              <Text textStyle="bodyText3" fontWeight="400" mb={2}>
+                Supply Data Submission Rate
+              </Text>
+              <SupplySubmissionRateChart data={data.mapData} height="383px" />
+            </Box>
+          </Grid>
+          <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
+              <Text textStyle="bodyText3" fontWeight="400" mb="16px">
+                All Gram Panchayats
+              </Text>
+              <AllGramPanchayatsTable data={blockTableData} />
+            </Box>
+            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
               <Flex align="center" justify="space-between" mb="40px">
                 <Text textStyle="bodyText3" fontWeight="400">
                   Pump Operators
@@ -668,27 +688,49 @@ export function CentralDashboard() {
                 height="360px"
                 note="Note: Active pump operators submit readings at least 30 days in a month."
               />
-            </>
-          ) : (
-            <>
-              <Text textStyle="bodyText3" fontWeight="400" mb="16px">
-                {isStateSelected ? 'All Districts' : 'All States/UTs'}
-              </Text>
-              {isStateSelected ? (
-                <AllDistrictsTable data={districtTableData} />
-              ) : (
-                <AllStatesTable data={data.mapData} />
-              )}
-            </>
-          )}
-        </Box>
-        <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
-          <Text textStyle="bodyText3" fontWeight="400" mb={2}>
-            Supply Data Submission Rate
-          </Text>
-          <SupplySubmissionRateChart data={data.mapData} height="383px" />
-        </Box>
-      </Grid>
+            </Box>
+          </Grid>
+        </>
+      ) : (
+        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
+            {isDistrictSelected ? (
+              <>
+                <Flex align="center" justify="space-between" mb="40px">
+                  <Text textStyle="bodyText3" fontWeight="400">
+                    Pump Operators
+                  </Text>
+                  <Text textStyle="bodyText3" fontWeight="400">
+                    Total: {pumpOperatorsTotal}
+                  </Text>
+                </Flex>
+                <PumpOperatorsChart
+                  data={data.pumpOperators}
+                  height="360px"
+                  note="Note: Active pump operators submit readings at least 30 days in a month."
+                />
+              </>
+            ) : (
+              <>
+                <Text textStyle="bodyText3" fontWeight="400" mb="16px">
+                  {isStateSelected ? 'All Districts' : 'All States/UTs'}
+                </Text>
+                {isStateSelected ? (
+                  <AllDistrictsTable data={districtTableData} />
+                ) : (
+                  <AllStatesTable data={data.mapData} />
+                )}
+              </>
+            )}
+          </Box>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
+            <Text textStyle="bodyText3" fontWeight="400" mb={2}>
+              Supply Data Submission Rate
+            </Text>
+            <SupplySubmissionRateChart data={data.mapData} height="383px" />
+          </Box>
+        </Grid>
+      )}
 
       {/* Pump Operator Performance Tables */}
       {isDistrictSelected ? (
@@ -709,7 +751,7 @@ export function CentralDashboard() {
       ) : null}
 
       {/* All Blocks */}
-      {isDistrictSelected ? (
+      {isDistrictSelected && !isBlockSelected ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
           <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="430px">
             <Text textStyle="bodyText3" fontWeight="400" mb="16px">

@@ -45,6 +45,14 @@ export interface PumpOperatorsData {
   value: number
 }
 
+export interface PhotoEvidenceComplianceData {
+  id: string
+  name: string
+  village: string
+  lastSubmission: string
+  readingValue: string
+}
+
 export interface PumpOperatorPerformanceData {
   id: string
   name: string
@@ -71,6 +79,7 @@ export interface DashboardData {
   mapData: EntityPerformance[]
   demandSupply: DemandSupplyData[]
   imageSubmissionStatus: ImageSubmissionStatusData[]
+  photoEvidenceCompliance: PhotoEvidenceComplianceData[]
   pumpOperators: PumpOperatorsData[]
   waterSupplyOutages: WaterSupplyOutageData[]
   topPerformers: EntityPerformance[]
