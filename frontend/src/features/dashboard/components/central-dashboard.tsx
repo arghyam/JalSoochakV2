@@ -10,6 +10,7 @@ import {
   SupplySubmissionRateChart,
   PumpOperatorsChart,
   ImageSubmissionStatusChart,
+  IssueTypeBreakdownChart,
   WaterSupplyOutagesChart,
 } from './charts'
 import {
@@ -823,7 +824,7 @@ export function CentralDashboard() {
               <Text textStyle="bodyText3" fontWeight="400" mb={2}>
                 Issue Type Breakdown
               </Text>
-              <WaterSupplyOutagesChart data={data.waterSupplyOutages} height="400px" />
+              <IssueTypeBreakdownChart data={data.waterSupplyOutages} height="400px" />
             </Box>
           </Grid>
         </>
