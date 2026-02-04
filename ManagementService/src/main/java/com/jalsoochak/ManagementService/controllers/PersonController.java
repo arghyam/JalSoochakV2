@@ -72,7 +72,8 @@ public class PersonController {
         }
 
         String inviteToken = personService.inviteUser(inviteRequest);
-        return ResponseEntity.ok(new InviteToken(inviteToken));
+        String message = "Invite sent to " + inviteRequest.getEmail();
+        return ResponseEntity.ok(new InviteToken(inviteToken, message));
     }
 
     @PostMapping("/complete/profile")

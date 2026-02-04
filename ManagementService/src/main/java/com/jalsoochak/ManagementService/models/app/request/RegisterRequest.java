@@ -11,16 +11,18 @@ import lombok.Setter;
 @Setter
 public class RegisterRequest {
     @NotBlank(message = "First name is required")
+    @Pattern(regexp = "^[A-Za-z]+$", message = "First name can contain only alphabets")
     private String firstName;
 
     @NotBlank(message = "Last name is required")
+    @Pattern(regexp = "^[A-Za-z]+$", message = "Last name can contain only alphabets")
     private String lastName;
 
     @Email(message = "Email should be valid")
     private String email;
 
     @NotBlank(message = "Phone number is required")
-    @Size(min = 10, message = "Phone number should not be less than 10 characters")
+    @Size(min = 10, max = 10, message = "Phone number must be exactly 10 digits")
     @Pattern(regexp = "\\d+", message = "Phone number should contain only digits")
     private String phoneNumber;
 
