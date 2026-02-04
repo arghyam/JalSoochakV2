@@ -145,7 +145,7 @@ export function OverviewPage() {
                 bg="white"
                 borderWidth="1px"
                 borderColor="neutral.100"
-                height={{ base: 'auto', md: '200px' }}
+                height={{ base: 'auto', xl: '200px' }}
                 borderRadius="lg"
                 boxShadow="default"
                 p={4}

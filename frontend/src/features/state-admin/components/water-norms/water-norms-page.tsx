@@ -320,7 +320,7 @@ export function WaterNormsPage() {
                     value={stateQuantity}
                     onChange={(e) => setStateQuantity(e.target.value)}
                     type="number"
-                    w={{ base: 'full', lg: '486px' }}
+                    w={{ base: 'full', lg: '319px', xl: '486px' }}
                     h="36px"
                     fontSize="sm"
                     borderColor="neutral.300"
@@ -351,7 +351,7 @@ export function WaterNormsPage() {
                         gap={{ base: 3, lg: 6 }}
                         align={{ base: 'stretch', lg: 'flex-end' }}
                       >
-                        <Box w={{ base: 'full', lg: '486px' }}>
+                        <Box w={{ base: 'full', lg: '319px', xl: '486px' }}>
                           <Text
                             fontSize={{ base: 'xs', md: 'sm' }}
                             fontWeight="medium"
@@ -403,7 +403,7 @@ export function WaterNormsPage() {
                               }
                               type="number"
                               fontSize="sm"
-                              w={{ base: 'full', lg: '486px' }}
+                              w={{ base: 'full', lg: '319px', xl: '486px' }}
                               h="36px"
                               borderColor="neutral.300"
                               borderRadius="6px"

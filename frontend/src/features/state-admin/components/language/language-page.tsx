@@ -202,7 +202,7 @@ export function LanguagePage() {
               gap={{ base: 6, lg: 0 }}
             >
               <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={6}>
-                <Box w={{ base: 'full', lg: '486px' }}>
+                <Box w={{ base: 'full', xl: '486px' }}>
                   <Text
                     as="label"
                     id="primary-language-label"
@@ -226,7 +226,7 @@ export function LanguagePage() {
                     ariaLabel={t('language.aria.selectPrimaryLanguage')}
                   />
                 </Box>
-                <Box w={{ base: 'full', lg: '486px' }}>
+                <Box w={{ base: 'full', xl: '486px' }}>
                   <Text
                     as="label"
                     id="secondary-language-label"

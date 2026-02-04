@@ -164,7 +164,7 @@ export function SystemRulesPage() {
                 bg="neutral.50"
                 py={6}
                 px={4}
-                height={{ base: 'auto', md: '174px' }}
+                height={{ base: 'auto', xl: '174px' }}
               >
                 <Heading as="h2" size="h3" fontWeight="400" mb={1}>
                   {t('systemRules.coverage.title')}
@@ -176,7 +176,7 @@ export function SystemRulesPage() {
                   value={coverage}
                   onChange={(valueString) => setCoverage(valueString)}
                   min={0}
-                  w={{ base: 'full', lg: '490px' }}
+                  w={{ base: 'full', xl: '490px' }}
                 >
                   <NumberInputField
                     placeholder={t('common:enter')}
@@ -204,7 +204,7 @@ export function SystemRulesPage() {
                 bg="neutral.50"
                 py={6}
                 px={4}
-                height={{ base: 'auto', md: '174px' }}
+                height={{ base: 'auto', xl: '174px' }}
               >
                 <Heading as="h2" size="h3" fontWeight="400" mb={1}>
                   {t('systemRules.continuity.title')}
@@ -216,7 +216,7 @@ export function SystemRulesPage() {
                   value={continuity}
                   onChange={(valueString) => setContinuity(valueString)}
                   min={0}
-                  w={{ base: 'full', lg: '490px' }}
+                  w={{ base: 'full', xl: '490px' }}
                 >
                   <NumberInputField
                     placeholder={t('common:enter')}
@@ -244,7 +244,7 @@ export function SystemRulesPage() {
                 bg="neutral.50"
                 py={6}
                 px={4}
-                height={{ base: 'auto', md: '174px' }}
+                height={{ base: 'auto', xl: '174px' }}
               >
                 <Heading as="h2" size="h3" fontWeight="400" mb={1}>
                   {t('systemRules.quantity.title')}
@@ -256,7 +256,7 @@ export function SystemRulesPage() {
                   value={quantity}
                   onChange={(valueString) => setQuantity(valueString)}
                   min={0}
-                  w={{ base: 'full', lg: '490px' }}
+                  w={{ base: 'full', xl: '490px' }}
                 >
                   <NumberInputField
                     placeholder={t('common:enter')}
@@ -284,7 +284,7 @@ export function SystemRulesPage() {
                 bg="neutral.50"
                 py={6}
                 px={4}
-                height={{ base: 'auto', md: '174px' }}
+                height={{ base: 'auto', xl: '174px' }}
               >
                 <Heading as="h2" size="h3" fontWeight="400" mb={1}>
                   {t('systemRules.regularity.title')}
@@ -296,7 +296,7 @@ export function SystemRulesPage() {
                   value={regularity}
                   onChange={(valueString) => setRegularity(valueString)}
                   min={0}
-                  w={{ base: 'full', lg: '490px' }}
+                  w={{ base: 'full', xl: '490px' }}
                 >
                   <NumberInputField
                     placeholder={t('common:enter')}

@@ -219,7 +219,10 @@ export function NudgesTemplatePage() {
                     direction={{ base: 'column', lg: 'row' }}
                   >
                     {/* Left Side - Language Select and Variables */}
-                    <Box flex={{ base: 'none', lg: '0 0 auto' }} w={{ base: 'full', lg: '486px' }}>
+                    <Box
+                      flex={{ base: 'none', lg: '0 0 auto' }}
+                      w={{ base: 'full', lg: '339px', xl: '486px' }}
+                    >
                       {/* Language Select */}
                       <Box mb={3}>
                         <Text
@@ -239,7 +242,7 @@ export function NudgesTemplatePage() {
                           value={state?.selectedLanguage || ''}
                           onChange={(value) => handleLanguageChange(template.id, value)}
                           placeholder={t('nudges.selectLanguage')}
-                          width={{ base: '100%', lg: '486px' }}
+                          width={{ base: '100%', xl: '486px' }}
                           textStyle="h10"
                           borderColor="neutral.300"
                           borderRadius="4px"
@@ -273,7 +276,7 @@ export function NudgesTemplatePage() {
                     </Box>
 
                     {/* Right Side - Message */}
-                    <Box w={{ base: 'full', lg: '486px' }}>
+                    <Box w={{ base: 'full', lg: '339px', xl: '486px' }}>
                       <Text
                         as="label"
                         textStyle="h10"
@@ -283,7 +286,7 @@ export function NudgesTemplatePage() {
                       >
                         {t('nudges.message')}
                       </Text>
-                      <Box position="relative" w={{ base: 'full', lg: '486px' }}>
+                      <Box position="relative" w={{ base: 'full', xl: '486px' }}>
                         <Textarea
                           value={state?.message || ''}
                           onChange={(e) => handleMessageChange(template.id, e.target.value)}
