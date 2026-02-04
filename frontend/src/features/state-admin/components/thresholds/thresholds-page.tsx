@@ -192,7 +192,7 @@ export function ThresholdsPage() {
                   value={coverage}
                   onChange={(valueString) => setCoverage(valueString)}
                   min={0}
-                  w={{ base: 'full', lg: '490px' }}
+                  w={{ base: 'full', xl: '490px' }}
                 >
                   <NumberInputField
                     placeholder={t('common:enter')}
@@ -240,7 +240,7 @@ export function ThresholdsPage() {
                   value={continuity}
                   onChange={(valueString) => setContinuity(valueString)}
                   min={0}
-                  w={{ base: 'full', lg: '490px' }}
+                  w={{ base: 'full', xl: '490px' }}
                 >
                   <NumberInputField
                     placeholder={t('common:enter')}
@@ -288,7 +288,7 @@ export function ThresholdsPage() {
                   value={quantity}
                   onChange={(valueString) => setQuantity(valueString)}
                   min={0}
-                  w={{ base: 'full', lg: '490px' }}
+                  w={{ base: 'full', xl: '490px' }}
                 >
                   <NumberInputField
                     placeholder={t('common:enter')}
@@ -336,7 +336,7 @@ export function ThresholdsPage() {
                   value={regularity}
                   onChange={(valueString) => setRegularity(valueString)}
                   min={0}
-                  w={{ base: 'full', lg: '490px' }}
+                  w={{ base: 'full', xl: '490px' }}
                 >
                   <NumberInputField
                     placeholder={t('common:enter')}

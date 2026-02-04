@@ -23,8 +23,9 @@ export interface TokenResponse {
   expires_in: number
   refresh_expires_in: number
   token_type: string
-  person_type: string
+  user_role: string
   tenant_id: string
+  person_id: string
 }
 
 export interface RefreshRequest {
@@ -42,6 +43,7 @@ export interface AuthUser {
   role: string
   phoneNumber: string
   tenantId: string
+  personId: string
 }
 
 export interface LoginResponse {
@@ -50,50 +52,13 @@ export interface LoginResponse {
   refreshToken: string
 }
 
-// Hardcoded credentials for testing (temporary - remove when backend is fixed)
-const HARDCODED_USERS: Record<string, { password: string; user: AuthUser }> = {
-  '4564564566': {
-    password: 'sdsdsd',
-    user: {
-      id: 'super-admin-001',
-      name: 'John Doe',
-      email: 'johndoe@jalsoochak.com',
-      role: 'super_admin',
-      phoneNumber: '4564564566',
-      tenantId: '',
-    },
-  },
-  '9876543210': {
-    password: 'sdsdsd',
-    user: {
-      id: 'state-admin-001',
-      name: 'Jane Doe',
-      email: 'janedoe@jalsoochak.com',
-      role: 'state_admin',
-      phoneNumber: '9876543210',
-      tenantId: 'Telangana',
-    },
-  },
-}
-
 export const authApi = {
   login: async (payload: LoginRequest): Promise<LoginResponse> => {
-    // Check hardcoded credentials first (temporary - remove when backend is fixed)
-    const hardcodedUser = HARDCODED_USERS[payload.phoneNumber]
-    if (hardcodedUser && hardcodedUser.password === payload.password) {
-      return {
-        user: hardcodedUser.user,
-        accessToken: `mock-access-token-${hardcodedUser.user.role}-${Date.now()}`,
-        refreshToken: `mock-refresh-token-${hardcodedUser.user.role}-${Date.now()}`,
-      }
-    }
-
-    // Fallback to real API call
     const response = await apiClient.post<TokenResponse>('/api/v2/auth/login', {
       username: payload.phoneNumber,
       password: payload.password,
     })
-    const { access_token, refresh_token, id_token, person_type, tenant_id } = response.data
+    const { access_token, refresh_token, id_token, user_role, tenant_id, person_id } = response.data
 
     const userFromToken = extractUserFromJWT(id_token)
     if (!userFromToken) {
@@ -102,8 +67,9 @@ export const authApi = {
 
     const user: AuthUser = {
       ...userFromToken,
-      role: person_type || '',
-      tenantId: tenant_id || '',
+      role: user_role ?? '',
+      tenantId: tenant_id ?? '',
+      personId: person_id ?? '',
     }
 
     return {
@@ -114,10 +80,10 @@ export const authApi = {
   },
 
   refresh: async (refreshToken: string): Promise<LoginResponse> => {
-    const response = await apiClient.post<Partial<TokenResponse>>('/api/v2/auth/refresh', {
+    const response = await apiClient.post<TokenResponse>('/api/v2/auth/refresh', {
       refreshToken,
     })
-    const { access_token, refresh_token, id_token, person_type, tenant_id } = response.data
+    const { access_token, refresh_token, id_token, user_role, tenant_id, person_id } = response.data
 
     if (!access_token || !refresh_token || !id_token) {
       throw new Error('Invalid token response')
@@ -130,8 +96,9 @@ export const authApi = {
 
     const user: AuthUser = {
       ...userFromToken,
-      role: person_type || '',
-      tenantId: tenant_id || '',
+      role: user_role ?? '',
+      tenantId: tenant_id ?? '',
+      personId: person_id ?? '',
     }
 
     return {
