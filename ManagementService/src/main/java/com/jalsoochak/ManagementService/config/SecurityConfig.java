@@ -35,7 +35,12 @@ public class SecurityConfig {
         http
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/refresh", "/auth/complete/profile").permitAll() // public endpoints
+                        .requestMatchers( "/auth/login",
+                                "/auth/refresh",
+                                "/auth/complete/profile",
+                                "/api/v2/auth/login",
+                                "/api/v2/auth/refresh",
+                                "/api/v2/auth/complete/profile").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
