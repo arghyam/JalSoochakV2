@@ -3,12 +3,16 @@ package com.jalsoochak.ManagementService.controllers;
 import com.jalsoochak.ManagementService.models.app.request.*;
 import com.jalsoochak.ManagementService.models.app.response.InviteToken;
 import com.jalsoochak.ManagementService.models.app.response.TokenResponse;
+import com.jalsoochak.ManagementService.repositories.TenantMasterRepository;
 import com.jalsoochak.ManagementService.services.impl.PersonService;
 import com.jalsoochak.ManagementService.exceptions.BadRequestException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -25,12 +29,15 @@ import java.util.Map;
 @RequestMapping({"/api/v2/auth", "/auth"})
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class PersonController {
     private final PersonService personService;
+    private final TenantMasterRepository tenantMasterRepository;
 
     @PostMapping("/invite/user")
     public ResponseEntity<InviteToken> inviteUser(
-            @RequestBody InviteRequest inviteRequest,
+            @Valid @RequestBody InviteRequest inviteRequest,
+            @RequestHeader("X-Tenant-ID") @NotBlank(message = "Tenant ID is required") String tenantId,
             @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
         if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")) {
@@ -49,6 +56,14 @@ public class PersonController {
             );
         }
 
+        if (!tenantMasterRepository.existsByTenantName(tenantId)) {
+            log.warn("Invalid tenant ID provided: {}", tenantId);
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Invalid tenant ID: " + tenantId
+            );
+        }
+
         if (!personService.isSuperAdmin(token)) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
@@ -62,7 +77,15 @@ public class PersonController {
 
     @PostMapping("/complete/profile")
     public ResponseEntity<String> completeProfile(
-            @RequestBody RegisterRequest registerRequest) {
+            @Valid @RequestBody RegisterRequest registerRequest) {
+
+        if (!tenantMasterRepository.existsByTenantName(registerRequest.getTenantId())) {
+            log.warn("Invalid tenant ID provided: {}", registerRequest.getTenantId());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Invalid tenant id " + registerRequest.getTenantId()
+            );
+        }
 
         personService.completeProfile(registerRequest);
 
@@ -70,7 +93,7 @@ public class PersonController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
         TokenResponse response = personService.login(request);
         return ResponseEntity.ok(response);
     }
