@@ -263,6 +263,10 @@ export function CentralDashboard() {
   const pumpOperatorsTotal = data.pumpOperators.reduce((total, item) => total + item.value, 0)
   const leadingPumpOperators = data.leadingPumpOperators ?? []
   const bottomPumpOperators = data.bottomPumpOperators ?? []
+  const villagePhotoEvidenceRows = data.photoEvidenceCompliance.map((row) => ({
+    ...row,
+    name: villagePumpOperatorDetails.name,
+  }))
 
   return (
     <Box>
@@ -772,8 +776,59 @@ export function CentralDashboard() {
         )}
       </Grid>
 
-      {/* Submission + Outages Charts */}
-      {isStateSelected ? (
+      {selectedVillage ? (
+        <>
+          <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="526px">
+              <PhotoEvidenceComplianceTable
+                data={villagePhotoEvidenceRows}
+                showVillageColumn={false}
+              />
+            </Box>
+            <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="526px">
+              <Text textStyle="bodyText3" fontWeight="400" mb={2}>
+                Demand vs Supply
+              </Text>
+              <DemandSupplyChart data={data.demandSupply} height="418px" />
+            </Box>
+          </Grid>
+          <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+            <Box
+              bg="white"
+              borderWidth="0.5px"
+              borderRadius="12px"
+              borderColor="#E4E4E7"
+              pt="24px"
+              pb="24px"
+              pl="16px"
+              pr="16px"
+              h="523px"
+            >
+              <Text textStyle="bodyText3" fontWeight="400" mb="0px">
+                Image Submission Status
+              </Text>
+              <ImageSubmissionStatusChart data={data.imageSubmissionStatus} height="406px" />
+            </Box>
+            <Box
+              bg="white"
+              borderWidth="0.5px"
+              borderRadius="12px"
+              borderColor="#E4E4E7"
+              pt="24px"
+              pb="24px"
+              pl="16px"
+              pr="16px"
+              h="523px"
+            >
+              <Text textStyle="bodyText3" fontWeight="400" mb={2}>
+                Issue Type Breakdown
+              </Text>
+              <WaterSupplyOutagesChart data={data.waterSupplyOutages} height="400px" />
+            </Box>
+          </Grid>
+        </>
+      ) : /* Submission + Outages Charts */
+      isStateSelected ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
           <Box
             bg="white"
@@ -811,87 +866,89 @@ export function CentralDashboard() {
       ) : null}
 
       {/* Performance + Demand vs Supply Charts */}
-      <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
-        <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
-          <Flex align="center" justify="space-between">
-            <Text textStyle="bodyText3" fontWeight="400">
-              {selectedGramPanchayat
-                ? 'All Villages Performance'
-                : isBlockSelected
-                  ? 'All Gram Panchayats Performance'
-                  : isDistrictSelected
-                    ? 'All Blocks Performance'
-                    : isStateSelected
-                      ? 'All Districts Performance'
-                      : 'All States/UTs Performance'}
+      {!selectedVillage ? (
+        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
+            <Flex align="center" justify="space-between">
+              <Text textStyle="bodyText3" fontWeight="400">
+                {selectedGramPanchayat
+                  ? 'All Villages Performance'
+                  : isBlockSelected
+                    ? 'All Gram Panchayats Performance'
+                    : isDistrictSelected
+                      ? 'All Blocks Performance'
+                      : isStateSelected
+                        ? 'All Districts Performance'
+                        : 'All States/UTs Performance'}
+              </Text>
+              {!isStateSelected &&
+              !isDistrictSelected &&
+              !isBlockSelected &&
+              !selectedGramPanchayat ? (
+                <Select
+                  h="32px"
+                  maxW="120px"
+                  fontSize="14px"
+                  fontWeight="600"
+                  borderRadius="4px"
+                  borderColor="neutral.400"
+                  borderWidth="1px"
+                  bg="white"
+                  color="neutral.400"
+                  placeholder="Select"
+                  appearance="none"
+                  value={performanceState}
+                  onChange={(event) => setPerformanceState(event.target.value)}
+                  _focus={{
+                    borderColor: 'primary.500',
+                    boxShadow: 'none',
+                  }}
+                >
+                  <option value="Punjab">Punjab</option>
+                </Select>
+              ) : null}
+            </Flex>
+            <AllStatesPerformanceChart
+              data={
+                selectedGramPanchayat
+                  ? villageTableData
+                  : isBlockSelected
+                    ? gramPanchayatTableData
+                    : isDistrictSelected
+                      ? blockTableData
+                      : isStateSelected
+                        ? districtTableData
+                        : performanceState
+                          ? data.mapData
+                              .filter((state) => state.name === performanceState)
+                              .slice(0, 1)
+                          : data.mapData
+              }
+              height="416px"
+              entityLabel={
+                selectedGramPanchayat
+                  ? 'Villages'
+                  : isBlockSelected
+                    ? 'Gram Panchayats'
+                    : isDistrictSelected
+                      ? 'Blocks'
+                      : isStateSelected
+                        ? 'Districts'
+                        : 'States/UTs'
+              }
+            />
+          </Box>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
+            <Text textStyle="bodyText3" fontWeight="400" mb={2}>
+              Demand vs Supply
             </Text>
-            {!isStateSelected &&
-            !isDistrictSelected &&
-            !isBlockSelected &&
-            !selectedGramPanchayat ? (
-              <Select
-                h="32px"
-                maxW="120px"
-                fontSize="14px"
-                fontWeight="600"
-                borderRadius="4px"
-                borderColor="neutral.400"
-                borderWidth="1px"
-                bg="white"
-                color="neutral.400"
-                placeholder="Select"
-                appearance="none"
-                value={performanceState}
-                onChange={(event) => setPerformanceState(event.target.value)}
-                _focus={{
-                  borderColor: 'primary.500',
-                  boxShadow: 'none',
-                }}
-              >
-                <option value="Punjab">Punjab</option>
-              </Select>
-            ) : null}
-          </Flex>
-          <AllStatesPerformanceChart
-            data={
-              selectedGramPanchayat
-                ? villageTableData
-                : isBlockSelected
-                  ? gramPanchayatTableData
-                  : isDistrictSelected
-                    ? blockTableData
-                    : isStateSelected
-                      ? districtTableData
-                      : performanceState
-                        ? data.mapData
-                            .filter((state) => state.name === performanceState)
-                            .slice(0, 1)
-                        : data.mapData
-            }
-            height="416px"
-            entityLabel={
-              selectedGramPanchayat
-                ? 'Villages'
-                : isBlockSelected
-                  ? 'Gram Panchayats'
-                  : isDistrictSelected
-                    ? 'Blocks'
-                    : isStateSelected
-                      ? 'Districts'
-                      : 'States/UTs'
-            }
-          />
-        </Box>
-        <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
-          <Text textStyle="bodyText3" fontWeight="400" mb={2}>
-            Demand vs Supply
-          </Text>
-          <DemandSupplyChart data={data.demandSupply} height="418px" />
-        </Box>
-      </Grid>
+            <DemandSupplyChart data={data.demandSupply} height="418px" />
+          </Box>
+        </Grid>
+      ) : null}
 
       {/* All States/Districts/Pump Operators + Submission Rate */}
-      {isBlockSelected ? (
+      {!selectedVillage && isBlockSelected ? (
         <>
           <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
             <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="526px">
@@ -930,7 +987,7 @@ export function CentralDashboard() {
             </Box>
           </Grid>
         </>
-      ) : (
+      ) : !selectedVillage ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
           <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
             {isDistrictSelected ? (
@@ -969,10 +1026,10 @@ export function CentralDashboard() {
             <SupplySubmissionRateChart data={data.mapData} height="383px" />
           </Box>
         </Grid>
-      )}
+      ) : null}
 
       {/* Pump Operator Performance Tables */}
-      {isDistrictSelected ? (
+      {!selectedVillage && isDistrictSelected ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
           <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="350px">
             <PumpOperatorsPerformanceTable
@@ -990,7 +1047,7 @@ export function CentralDashboard() {
       ) : null}
 
       {/* All Blocks */}
-      {isDistrictSelected && !isBlockSelected ? (
+      {!selectedVillage && isDistrictSelected && !isBlockSelected ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
           <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="430px">
             <Text textStyle="bodyText3" fontWeight="400" mb="16px">

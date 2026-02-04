@@ -5,12 +5,14 @@ interface PhotoEvidenceComplianceTableProps {
   data: PhotoEvidenceComplianceData[]
   title?: string
   maxItems?: number
+  showVillageColumn?: boolean
 }
 
 export function PhotoEvidenceComplianceTable({
   data,
   title = 'Photo Evidence Compliance',
   maxItems,
+  showVillageColumn = true,
 }: PhotoEvidenceComplianceTableProps) {
   const safeMaxItems =
     typeof maxItems === 'number' && Number.isFinite(maxItems) ? Math.max(0, maxItems) : undefined
@@ -54,7 +56,7 @@ export function PhotoEvidenceComplianceTable({
           >
             <Tr>
               <Th>Name</Th>
-              <Th>Village</Th>
+              {showVillageColumn ? <Th>Village</Th> : null}
               <Th>Last Submission</Th>
               <Th>Reading Value</Th>
             </Tr>
@@ -75,7 +77,7 @@ export function PhotoEvidenceComplianceTable({
             {rows.map((row) => (
               <Tr key={row.id} _odd={{ bg: 'primary.25' }}>
                 <Td>{row.name}</Td>
-                <Td>{row.village}</Td>
+                {showVillageColumn ? <Td>{row.village}</Td> : null}
                 <Td>{row.lastSubmission}</Td>
                 <Td>{row.readingValue}</Td>
               </Tr>
