@@ -67,9 +67,9 @@ export const authApi = {
 
     const user: AuthUser = {
       ...userFromToken,
-      role: user_role || '',
-      tenantId: tenant_id || '',
-      personId: person_id || '',
+      role: user_role ?? '',
+      tenantId: tenant_id ?? '',
+      personId: person_id ?? '',
     }
 
     return {
@@ -80,7 +80,7 @@ export const authApi = {
   },
 
   refresh: async (refreshToken: string): Promise<LoginResponse> => {
-    const response = await apiClient.post<Partial<TokenResponse>>('/api/v2/auth/refresh', {
+    const response = await apiClient.post<TokenResponse>('/api/v2/auth/refresh', {
       refreshToken,
     })
     const { access_token, refresh_token, id_token, user_role, tenant_id, person_id } = response.data
@@ -96,9 +96,9 @@ export const authApi = {
 
     const user: AuthUser = {
       ...userFromToken,
-      role: user_role || '',
-      tenantId: tenant_id || '',
-      personId: person_id || '',
+      role: user_role ?? '',
+      tenantId: tenant_id ?? '',
+      personId: person_id ?? '',
     }
 
     return {
