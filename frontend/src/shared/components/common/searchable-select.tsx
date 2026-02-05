@@ -9,6 +9,8 @@ import {
   useOutsideClick,
   Flex,
 } from '@chakra-ui/react'
+import type { ResponsiveValue } from '@chakra-ui/react'
+import type { Property } from 'csstype'
 import { SearchIcon, ChevronDownIcon } from '@chakra-ui/icons'
 
 export interface SearchableSelectOption {
@@ -22,7 +24,7 @@ export interface SearchableSelectProps {
   onChange: (value: string) => void
   placeholder?: string
   disabled?: boolean
-  width?: string
+  width?: ResponsiveValue<Property.Width>
   fontSize?: string
   textColor?: string
   height?: string
@@ -31,6 +33,10 @@ export interface SearchableSelectProps {
   textStyle?: string
   required?: boolean
   isFilter?: boolean
+  id?: string
+  'aria-labelledby'?: string
+  ariaLabel?: string
+  placeholderColor?: string
 }
 
 export function SearchableSelect({
@@ -40,7 +46,7 @@ export function SearchableSelect({
   placeholder = 'Select',
   disabled = false,
   width = '486px',
-  fontSize = 'md',
+  fontSize = 'sm',
   textColor,
   height = '36px',
   borderRadius = '6px',
@@ -48,6 +54,10 @@ export function SearchableSelect({
   textStyle = 'h10',
   required = false,
   isFilter = false,
+  id,
+  'aria-labelledby': ariaLabelledBy,
+  ariaLabel,
+  placeholderColor = 'neutral.500',
 }: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -88,8 +98,8 @@ export function SearchableSelect({
   const displayColor = isFilter
     ? selectedOption
       ? 'primary.500'
-      : textColor || 'neutral.500'
-    : textColor || (selectedOption ? 'neutral.950' : 'neutral.500')
+      : textColor || placeholderColor
+    : textColor || (selectedOption ? 'neutral.950' : placeholderColor)
   const displayBorderColor = isFilter ? (selectedOption ? 'primary.500' : borderColor) : borderColor
 
   return (
@@ -98,10 +108,13 @@ export function SearchableSelect({
       <Flex
         as="button"
         type="button"
+        id={id}
         role="combobox"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         aria-controls={listboxId}
+        aria-labelledby={ariaLabelledBy}
+        aria-label={ariaLabel}
         aria-disabled={disabled}
         disabled={disabled}
         w="full"
@@ -127,7 +140,6 @@ export function SearchableSelect({
       >
         <Text
           fontSize={fontSize}
-          // color={textColor || (selectedOption ? 'neutral.950' : 'neutral.500')}
           color={displayColor}
           textStyle={textStyle}
           fontWeight={isFilter ? 'semibold' : '400'}
@@ -167,7 +179,7 @@ export function SearchableSelect({
           borderColor="neutral.100"
           borderRadius="8px"
           boxShadow="0px 4px 6px -2px rgba(10, 13, 18, 0.03)"
-          w={width}
+          w="full"
           maxH="240px"
           overflow="hidden"
         >

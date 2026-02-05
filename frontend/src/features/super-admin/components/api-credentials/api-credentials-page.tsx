@@ -2,14 +2,17 @@ import { useEffect, useState } from 'react'
 import {
   Box,
   Flex,
-  Grid,
+  SimpleGrid,
+  Heading,
   Text,
   Button,
   Input,
   InputGroup,
   InputLeftElement,
   Badge,
+  useBreakpointValue,
 } from '@chakra-ui/react'
+import { useTranslation } from 'react-i18next'
 import { SearchIcon } from '@chakra-ui/icons'
 import { BiKey } from 'react-icons/bi'
 import { getMockApiCredentialsData, generateApiKey, sendApiKey } from '../../services/mock-data'
@@ -18,12 +21,21 @@ import type { ApiCredentialsData, ApiCredential } from '../../types/api-credenti
 import { STATUS_FILTER_OPTIONS } from '../../types/api-credentials'
 
 export function ApiCredentialsPage() {
+  const { t, i18n } = useTranslation(['super-admin', 'common'])
   const [data, setData] = useState<ApiCredentialsData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [generatingKeyFor, setGeneratingKeyFor] = useState<string | null>(null)
   const [sendingKeyFor, setSendingKeyFor] = useState<string | null>(null)
+
+  // Responsive values
+  const searchInputWidth = useBreakpointValue({ base: 'full', md: '300px' }) ?? '300px'
+  const gridColumns = useBreakpointValue({ base: 1, lg: 2 }) ?? 2
+
+  useEffect(() => {
+    document.title = `${t('apiCredentials.title')} | JalSoochak`
+  }, [t])
 
   useEffect(() => {
     let isMounted = true
@@ -52,21 +64,25 @@ export function ApiCredentialsPage() {
   }, [])
 
   const formatDate = (date: Date): string => {
-    const day = String(date.getDate()).padStart(2, '0')
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const year = String(date.getFullYear()).slice(-2)
-    return `${day}-${month}-${year}`
+    return new Intl.DateTimeFormat(i18n.language, {
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit',
+    }).format(date)
   }
 
   const formatLastUsed = (date: Date): string => {
-    const day = String(date.getDate()).padStart(2, '0')
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const year = String(date.getFullYear()).slice(-2)
-    let hours = date.getHours()
-    const minutes = String(date.getMinutes()).padStart(2, '0')
-    const ampm = hours >= 12 ? 'pm' : 'am'
-    hours = hours % 12 || 12
-    return `${day}-${month}-${year}, ${hours}:${minutes}${ampm}`
+    const dateFormatter = new Intl.DateTimeFormat(i18n.language, {
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit',
+    })
+    const timeFormatter = new Intl.DateTimeFormat(i18n.language, {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    })
+    return `${dateFormatter.format(date)}, ${timeFormatter.format(date)}`
   }
 
   const handleGenerateKey = async (credentialId: string) => {
@@ -105,12 +121,12 @@ export function ApiCredentialsPage() {
       active: {
         bg: '#E1FFEA',
         color: '#079455',
-        label: 'Active',
+        label: t('common:status.active'),
       },
       inactive: {
         bg: '#FEE4E2',
         color: '#D92D20',
-        label: 'Inactive',
+        label: t('common:status.inactive'),
       },
     }
 
@@ -145,41 +161,55 @@ export function ApiCredentialsPage() {
 
   if (isLoading) {
     return (
-      <Flex h="64" align="center" justify="center">
-        <Text color="neutral.600">Loading...</Text>
-      </Flex>
+      <Box w="full">
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={5}>
+          {t('apiCredentials.title')}
+        </Heading>
+        <Flex role="status" aria-live="polite" h="64" align="center" justify="center">
+          <Text color="neutral.600">{t('common:loading')}</Text>
+        </Flex>
+      </Box>
     )
   }
 
   if (!data) {
     return (
-      <Flex h="64" align="center" justify="center">
-        <Text color="neutral.600">No data available</Text>
-      </Flex>
+      <Box w="full">
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={5}>
+          {t('apiCredentials.title')}
+        </Heading>
+        <Flex h="64" align="center" justify="center">
+          <Text color="neutral.600">{t('common:noDataAvailable')}</Text>
+        </Flex>
+      </Box>
     )
   }
 
   return (
     <Box w="full">
       {/* Page Header */}
-      <Flex justify="space-between" align="center" mb={5} h={12}>
-        <Text textStyle="h5">API Credentials</Text>
-      </Flex>
+      <Box mb={5}>
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }}>
+          {t('apiCredentials.title')}
+        </Heading>
+      </Box>
 
       {/* Search and Filter Row */}
       <Flex
         justify="space-between"
         align="center"
         mb={6}
-        h={16}
+        h={{ base: 'auto', md: 16 }}
         bg="white"
         py={4}
-        px={6}
+        px={{ base: 3, md: 6 }}
         borderRadius={3}
         border="0.5px"
         borderColor="neutral.200"
+        flexDirection={{ base: 'column', md: 'row' }}
+        gap={{ base: 3, md: 0 }}
       >
-        <InputGroup w="300px">
+        <InputGroup w={searchInputWidth}>
           <InputLeftElement
             pointerEvents="none"
             display="flex"
@@ -187,12 +217,13 @@ export function ApiCredentialsPage() {
             justifyContent="center"
             h="32px"
           >
-            <SearchIcon color="neutral.400" boxSize={4} />
+            <SearchIcon color="neutral.400" boxSize={4} aria-hidden="true" />
           </InputLeftElement>
           <Input
-            placeholder="Search by State/UT name"
+            placeholder={t('apiCredentials.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            aria-label={t('apiCredentials.searchPlaceholder')}
             borderColor="neutral.300"
             borderRadius="8px"
             fontSize="14px"
@@ -206,21 +237,24 @@ export function ApiCredentialsPage() {
           options={STATUS_FILTER_OPTIONS}
           value={statusFilter}
           onChange={setStatusFilter}
-          placeholder="Status"
-          width="140px"
+          placeholder={t('common:statusLabel')}
+          width={{ base: '100%', md: '140px' }}
           fontSize="14px"
           textColor="neutral.400"
           borderColor="neutral.400"
           borderRadius="4px"
           height="32px"
+          aria-label={t('common:statusLabel')}
         />
       </Flex>
 
       {/* Credentials Grid */}
-      <Grid templateColumns="repeat(2, 1fr)" gap={6}>
+      <SimpleGrid columns={gridColumns} spacing={7}>
         {filteredCredentials.map((credential) => (
           <Box
             key={credential.id}
+            as="article"
+            aria-labelledby={`credential-${credential.id}-title`}
             bg="white"
             borderWidth="0.5px"
             borderColor="neutral.200"
@@ -229,53 +263,60 @@ export function ApiCredentialsPage() {
             py={6}
             px={4}
           >
-            <Text textStyle="h8" mb={4}>
+            <Heading
+              as="h2"
+              size="h3"
+              fontWeight="400"
+              mb={4}
+              id={`credential-${credential.id}-title`}
+            >
               {credential.stateUtName}
-            </Text>
+            </Heading>
 
             <Flex align="center" gap={1} mb={3}>
-              <BiKey />
-              <Text fontSize="13px">{credential.apiKey}</Text>
+              <BiKey aria-hidden="true" />
+              <Text fontSize="14px">{credential.apiKey}</Text>
             </Flex>
 
             {/* Details Grid */}
-            <Grid templateColumns="1fr 1fr" gap={3} mb={3}>
+            <SimpleGrid columns={2} gap={3} mb={3}>
               <Box>
-                <Text fontSize="14px" mb={1}>
-                  Last used:
+                <Text fontSize="14px" fontWeight="500" mb={1}>
+                  {t('apiCredentials.labels.lastUsed')}
                 </Text>
                 <Text fontSize="14px">{formatLastUsed(credential.lastUsed)}</Text>
               </Box>
               <Box>
-                <Text fontSize="14px" mb={1}>
-                  Created on:
+                <Text fontSize="14px" mb={1} fontWeight="500">
+                  {t('apiCredentials.labels.createdOn')}
                 </Text>
                 <Text fontSize="14px">{formatDate(credential.createdOn)}</Text>
               </Box>
               <Box>
-                <Text fontSize="14px" mb={1}>
-                  Next rotation:
+                <Text fontSize="14px" mb={1} fontWeight="500">
+                  {t('apiCredentials.labels.nextRotation')}
                 </Text>
                 <Text fontSize="14px">{formatDate(credential.nextRotation)}</Text>
               </Box>
               <Box>
-                <Text fontSize="14px" mb={1}>
-                  State/UT Status:
+                <Text fontSize="14px" mb={1} fontWeight="500">
+                  {t('apiCredentials.labels.stateUtStatus')}
                 </Text>
                 {getStatusBadge(credential.status)}
               </Box>
-            </Grid>
+            </SimpleGrid>
 
             {/* Action Buttons */}
-            <Flex gap={3}>
+            <Flex gap={3} flexDirection={{ base: 'column', sm: 'row' }}>
               <Button
                 variant="secondary"
                 size="md"
                 flex={1}
                 isLoading={generatingKeyFor === credential.id}
                 onClick={() => handleGenerateKey(credential.id)}
+                aria-label={`${t('apiCredentials.buttons.generateKey')} ${credential.stateUtName}`}
               >
-                Generate Key
+                {t('apiCredentials.buttons.generateKey')}
               </Button>
               <Button
                 variant="primary"
@@ -283,13 +324,14 @@ export function ApiCredentialsPage() {
                 flex={1}
                 isLoading={sendingKeyFor === credential.id}
                 onClick={() => handleSendKey(credential.id)}
+                aria-label={`${t('apiCredentials.buttons.sendKey')} ${credential.stateUtName}`}
               >
-                Send Key
+                {t('apiCredentials.buttons.sendKey')}
               </Button>
             </Flex>
           </Box>
         ))}
-      </Grid>
+      </SimpleGrid>
 
       {/* Empty State */}
       {filteredCredentials.length === 0 && (
@@ -301,8 +343,9 @@ export function ApiCredentialsPage() {
           borderWidth="0.5px"
           borderColor="neutral.200"
           borderRadius="12px"
+          role="status"
         >
-          <Text color="neutral.600">No credentials found matching your filters</Text>
+          <Text color="neutral.600">{t('apiCredentials.messages.noCredentialsFound')}</Text>
         </Flex>
       )}
     </Box>

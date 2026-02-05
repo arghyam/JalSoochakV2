@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Box, Text, Flex, Grid, IconButton } from '@chakra-ui/react'
+import { Box, Heading, Text, Flex, SimpleGrid, IconButton } from '@chakra-ui/react'
+import { useTranslation } from 'react-i18next'
 import { EditIcon } from '@chakra-ui/icons'
 import { Toggle, ToastContainer } from '@/shared/components/common'
 import { useToast } from '@/shared/hooks/use-toast'
@@ -9,6 +10,7 @@ import type { StateUT } from '../../types/states-uts'
 import { ROUTES } from '@/shared/constants/routes'
 
 export function ViewStateUTPage() {
+  const { t } = useTranslation(['super-admin', 'common'])
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
   const toast = useToast()
@@ -16,6 +18,10 @@ export function ViewStateUTPage() {
   const [state, setState] = useState<StateUT | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false)
+
+  useEffect(() => {
+    document.title = `${t('statesUts.viewTitle')} | JalSoochak`
+  }, [t])
 
   const fetchState = useCallback(async (stateId: string) => {
     setIsLoading(true)
@@ -49,15 +55,17 @@ export function ViewStateUTPage() {
       if (updated) {
         setState(updated)
         toast.addToast(
-          `State/UT ${newStatus === 'active' ? 'activated' : 'deactivated'} successfully`,
+          newStatus === 'active'
+            ? t('statesUts.messages.activatedSuccess')
+            : t('statesUts.messages.deactivatedSuccess'),
           'success'
         )
       } else {
-        toast.addToast('State/UT not found', 'error')
+        toast.addToast(t('statesUts.messages.notFound'), 'error')
       }
     } catch (error) {
       console.error('Failed to update status:', error)
-      toast.addToast('Failed to update status', 'error')
+      toast.addToast(t('statesUts.messages.failedToUpdateStatus'), 'error')
     } finally {
       setIsUpdatingStatus(false)
     }
@@ -72,10 +80,12 @@ export function ViewStateUTPage() {
   if (isLoading) {
     return (
       <Box w="full">
-        <Text textStyle="h5">Manage State/UTs</Text>
-        <Text color="neutral.600" mt={4}>
-          Loading...
-        </Text>
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={5}>
+          {t('statesUts.title')}
+        </Heading>
+        <Flex role="status" aria-live="polite" align="center" justify="center" minH="200px">
+          <Text color="neutral.600">{t('common:loading')}</Text>
+        </Flex>
       </Box>
     )
   }
@@ -83,9 +93,11 @@ export function ViewStateUTPage() {
   if (!state) {
     return (
       <Box w="full">
-        <Text textStyle="h5">Manage State/UTs</Text>
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={5}>
+          {t('statesUts.title')}
+        </Heading>
         <Text color="neutral.600" mt={4}>
-          State/UT not found
+          {t('statesUts.messages.notFound')}
         </Text>
       </Box>
     )
@@ -95,24 +107,28 @@ export function ViewStateUTPage() {
     <Box w="full">
       {/* Page Header with Breadcrumb */}
       <Box mb={5}>
-        <Text textStyle="h5" mb={2}>
-          Manage State/UTs
-        </Text>
-        <Flex gap={2}>
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={2}>
+          {t('statesUts.title')}
+        </Heading>
+        <Flex as="nav" aria-label="Breadcrumb" gap={2} flexWrap="wrap">
           <Text
+            as="a"
             fontSize="14px"
+            lineHeight="21px"
             color="neutral.500"
             cursor="pointer"
             _hover={{ textDecoration: 'underline' }}
             onClick={() => navigate(ROUTES.SUPER_ADMIN_STATES_UTS)}
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && navigate(ROUTES.SUPER_ADMIN_STATES_UTS)}
           >
-            Manage States/UTs
+            {t('statesUts.breadcrumb.manage')}
           </Text>
-          <Text fontSize="14px" color="neutral.500">
+          <Text fontSize="14px" lineHeight="21px" color="neutral.500" aria-hidden="true">
             /
           </Text>
-          <Text fontSize="14px" color="#26272B">
-            View State/UT
+          <Text fontSize="14px" lineHeight="21px" color="#26272B" aria-current="page">
+            {t('statesUts.breadcrumb.view')}
           </Text>
         </Flex>
       </Box>
@@ -124,15 +140,17 @@ export function ViewStateUTPage() {
         borderColor="neutral.200"
         borderRadius="12px"
         w="full"
-        minH="calc(100vh - 180px)"
+        minH={{ base: 'auto', lg: 'calc(100vh - 180px)' }}
         py={6}
-        px={4}
+        px={{ base: 3, md: 4 }}
       >
         {/* State/UT Details Section */}
         <Flex justify="space-between" align="flex-start" mb={4}>
-          <Text textStyle="h8">State/UT Details</Text>
+          <Heading as="h2" size="h3" fontWeight="400" id="state-details-heading">
+            {t('statesUts.details.title')}
+          </Heading>
           <IconButton
-            aria-label="Edit State/UT"
+            aria-label={`${t('statesUts.aria.editStateUt')} ${state.name}`}
             icon={<EditIcon boxSize={5} />}
             variant="ghost"
             size="sm"
@@ -141,92 +159,103 @@ export function ViewStateUTPage() {
             onClick={handleEdit}
           />
         </Flex>
-        <Grid templateColumns="repeat(2, 1fr)" gap={6} mb={7}>
+        <SimpleGrid
+          columns={{ base: 1, lg: 2 }}
+          spacing={6}
+          mb={7}
+          aria-labelledby="state-details-heading"
+        >
           <Box>
-            <Text fontSize="14px" fontWeight="500" mb={1}>
-              State/UT name
+            <Text textStyle="h10" fontWeight="500" mb={1}>
+              {t('statesUts.details.name')}
             </Text>
-            <Text fontSize="14px" fontWeight="400">
+            <Text textStyle="h10" fontWeight="400">
               {state.name}
             </Text>
           </Box>
           <Box>
-            <Text fontSize="14px" fontWeight="500" mb={1}>
-              State/UT code
+            <Text textStyle="h10" mb={1}>
+              {t('statesUts.details.code')}
             </Text>
-            <Text fontSize="14px" fontWeight="400">
+            <Text textStyle="h10" fontWeight="400">
               {state.code}
             </Text>
           </Box>
-        </Grid>
+        </SimpleGrid>
 
         {/* State Admin Details Section */}
-        <Text textStyle="h8" mb={4}>
-          State Admin Details
-        </Text>
-        <Grid templateColumns="repeat(2, 1fr)" gap={6} mb={7}>
+        <Heading as="h2" size="h3" fontWeight="400" mb={4} id="admin-details-heading">
+          {t('statesUts.adminDetails.title')}
+        </Heading>
+        <SimpleGrid
+          columns={{ base: 1, lg: 2 }}
+          spacing={6}
+          mb={7}
+          aria-labelledby="admin-details-heading"
+        >
           <Box>
-            <Text fontSize="14px" fontWeight="500" mb={1}>
-              First name
+            <Text textStyle="h10" mb={1}>
+              {t('statesUts.adminDetails.firstName')}
             </Text>
-            <Text fontSize="14px" fontWeight="400">
+            <Text textStyle="h10" fontWeight="400">
               {state.admin.firstName}
             </Text>
           </Box>
           <Box>
-            <Text fontSize="14px" fontWeight="500" mb={1}>
-              Last name
+            <Text textStyle="h10" mb={1}>
+              {t('statesUts.adminDetails.lastName')}
             </Text>
-            <Text fontSize="14px" fontWeight="400">
+            <Text textStyle="h10" fontWeight="400">
               {state.admin.lastName}
             </Text>
           </Box>
           <Box>
-            <Text fontSize="14px" fontWeight="500" mb={1}>
-              Email address
+            <Text textStyle="h10" mb={1}>
+              {t('statesUts.adminDetails.email')}
             </Text>
-            <Text fontSize="14px" fontWeight="400">
+            <Text textStyle="h10" fontWeight="400">
               {state.admin.email}
             </Text>
           </Box>
           <Box>
-            <Text fontSize="14px" fontWeight="500" mb={1}>
-              Phone number
+            <Text textStyle="h10" mb={1}>
+              {t('statesUts.adminDetails.phone')}
             </Text>
-            <Text fontSize="14px" fontWeight="400">
+            <Text textStyle="h10" fontWeight="400">
               +91 {state.admin.phone.replace(/(\d{5})(\d{5})/, '$1-$2')}
             </Text>
           </Box>
           <Box>
-            <Text fontSize="14px" fontWeight="500" mb={1}>
-              Secondary email address (optional)
+            <Text textStyle="h10" mb={1}>
+              {t('statesUts.adminDetails.secondaryEmail')}
             </Text>
-            <Text fontSize="14px" fontWeight="400">
-              {state.admin.secondaryEmail || 'N/A'}
+            <Text textStyle="h10" fontWeight="400">
+              {state.admin.secondaryEmail || t('common:na')}
             </Text>
           </Box>
           <Box>
-            <Text fontSize="14px" fontWeight="500" mb={1}>
-              Contact number (optional)
+            <Text textStyle="h10" mb={1}>
+              {t('statesUts.adminDetails.contactNumber')}
             </Text>
-            <Text fontSize="14px" fontWeight="400">
-              {state.admin.contactNumber || 'N/A'}
+            <Text textStyle="h10" fontWeight="400">
+              {state.admin.contactNumber || t('common:na')}
             </Text>
           </Box>
-        </Grid>
+        </SimpleGrid>
 
         {/* Status Section */}
-        <Text textStyle="h8" mb={4}>
-          Status
-        </Text>
-        <Flex align="center" gap={2} h={6}>
-          <Text fontSize="14px" fontWeight="500">
-            Activated
+        <Heading as="h2" size="h3" fontWeight="400" mb={4} id="status-heading">
+          {t('statesUts.statusSection.title')}
+        </Heading>
+        <Flex align="center" gap={2} h={6} aria-labelledby="status-heading">
+          <Text textStyle="h10" id="activated-label">
+            {t('statesUts.statusSection.activated')}
           </Text>
           <Toggle
             isChecked={state.status === 'active'}
             onChange={handleStatusToggle}
             isDisabled={isUpdatingStatus}
+            aria-labelledby="activated-label"
           />
         </Flex>
       </Box>

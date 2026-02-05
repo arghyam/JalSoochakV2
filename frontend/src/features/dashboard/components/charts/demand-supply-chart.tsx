@@ -1,6 +1,8 @@
 import { useMemo } from 'react'
+import { useTheme } from '@chakra-ui/react'
 import * as echarts from 'echarts'
 import { EChartsWrapper } from './echarts-wrapper'
+import { getBodyText7Style } from './chart-text-style'
 import type { DemandSupplyData } from '../../types'
 
 interface DemandSupplyChartProps {
@@ -10,6 +12,9 @@ interface DemandSupplyChartProps {
 }
 
 export function DemandSupplyChart({ data, className, height = '400px' }: DemandSupplyChartProps) {
+  const theme = useTheme()
+  const bodyText7 = getBodyText7Style(theme)
+
   const option = useMemo<echarts.EChartsOption>(() => {
     const periods = data.map((d) => d.period)
     const demand = data.map((d) => d.demand)
@@ -19,19 +24,11 @@ export function DemandSupplyChart({ data, className, height = '400px' }: DemandS
       tooltip: {
         show: false,
       },
-      legend: {
-        data: ['Demand', 'Supply'],
-        bottom: 8,
-        left: 'center',
-        icon: 'rect',
-        itemWidth: 10,
-        itemHeight: 10,
-      },
       grid: {
         left: '8%',
         right: '4%',
         top: '14%',
-        bottom: '26%',
+        bottom: '5%',
         containLabel: true,
       },
       xAxis: {
@@ -43,6 +40,16 @@ export function DemandSupplyChart({ data, className, height = '400px' }: DemandS
         nameGap: 28,
         axisLabel: {
           rotate: 0,
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          color: bodyText7.color,
+        },
+        nameTextStyle: {
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          color: bodyText7.color,
         },
       },
       yAxis: {
@@ -50,6 +57,18 @@ export function DemandSupplyChart({ data, className, height = '400px' }: DemandS
         name: 'Quantity (units)',
         nameLocation: 'middle',
         nameGap: 40,
+        nameTextStyle: {
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          color: bodyText7.color,
+        },
+        axisLabel: {
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          color: bodyText7.color,
+        },
         interval: 25,
         max: 125,
       },
@@ -82,7 +101,61 @@ export function DemandSupplyChart({ data, className, height = '400px' }: DemandS
         },
       ],
     }
-  }, [data])
+  }, [data, bodyText7])
 
-  return <EChartsWrapper option={option} className={className} height={height} />
+  const containerHeight = typeof height === 'number' ? `${height}px` : height
+  const legendItems = [
+    { label: 'Demand', color: '#3291D1' },
+    { label: 'Supply', color: '#ADD3ED' },
+  ]
+
+  return (
+    <div
+      className={className}
+      style={{
+        width: '100%',
+        height: containerHeight,
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <div style={{ flex: 1, minHeight: 0 }}>
+        <EChartsWrapper option={option} height="100%" />
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '16px',
+          paddingTop: '8px',
+        }}
+      >
+        {legendItems.map((item) => (
+          <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span
+              aria-hidden="true"
+              style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '2px',
+                backgroundColor: item.color,
+                display: 'inline-block',
+              }}
+            />
+            <span
+              style={{
+                fontSize: bodyText7.fontSize,
+                lineHeight: `${bodyText7.lineHeight}px`,
+                fontWeight: 400,
+                color: bodyText7.color,
+              }}
+            >
+              {item.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 }

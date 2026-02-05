@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Box, Flex, Text, Heading, Grid, Icon, Image, Select } from '@chakra-ui/react'
+import { Box, Flex, Text, Heading, Grid, Icon, Image, Select, Avatar } from '@chakra-ui/react'
 import { useDashboardData } from '../hooks/use-dashboard-data'
 import { KPICard } from './kpi-card'
 import {
@@ -8,15 +8,25 @@ import {
   DemandSupplyChart,
   AllStatesPerformanceChart,
   SupplySubmissionRateChart,
+  PumpOperatorsChart,
   ImageSubmissionStatusChart,
+  IssueTypeBreakdownChart,
   WaterSupplyOutagesChart,
 } from './charts'
-import { AllStatesTable } from './tables'
+import {
+  AllBlocksTable,
+  AllDistrictsTable,
+  AllStatesTable,
+  PumpOperatorsPerformanceTable,
+  PhotoEvidenceComplianceTable,
+  AllGramPanchayatsTable,
+} from './tables'
 import { LoadingSpinner, SearchableSelect } from '@/shared/components/common'
 import { MdOutlineWaterDrop, MdArrowUpward, MdArrowDownward } from 'react-icons/md'
 import { AiOutlineHome, AiOutlineInfoCircle } from 'react-icons/ai'
 import waterTapIcon from '@/assets/media/water-tap_1822589 1.svg'
 import type { SearchableSelectOption } from '@/shared/components/common'
+import type { EntityPerformance } from '../types'
 import { SearchLayout, FilterLayout } from '@/shared/components/layout'
 import {
   mockFilterStates,
@@ -26,24 +36,72 @@ import {
   mockFilterVillages,
   mockFilterDuration,
   mockFilterSchemes,
+  mockDistrictPerformanceByState,
+  mockBlockPerformanceByDistrict,
+  mockGramPanchayatPerformanceByBlock,
+  mockVillagePerformanceByGramPanchayat,
 } from '../services/mock/dashboard-mock'
+
+const storageKey = 'central-dashboard-filters'
+
+type StoredFilters = {
+  selectedState?: string
+  selectedDistrict?: string
+  selectedBlock?: string
+  selectedGramPanchayat?: string
+  selectedVillage?: string
+  selectedDuration?: string
+  selectedScheme?: string
+  filterTabIndex?: number
+}
+
+const getStoredFilters = (): StoredFilters => {
+  if (typeof window === 'undefined') return {}
+  try {
+    const saved = window.localStorage.getItem(storageKey)
+    if (!saved) return {}
+    const parsed = JSON.parse(saved) as StoredFilters
+    return parsed && typeof parsed === 'object' ? parsed : {}
+  } catch {
+    try {
+      window.localStorage.removeItem(storageKey)
+    } catch {
+      // Ignore storage errors (quota/private mode)
+    }
+    return {}
+  }
+}
 
 export function CentralDashboard() {
   const navigate = useNavigate()
   const { data, isLoading, error } = useDashboardData('central')
-  const [selectedState, setSelectedState] = useState('')
-  const [selectedDistrict, setSelectedDistrict] = useState('')
-  const [selectedBlock, setSelectedBlock] = useState('')
-  const [selectedGramPanchayat, setSelectedGramPanchayat] = useState('')
-  const [selectedVillage, setSelectedVillage] = useState('')
-  const [selectedDuration, setSelectedDuration] = useState('')
-  const [selectedScheme, setSelectedScheme] = useState('')
+  const [storedFilters] = useState(() => getStoredFilters())
+  const [selectedState, setSelectedState] = useState(storedFilters.selectedState ?? '')
+  const [selectedDistrict, setSelectedDistrict] = useState(storedFilters.selectedDistrict ?? '')
+  const [selectedBlock, setSelectedBlock] = useState(storedFilters.selectedBlock ?? '')
+  const [selectedGramPanchayat, setSelectedGramPanchayat] = useState(
+    storedFilters.selectedGramPanchayat ?? ''
+  )
+  const [selectedVillage, setSelectedVillage] = useState(storedFilters.selectedVillage ?? '')
+  const [selectedDuration, setSelectedDuration] = useState(storedFilters.selectedDuration ?? '')
+  const [selectedScheme, setSelectedScheme] = useState(storedFilters.selectedScheme ?? '')
   const [performanceState, setPerformanceState] = useState('')
-  const [filterTabIndex, setFilterTabIndex] = useState(0)
+  const [filterTabIndex, setFilterTabIndex] = useState(
+    typeof storedFilters.filterTabIndex === 'number' ? storedFilters.filterTabIndex : 0
+  )
   const isStateSelected = Boolean(selectedState)
-
+  const isDistrictSelected = Boolean(selectedDistrict)
+  const isBlockSelected = Boolean(selectedBlock)
   const emptyOptions: SearchableSelectOption[] = []
   const isAdvancedEnabled = Boolean(selectedState && selectedDistrict)
+  const districtTableData =
+    mockDistrictPerformanceByState[selectedState] ?? ([] as EntityPerformance[])
+  const blockTableData =
+    mockBlockPerformanceByDistrict[selectedDistrict] ?? ([] as EntityPerformance[])
+  const gramPanchayatTableData =
+    mockGramPanchayatPerformanceByBlock[selectedBlock] ?? ([] as EntityPerformance[])
+  const villageTableData =
+    mockVillagePerformanceByGramPanchayat[selectedGramPanchayat] ?? ([] as EntityPerformance[])
   const districtOptions = selectedState ? (mockFilterDistricts[selectedState] ?? []) : emptyOptions
   const blockOptions = selectedDistrict ? (mockFilterBlocks[selectedDistrict] ?? []) : emptyOptions
   const gramPanchayatOptions = selectedBlock
@@ -52,6 +110,28 @@ export function CentralDashboard() {
   const villageOptions = selectedGramPanchayat
     ? (mockFilterVillages[selectedGramPanchayat] ?? [])
     : emptyOptions
+  const handleStateChange = (value: string) => {
+    setSelectedState(value)
+    setSelectedDistrict('')
+    setSelectedBlock('')
+    setSelectedGramPanchayat('')
+    setSelectedVillage('')
+  }
+  const handleDistrictChange = (value: string) => {
+    setSelectedDistrict(value)
+    setSelectedBlock('')
+    setSelectedGramPanchayat('')
+    setSelectedVillage('')
+  }
+  const handleBlockChange = (value: string) => {
+    setSelectedBlock(value)
+    setSelectedGramPanchayat('')
+    setSelectedVillage('')
+  }
+  const handleGramPanchayatChange = (value: string) => {
+    setSelectedGramPanchayat(value)
+    setSelectedVillage('')
+  }
   const handleClearFilters = () => {
     setSelectedState('')
     setSelectedDistrict('')
@@ -61,6 +141,33 @@ export function CentralDashboard() {
     setSelectedDuration('')
     setSelectedScheme('')
   }
+
+  useEffect(() => {
+    const payload = {
+      selectedState,
+      selectedDistrict,
+      selectedBlock,
+      selectedGramPanchayat,
+      selectedVillage,
+      selectedDuration,
+      selectedScheme,
+      filterTabIndex,
+    }
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(payload))
+    } catch {
+      // Ignore storage errors (quota/private mode)
+    }
+  }, [
+    filterTabIndex,
+    selectedBlock,
+    selectedDistrict,
+    selectedDuration,
+    selectedGramPanchayat,
+    selectedScheme,
+    selectedState,
+    selectedVillage,
+  ])
 
   const handleStateClick = (stateId: string, _stateName: string) => {
     navigate(`/states/${stateId}`)
@@ -100,6 +207,8 @@ export function CentralDashboard() {
     !data.mapData ||
     !data.demandSupply ||
     !data.imageSubmissionStatus ||
+    !data.pumpOperators ||
+    !data.photoEvidenceCompliance ||
     !data.waterSupplyOutages ||
     !data.topPerformers ||
     !data.worstPerformers ||
@@ -142,6 +251,23 @@ export function CentralDashboard() {
       trend: { direction: 'down', text: '-3% vs last month' },
     },
   ] as const
+  const villagePumpOperatorDetails = {
+    name: 'Ajay Yadav',
+    scheme: 'Rural Water Supply 001',
+    stationLocation: 'Central Pumping Station',
+    lastSubmission: '11-02-24, 1:00pm',
+    reportingRate: '85%',
+    missingSubmissionCount: '3',
+    inactiveDays: '2',
+  }
+
+  const pumpOperatorsTotal = data.pumpOperators.reduce((total, item) => total + item.value, 0)
+  const leadingPumpOperators = data.leadingPumpOperators ?? []
+  const bottomPumpOperators = data.bottomPumpOperators ?? []
+  const villagePhotoEvidenceRows = data.photoEvidenceCompliance.map((row) => ({
+    ...row,
+    name: villagePumpOperatorDetails.name,
+  }))
 
   return (
     <Box>
@@ -156,10 +282,16 @@ export function CentralDashboard() {
             <SearchableSelect
               options={mockFilterStates}
               value={selectedState}
-              onChange={setSelectedState}
+              onChange={handleStateChange}
               placeholder="States/UTs"
               required
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -170,10 +302,16 @@ export function CentralDashboard() {
             <SearchableSelect
               options={districtOptions}
               value={selectedDistrict}
-              onChange={setSelectedDistrict}
+              onChange={handleDistrictChange}
               placeholder="District"
               required
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -184,9 +322,15 @@ export function CentralDashboard() {
             <SearchableSelect
               options={blockOptions}
               value={selectedBlock}
-              onChange={setSelectedBlock}
+              onChange={handleBlockChange}
               placeholder="Block"
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -198,9 +342,15 @@ export function CentralDashboard() {
             <SearchableSelect
               options={gramPanchayatOptions}
               value={selectedGramPanchayat}
-              onChange={setSelectedGramPanchayat}
+              onChange={handleGramPanchayatChange}
               placeholder="Gram Panchayat"
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -214,7 +364,13 @@ export function CentralDashboard() {
               value={selectedVillage}
               onChange={setSelectedVillage}
               placeholder="Village"
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -228,7 +384,13 @@ export function CentralDashboard() {
               value={selectedDuration}
               onChange={setSelectedDuration}
               placeholder="Duration"
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -242,7 +404,13 @@ export function CentralDashboard() {
               value={selectedScheme}
               onChange={setSelectedScheme}
               placeholder="Scheme"
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -259,7 +427,13 @@ export function CentralDashboard() {
               value=""
               onChange={() => {}}
               placeholder="Zone"
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -273,7 +447,13 @@ export function CentralDashboard() {
               value=""
               onChange={() => {}}
               placeholder="Circle"
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -287,7 +467,13 @@ export function CentralDashboard() {
               value=""
               onChange={() => {}}
               placeholder="Division"
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -301,7 +487,13 @@ export function CentralDashboard() {
               value=""
               onChange={() => {}}
               placeholder="Subdivision"
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -315,7 +507,13 @@ export function CentralDashboard() {
               value=""
               onChange={() => {}}
               placeholder="Village"
-              width="162px"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
               height="32px"
               borderRadius="4px"
               fontSize="sm"
@@ -329,11 +527,7 @@ export function CentralDashboard() {
       </FilterLayout>
 
       {/* KPI Cards */}
-      <Grid
-        templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }}
-        gap={4}
-        mb={6}
-      >
+      <Grid templateColumns={{ base: '1fr', lg: 'repeat(3, 1fr)' }} gap={4} mb={6}>
         <KPICard
           title="Number of schemes"
           value={data.kpis.totalSchemes}
@@ -392,7 +586,7 @@ export function CentralDashboard() {
           borderRadius="12px"
           borderColor="#E4E4E7"
           pt="24px"
-          pb="24px"
+          pb="10px"
           pl="16px"
           pr="16px"
           w="full"
@@ -405,61 +599,237 @@ export function CentralDashboard() {
             height="100%"
           />
         </Box>
-        <Box
-          bg="white"
-          borderWidth="0.5px"
-          borderRadius="12px"
-          borderColor="#E4E4E7"
-          pt="24px"
-          pb="24px"
-          pl="16px"
-          pr="16px"
-          w="full"
-          h="731px"
-        >
-          <Text textStyle="bodyText3" fontWeight="400" mb={4}>
-            Core Metrics
-          </Text>
-          <Flex direction="column" gap="16px">
-            {coreMetrics.map((metric) => {
-              const isPositive = metric.trend.direction === 'up'
-              const TrendIcon = isPositive ? MdArrowUpward : MdArrowDownward
-              const trendColor = isPositive ? '#079455' : '#D92D20'
+        {selectedVillage ? (
+          <Flex direction="column" gap="28px" w="full">
+            <Box
+              bg="white"
+              borderWidth="0.5px"
+              borderRadius="12px"
+              borderColor="#E4E4E7"
+              pt="24px"
+              pb="24px"
+              pl="16px"
+              pr="16px"
+              w="full"
+              h="330px"
+            >
+              <Text textStyle="bodyText3" fontWeight="400" mb={4}>
+                Core Metrics
+              </Text>
+              <Box>
+                <Grid templateColumns="repeat(2, 1fr)" gap="12px">
+                  {coreMetrics.map((metric) => {
+                    const isPositive = metric.trend.direction === 'up'
+                    const TrendIcon = isPositive ? MdArrowUpward : MdArrowDownward
+                    const trendColor = isPositive ? '#079455' : '#D92D20'
 
-              return (
-                <Box key={metric.label} bg="#FAFAFA" borderRadius="8px" px="16px" py="24px">
-                  <Flex direction="column" align="center" gap={2} h="100%" w="full">
-                    <Flex align="center" justify="center" w="full" position="relative">
-                      <Text textStyle="bodyText4" fontWeight="400" color="neutral.600">
-                        {metric.label}
-                      </Text>
-                      <Icon
-                        as={AiOutlineInfoCircle}
-                        boxSize="16px"
-                        color="neutral.400"
-                        position="absolute"
-                        right="0"
-                      />
-                    </Flex>
-                    <Text textStyle="bodyText2" fontWeight="400" color="neutral.900">
-                      {metric.value}
-                    </Text>
-                    <Flex align="center" gap={1}>
-                      <Icon as={TrendIcon} boxSize="16px" color={trendColor} />
-                      <Text textStyle="bodyText4" fontWeight="400" color={trendColor}>
-                        {metric.trend.text}
-                      </Text>
-                    </Flex>
-                  </Flex>
-                </Box>
-              )
-            })}
+                    return (
+                      <Box
+                        key={metric.label}
+                        px="16px"
+                        py="12px"
+                        h="112px"
+                        bg="#FAFAFA"
+                        borderRadius="8px"
+                      >
+                        <Flex direction="column" align="center" gap="4px" h="100%" w="full">
+                          <Flex align="center" justify="center" w="full" position="relative">
+                            <Text textStyle="bodyText4" fontWeight="400" color="neutral.600">
+                              {metric.label}
+                            </Text>
+                            <Icon
+                              as={AiOutlineInfoCircle}
+                              boxSize="16px"
+                              color="neutral.400"
+                              position="absolute"
+                              right="0"
+                            />
+                          </Flex>
+                          <Text textStyle="bodyText2" fontWeight="400" color="neutral.950">
+                            {metric.value}
+                          </Text>
+                          <Flex align="center" gap={1}>
+                            <Icon as={TrendIcon} boxSize="16px" color={trendColor} />
+                            <Text textStyle="bodyText4" fontWeight="400" color={trendColor}>
+                              {metric.trend.text}
+                            </Text>
+                          </Flex>
+                        </Flex>
+                      </Box>
+                    )
+                  })}
+                </Grid>
+              </Box>
+            </Box>
+            <Box
+              bg="white"
+              borderWidth="0.5px"
+              borderRadius="12px"
+              borderColor="#E4E4E7"
+              pt="24px"
+              pb="24px"
+              pl="16px"
+              pr="16px"
+              w="full"
+              h="373px"
+            >
+              <Text textStyle="bodyText3" fontWeight="400" mb={4}>
+                Pump Operator Details
+              </Text>
+              <Flex align="center" gap={3} mb={6}>
+                <Avatar name={villagePumpOperatorDetails.name} boxSize="44px" />
+                <Text textStyle="bodyText4" fontSize="14px" fontWeight="500" color="neutral.950">
+                  {villagePumpOperatorDetails.name}
+                </Text>
+              </Flex>
+              <Grid templateColumns="1fr auto" columnGap="24px" rowGap="12px" alignItems="center">
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.600">
+                  Scheme name/ Scheme ID
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.950" textAlign="right">
+                  {villagePumpOperatorDetails.scheme}
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.600">
+                  Station location
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.950" textAlign="right">
+                  {villagePumpOperatorDetails.stationLocation}
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.600">
+                  Last submission
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.950" textAlign="right">
+                  {villagePumpOperatorDetails.lastSubmission}
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.600">
+                  Reporting rate
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.950" textAlign="right">
+                  {villagePumpOperatorDetails.reportingRate}
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.600">
+                  Missing submission count
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.950" textAlign="right">
+                  {villagePumpOperatorDetails.missingSubmissionCount}
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.600">
+                  Inactive days
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.950" textAlign="right">
+                  {villagePumpOperatorDetails.inactiveDays}
+                </Text>
+              </Grid>
+            </Box>
           </Flex>
-        </Box>
+        ) : (
+          <Box
+            bg="white"
+            borderWidth="0.5px"
+            borderRadius="12px"
+            borderColor="#E4E4E7"
+            pt="24px"
+            pb="24px"
+            pl="16px"
+            pr="16px"
+            w="full"
+            h="731px"
+          >
+            <Text textStyle="bodyText3" fontWeight="400" mb={4}>
+              Core Metrics
+            </Text>
+            <Flex direction="column" gap="16px">
+              {coreMetrics.map((metric) => {
+                const isPositive = metric.trend.direction === 'up'
+                const TrendIcon = isPositive ? MdArrowUpward : MdArrowDownward
+                const trendColor = isPositive ? '#079455' : '#D92D20'
+
+                return (
+                  <Box key={metric.label} bg="#FAFAFA" borderRadius="8px" px="16px" py="24px">
+                    <Flex direction="column" align="center" gap="4px" h="92px" w="full">
+                      <Flex align="center" justify="center" w="full" position="relative">
+                        <Text textStyle="bodyText4" fontWeight="400" color="neutral.600">
+                          {metric.label}
+                        </Text>
+                        <Icon
+                          as={AiOutlineInfoCircle}
+                          boxSize="16px"
+                          color="neutral.400"
+                          position="absolute"
+                          right="0"
+                        />
+                      </Flex>
+                      <Text textStyle="bodyText2" fontWeight="400" color="neutral.900">
+                        {metric.value}
+                      </Text>
+                      <Flex align="center" gap={1}>
+                        <Icon as={TrendIcon} boxSize="16px" color={trendColor} />
+                        <Text textStyle="bodyText4" fontWeight="400" color={trendColor}>
+                          {metric.trend.text}
+                        </Text>
+                      </Flex>
+                    </Flex>
+                  </Box>
+                )
+              })}
+            </Flex>
+          </Box>
+        )}
       </Grid>
 
-      {/* Submission + Outages Charts */}
-      {isStateSelected ? (
+      {selectedVillage ? (
+        <>
+          <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="526px">
+              <PhotoEvidenceComplianceTable
+                data={villagePhotoEvidenceRows}
+                showVillageColumn={false}
+              />
+            </Box>
+            <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="526px">
+              <Text textStyle="bodyText3" fontWeight="400" mb={2}>
+                Demand vs Supply
+              </Text>
+              <DemandSupplyChart data={data.demandSupply} height="418px" />
+            </Box>
+          </Grid>
+          <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+            <Box
+              bg="white"
+              borderWidth="0.5px"
+              borderRadius="12px"
+              borderColor="#E4E4E7"
+              pt="24px"
+              pb="24px"
+              pl="16px"
+              pr="16px"
+              h="523px"
+            >
+              <Text textStyle="bodyText3" fontWeight="400" mb="0px">
+                Image Submission Status
+              </Text>
+              <ImageSubmissionStatusChart data={data.imageSubmissionStatus} height="406px" />
+            </Box>
+            <Box
+              bg="white"
+              borderWidth="0.5px"
+              borderRadius="12px"
+              borderColor="#E4E4E7"
+              pt="24px"
+              pb="24px"
+              pl="16px"
+              pr="16px"
+              h="523px"
+            >
+              <Text textStyle="bodyText3" fontWeight="400" mb={2}>
+                Issue Type Breakdown
+              </Text>
+              <IssueTypeBreakdownChart data={data.waterSupplyOutages} height="400px" />
+            </Box>
+          </Grid>
+        </>
+      ) : /* Submission + Outages Charts */
+      isStateSelected ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
           <Box
             bg="white"
@@ -497,66 +867,207 @@ export function CentralDashboard() {
       ) : null}
 
       {/* Performance + Demand vs Supply Charts */}
-      <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
-        <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
-          <Flex align="center" justify="space-between">
-            <Text textStyle="bodyText3" fontWeight="400">
-              All States/UTs Performance
+      {!selectedVillage ? (
+        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
+            <Flex align="center" justify="space-between">
+              <Text textStyle="bodyText3" fontWeight="400">
+                {selectedGramPanchayat
+                  ? 'All Villages Performance'
+                  : isBlockSelected
+                    ? 'All Gram Panchayats Performance'
+                    : isDistrictSelected
+                      ? 'All Blocks Performance'
+                      : isStateSelected
+                        ? 'All Districts Performance'
+                        : 'All States/UTs Performance'}
+              </Text>
+              {!isStateSelected &&
+              !isDistrictSelected &&
+              !isBlockSelected &&
+              !selectedGramPanchayat ? (
+                <Select
+                  h="32px"
+                  maxW="120px"
+                  fontSize="14px"
+                  fontWeight="600"
+                  borderRadius="4px"
+                  borderColor="neutral.400"
+                  borderWidth="1px"
+                  bg="white"
+                  color="neutral.400"
+                  placeholder="Select"
+                  appearance="none"
+                  value={performanceState}
+                  onChange={(event) => setPerformanceState(event.target.value)}
+                  _focus={{
+                    borderColor: 'primary.500',
+                    boxShadow: 'none',
+                  }}
+                >
+                  <option value="Punjab">Punjab</option>
+                </Select>
+              ) : null}
+            </Flex>
+            <AllStatesPerformanceChart
+              data={
+                selectedGramPanchayat
+                  ? villageTableData
+                  : isBlockSelected
+                    ? gramPanchayatTableData
+                    : isDistrictSelected
+                      ? blockTableData
+                      : isStateSelected
+                        ? districtTableData
+                        : performanceState
+                          ? data.mapData
+                              .filter((state) => state.name === performanceState)
+                              .slice(0, 1)
+                          : data.mapData
+              }
+              height="416px"
+              entityLabel={
+                selectedGramPanchayat
+                  ? 'Villages'
+                  : isBlockSelected
+                    ? 'Gram Panchayats'
+                    : isDistrictSelected
+                      ? 'Blocks'
+                      : isStateSelected
+                        ? 'Districts'
+                        : 'States/UTs'
+              }
+            />
+          </Box>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
+            <Text textStyle="bodyText3" fontWeight="400" mb={2}>
+              Demand vs Supply
             </Text>
-            <Select
-              h="32px"
-              maxW="120px"
-              fontSize="14px"
-              fontWeight="600"
-              borderRadius="4px"
-              borderColor="neutral.400"
-              borderWidth="1px"
-              bg="white"
-              color="neutral.400"
-              placeholder="Select"
-              appearance="none"
-              value={performanceState}
-              onChange={(event) => setPerformanceState(event.target.value)}
-              _focus={{
-                borderColor: 'primary.500',
-                boxShadow: 'none',
-              }}
-            >
-              <option value="Punjab">Punjab</option>
-            </Select>
-          </Flex>
-          <AllStatesPerformanceChart
-            data={
-              performanceState
-                ? data.mapData.filter((state) => state.name === performanceState).slice(0, 1)
-                : data.mapData
-            }
-            height="416px"
-          />
-        </Box>
-        <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
-          <Text textStyle="bodyText3" fontWeight="400" mb={2}>
-            Demand vs Supply
-          </Text>
-          <DemandSupplyChart data={data.demandSupply} height="418px" />
-        </Box>
-      </Grid>
+            <DemandSupplyChart data={data.demandSupply} height="418px" />
+          </Box>
+        </Grid>
+      ) : null}
 
-      {/* All States + Submission Rate */}
-      <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-        <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
-          <Text textStyle="bodyText3" fontWeight="400" mb="16px">
-            All States/UTs
-          </Text>
-          <AllStatesTable data={data.mapData} />
-        </Box>
-        <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
-          <Text textStyle="bodyText3" fontWeight="400" mb={2}>
-            Supply Data Submission Rate
-          </Text>
-          <SupplySubmissionRateChart data={data.mapData} height="383px" />
-        </Box>
-      </Grid>
+      {/* All States/Districts/Pump Operators + Submission Rate */}
+      {!selectedVillage && isBlockSelected ? (
+        <>
+          <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="526px">
+              <PhotoEvidenceComplianceTable data={data.photoEvidenceCompliance} />
+            </Box>
+            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="526px">
+              <Text textStyle="bodyText3" fontWeight="400" mb={2}>
+                Supply Data Submission Rate
+              </Text>
+              <SupplySubmissionRateChart data={data.mapData} height="383px" />
+            </Box>
+          </Grid>
+          <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
+              <Text textStyle="bodyText3" fontWeight="400" mb="16px">
+                {selectedGramPanchayat ? 'All Villages' : 'All Gram Panchayats'}
+              </Text>
+              <AllGramPanchayatsTable
+                data={selectedGramPanchayat ? villageTableData : gramPanchayatTableData}
+              />
+            </Box>
+            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
+              <Flex align="center" justify="space-between" mb="40px">
+                <Text textStyle="bodyText3" fontWeight="400">
+                  Pump Operators
+                </Text>
+                <Text textStyle="bodyText3" fontWeight="400">
+                  Total: {pumpOperatorsTotal}
+                </Text>
+              </Flex>
+              <PumpOperatorsChart
+                data={data.pumpOperators}
+                height="360px"
+                note="Note: Active pump operators submit readings at least 30 days in a month."
+              />
+            </Box>
+          </Grid>
+        </>
+      ) : !selectedVillage ? (
+        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
+            {isDistrictSelected ? (
+              <>
+                <Flex align="center" justify="space-between" mb="40px">
+                  <Text textStyle="bodyText3" fontWeight="400">
+                    Pump Operators
+                  </Text>
+                  <Text textStyle="bodyText3" fontWeight="400">
+                    Total: {pumpOperatorsTotal}
+                  </Text>
+                </Flex>
+                <PumpOperatorsChart
+                  data={data.pumpOperators}
+                  height="360px"
+                  note="Note: Active pump operators submit readings at least 30 days in a month."
+                />
+              </>
+            ) : (
+              <>
+                <Text textStyle="bodyText3" fontWeight="400" mb="16px">
+                  {isStateSelected ? 'All Districts' : 'All States/UTs'}
+                </Text>
+                {isStateSelected ? (
+                  <AllDistrictsTable data={districtTableData} />
+                ) : (
+                  <AllStatesTable data={data.mapData} />
+                )}
+              </>
+            )}
+          </Box>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
+            <Text textStyle="bodyText3" fontWeight="400" mb={2}>
+              Supply Data Submission Rate
+            </Text>
+            <SupplySubmissionRateChart data={data.mapData} height="383px" />
+          </Box>
+        </Grid>
+      ) : null}
+
+      {/* Pump Operator Performance Tables */}
+      {!selectedVillage && isDistrictSelected ? (
+        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="350px">
+            <PumpOperatorsPerformanceTable
+              title="Leading Pump Operators Performance"
+              data={leadingPumpOperators}
+            />
+          </Box>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="350px">
+            <PumpOperatorsPerformanceTable
+              title="Bottom Pump Operators Performance"
+              data={bottomPumpOperators}
+            />
+          </Box>
+        </Grid>
+      ) : null}
+
+      {/* All Blocks */}
+      {!selectedVillage && isDistrictSelected && !isBlockSelected ? (
+        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="430px">
+            <Text textStyle="bodyText3" fontWeight="400" mb="16px">
+              All Blocks
+            </Text>
+            <AllBlocksTable data={blockTableData} />
+          </Box>
+          <Box
+            display={{ base: 'none', lg: 'block' }}
+            borderRadius="12px"
+            borderWidth="0.5px"
+            borderColor="transparent"
+            bg="transparent"
+            h="430px"
+          />
+        </Grid>
+      ) : null}
+
+      {/* Pump Operators now lives beside Submission Rate when district is selected */}
     </Box>
   )
 }

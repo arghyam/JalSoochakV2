@@ -11,6 +11,7 @@ interface BarLineChartProps<T extends object> {
   height?: string
   barLegendLabel?: string
   lineLegendLabel?: string
+  lineAccentColor?: string
 }
 
 export function BarLineChart<T extends object>({
@@ -23,6 +24,7 @@ export function BarLineChart<T extends object>({
   height = '400px',
   barLegendLabel,
   lineLegendLabel,
+  lineAccentColor = '#FFECCC',
 }: BarLineChartProps<T>) {
   const legendData = [barLegendLabel || String(barKey), lineLegendLabel || String(lineKey)]
 
@@ -114,7 +116,14 @@ export function BarLineChart<T extends object>({
           color: lineColor,
         },
         itemStyle: {
-          color: lineColor,
+          color: lineAccentColor,
+        },
+        legendHoverLink: true,
+
+        emphasis: {
+          itemStyle: {
+            color: lineAccentColor,
+          },
         },
         areaStyle: {
           color: {
@@ -126,11 +135,11 @@ export function BarLineChart<T extends object>({
             colorStops: [
               {
                 offset: 0,
-                color: lineColor + '40',
+                color: lineAccentColor,
               },
               {
                 offset: 1,
-                color: lineColor + '10',
+                color: lineAccentColor,
               },
             ],
           },
@@ -143,7 +152,7 @@ export function BarLineChart<T extends object>({
         data: data.map((item) => item[barKey]),
         itemStyle: {
           color: barColor,
-          borderRadius: [4, 4, 0, 0],
+          borderRadius: [12, 12, 12, 12],
         },
         barCategoryGap: '40%',
       },

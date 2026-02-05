@@ -6,6 +6,7 @@ labels:
 
 ingress:
   enabled: true
+  zuul: true
   context: "api/v2/auth(/|$)(.*)"
 # Init Containers Configs
 
@@ -54,4 +55,31 @@ env: |
     valueFrom:
       secretKeyRef:
         key: keycloak-admin-client-secret
+        name: jalsoochak
+  - name: SPRING_MAIL_USERNAME
+    valueFrom:
+      secretKeyRef:
+        key: mail-username
+        name: jalsoochak
+  - name: SPRING_MAIL_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        key: mail-password
+        name: jalsoochak
+  - name: MAIL_FROM_EMAIL
+    valueFrom:
+      secretKeyRef:
+        key: mail-id
+        name: jalsoochak
+  - name: SPRING_MAIL_PROPERTIES_MAIL_SMTP_DEBUG
+    value: "true"
+  - name: KEYCLOAK_REALM
+    valueFrom:
+      secretKeyRef:
+        key: keycloak-realm
+        name: jalsoochak
+  - name: KEYCLOAK_PUBLIC_KEY
+    valueFrom:
+      secretKeyRef:
+        key: keycloak-public-key
         name: jalsoochak

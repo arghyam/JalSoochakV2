@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Box, Text, Button, Flex, HStack } from '@chakra-ui/react'
+import { Box, Text, Button, Flex, HStack, Heading, Spinner, SimpleGrid } from '@chakra-ui/react'
 import { useTranslation } from 'react-i18next'
 import { EditIcon } from '@chakra-ui/icons'
 import {
@@ -20,6 +20,10 @@ export function LanguagePage() {
   const [primaryLanguage, setPrimaryLanguage] = useState('')
   const [secondaryLanguage, setSecondaryLanguage] = useState('')
   const toast = useToast()
+
+  useEffect(() => {
+    document.title = `${t('language.title')} | JalSoochak`
+  }, [t])
 
   useEffect(() => {
     const fetchConfig = async () => {
@@ -88,10 +92,13 @@ export function LanguagePage() {
   if (isLoading) {
     return (
       <Box w="full">
-        <Text fontSize="2xl" fontWeight="semibold" color="neutral.950" mb={6}>
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={6}>
           {t('language.title')}
-        </Text>
-        <Text color="neutral.600">{t('common:loading')}</Text>
+        </Heading>
+        <Flex align="center" role="status" aria-live="polite" aria-busy="true">
+          <Spinner size="md" color="primary.500" mr={3} />
+          <Text color="neutral.600">{t('common:loading')}</Text>
+        </Flex>
       </Box>
     )
   }
@@ -100,24 +107,37 @@ export function LanguagePage() {
     <Box w="full">
       {/* Page Header */}
       <Box mb={5}>
-        <Text textStyle="h5">{t('language.title')}</Text>
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }}>
+          {t('language.title')}
+        </Heading>
       </Box>
 
       {/* Language Configuration Card */}
       <Box
+        as="section"
+        aria-labelledby="language-config-heading"
         bg="white"
         borderWidth="0.5px"
         borderColor="neutral.100"
-        borderRadius="12px"
+        borderRadius={{ base: 'lg', md: 'xl' }}
         w="full"
-        minH="calc(100vh - 148px)"
-        py={6}
+        minH={{ base: 'auto', lg: 'calc(100vh - 148px)' }}
+        py={{ base: 4, md: 6 }}
         px={4}
       >
         <Flex direction="column" w="full" h="full" justify="space-between">
           {/* Card Header */}
           <Flex justify="space-between" align="center" mb={4}>
-            <Text textStyle="h8">{t('language.configuration')}</Text>
+            <Heading
+              as="h2"
+              id="language-config-heading"
+              size="h3"
+              textStyle="h8"
+              fontWeight="400"
+              fontSize={{ base: 'md', md: 'xl' }}
+            >
+              {t('language.configuration')}
+            </Heading>
             {config?.isConfigured && !isEditing && (
               <Button
                 variant="ghost"
@@ -131,57 +151,91 @@ export function LanguagePage() {
                 _hover={{ bg: 'primary.50', color: 'primary.500' }}
                 aria-label={t('language.aria.editConfiguration')}
               >
-                <EditIcon h={5} w={5} />
+                <EditIcon h={5} w={5} aria-hidden="true" />
               </Button>
             )}
           </Flex>
 
           {/* View Mode */}
           {!isEditing && config?.isConfigured ? (
-            <Box w="full" h="full" minH="calc(100vh - 250px)">
-              <Flex gap={6} mb={4} justify="space-between">
-                <Box w="486px" h="36px">
-                  <Text fontSize="sm" fontWeight="medium" color="neutral.700" mb={1}>
+            <Box w="full" h="full" minH={{ base: 'auto', lg: 'calc(100vh - 250px)' }}>
+              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 4, md: 6 }} mb={4}>
+                <Box>
+                  <Text
+                    fontSize={{ base: 'xs', md: 'sm' }}
+                    fontWeight="medium"
+                    color="neutral.700"
+                    mb={1}
+                  >
                     {t('language.primaryLanguage')}
                   </Text>
-                  <Text fontSize="md" color="neutral.950">
+                  <Text fontSize={{ base: 'xs', md: 'sm' }} color="neutral.950">
                     {getPrimaryLanguageLabel()}
                   </Text>
                 </Box>
-                <Box w="486px" h="36px">
-                  <Text fontSize="sm" fontWeight="medium" color="neutral.700" mb={1}>
+                <Box>
+                  <Text
+                    fontSize={{ base: 'xs', md: 'sm' }}
+                    fontWeight="medium"
+                    color="neutral.700"
+                    mb={1}
+                  >
                     {t('language.secondaryLanguage')}
                   </Text>
-                  <Text fontSize="md" color="neutral.950">
+                  <Text fontSize={{ base: 'xs', md: 'sm' }} color="neutral.950">
                     {getSecondaryLanguageLabel() || '-'}
                   </Text>
                 </Box>
-              </Flex>
+              </SimpleGrid>
             </Box>
           ) : (
             /* Edit Mode */
             <Flex
+              as="form"
+              role="form"
+              aria-label={t('language.configuration')}
               direction="column"
               w="full"
               h="full"
               justify="space-between"
-              minH="calc(100vh - 250px)"
+              minH={{ base: 'auto', lg: 'calc(100vh - 250px)' }}
+              gap={{ base: 6, lg: 0 }}
             >
-              <Flex gap={6} justify="space-between">
-                <Box w="486px">
-                  <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
-                    {t('language.primaryLanguage')}*
+              <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={6}>
+                <Box w={{ base: 'full', xl: '486px' }}>
+                  <Text
+                    as="label"
+                    id="primary-language-label"
+                    fontSize={{ base: 'xs', md: 'sm' }}
+                    fontWeight="medium"
+                    color="neutral.950"
+                    mb={1}
+                    display="block"
+                  >
+                    {t('language.primaryLanguage')}
+                    <Text as="span" color="error.500" ml={1}>
+                      *
+                    </Text>
                   </Text>
                   <SearchableSelect
                     options={AVAILABLE_LANGUAGES}
                     value={primaryLanguage}
                     onChange={setPrimaryLanguage}
                     placeholder={t('common:select')}
-                    width="486px"
+                    width="100%"
+                    ariaLabel={t('language.aria.selectPrimaryLanguage')}
                   />
                 </Box>
-                <Box w="486px">
-                  <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
+                <Box w={{ base: 'full', xl: '486px' }}>
+                  <Text
+                    as="label"
+                    id="secondary-language-label"
+                    fontSize={{ base: 'xs', md: 'sm' }}
+                    fontWeight="medium"
+                    color="neutral.950"
+                    mb={1}
+                    display="block"
+                  >
                     {t('language.secondaryLanguage')}
                   </Text>
                   <SearchableSelect
@@ -189,28 +243,32 @@ export function LanguagePage() {
                     value={secondaryLanguage}
                     onChange={setSecondaryLanguage}
                     placeholder={t('common:select')}
-                    width="486px"
+                    width="100%"
+                    ariaLabel={t('language.aria.selectSecondaryLanguage')}
                   />
                 </Box>
-              </Flex>
+              </SimpleGrid>
 
-              {/* Action Buttons*/}
-              <HStack spacing={3} justify="flex-end">
-                {config?.isConfigured && (
-                  <Button
-                    variant="secondary"
-                    size="md"
-                    width="174px"
-                    onClick={handleCancel}
-                    isDisabled={isSaving}
-                  >
-                    {t('common:button.cancel')}
-                  </Button>
-                )}
+              {/* Action Buttons */}
+              <HStack
+                spacing={3}
+                justify={{ base: 'stretch', sm: 'flex-end' }}
+                flexDirection={{ base: 'column-reverse', sm: 'row' }}
+                mt={{ base: 4, lg: 0 }}
+              >
+                <Button
+                  variant="secondary"
+                  size="md"
+                  width={{ base: 'full', sm: '174px' }}
+                  onClick={handleCancel}
+                  isDisabled={isSaving}
+                >
+                  {t('common:button.cancel')}
+                </Button>
                 <Button
                   variant="primary"
                   size="md"
-                  width="174px"
+                  width={{ base: 'full', sm: '174px' }}
                   onClick={handleSave}
                   isLoading={isSaving}
                   isDisabled={!primaryLanguage}

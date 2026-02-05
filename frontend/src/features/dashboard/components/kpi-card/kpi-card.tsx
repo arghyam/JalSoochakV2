@@ -30,7 +30,12 @@ export function KPICard({ title, value, icon }: KPICardProps) {
           </Flex>
         )}
         <Flex direction="column" gap={2}>
-          <Text textStyle="bodyText4" fontWeight="400" color="neutral.600">
+          <Text
+            textStyle="bodyText4"
+            fontWeight="400"
+            color="neutral.600"
+            fontSize={{ base: '14px', md: '16px' }}
+          >
             {title}
           </Text>
           <Flex align="baseline" gap={2}>

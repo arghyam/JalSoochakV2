@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next'
 import { MdOutlineMoving, MdOutlinePlace } from 'react-icons/md'
 import { AiOutlineEye, AiOutlineSetting, AiOutlineWarning, AiOutlineApi } from 'react-icons/ai'
 import { BiKey } from 'react-icons/bi'
+import { FiLogOut } from 'react-icons/fi'
 import { IoLanguageOutline, IoWaterOutline } from 'react-icons/io5'
 import { HiOutlineTemplate } from 'react-icons/hi'
 import { BsPerson, BsListUl } from 'react-icons/bs'
@@ -174,19 +175,24 @@ export function Sidebar({ onNavClick }: SidebarProps) {
         bg="white"
         borderRight="1px"
         borderColor="neutral.100"
+        py={10}
       >
         {/* Brand Section */}
         <Flex
-          h="80px"
+          h="84px"
           align="center"
           justify="center"
           gap={2}
           borderBottom="1px"
           borderColor="neutral.100"
           px={7}
-          pt={2}
         >
-          <Image src={jalsoochakLogo} alt={t('sidebar.logoAlt', 'JalSoochak logo')} />
+          <Image
+            src={jalsoochakLogo}
+            alt={t('sidebar.logoAlt', 'JalSoochak logo')}
+            height="84px"
+            width="168px"
+          />
         </Flex>
 
         {/* Navigation Section */}
@@ -199,7 +205,11 @@ export function Sidebar({ onNavClick }: SidebarProps) {
         >
           <Stack gap={4} px={7} py={4}>
             {visibleNavItems.map((item) => {
-              const isActive = location.pathname === item.path
+              const isActive =
+                location.pathname === item.path ||
+                (item.path !== ROUTES.SUPER_ADMIN_OVERVIEW &&
+                  item.path !== ROUTES.STATE_ADMIN_OVERVIEW &&
+                  location.pathname.startsWith(item.path + '/'))
               const ItemIcon = item.icon
 
               return (
@@ -270,8 +280,22 @@ export function Sidebar({ onNavClick }: SidebarProps) {
               </Flex>
             </Flex>
           </MenuButton>
-          <MenuList>
-            <MenuItem onClick={handleLogout}>{t('sidebar.logout')}</MenuItem>
+          <MenuList height="44px" px={7} py={0}>
+            <MenuItem
+              height="full"
+              width="167px"
+              px={3}
+              py={0}
+              gap={2}
+              borderRadius={2}
+              onClick={handleLogout}
+              _hover={{ bg: 'neutral.100' }}
+            >
+              <FiLogOut />
+              <Text fontSize="16px" fontWeight="500">
+                {t('sidebar.logout')}
+              </Text>
+            </MenuItem>
           </MenuList>
         </Menu>
       </Flex>

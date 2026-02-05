@@ -71,5 +71,18 @@
   "time": {
     "am": "am",
     "pm": "pm"
+  },
+
+  "table": {
+    "itemsPerPage": "Items per Page",
+    "previous": "Previous",
+    "next": "Next",
+    "noResults": "No results found",
+    "goToPage": "Go to page {{page}}"
+  },
+
+  "searchableSelect": {
+    "search": "Search",
+    "noResults": "No results found"
   }
 }
