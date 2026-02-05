@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Box, Flex, Text, Heading, Grid, Icon, Image, Select } from '@chakra-ui/react'
+import { Box, Flex, Text, Heading, Grid, Icon, Image, Select, Avatar } from '@chakra-ui/react'
 import { useDashboardData } from '../hooks/use-dashboard-data'
 import { KPICard } from './kpi-card'
 import {
@@ -10,6 +10,7 @@ import {
   SupplySubmissionRateChart,
   PumpOperatorsChart,
   ImageSubmissionStatusChart,
+  IssueTypeBreakdownChart,
   WaterSupplyOutagesChart,
 } from './charts'
 import {
@@ -166,7 +167,6 @@ export function CentralDashboard() {
     selectedScheme,
     selectedState,
     selectedVillage,
-    storageKey,
   ])
 
   const handleStateClick = (stateId: string, _stateName: string) => {
@@ -251,10 +251,23 @@ export function CentralDashboard() {
       trend: { direction: 'down', text: '-3% vs last month' },
     },
   ] as const
+  const villagePumpOperatorDetails = {
+    name: 'Ajay Yadav',
+    scheme: 'Rural Water Supply 001',
+    stationLocation: 'Central Pumping Station',
+    lastSubmission: '11-02-24, 1:00pm',
+    reportingRate: '85%',
+    missingSubmissionCount: '3',
+    inactiveDays: '2',
+  }
 
   const pumpOperatorsTotal = data.pumpOperators.reduce((total, item) => total + item.value, 0)
   const leadingPumpOperators = data.leadingPumpOperators ?? []
   const bottomPumpOperators = data.bottomPumpOperators ?? []
+  const villagePhotoEvidenceRows = data.photoEvidenceCompliance.map((row) => ({
+    ...row,
+    name: villagePumpOperatorDetails.name,
+  }))
 
   return (
     <Box>
@@ -586,61 +599,237 @@ export function CentralDashboard() {
             height="100%"
           />
         </Box>
-        <Box
-          bg="white"
-          borderWidth="0.5px"
-          borderRadius="12px"
-          borderColor="#E4E4E7"
-          pt="24px"
-          pb="24px"
-          pl="16px"
-          pr="16px"
-          w="full"
-          h="731px"
-        >
-          <Text textStyle="bodyText3" fontWeight="400" mb={4}>
-            Core Metrics
-          </Text>
-          <Flex direction="column" gap="16px">
-            {coreMetrics.map((metric) => {
-              const isPositive = metric.trend.direction === 'up'
-              const TrendIcon = isPositive ? MdArrowUpward : MdArrowDownward
-              const trendColor = isPositive ? '#079455' : '#D92D20'
+        {selectedVillage ? (
+          <Flex direction="column" gap="28px" w="full">
+            <Box
+              bg="white"
+              borderWidth="0.5px"
+              borderRadius="12px"
+              borderColor="#E4E4E7"
+              pt="24px"
+              pb="24px"
+              pl="16px"
+              pr="16px"
+              w="full"
+              h="330px"
+            >
+              <Text textStyle="bodyText3" fontWeight="400" mb={4}>
+                Core Metrics
+              </Text>
+              <Box>
+                <Grid templateColumns="repeat(2, 1fr)" gap="12px">
+                  {coreMetrics.map((metric) => {
+                    const isPositive = metric.trend.direction === 'up'
+                    const TrendIcon = isPositive ? MdArrowUpward : MdArrowDownward
+                    const trendColor = isPositive ? '#079455' : '#D92D20'
 
-              return (
-                <Box key={metric.label} bg="#FAFAFA" borderRadius="8px" px="16px" py="24px">
-                  <Flex direction="column" align="center" gap={2} h="100%" w="full">
-                    <Flex align="center" justify="center" w="full" position="relative">
-                      <Text textStyle="bodyText4" fontWeight="400" color="neutral.600">
-                        {metric.label}
-                      </Text>
-                      <Icon
-                        as={AiOutlineInfoCircle}
-                        boxSize="16px"
-                        color="neutral.400"
-                        position="absolute"
-                        right="0"
-                      />
-                    </Flex>
-                    <Text textStyle="bodyText2" fontWeight="400" color="neutral.900">
-                      {metric.value}
-                    </Text>
-                    <Flex align="center" gap={1}>
-                      <Icon as={TrendIcon} boxSize="16px" color={trendColor} />
-                      <Text textStyle="bodyText4" fontWeight="400" color={trendColor}>
-                        {metric.trend.text}
-                      </Text>
-                    </Flex>
-                  </Flex>
-                </Box>
-              )
-            })}
+                    return (
+                      <Box
+                        key={metric.label}
+                        px="16px"
+                        py="12px"
+                        h="112px"
+                        bg="#FAFAFA"
+                        borderRadius="8px"
+                      >
+                        <Flex direction="column" align="center" gap="4px" h="100%" w="full">
+                          <Flex align="center" justify="center" w="full" position="relative">
+                            <Text textStyle="bodyText4" fontWeight="400" color="neutral.600">
+                              {metric.label}
+                            </Text>
+                            <Icon
+                              as={AiOutlineInfoCircle}
+                              boxSize="16px"
+                              color="neutral.400"
+                              position="absolute"
+                              right="0"
+                            />
+                          </Flex>
+                          <Text textStyle="bodyText2" fontWeight="400" color="neutral.950">
+                            {metric.value}
+                          </Text>
+                          <Flex align="center" gap={1}>
+                            <Icon as={TrendIcon} boxSize="16px" color={trendColor} />
+                            <Text textStyle="bodyText4" fontWeight="400" color={trendColor}>
+                              {metric.trend.text}
+                            </Text>
+                          </Flex>
+                        </Flex>
+                      </Box>
+                    )
+                  })}
+                </Grid>
+              </Box>
+            </Box>
+            <Box
+              bg="white"
+              borderWidth="0.5px"
+              borderRadius="12px"
+              borderColor="#E4E4E7"
+              pt="24px"
+              pb="24px"
+              pl="16px"
+              pr="16px"
+              w="full"
+              h="373px"
+            >
+              <Text textStyle="bodyText3" fontWeight="400" mb={4}>
+                Pump Operator Details
+              </Text>
+              <Flex align="center" gap={3} mb={6}>
+                <Avatar name={villagePumpOperatorDetails.name} boxSize="44px" />
+                <Text textStyle="bodyText4" fontSize="14px" fontWeight="500" color="neutral.950">
+                  {villagePumpOperatorDetails.name}
+                </Text>
+              </Flex>
+              <Grid templateColumns="1fr auto" columnGap="24px" rowGap="12px" alignItems="center">
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.600">
+                  Scheme name/ Scheme ID
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.950" textAlign="right">
+                  {villagePumpOperatorDetails.scheme}
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.600">
+                  Station location
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.950" textAlign="right">
+                  {villagePumpOperatorDetails.stationLocation}
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.600">
+                  Last submission
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.950" textAlign="right">
+                  {villagePumpOperatorDetails.lastSubmission}
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.600">
+                  Reporting rate
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.950" textAlign="right">
+                  {villagePumpOperatorDetails.reportingRate}
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.600">
+                  Missing submission count
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.950" textAlign="right">
+                  {villagePumpOperatorDetails.missingSubmissionCount}
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.600">
+                  Inactive days
+                </Text>
+                <Text textStyle="bodyText4" fontWeight="400" color="neutral.950" textAlign="right">
+                  {villagePumpOperatorDetails.inactiveDays}
+                </Text>
+              </Grid>
+            </Box>
           </Flex>
-        </Box>
+        ) : (
+          <Box
+            bg="white"
+            borderWidth="0.5px"
+            borderRadius="12px"
+            borderColor="#E4E4E7"
+            pt="24px"
+            pb="24px"
+            pl="16px"
+            pr="16px"
+            w="full"
+            h="731px"
+          >
+            <Text textStyle="bodyText3" fontWeight="400" mb={4}>
+              Core Metrics
+            </Text>
+            <Flex direction="column" gap="16px">
+              {coreMetrics.map((metric) => {
+                const isPositive = metric.trend.direction === 'up'
+                const TrendIcon = isPositive ? MdArrowUpward : MdArrowDownward
+                const trendColor = isPositive ? '#079455' : '#D92D20'
+
+                return (
+                  <Box key={metric.label} bg="#FAFAFA" borderRadius="8px" px="16px" py="24px">
+                    <Flex direction="column" align="center" gap="4px" h="92px" w="full">
+                      <Flex align="center" justify="center" w="full" position="relative">
+                        <Text textStyle="bodyText4" fontWeight="400" color="neutral.600">
+                          {metric.label}
+                        </Text>
+                        <Icon
+                          as={AiOutlineInfoCircle}
+                          boxSize="16px"
+                          color="neutral.400"
+                          position="absolute"
+                          right="0"
+                        />
+                      </Flex>
+                      <Text textStyle="bodyText2" fontWeight="400" color="neutral.900">
+                        {metric.value}
+                      </Text>
+                      <Flex align="center" gap={1}>
+                        <Icon as={TrendIcon} boxSize="16px" color={trendColor} />
+                        <Text textStyle="bodyText4" fontWeight="400" color={trendColor}>
+                          {metric.trend.text}
+                        </Text>
+                      </Flex>
+                    </Flex>
+                  </Box>
+                )
+              })}
+            </Flex>
+          </Box>
+        )}
       </Grid>
 
-      {/* Submission + Outages Charts */}
-      {isStateSelected ? (
+      {selectedVillage ? (
+        <>
+          <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="526px">
+              <PhotoEvidenceComplianceTable
+                data={villagePhotoEvidenceRows}
+                showVillageColumn={false}
+              />
+            </Box>
+            <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="526px">
+              <Text textStyle="bodyText3" fontWeight="400" mb={2}>
+                Demand vs Supply
+              </Text>
+              <DemandSupplyChart data={data.demandSupply} height="418px" />
+            </Box>
+          </Grid>
+          <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+            <Box
+              bg="white"
+              borderWidth="0.5px"
+              borderRadius="12px"
+              borderColor="#E4E4E7"
+              pt="24px"
+              pb="24px"
+              pl="16px"
+              pr="16px"
+              h="523px"
+            >
+              <Text textStyle="bodyText3" fontWeight="400" mb="0px">
+                Image Submission Status
+              </Text>
+              <ImageSubmissionStatusChart data={data.imageSubmissionStatus} height="406px" />
+            </Box>
+            <Box
+              bg="white"
+              borderWidth="0.5px"
+              borderRadius="12px"
+              borderColor="#E4E4E7"
+              pt="24px"
+              pb="24px"
+              pl="16px"
+              pr="16px"
+              h="523px"
+            >
+              <Text textStyle="bodyText3" fontWeight="400" mb={2}>
+                Issue Type Breakdown
+              </Text>
+              <IssueTypeBreakdownChart data={data.waterSupplyOutages} height="400px" />
+            </Box>
+          </Grid>
+        </>
+      ) : /* Submission + Outages Charts */
+      isStateSelected ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
           <Box
             bg="white"
@@ -678,87 +867,89 @@ export function CentralDashboard() {
       ) : null}
 
       {/* Performance + Demand vs Supply Charts */}
-      <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
-        <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
-          <Flex align="center" justify="space-between">
-            <Text textStyle="bodyText3" fontWeight="400">
-              {selectedGramPanchayat
-                ? 'All Villages Performance'
-                : isBlockSelected
-                  ? 'All Gram Panchayats Performance'
-                  : isDistrictSelected
-                    ? 'All Blocks Performance'
-                    : isStateSelected
-                      ? 'All Districts Performance'
-                      : 'All States/UTs Performance'}
+      {!selectedVillage ? (
+        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
+            <Flex align="center" justify="space-between">
+              <Text textStyle="bodyText3" fontWeight="400">
+                {selectedGramPanchayat
+                  ? 'All Villages Performance'
+                  : isBlockSelected
+                    ? 'All Gram Panchayats Performance'
+                    : isDistrictSelected
+                      ? 'All Blocks Performance'
+                      : isStateSelected
+                        ? 'All Districts Performance'
+                        : 'All States/UTs Performance'}
+              </Text>
+              {!isStateSelected &&
+              !isDistrictSelected &&
+              !isBlockSelected &&
+              !selectedGramPanchayat ? (
+                <Select
+                  h="32px"
+                  maxW="120px"
+                  fontSize="14px"
+                  fontWeight="600"
+                  borderRadius="4px"
+                  borderColor="neutral.400"
+                  borderWidth="1px"
+                  bg="white"
+                  color="neutral.400"
+                  placeholder="Select"
+                  appearance="none"
+                  value={performanceState}
+                  onChange={(event) => setPerformanceState(event.target.value)}
+                  _focus={{
+                    borderColor: 'primary.500',
+                    boxShadow: 'none',
+                  }}
+                >
+                  <option value="Punjab">Punjab</option>
+                </Select>
+              ) : null}
+            </Flex>
+            <AllStatesPerformanceChart
+              data={
+                selectedGramPanchayat
+                  ? villageTableData
+                  : isBlockSelected
+                    ? gramPanchayatTableData
+                    : isDistrictSelected
+                      ? blockTableData
+                      : isStateSelected
+                        ? districtTableData
+                        : performanceState
+                          ? data.mapData
+                              .filter((state) => state.name === performanceState)
+                              .slice(0, 1)
+                          : data.mapData
+              }
+              height="416px"
+              entityLabel={
+                selectedGramPanchayat
+                  ? 'Villages'
+                  : isBlockSelected
+                    ? 'Gram Panchayats'
+                    : isDistrictSelected
+                      ? 'Blocks'
+                      : isStateSelected
+                        ? 'Districts'
+                        : 'States/UTs'
+              }
+            />
+          </Box>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
+            <Text textStyle="bodyText3" fontWeight="400" mb={2}>
+              Demand vs Supply
             </Text>
-            {!isStateSelected &&
-            !isDistrictSelected &&
-            !isBlockSelected &&
-            !selectedGramPanchayat ? (
-              <Select
-                h="32px"
-                maxW="120px"
-                fontSize="14px"
-                fontWeight="600"
-                borderRadius="4px"
-                borderColor="neutral.400"
-                borderWidth="1px"
-                bg="white"
-                color="neutral.400"
-                placeholder="Select"
-                appearance="none"
-                value={performanceState}
-                onChange={(event) => setPerformanceState(event.target.value)}
-                _focus={{
-                  borderColor: 'primary.500',
-                  boxShadow: 'none',
-                }}
-              >
-                <option value="Punjab">Punjab</option>
-              </Select>
-            ) : null}
-          </Flex>
-          <AllStatesPerformanceChart
-            data={
-              selectedGramPanchayat
-                ? villageTableData
-                : isBlockSelected
-                  ? gramPanchayatTableData
-                  : isDistrictSelected
-                    ? blockTableData
-                    : isStateSelected
-                      ? districtTableData
-                      : performanceState
-                        ? data.mapData
-                            .filter((state) => state.name === performanceState)
-                            .slice(0, 1)
-                        : data.mapData
-            }
-            height="416px"
-            entityLabel={
-              selectedGramPanchayat
-                ? 'Villages'
-                : isBlockSelected
-                  ? 'Gram Panchayats'
-                  : isDistrictSelected
-                    ? 'Blocks'
-                    : isStateSelected
-                      ? 'Districts'
-                      : 'States/UTs'
-            }
-          />
-        </Box>
-        <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
-          <Text textStyle="bodyText3" fontWeight="400" mb={2}>
-            Demand vs Supply
-          </Text>
-          <DemandSupplyChart data={data.demandSupply} height="418px" />
-        </Box>
-      </Grid>
+            <DemandSupplyChart data={data.demandSupply} height="418px" />
+          </Box>
+        </Grid>
+      ) : null}
 
       {/* All States/Districts/Pump Operators + Submission Rate */}
-      {isBlockSelected ? (
+      {!selectedVillage && isBlockSelected ? (
         <>
           <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
             <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="526px">
@@ -797,7 +988,7 @@ export function CentralDashboard() {
             </Box>
           </Grid>
         </>
-      ) : (
+      ) : !selectedVillage ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
           <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
             {isDistrictSelected ? (
@@ -836,10 +1027,10 @@ export function CentralDashboard() {
             <SupplySubmissionRateChart data={data.mapData} height="383px" />
           </Box>
         </Grid>
-      )}
+      ) : null}
 
       {/* Pump Operator Performance Tables */}
-      {isDistrictSelected ? (
+      {!selectedVillage && isDistrictSelected ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
           <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="350px">
             <PumpOperatorsPerformanceTable
@@ -857,7 +1048,7 @@ export function CentralDashboard() {
       ) : null}
 
       {/* All Blocks */}
-      {isDistrictSelected && !isBlockSelected ? (
+      {!selectedVillage && isDistrictSelected && !isBlockSelected ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
           <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="430px">
             <Text textStyle="bodyText3" fontWeight="400" mb="16px">

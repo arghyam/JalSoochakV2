@@ -28,7 +28,7 @@ export function DemandSupplyChart({ data, className, height = '400px' }: DemandS
         left: '8%',
         right: '4%',
         top: '14%',
-        bottom: '26%',
+        bottom: '5%',
         containLabel: true,
       },
       xAxis: {

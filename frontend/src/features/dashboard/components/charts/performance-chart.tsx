@@ -37,14 +37,14 @@ export function AllStatesPerformanceChart({
         left: '10%',
         right: '4%',
         top: '10%',
-        bottom: '26%',
+        bottom: '5%',
         containLabel: true,
       },
       graphic: [
         {
           type: 'text',
           left: 'center',
-          bottom: 36,
+          bottom: 5,
           style: {
             text: entityLabel,
             fill: bodyText7.color,
@@ -63,7 +63,7 @@ export function AllStatesPerformanceChart({
         axisLabel: {
           rotate: 45,
           interval: 0,
-          margin: 20,
+          margin: 15,
           fontSize: bodyText7.fontSize,
           lineHeight: bodyText7.lineHeight,
           fontWeight: 400,
