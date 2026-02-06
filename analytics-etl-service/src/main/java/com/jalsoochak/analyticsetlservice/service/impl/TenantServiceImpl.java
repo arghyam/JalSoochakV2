@@ -1,10 +1,15 @@
 package com.jalsoochak.analyticsetlservice.service.impl;
 
+import com.jalsoochak.analyticsetlservice.dto.TenantEventDTO;
 import com.jalsoochak.analyticsetlservice.dto.TenantResponseDTO;
+import com.jalsoochak.analyticsetlservice.entity.DimTenant;
 import com.jalsoochak.analyticsetlservice.mapper.TenantMapper;
 import com.jalsoochak.analyticsetlservice.repository.DimTenantRepository;
 import com.jalsoochak.analyticsetlservice.service.TenantService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +20,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class TenantServiceImpl implements TenantService {
+
+    private static final Logger log = LoggerFactory.getLogger(TenantServiceImpl.class);
 
     private final DimTenantRepository repository;
     private final TenantMapper mapper;
@@ -48,5 +55,68 @@ public class TenantServiceImpl implements TenantService {
     public Optional<TenantResponseDTO> getTenantByCode(String tenantCode) {
         return repository.findByTenantCode(tenantCode)
                 .map(mapper::toDTO);
+    }
+
+
+    // This method is used to upsert a tenant from the event data.
+    @Override
+    @Transactional 
+    public TenantResponseDTO upsertTenant(TenantEventDTO eventDTO) {
+        if (eventDTO == null || eventDTO.getTenantCode() == null) {
+            throw new IllegalArgumentException("TenantEventDTO and tenant_code must not be null");
+        }
+
+        Optional<DimTenant> existingTenant = repository.findByTenantCode(eventDTO.getTenantCode());
+
+        DimTenant tenant;
+        if (existingTenant.isPresent()) {
+            tenant = existingTenant.get();
+            mapper.updateEntity(tenant, eventDTO);
+            log.info("Updating existing tenant: {}", eventDTO.getTenantCode());
+        } else {
+            tenant = mapper.toEntity(eventDTO);
+            log.info("Creating new tenant: {}", eventDTO.getTenantCode());
+        }
+
+        DimTenant savedTenant = repository.save(tenant);
+        return mapper.toDTO(savedTenant);
+    }
+
+    // This method is used to delete a tenant by ID from the event data.
+    @Override
+    @Transactional
+    public boolean deleteTenantById(Integer tenantId) {
+        if (tenantId == null) {
+            throw new IllegalArgumentException("tenant_id must not be null");
+        }
+
+        Optional<DimTenant> existingTenant = repository.findById(tenantId);
+        if (existingTenant.isPresent()) {
+            repository.delete(existingTenant.get());
+            log.info("Deleted tenant with id: {}", tenantId);
+            return true;
+        }
+
+        log.warn("Tenant not found for deletion with id: {}", tenantId);
+        return false;
+    }
+
+    // This method is used to delete a tenant by code from the event data.
+    @Override
+    @Transactional
+    public boolean deleteTenantByCode(String tenantCode) {
+        if (tenantCode == null || tenantCode.isBlank()) {
+            throw new IllegalArgumentException("tenant_code must not be null or blank");
+        }
+
+        Optional<DimTenant> existingTenant = repository.findByTenantCode(tenantCode);
+        if (existingTenant.isPresent()) {
+            repository.delete(existingTenant.get());
+            log.info("Deleted tenant with code: {}", tenantCode);
+            return true;
+        }
+
+        log.warn("Tenant not found for deletion with code: {}", tenantCode);
+        return false;
     }
 }
