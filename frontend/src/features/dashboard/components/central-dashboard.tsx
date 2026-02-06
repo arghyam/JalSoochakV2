@@ -92,6 +92,7 @@ export function CentralDashboard() {
   const isStateSelected = Boolean(selectedState)
   const isDistrictSelected = Boolean(selectedDistrict)
   const isBlockSelected = Boolean(selectedBlock)
+  const isGramPanchayatSelected = Boolean(selectedGramPanchayat)
   const emptyOptions: SearchableSelectOption[] = []
   const isAdvancedEnabled = Boolean(selectedState && selectedDistrict)
   const districtTableData =
@@ -102,6 +103,24 @@ export function CentralDashboard() {
     mockGramPanchayatPerformanceByBlock[selectedBlock] ?? ([] as EntityPerformance[])
   const villageTableData =
     mockVillagePerformanceByGramPanchayat[selectedGramPanchayat] ?? ([] as EntityPerformance[])
+  const supplySubmissionRateData = isGramPanchayatSelected
+    ? villageTableData
+    : isBlockSelected
+      ? gramPanchayatTableData
+      : isDistrictSelected
+        ? blockTableData
+        : isStateSelected
+          ? districtTableData
+          : (data?.mapData ?? ([] as EntityPerformance[]))
+  const supplySubmissionRateLabel = isGramPanchayatSelected
+    ? 'Villages'
+    : isBlockSelected
+      ? 'Gram Panchayats'
+      : isDistrictSelected
+        ? 'Blocks'
+        : isStateSelected
+          ? 'Districts'
+          : 'States/UTs'
   const districtOptions = selectedState ? (mockFilterDistricts[selectedState] ?? []) : emptyOptions
   const blockOptions = selectedDistrict ? (mockFilterBlocks[selectedDistrict] ?? []) : emptyOptions
   const gramPanchayatOptions = selectedBlock
@@ -228,6 +247,53 @@ export function CentralDashboard() {
       </Flex>
     )
   }
+
+  const waterSupplyOutagesData = isGramPanchayatSelected
+    ? (mockVillagePerformanceByGramPanchayat[selectedGramPanchayat] ?? []).map((village, index) => {
+        if (data.waterSupplyOutages.length === 0) {
+          return {
+            district: village.name,
+            electricityFailure: 0,
+            pipelineLeak: 0,
+            pumpFailure: 0,
+            valveIssue: 0,
+            sourceDrying: 0,
+          }
+        }
+        const source = data.waterSupplyOutages[index % data.waterSupplyOutages.length]
+        return { ...source, district: village.name }
+      })
+    : isBlockSelected
+      ? (mockGramPanchayatPerformanceByBlock[selectedBlock] ?? []).map((gramPanchayat, index) => {
+          if (data.waterSupplyOutages.length === 0) {
+            return {
+              district: gramPanchayat.name,
+              electricityFailure: 0,
+              pipelineLeak: 0,
+              pumpFailure: 0,
+              valveIssue: 0,
+              sourceDrying: 0,
+            }
+          }
+          const source = data.waterSupplyOutages[index % data.waterSupplyOutages.length]
+          return { ...source, district: gramPanchayat.name }
+        })
+      : isDistrictSelected
+        ? (mockBlockPerformanceByDistrict[selectedDistrict] ?? []).map((block, index) => {
+            if (data.waterSupplyOutages.length === 0) {
+              return {
+                district: block.name,
+                electricityFailure: 0,
+                pipelineLeak: 0,
+                pumpFailure: 0,
+                valveIssue: 0,
+                sourceDrying: 0,
+              }
+            }
+            const source = data.waterSupplyOutages[index % data.waterSupplyOutages.length]
+            return { ...source, district: block.name }
+          })
+        : data.waterSupplyOutages
 
   const coreMetrics = [
     {
@@ -780,13 +846,13 @@ export function CentralDashboard() {
       {selectedVillage ? (
         <>
           <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="526px">
+            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="536px">
               <PhotoEvidenceComplianceTable
                 data={villagePhotoEvidenceRows}
                 showVillageColumn={false}
               />
             </Box>
-            <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="526px">
+            <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
               <Text textStyle="bodyText3" fontWeight="400" mb={2}>
                 Demand vs Supply
               </Text>
@@ -824,7 +890,7 @@ export function CentralDashboard() {
               <Text textStyle="bodyText3" fontWeight="400" mb={2}>
                 Issue Type Breakdown
               </Text>
-              <IssueTypeBreakdownChart data={data.waterSupplyOutages} height="400px" />
+              <IssueTypeBreakdownChart data={waterSupplyOutagesData} height="400px" />
             </Box>
           </Grid>
         </>
@@ -861,7 +927,19 @@ export function CentralDashboard() {
             <Text textStyle="bodyText3" fontWeight="400" mb={2}>
               Water Supply Outages
             </Text>
-            <WaterSupplyOutagesChart data={data.waterSupplyOutages} height="400px" />
+            <WaterSupplyOutagesChart
+              data={waterSupplyOutagesData}
+              height="400px"
+              xAxisLabel={
+                isGramPanchayatSelected
+                  ? 'Villages'
+                  : isBlockSelected
+                    ? 'Gram Panchayats'
+                    : isDistrictSelected
+                      ? 'Blocks'
+                      : 'Districts'
+              }
+            />
           </Box>
         </Grid>
       ) : null}
@@ -925,7 +1003,7 @@ export function CentralDashboard() {
                               .slice(0, 1)
                           : data.mapData
               }
-              height="416px"
+              height="440px"
               entityLabel={
                 selectedGramPanchayat
                   ? 'Villages'
@@ -959,7 +1037,11 @@ export function CentralDashboard() {
               <Text textStyle="bodyText3" fontWeight="400" mb={2}>
                 Supply Data Submission Rate
               </Text>
-              <SupplySubmissionRateChart data={data.mapData} height="383px" />
+              <SupplySubmissionRateChart
+                data={supplySubmissionRateData}
+                height="383px"
+                entityLabel={supplySubmissionRateLabel}
+              />
             </Box>
           </Grid>
           <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
@@ -1024,7 +1106,11 @@ export function CentralDashboard() {
             <Text textStyle="bodyText3" fontWeight="400" mb={2}>
               Supply Data Submission Rate
             </Text>
-            <SupplySubmissionRateChart data={data.mapData} height="383px" />
+            <SupplySubmissionRateChart
+              data={supplySubmissionRateData}
+              height="383px"
+              entityLabel={supplySubmissionRateLabel}
+            />
           </Box>
         </Grid>
       ) : null}
