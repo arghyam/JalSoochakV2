@@ -1,7 +1,6 @@
 package com.jalsoochak.dataplatform.entity;
 
 import jakarta.persistence.Column;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,7 +19,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "tenant_master")
-public class TenantMaster {
+public class TenantMaster extends AuditEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,15 +29,7 @@ public class TenantMaster {
 
     @Column(name = "tenant_name", nullable = false)
     private String tenantName;
-
-    @Column(name = "created_by")
-    private String createdBy;
-
-    @Column(name = "updated_by")
-    private String updatedBy;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
+    
 }
 
 

@@ -1,6 +1,8 @@
 package com.jalsoochak.dataplatform.entity;
 
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -17,9 +19,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Getter
 @Setter
 @Entity
@@ -27,20 +26,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "village_master")
-public class VillageMaster {
+public class VillageMaster extends AuditEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "created_by")
-    private Long createdBy;
-
-    @Column(name = "updated_by")
-    private Long updatedBy;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
 
     @Column(name = "title", length = 100)
     private String title;
@@ -61,6 +51,7 @@ public class VillageMaster {
 
     @OneToMany(mappedBy = "village", fetch = FetchType.LAZY)
     private List<SchemeMaster> schemes;
+    
 }
 
 

@@ -1,5 +1,7 @@
 package com.jalsoochak.dataplatform.entity;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -16,30 +18,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Getter
 @Setter
 @Entity
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "person")
-public class Person {
+@Table(name = "person_master")
+public class PersonMaster extends AuditEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "created_by")
-    private Long createdBy;
-
-    @Column(name = "updated_by")
-    private Long updatedBy;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
 
     @Column(name = "first_name", length = 100)
     private String firstName;
@@ -56,6 +46,9 @@ public class Person {
     @Column(name = "tenant_id", length = 50)
     private String tenantId;
 
+    @Column(name = "is_active")
+    private Boolean isActive;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "person_type_id")
     private PersonTypeMaster personType;
@@ -65,6 +58,7 @@ public class Person {
 
     @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
     private List<BfmReading> bfmReadings;
+
 }
 
 

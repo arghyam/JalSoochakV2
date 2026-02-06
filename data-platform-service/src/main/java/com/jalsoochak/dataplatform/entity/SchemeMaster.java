@@ -1,5 +1,8 @@
 package com.jalsoochak.dataplatform.entity;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -16,9 +19,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Getter
 @Setter
 @Entity
@@ -26,20 +26,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "scheme_master")
-public class SchemeMaster {
+public class SchemeMaster extends AuditEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "created_by")
-    private Long createdBy;
-
-    @Column(name = "updated_by")
-    private Long updatedBy;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
 
     @Column(name = "state_scheme_id")
     private Integer stateSchemeId;
@@ -68,6 +59,9 @@ public class SchemeMaster {
     @Column(columnDefinition = "GEOMETRY")
     private String geolocation;
 
+    @Column(name = "is_active")
+    private Boolean isActive;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "village_id")
     private VillageMaster village;
@@ -77,6 +71,7 @@ public class SchemeMaster {
 
     @OneToMany(mappedBy = "scheme", fetch = FetchType.LAZY)
     private List<BfmReading> bfmReadings;
+    
 }
 
 
