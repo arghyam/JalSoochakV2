@@ -33,6 +33,15 @@ export function AllStatesPerformanceChart({
   const thumbLeftRef = useRef(0)
   const [containerWidth, setContainerWidth] = useState(0)
 
+  const defaultItemWidth = 80
+  const minItemWidth = 56
+  const effectiveItemWidth =
+    containerWidth > 0
+      ? Math.max(minItemWidth, Math.floor(containerWidth / Math.max(data.length, 1)))
+      : defaultItemWidth
+  const itemWidth = Math.min(defaultItemWidth, effectiveItemWidth)
+  const barWidth = Math.min(34, Math.max(16, Math.floor(itemWidth * 0.45)))
+
   const option = useMemo<echarts.EChartsOption>(() => {
     const sortedData = [...data].sort((a, b) => b.quantity - a.quantity)
     const entities = sortedData.map((d) => d.name)
@@ -44,19 +53,22 @@ export function AllStatesPerformanceChart({
         show: false,
       },
       grid: {
-        left: 0,
+        left: 24,
         right: '4%',
         top: '10%',
-        bottom: '5%',
+        bottom: '2%',
         containLabel: true,
       },
       xAxis: {
         type: 'category',
+        boundaryGap: true,
         data: entities,
         axisTick: {
           show: false,
         },
         axisLabel: {
+          showMaxLabel: true,
+          showMinLabel: true,
           rotate: 45,
           interval: 0,
           margin: 15,
@@ -91,7 +103,7 @@ export function AllStatesPerformanceChart({
           name: 'Quantity',
           type: 'bar',
           data: quantity,
-          barWidth: 34,
+          barWidth,
           itemStyle: {
             color: '#3291D1',
             borderRadius: [4, 4, 0, 0],
@@ -101,7 +113,7 @@ export function AllStatesPerformanceChart({
           name: 'Regularity',
           type: 'bar',
           data: regularity,
-          barWidth: 34,
+          barWidth,
           barGap: '30%',
           itemStyle: {
             color: '#ADD3ED',
@@ -110,7 +122,7 @@ export function AllStatesPerformanceChart({
         },
       ],
     }
-  }, [data, bodyText7, entityLabel])
+  }, [data, bodyText7, entityLabel, barWidth])
 
   const axisOption = useMemo<echarts.EChartsOption>(() => {
     return {
@@ -134,7 +146,11 @@ export function AllStatesPerformanceChart({
           show: false,
         },
         axisLabel: {
-          show: false,
+          show: true,
+          rotate: 45,
+          margin: 15,
+          formatter: () => '',
+          color: 'transparent',
         },
       },
       yAxis: {
@@ -157,6 +173,7 @@ export function AllStatesPerformanceChart({
           fontWeight: 400,
           color: bodyText7.color,
         },
+        min: 0,
         max: 100,
         interval: 25,
         splitLine: {
@@ -182,9 +199,11 @@ export function AllStatesPerformanceChart({
     { label: 'Quantity', color: '#3291D1' },
     { label: 'Regularity', color: '#ADD3ED' },
   ]
-  const itemWidth = 80
-  const shouldScroll = data.length > normalizedMaxItems
-  const chartPixelWidth = shouldScroll ? Math.max(data.length * itemWidth, containerWidth + 1) : 0
+  const baseChartWidth = data.length * itemWidth
+  const chartPixelWidth =
+    containerWidth > 0 ? Math.max(baseChartWidth, containerWidth) : baseChartWidth
+  const shouldScroll =
+    data.length > normalizedMaxItems && containerWidth > 0 && baseChartWidth > containerWidth
   const chartWidth = shouldScroll ? `${chartPixelWidth}px` : '100%'
 
   const getTrackWidth = () => {
@@ -371,7 +390,7 @@ export function AllStatesPerformanceChart({
         <Box
           ref={scrollbarTrackRef}
           height="4px"
-          bg="neutral.100"
+          bg="neutral.200"
           borderRadius="999px"
           position="relative"
         >

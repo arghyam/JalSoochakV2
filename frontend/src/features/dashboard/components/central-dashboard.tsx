@@ -925,7 +925,7 @@ export function CentralDashboard() {
                               .slice(0, 1)
                           : data.mapData
               }
-              height="416px"
+              height="440px"
               entityLabel={
                 selectedGramPanchayat
                   ? 'Villages'
