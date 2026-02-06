@@ -103,6 +103,24 @@ export function CentralDashboard() {
     mockGramPanchayatPerformanceByBlock[selectedBlock] ?? ([] as EntityPerformance[])
   const villageTableData =
     mockVillagePerformanceByGramPanchayat[selectedGramPanchayat] ?? ([] as EntityPerformance[])
+  const supplySubmissionRateData = isGramPanchayatSelected
+    ? villageTableData
+    : isBlockSelected
+      ? gramPanchayatTableData
+      : isDistrictSelected
+        ? blockTableData
+        : isStateSelected
+          ? districtTableData
+          : data.mapData
+  const supplySubmissionRateLabel = isGramPanchayatSelected
+    ? 'Villages'
+    : isBlockSelected
+      ? 'Gram Panchayat'
+      : isDistrictSelected
+        ? 'Blocks'
+        : isStateSelected
+          ? 'Districts'
+          : 'States/UTs'
   const districtOptions = selectedState ? (mockFilterDistricts[selectedState] ?? []) : emptyOptions
   const blockOptions = selectedDistrict ? (mockFilterBlocks[selectedDistrict] ?? []) : emptyOptions
   const gramPanchayatOptions = selectedBlock
@@ -1019,7 +1037,11 @@ export function CentralDashboard() {
               <Text textStyle="bodyText3" fontWeight="400" mb={2}>
                 Supply Data Submission Rate
               </Text>
-              <SupplySubmissionRateChart data={data.mapData} height="383px" />
+              <SupplySubmissionRateChart
+                data={supplySubmissionRateData}
+                height="383px"
+                entityLabel={supplySubmissionRateLabel}
+              />
             </Box>
           </Grid>
           <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
@@ -1084,7 +1106,11 @@ export function CentralDashboard() {
             <Text textStyle="bodyText3" fontWeight="400" mb={2}>
               Supply Data Submission Rate
             </Text>
-            <SupplySubmissionRateChart data={data.mapData} height="383px" />
+            <SupplySubmissionRateChart
+              data={supplySubmissionRateData}
+              height="383px"
+              entityLabel={supplySubmissionRateLabel}
+            />
           </Box>
         </Grid>
       ) : null}

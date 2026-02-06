@@ -10,6 +10,7 @@ interface SupplySubmissionRateChartProps {
   className?: string
   height?: string | number
   maxItems?: number
+  entityLabel?: string
 }
 
 export function SupplySubmissionRateChart({
@@ -17,6 +18,7 @@ export function SupplySubmissionRateChart({
   className,
   height = '500px',
   maxItems = 5,
+  entityLabel = 'States/UTs',
 }: SupplySubmissionRateChartProps) {
   const theme = useTheme()
 
@@ -100,7 +102,7 @@ export function SupplySubmissionRateChart({
           left: 'center',
           bottom: 2,
           style: {
-            text: 'States/UTs',
+            text: entityLabel,
             fill: bodyText7.color,
             fontSize: bodyText7.fontSize,
             fontWeight: 400,
@@ -109,7 +111,7 @@ export function SupplySubmissionRateChart({
         },
       ],
     }
-  }, [data, maxItems, theme])
+  }, [data, entityLabel, maxItems, theme])
 
   return <EChartsWrapper option={option} className={className} height={height} />
 }
