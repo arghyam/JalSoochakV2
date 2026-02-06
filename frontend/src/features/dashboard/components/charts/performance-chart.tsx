@@ -155,16 +155,7 @@ export function AllStatesPerformanceChart({
       },
       yAxis: {
         type: 'value',
-        name: 'Quantity & Regularity',
-        nameLocation: 'middle',
-        nameGap: 40,
         position: 'right',
-        nameTextStyle: {
-          fontSize: bodyText7.fontSize,
-          lineHeight: bodyText7.lineHeight,
-          fontWeight: 400,
-          color: bodyText7.color,
-        },
         axisLabel: {
           align: 'right',
           margin: 2,

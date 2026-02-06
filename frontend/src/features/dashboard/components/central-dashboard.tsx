@@ -846,13 +846,13 @@ export function CentralDashboard() {
       {selectedVillage ? (
         <>
           <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="526px">
+            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="536px">
               <PhotoEvidenceComplianceTable
                 data={villagePhotoEvidenceRows}
                 showVillageColumn={false}
               />
             </Box>
-            <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="526px">
+            <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
               <Text textStyle="bodyText3" fontWeight="400" mb={2}>
                 Demand vs Supply
               </Text>
