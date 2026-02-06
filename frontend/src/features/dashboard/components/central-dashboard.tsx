@@ -92,6 +92,7 @@ export function CentralDashboard() {
   const isStateSelected = Boolean(selectedState)
   const isDistrictSelected = Boolean(selectedDistrict)
   const isBlockSelected = Boolean(selectedBlock)
+  const isGramPanchayatSelected = Boolean(selectedGramPanchayat)
   const emptyOptions: SearchableSelectOption[] = []
   const isAdvancedEnabled = Boolean(selectedState && selectedDistrict)
   const districtTableData =
@@ -229,11 +230,11 @@ export function CentralDashboard() {
     )
   }
 
-  const waterSupplyOutagesData = isBlockSelected
-    ? (mockGramPanchayatPerformanceByBlock[selectedBlock] ?? []).map((gramPanchayat, index) => {
+  const waterSupplyOutagesData = isGramPanchayatSelected
+    ? (mockVillagePerformanceByGramPanchayat[selectedGramPanchayat] ?? []).map((village, index) => {
         if (data.waterSupplyOutages.length === 0) {
           return {
-            district: gramPanchayat.name,
+            district: village.name,
             electricityFailure: 0,
             pipelineLeak: 0,
             pumpFailure: 0,
@@ -242,13 +243,13 @@ export function CentralDashboard() {
           }
         }
         const source = data.waterSupplyOutages[index % data.waterSupplyOutages.length]
-        return { ...source, district: gramPanchayat.name }
+        return { ...source, district: village.name }
       })
-    : isDistrictSelected
-      ? (mockBlockPerformanceByDistrict[selectedDistrict] ?? []).map((block, index) => {
+    : isBlockSelected
+      ? (mockGramPanchayatPerformanceByBlock[selectedBlock] ?? []).map((gramPanchayat, index) => {
           if (data.waterSupplyOutages.length === 0) {
             return {
-              district: block.name,
+              district: gramPanchayat.name,
               electricityFailure: 0,
               pipelineLeak: 0,
               pumpFailure: 0,
@@ -257,9 +258,24 @@ export function CentralDashboard() {
             }
           }
           const source = data.waterSupplyOutages[index % data.waterSupplyOutages.length]
-          return { ...source, district: block.name }
+          return { ...source, district: gramPanchayat.name }
         })
-      : data.waterSupplyOutages
+      : isDistrictSelected
+        ? (mockBlockPerformanceByDistrict[selectedDistrict] ?? []).map((block, index) => {
+            if (data.waterSupplyOutages.length === 0) {
+              return {
+                district: block.name,
+                electricityFailure: 0,
+                pipelineLeak: 0,
+                pumpFailure: 0,
+                valveIssue: 0,
+                sourceDrying: 0,
+              }
+            }
+            const source = data.waterSupplyOutages[index % data.waterSupplyOutages.length]
+            return { ...source, district: block.name }
+          })
+        : data.waterSupplyOutages
 
   const coreMetrics = [
     {
@@ -897,7 +913,13 @@ export function CentralDashboard() {
               data={waterSupplyOutagesData}
               height="400px"
               xAxisLabel={
-                isBlockSelected ? 'Gram Panchayats' : isDistrictSelected ? 'Blocks' : 'Districts'
+                isGramPanchayatSelected
+                  ? 'Villages'
+                  : isBlockSelected
+                    ? 'Gram Panchayats'
+                    : isDistrictSelected
+                      ? 'Blocks'
+                      : 'Districts'
               }
             />
           </Box>
