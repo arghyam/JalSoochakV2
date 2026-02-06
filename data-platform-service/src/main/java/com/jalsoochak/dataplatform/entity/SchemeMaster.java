@@ -53,15 +53,20 @@ public class SchemeMaster {
     @Column(name = "fhtc_count")
     private Integer fhtcCount;
 
+    @Column(name = "planned_fhtc")
+    private Integer plannedFhtc;
+
     @Column(name = "house_hold_count")
     private Integer houseHoldCount;
 
+    @Column(name = "latitude", precision = 10, scale = 8)
+    private BigDecimal latitude;
+
+    @Column(name = "longitude", precision = 10, scale = 8)
+    private Double longitude;
+
     @Column(columnDefinition = "GEOMETRY")
     private String geolocation;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "scheme_type_id")
-    private SchemeTypeMaster schemeType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "village_id")

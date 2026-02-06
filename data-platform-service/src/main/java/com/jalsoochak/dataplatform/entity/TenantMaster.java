@@ -36,6 +36,9 @@ public class TenantMaster {
 
     @Column(name = "updated_by")
     private String updatedBy;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 }
 
 

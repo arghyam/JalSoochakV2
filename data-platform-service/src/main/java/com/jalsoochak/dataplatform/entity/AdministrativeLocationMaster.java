@@ -44,4 +44,7 @@ public class AdministrativeLocationMaster {
     @JoinColumn(name = "administrative_location_type_id", referencedColumnName = "id")
     private AdministrativeLocationTypeMaster administrativeLocationType;
 
+    @ManyToOne
+    @JoinColumn(name = "parent_id", referencedColumnName = "id")
+    private AdministrativeLocationMaster administrativeLocation;
 }

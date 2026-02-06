@@ -48,6 +48,9 @@ public class VillageMaster {
     @Column(name = "lgd_code")
     private Integer lgdCode;
 
+    @Column(name = "house_hold_count")
+    private Integer houseHoldCount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_administrative_location_id")
     private AdministrativeLocationMaster parentAdministrativeLocation;

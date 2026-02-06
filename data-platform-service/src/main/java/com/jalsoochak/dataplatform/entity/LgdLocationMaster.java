@@ -47,6 +47,10 @@ public class LgdLocationMaster {
     @ManyToOne
     @JoinColumn(name = "lgd_location_type_id", referencedColumnName = "id")
     private LgdLocationTypeMaster lgdLocationType;
+
+    @ManyToOne
+    @JoinColumn(name = "parent_id", referencedColumnName = "id")
+    private LgdLocationMaster lgdLocation;
 }
 
 

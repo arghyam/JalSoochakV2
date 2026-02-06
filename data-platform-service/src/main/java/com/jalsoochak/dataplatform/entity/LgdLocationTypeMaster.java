@@ -42,6 +42,10 @@ public class LgdLocationTypeMaster {
 
     @Column(name = "title", length = 100)
     private String title;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id", referencedColumnName = "id")
+    private LgdLocationTypeMaster lgdLocationType;
 }
 
 
