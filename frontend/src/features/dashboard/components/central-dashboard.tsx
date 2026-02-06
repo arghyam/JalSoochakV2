@@ -229,6 +229,23 @@ export function CentralDashboard() {
     )
   }
 
+  const waterSupplyOutagesData = isDistrictSelected
+    ? (mockBlockPerformanceByDistrict[selectedDistrict] ?? []).map((block, index) => {
+        if (data.waterSupplyOutages.length === 0) {
+          return {
+            district: block.name,
+            electricityFailure: 0,
+            pipelineLeak: 0,
+            pumpFailure: 0,
+            valveIssue: 0,
+            sourceDrying: 0,
+          }
+        }
+        const source = data.waterSupplyOutages[index % data.waterSupplyOutages.length]
+        return { ...source, district: block.name }
+      })
+    : data.waterSupplyOutages
+
   const coreMetrics = [
     {
       label: 'Coverage',
@@ -824,7 +841,7 @@ export function CentralDashboard() {
               <Text textStyle="bodyText3" fontWeight="400" mb={2}>
                 Issue Type Breakdown
               </Text>
-              <IssueTypeBreakdownChart data={data.waterSupplyOutages} height="400px" />
+              <IssueTypeBreakdownChart data={waterSupplyOutagesData} height="400px" />
             </Box>
           </Grid>
         </>
@@ -861,7 +878,11 @@ export function CentralDashboard() {
             <Text textStyle="bodyText3" fontWeight="400" mb={2}>
               Water Supply Outages
             </Text>
-            <WaterSupplyOutagesChart data={data.waterSupplyOutages} height="400px" />
+            <WaterSupplyOutagesChart
+              data={waterSupplyOutagesData}
+              height="400px"
+              xAxisLabel={isDistrictSelected ? 'Blocks' : 'Districts'}
+            />
           </Box>
         </Grid>
       ) : null}
