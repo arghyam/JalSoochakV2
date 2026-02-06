@@ -122,7 +122,7 @@ export function AllStatesPerformanceChart({
         },
       ],
     }
-  }, [data, bodyText7, entityLabel, barWidth])
+  }, [data, bodyText7, barWidth])
 
   const axisOption = useMemo<echarts.EChartsOption>(() => {
     return {
@@ -304,7 +304,7 @@ export function AllStatesPerformanceChart({
         flexDirection: 'column',
       }}
     >
-      <Box flex={1} minH={0} overflow="hidden" display="flex">
+      <Box flex={1} minH={0} overflow="visible" display="flex">
         <Box width="72px" flexShrink={0} position="relative">
           <EChartsWrapper option={axisOption} height="100%" />
           <Box

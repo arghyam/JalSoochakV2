@@ -111,11 +111,11 @@ export function CentralDashboard() {
         ? blockTableData
         : isStateSelected
           ? districtTableData
-          : data.mapData
+          : (data?.mapData ?? ([] as EntityPerformance[]))
   const supplySubmissionRateLabel = isGramPanchayatSelected
     ? 'Villages'
     : isBlockSelected
-      ? 'Gram Panchayat'
+      ? 'Gram Panchayats'
       : isDistrictSelected
         ? 'Blocks'
         : isStateSelected

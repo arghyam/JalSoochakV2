@@ -165,7 +165,7 @@ export function WaterSupplyOutagesChart({
         },
       ],
     }
-  }, [data, bodyText7, xAxisLabel, barWidth])
+  }, [data, bodyText7, barWidth])
 
   const axisOption = useMemo<echarts.EChartsOption>(() => {
     return {
