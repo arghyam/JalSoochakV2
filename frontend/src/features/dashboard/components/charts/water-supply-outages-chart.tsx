@@ -330,6 +330,12 @@ export function WaterSupplyOutagesChart({
     event.currentTarget.releasePointerCapture(event.pointerId)
   }
 
+  const handleThumbPointerCancel = (event: PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingThumb.current) return
+    isDraggingThumb.current = false
+    event.currentTarget.releasePointerCapture(event.pointerId)
+  }
+
   useEffect(() => {
     updateThumbFromScroll()
   }, [data.length, containerWidth, updateThumbFromScroll])
@@ -448,6 +454,7 @@ export function WaterSupplyOutagesChart({
             onPointerMove={handleThumbPointerMove}
             onPointerUp={handleThumbPointerUp}
             onPointerLeave={handleThumbPointerUp}
+            onPointerCancel={handleThumbPointerCancel}
             style={{
               position: 'absolute',
               top: 0,
