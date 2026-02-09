@@ -37,7 +37,8 @@ export const Toggle = forwardRef<ToggleProps, 'input'>((props, ref) => {
       sx={{
         '.chakra-switch__track': {
           bg: isDisabled ? 'neutral.200' : 'neutral.300',
-          width: '44px',
+          boxSizing: 'border-box',
+          width: '43px',
           height: '24px',
           padding: '2px',
           _checked: {
@@ -45,11 +46,12 @@ export const Toggle = forwardRef<ToggleProps, 'input'>((props, ref) => {
           },
         },
         '.chakra-switch__thumb': {
+          boxSizing: 'border-box',
           width: '20px',
           height: '20px',
           bg: 'white',
           _checked: {
-            transform: 'translateX(20px)',
+            transform: 'translateX(19px)',
           },
         },
       }}

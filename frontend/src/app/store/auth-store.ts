@@ -50,7 +50,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
       // Role-based redirect path
       if (user.role === AUTH_ROLES.SUPER_ADMIN) {
-        return '/admin'
+        return '/super-admin'
       } else if (user.role === AUTH_ROLES.STATE_ADMIN) {
         return '/state-admin'
       } else {

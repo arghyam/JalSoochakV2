@@ -1,62 +1,151 @@
 package com.jalsoochak.ManagementService.controllers;
 
-import com.jalsoochak.ManagementService.models.app.request.LoginRequest;
-import com.jalsoochak.ManagementService.models.app.request.RegisterRequest;
-import com.jalsoochak.ManagementService.models.app.request.TokenRequest;
-import com.jalsoochak.ManagementService.services.impl.KeycloakAdminClientService;
+import com.jalsoochak.ManagementService.models.app.request.*;
+import com.jalsoochak.ManagementService.models.app.response.InviteToken;
+import com.jalsoochak.ManagementService.models.app.response.TokenResponse;
+import com.jalsoochak.ManagementService.repositories.TenantMasterRepository;
+import com.jalsoochak.ManagementService.services.impl.PersonService;
+import com.jalsoochak.ManagementService.exceptions.BadRequestException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping({"/api/v2/auth", "/auth"})
 @RequiredArgsConstructor
+@Slf4j
+@Validated
 public class PersonController {
-    private final KeycloakAdminClientService keycloakAdminClientService;
+    private final PersonService personService;
+    private final TenantMasterRepository tenantMasterRepository;
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request,
-                                      @RequestHeader("Authorization") String authorizationHeader) {
-        if (authorizationHeader == null || !authorizationHeader.toLowerCase().startsWith("bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Missing or invalid Authorization header");
+    @PostMapping("/invite/user")
+    public ResponseEntity<InviteToken> inviteUser(
+            @Valid @RequestBody InviteRequest inviteRequest,
+            @RequestHeader("X-Tenant-ID") @NotBlank(message = "Tenant ID is required") String tenantId,
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Missing or invalid Authorization header"
+            );
         }
 
-        String token = authorizationHeader.substring(7).trim();
+        String token = authHeader.substring(7).trim();
+
         if (token.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Authorization token is empty");
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Authorization token is empty"
+            );
         }
 
-        if (!keycloakAdminClientService.isSuperAdmin(token)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Only Super Admin can register new users");
+        if (!tenantMasterRepository.existsByTenantName(tenantId)) {
+            log.warn("Invalid tenant ID provided: {}", tenantId);
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Invalid tenant ID: " + tenantId
+            );
         }
 
-        Long creatorId = keycloakAdminClientService.getPersonIdFromToken(token);
+        if (!personService.isSuperAdmin(token)) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Only super admin can invite user"
+            );
+        }
 
-        keycloakAdminClientService.createKeycloakUser(request, creatorId);
+        String inviteToken = personService.inviteUser(inviteRequest);
+        String message = "Invite sent to " + inviteRequest.getEmail();
+        return ResponseEntity.ok(new InviteToken(inviteToken, message));
+    }
+
+    @PostMapping("/complete/profile")
+    public ResponseEntity<String> completeProfile(
+            @Valid @RequestBody RegisterRequest registerRequest) {
+
+        if (!tenantMasterRepository.existsByTenantName(registerRequest.getTenantId())) {
+            log.warn("Invalid tenant ID provided: {}", registerRequest.getTenantId());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Invalid tenant id " + registerRequest.getTenantId()
+            );
+        }
+
+        personService.completeProfile(registerRequest);
+
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        return  keycloakAdminClientService.login(loginRequest);
+    public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
+        TokenResponse response = personService.login(request);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(@RequestBody TokenRequest request) {
-        return keycloakAdminClientService.refreshToken(request.getRefreshToken());
+    public ResponseEntity<TokenResponse> refresh(@RequestBody TokenRequest tokenRequest) {
+        TokenResponse response = personService.refreshToken(tokenRequest.getRefreshToken());
+        return ResponseEntity.ok(response);
     }
 
+
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestBody TokenRequest request) {
-        return keycloakAdminClientService.logout(request.getRefreshToken());
+    public ResponseEntity<String> logout(@RequestParam String refreshToken) {
+        boolean success = personService.logout(refreshToken);
+        return success ? ResponseEntity.ok("Logged out") :
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Logout failed");
+    }
+
+
+    @PostMapping("/bulk/invite")
+    public ResponseEntity<?> bulkInvite(
+            @RequestParam("file") MultipartFile file,
+            @RequestHeader("X-Tenant-ID") String tenantId,
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Missing or invalid Authorization header"));
+        }
+
+        try {
+            Map<String, Object> result = personService.bulkInviteUsers(file, tenantId);
+            return ResponseEntity.ok(result);
+
+        } catch (BadRequestException e) {
+            log.warn("BadRequestException in bulkInvite: {}", e.getMessage());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", e.getMessage());
+
+            if (e.getErrors() != null) {
+                response.put("errors", e.getErrors());
+            }
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(response);
+        } catch (Exception e) {
+            log.error("Error in bulkInvite", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "An unexpected error occurred. Please contact support."));
+        }
     }
 
 }

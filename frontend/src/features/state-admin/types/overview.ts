@@ -7,8 +7,8 @@ export interface StatsCard {
 
 export interface DemandSupplyDataPoint {
   period: string
-  demand: number
-  supply: number
+  Demand: number
+  Supply: number
 }
 
 export interface DailyIngestionDataPoint {

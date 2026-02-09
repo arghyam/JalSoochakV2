@@ -1,15 +1,20 @@
 package com.jalsoochak.water_supply_calculation_service.services;
 
+import com.jalsoochak.water_supply_calculation_service.exceptions.ApiException;
 import com.jalsoochak.water_supply_calculation_service.models.app.requests.CreateReadingRequest;
 import com.jalsoochak.water_supply_calculation_service.models.app.responses.CreateReadingResponse;
 import com.jalsoochak.water_supply_calculation_service.models.app.responses.FlowVisionResult;
 import com.jalsoochak.water_supply_calculation_service.models.entities.BfmReading;
+import com.jalsoochak.water_supply_calculation_service.models.entities.MessageTemplate;
 import com.jalsoochak.water_supply_calculation_service.models.entities.PersonMaster;
 import com.jalsoochak.water_supply_calculation_service.models.entities.SchemeMaster;
+import com.jalsoochak.water_supply_calculation_service.models.entities.StateAdminConfig;
 import com.jalsoochak.water_supply_calculation_service.repositories.BfmReadingRepository;
+import com.jalsoochak.water_supply_calculation_service.repositories.MessageTemplateRepository;
 import com.jalsoochak.water_supply_calculation_service.repositories.PersonRepository;
 import com.jalsoochak.water_supply_calculation_service.repositories.PersonSchemeRepository;
 import com.jalsoochak.water_supply_calculation_service.repositories.SchemeRepository;
+import com.jalsoochak.water_supply_calculation_service.repositories.StateAdminConfigRepository;
 import com.jalsoochak.water_supply_calculation_service.tenant.TenantContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,10 +39,12 @@ public class BfmReadingService {
     private final PersonSchemeRepository personSchemeRepository;
     private final BfmReadingRepository bfmReadingRepository;
     private final FlowVisionService flowVisionService;
+    private final StateAdminConfigRepository stateAdminConfigRepository;
+    private final MessageTemplateRepository messageTemplateRepository;
 
-    public CreateReadingResponse createReading(CreateReadingRequest request) {
+    public CreateReadingResponse createReading(CreateReadingRequest request, PersonMaster person, String contactId) {
 
-        String tenantId = TenantContext.getTenantId();
+        String tenantId = person.getTenantId();
 
         SchemeMaster scheme = schemeRepository
                 .findByIdAndTenantId(request.getSchemeId(), tenantId)
@@ -65,6 +72,7 @@ public class BfmReadingService {
         FlowVisionResult ocrResult = null;
         BigDecimal finalReading = request.getReadingValue();
         String message = "Reading created successfully";
+        BigDecimal confidenceLevel = null;
 
         if (finalReading == null) {
 
@@ -79,15 +87,16 @@ public class BfmReadingService {
                 ocrResult = flowVisionService.extractReading(request.getReadingUrl());
                 log.info("ocr result: {}", ocrResult);
                 if (ocrResult == null || ocrResult.getAdjustedReading() == null) {
-                    message = "Image processed but meter reading could not be detected clearly";
+                    message = getLocalizedMessage(person, "OCRNoReadingMessage");
                 } else {
                     finalReading = ocrResult.getAdjustedReading();
+                    confidenceLevel = ocrResult.getQualityConfidence();
                 }
 
             } catch (Exception ex) {
                 log.error("FlowVision OCR failed for URL: {}", request.getReadingUrl(), ex);
 
-                message = "Image could not be processed. Please upload a clearer image.";
+                message = getLocalizedMessage(person, "OCRFailedMessage");
 
                 return CreateReadingResponse.builder()
                         .success(false)
@@ -95,15 +104,12 @@ public class BfmReadingService {
                         .correlationId(UUID.randomUUID().toString())
                         .build();
             }
+
         }
 
-        if (finalReading == null) {
-            return CreateReadingResponse.builder()
-                    .success(false)
-                    .message("Meter reading could not be determined. Please retry.")
-                    .correlationId(UUID.randomUUID().toString())
-                    .build();
-        }
+        boolean isValid = finalReading != null
+                && finalReading.compareTo(BigDecimal.ZERO) > 0
+                && (confidenceLevel == null || confidenceLevel.compareTo(BigDecimal.valueOf(0.7)) >= 0);
 
         BfmReading reading = BfmReading.builder()
                 .scheme(scheme)
@@ -117,6 +123,7 @@ public class BfmReadingService {
                                 ? request.getReadingValue()
                                 : finalReading
                 )
+                .qualityConfidence(confidenceLevel)
                 .readingDateTime(
                         Optional.ofNullable(request.getReadingTime())
                                 .orElse(LocalDateTime.now())
@@ -131,22 +138,91 @@ public class BfmReadingService {
 
         bfmReadingRepository.save(reading);
 
+        BigDecimal lastConfirmedReading = bfmReadingRepository
+                .findTopByScheme_IdAndTenantIdAndIdNotAndConfirmedReadingGreaterThanAndQualityConfidenceGreaterThanEqualOrderByReadingDateTimeDesc(
+                        scheme.getId(),
+                        tenantId,
+                        reading.getId(),
+                        BigDecimal.ZERO,
+                        0.7
+                )
+                .map(BfmReading::getConfirmedReading)
+                .orElse(null);
+
+        String finalMessage;
+        if(isValid){
+            finalMessage = getReadingResultMessage(contactId,  finalReading, lastConfirmedReading);
+        } else if (finalReading == null || finalReading.compareTo(BigDecimal.ZERO) <= 0){
+            finalMessage = getLocalizedMessage(person, "InvalidReadingMessage");
+        } else {
+            finalMessage = getLocalizedMessage(person, "LowConfidenceMessage");
+        }
         return CreateReadingResponse.builder()
-                .success(true)
-                .message(message)
+                .success(isValid)
+                .message(finalMessage)
                 .correlationId(reading.getCorrelationId())
                 .meterReading(finalReading)
+                .qualityConfidence(confidenceLevel)
                 .qualityStatus(ocrResult != null ? ocrResult.getQualityStatus() : null)
-                .qualityConfidence(ocrResult != null ? ocrResult.getQualityConfidence() : null)
-                .lastConfirmedReading(
-                        bfmReadingRepository
-                                .findTopByScheme_IdAndTenantIdOrderByReadingDateTimeDesc(
-                                        scheme.getId(), tenantId
-                                )
-                                .map(BfmReading::getConfirmedReading)
-                                .orElse(null)
-                )
+                .lastConfirmedReading(lastConfirmedReading)
                 .build();
+    }
+
+    private String getLocalizedMessage(PersonMaster person, String flowName) {
+
+        StateAdminConfig config = stateAdminConfigRepository
+                .findByPhoneNumber(person.getPhoneNumber())
+                .orElseThrow(() -> new ApiException(
+                        "config not found for user with phone number: " + person.getPhoneNumber(),
+                        HttpStatus.NOT_FOUND
+                ));
+
+        MessageTemplate template = messageTemplateRepository
+                .findByFlowNameAndLanguageCode(flowName, config.getLanguageCode())
+                .orElseThrow(() -> new ApiException(
+                        "Message template not found for flow " + flowName +
+                                " and language " + config.getLanguageCode(),
+                        HttpStatus.NOT_FOUND
+                ));
+
+        return formatTemplates(template.getTemplateText());
+    }
+
+    private String formatTemplates(String templateText) {
+        if (templateText == null || templateText.isBlank()) {
+            return "";
+        }
+        return templateText
+                .trim()
+                .replace("\\n", "\n")
+                .replaceAll("\n{3,}", "\n\n");
+    }
+
+
+    private String getReadingResultMessage(
+            String contactId,
+            BigDecimal currentReading,
+            BigDecimal lastConfirmedReading
+    ) {
+        StateAdminConfig config = stateAdminConfigRepository.findByPhoneNumber(contactId)
+                .orElseThrow(() -> new ApiException( "config not found for user with phone number: " + contactId,
+                        HttpStatus.NOT_FOUND));
+
+        MessageTemplate template = messageTemplateRepository
+                .findByFlowNameAndLanguageCode(
+                        "ReadingResultMessage",
+                        config.getLanguageCode()
+                )
+                .orElseThrow(() -> new ApiException(
+                        "Reading result message template not found",
+                        HttpStatus.NOT_FOUND
+                ));
+
+        return formatTemplate(
+                template.getTemplateText(),
+                currentReading,
+                lastConfirmedReading
+        );
     }
 
     @Transactional
@@ -191,4 +267,15 @@ public class BfmReadingService {
                 .build();
     }
 
+    private String formatTemplate(
+            String template,
+            BigDecimal currentReading,
+            BigDecimal lastReading
+    ) {
+        return template
+                .replace("{current_reading}",
+                        currentReading != null ? currentReading.toPlainString() : "-")
+                .replace("{last_reading}",
+                        lastReading != null ? lastReading.toPlainString() : "N/A");
+    }
 }

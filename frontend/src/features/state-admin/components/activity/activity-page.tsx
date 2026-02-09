@@ -1,12 +1,18 @@
 import { useEffect, useState } from 'react'
-import { Box, Text } from '@chakra-ui/react'
+import { Box, Text, Heading } from '@chakra-ui/react'
+import { useTranslation } from 'react-i18next'
 import { DataTable, type DataTableColumn } from '@/shared/components/common'
 import { getMockActivityData } from '../../services/mock-data'
 import type { ActivityLog } from '../../types/activity'
 
 export function ActivityPage() {
+  const { t } = useTranslation(['state-admin', 'common'])
   const [activities, setActivities] = useState<ActivityLog[]>([])
   const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    document.title = `${t('activity.title')} | JalSoochak`
+  }, [t])
 
   useEffect(() => {
     const fetchActivities = async () => {
@@ -41,7 +47,7 @@ export function ActivityPage() {
   const columns: DataTableColumn<ActivityLog>[] = [
     {
       key: 'timestamp',
-      header: 'Timestamp',
+      header: t('activity.table.timestamp'),
       sortable: true,
       render: (row) => (
         <Text textStyle="h10" fontWeight="400">
@@ -51,8 +57,8 @@ export function ActivityPage() {
     },
     {
       key: 'action',
-      header: 'Action',
-      sortable: true,
+      header: t('activity.table.action'),
+      sortable: false,
       render: (row) => (
         <Text textStyle="h10" fontWeight="400">
           {row.action}
@@ -61,8 +67,8 @@ export function ActivityPage() {
     },
     {
       key: 'status',
-      header: 'Status',
-      sortable: true,
+      header: t('activity.table.status'),
+      sortable: false,
       render: (row) => (
         <Box
           as="span"
@@ -77,7 +83,7 @@ export function ActivityPage() {
           bg={row.status === 'Success' ? 'success.50' : 'error.50'}
           color={row.status === 'Success' ? 'success.500' : 'error.500'}
         >
-          {row.status}
+          {row.status === 'Success' ? t('common:status.success') : t('common:status.failed')}
         </Box>
       ),
     },
@@ -87,17 +93,21 @@ export function ActivityPage() {
     <Box w="full">
       {/* Page Header */}
       <Box mb={5}>
-        <Text textStyle="h5">Activity</Text>
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }}>
+          {t('activity.title')}
+        </Heading>
       </Box>
 
       {/* Activity Table */}
-      <DataTable
-        columns={columns}
-        data={activities}
-        getRowKey={(row) => row.id}
-        emptyMessage="No activities found"
-        isLoading={isLoading}
-      />
+      <Box as="section" aria-label={t('activity.aria.tableSection')}>
+        <DataTable
+          columns={columns}
+          data={activities}
+          getRowKey={(row) => row.id}
+          emptyMessage={t('activity.messages.noActivitiesFound')}
+          isLoading={isLoading}
+        />
+      </Box>
     </Box>
   )
 }

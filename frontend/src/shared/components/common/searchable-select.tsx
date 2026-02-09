@@ -9,6 +9,8 @@ import {
   useOutsideClick,
   Flex,
 } from '@chakra-ui/react'
+import type { ResponsiveValue } from '@chakra-ui/react'
+import type { Property } from 'csstype'
 import { SearchIcon, ChevronDownIcon } from '@chakra-ui/icons'
 
 export interface SearchableSelectOption {
@@ -22,10 +24,19 @@ export interface SearchableSelectProps {
   onChange: (value: string) => void
   placeholder?: string
   disabled?: boolean
-  width?: string
+  width?: ResponsiveValue<Property.Width>
   fontSize?: string
   textColor?: string
   height?: string
+  borderRadius?: string
+  borderColor?: string
+  textStyle?: string
+  required?: boolean
+  isFilter?: boolean
+  id?: string
+  'aria-labelledby'?: string
+  ariaLabel?: string
+  placeholderColor?: string
 }
 
 export function SearchableSelect({
@@ -35,9 +46,18 @@ export function SearchableSelect({
   placeholder = 'Select',
   disabled = false,
   width = '486px',
-  fontSize = 'md',
+  fontSize = 'sm',
   textColor,
   height = '36px',
+  borderRadius = '6px',
+  borderColor = 'neutral.300',
+  textStyle = 'h10',
+  required = false,
+  isFilter = false,
+  id,
+  'aria-labelledby': ariaLabelledBy,
+  ariaLabel,
+  placeholderColor = 'neutral.500',
 }: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -75,16 +95,26 @@ export function SearchableSelect({
     }
   }
 
+  const displayColor = isFilter
+    ? selectedOption
+      ? 'primary.500'
+      : textColor || placeholderColor
+    : textColor || (selectedOption ? 'neutral.950' : placeholderColor)
+  const displayBorderColor = isFilter ? (selectedOption ? 'primary.500' : borderColor) : borderColor
+
   return (
     <Box position="relative" ref={containerRef} w={width}>
       {/* Select Input */}
       <Flex
         as="button"
         type="button"
+        id={id}
         role="combobox"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         aria-controls={listboxId}
+        aria-labelledby={ariaLabelledBy}
+        aria-label={ariaLabel}
         aria-disabled={disabled}
         disabled={disabled}
         w="full"
@@ -93,8 +123,8 @@ export function SearchableSelect({
         py="6px"
         bg="white"
         borderWidth="1px"
-        borderColor="neutral.300"
-        borderRadius="6px"
+        borderColor={displayBorderColor}
+        borderRadius={borderRadius}
         align="center"
         justify="space-between"
         cursor={disabled ? 'not-allowed' : 'pointer'}
@@ -110,10 +140,24 @@ export function SearchableSelect({
       >
         <Text
           fontSize={fontSize}
-          color={textColor || (selectedOption ? 'neutral.950' : 'neutral.500')}
+          color={displayColor}
+          textStyle={textStyle}
+          fontWeight={isFilter ? 'semibold' : '400'}
           noOfLines={1}
         >
-          {selectedOption ? selectedOption.label : placeholder}
+          {selectedOption ? (
+            selectedOption.label
+          ) : (
+            <>
+              {placeholder}
+              {required && (
+                <Text as="span" color="#D92D20">
+                  {' '}
+                  *
+                </Text>
+              )}
+            </>
+          )}
         </Text>
         <ChevronDownIcon
           boxSize={5}
@@ -135,7 +179,7 @@ export function SearchableSelect({
           borderColor="neutral.100"
           borderRadius="8px"
           boxShadow="0px 4px 6px -2px rgba(10, 13, 18, 0.03)"
-          w={width}
+          w="full"
           maxH="240px"
           overflow="hidden"
         >
@@ -149,7 +193,7 @@ export function SearchableSelect({
                 placeholder="Search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                borderColor="neutral.300"
+                borderColor={borderColor}
                 borderRadius="4px"
                 _hover={{ borderColor: 'neutral.400' }}
                 _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}

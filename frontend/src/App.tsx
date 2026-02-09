@@ -5,6 +5,9 @@ import { ErrorBoundary } from '@/shared/components/common/error-boundary'
 import { router } from '@/app/router'
 import { useAuthStore } from '@/app/store'
 
+// Initialize i18n
+import '@/app/i18n'
+
 function App() {
   const bootstrap = useAuthStore((state) => state.bootstrap)
 

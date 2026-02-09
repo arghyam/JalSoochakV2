@@ -1,6 +1,8 @@
 import { useMemo } from 'react'
+import { useTheme } from '@chakra-ui/react'
 import * as echarts from 'echarts'
 import { EChartsWrapper } from './echarts-wrapper'
+import { getBodyText6Style } from './chart-text-style'
 import type { EntityPerformance } from '../../types'
 
 interface IndiaMapChartProps {
@@ -20,6 +22,8 @@ export function IndiaMapChart({
   className,
   height = '600px',
 }: IndiaMapChartProps) {
+  const theme = useTheme()
+
   const option = useMemo<echarts.EChartsOption>(() => {
     // Create map data series
     const mapSeries = data.map((state) => ({
@@ -36,8 +40,8 @@ export function IndiaMapChart({
     }))
 
     return {
+      backgroundColor: '#FAFAFA',
       title: {
-        text: 'India Water Supply Performance Map',
         left: 'center',
         textStyle: {
           fontSize: 18,
@@ -75,20 +79,6 @@ export function IndiaMapChart({
           return (p as { name?: string }).name || ''
         },
       },
-      visualMap: {
-        min: 0,
-        max: 100,
-        left: 'left',
-        top: 'bottom',
-        text: ['High', 'Low'],
-        calculable: true,
-        inRange: {
-          color: ['#ef4444', '#f97316', '#22c55e'], // Red to Orange to Green
-        },
-        textStyle: {
-          color: '#333',
-        },
-      },
       series: [
         {
           name: 'State Performance',
@@ -103,12 +93,13 @@ export function IndiaMapChart({
           },
           data: mapSeries,
           itemStyle: {
+            areaColor: '#3291D1',
             borderColor: '#fff',
             borderWidth: 1,
           },
           emphasis: {
             itemStyle: {
-              areaColor: '#ffd700',
+              areaColor: '#2874A7',
               borderWidth: 2,
             },
             label: {
@@ -120,6 +111,15 @@ export function IndiaMapChart({
       ],
     }
   }, [data])
+
+  const bodyText6 = getBodyText6Style(theme)
+  const legendItems = [
+    { label: 'Good', color: '#079455' },
+    { label: 'Critical', color: '#F79009' },
+    { label: 'Needs Attention', color: '#D92D20' },
+  ]
+
+  const containerHeight = typeof height === 'number' ? `${height}px` : height
 
   const handleChartReady = (chart: echarts.ECharts) => {
     // Register click event
@@ -153,11 +153,52 @@ export function IndiaMapChart({
   }
 
   return (
-    <EChartsWrapper
-      option={option}
+    <div
       className={className}
-      height={height}
-      onChartReady={handleChartReady}
-    />
+      style={{
+        width: '100%',
+        height: containerHeight,
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <div style={{ flex: 1, minHeight: 0 }}>
+        <EChartsWrapper option={option} height="100%" onChartReady={handleChartReady} />
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '16px',
+          paddingTop: '8px',
+        }}
+      >
+        {legendItems.map((item) => (
+          <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span
+              aria-hidden="true"
+              style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '2px',
+                backgroundColor: item.color,
+                display: 'inline-block',
+              }}
+            />
+            <span
+              style={{
+                fontSize: bodyText6.fontSize,
+                lineHeight: `${bodyText6.lineHeight}px`,
+                fontWeight: bodyText6.fontWeight,
+                color: bodyText6.color,
+              }}
+            >
+              {item.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }

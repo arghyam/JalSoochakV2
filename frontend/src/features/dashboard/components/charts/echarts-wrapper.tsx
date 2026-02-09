@@ -49,6 +49,22 @@ export function EChartsWrapper({
     }
   }, [])
 
+  // Handle parent/container resize (e.g., layout changes without window resize)
+  useEffect(() => {
+    const chart = chartInstanceRef.current
+    if (!chart || !chartRef.current) return
+
+    const resizeObserver = new ResizeObserver(() => {
+      chart.resize()
+    })
+
+    resizeObserver.observe(chartRef.current)
+
+    return () => {
+      resizeObserver.disconnect()
+    }
+  }, [])
+
   // Cleanup: dispose chart on unmount only
   useEffect(() => {
     return () => {
@@ -63,7 +79,10 @@ export function EChartsWrapper({
     <div
       ref={chartRef}
       className={className}
-      style={{ height: typeof height === 'number' ? `${height}px` : height }}
+      style={{
+        width: '100%',
+        height: typeof height === 'number' ? `${height}px` : height,
+      }}
     />
   )
 }

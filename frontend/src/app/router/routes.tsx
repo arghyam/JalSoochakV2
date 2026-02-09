@@ -6,6 +6,9 @@ import {
   OverviewPage as SuperAdminOverviewPage,
   SystemRulesPage,
   StatesUTsPage,
+  AddStateUTPage,
+  ViewStateUTPage,
+  EditStateUTPage,
   ApiCredentialsPage,
   IngestionMonitorPage,
 } from '@/features/super-admin'
@@ -84,6 +87,22 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    path: ROUTES.CREATE_PASSWORD,
+    element: (
+      <RedirectIfAuthenticated>
+        <SignupFlowPage initialStep="createPassword" />
+      </RedirectIfAuthenticated>
+    ),
+  },
+  {
+    path: ROUTES.CREDENTIALS,
+    element: (
+      <RedirectIfAuthenticated>
+        <SignupFlowPage initialStep="credentials" />
+      </RedirectIfAuthenticated>
+    ),
+  },
+  {
     path: ROUTES.RESET_PASSWORD,
     element: (
       <RedirectIfAuthenticated>
@@ -111,6 +130,18 @@ export const router = createBrowserRouter([
       {
         path: ROUTES.SUPER_ADMIN_STATES_UTS,
         element: <StatesUTsPage />,
+      },
+      {
+        path: ROUTES.SUPER_ADMIN_STATES_UTS_ADD,
+        element: <AddStateUTPage />,
+      },
+      {
+        path: ROUTES.SUPER_ADMIN_STATES_UTS_VIEW,
+        element: <ViewStateUTPage />,
+      },
+      {
+        path: ROUTES.SUPER_ADMIN_STATES_UTS_EDIT,
+        element: <EditStateUTPage />,
       },
       {
         path: ROUTES.SUPER_ADMIN_API_CREDENTIALS,

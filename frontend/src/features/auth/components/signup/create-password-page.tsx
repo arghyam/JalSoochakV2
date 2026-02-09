@@ -7,6 +7,8 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  List,
+  ListItem,
   Text,
 } from '@chakra-ui/react'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
@@ -23,8 +25,13 @@ export function CreatePasswordPage({ onNext }: CreatePasswordPageProps) {
   const [rememberMe, setRememberMe] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const hasUppercase = /[A-Z]/.test(password)
+  const hasLowercase = /[a-z]/.test(password)
+  const hasNumber = /\d/.test(password)
+  const hasSpecialChar = /[^A-Za-z0-9]/.test(password)
   const hasMinLength = password.length >= 8
-  const isPasswordValid = hasMinLength
+  const isPasswordValid =
+    hasUppercase && hasLowercase && hasNumber && hasSpecialChar && hasMinLength
   const isPasswordMatch = password === confirmPassword
   const canSubmit =
     password.length > 0 && confirmPassword.length > 0 && isPasswordValid && isPasswordMatch
@@ -34,14 +41,14 @@ export function CreatePasswordPage({ onNext }: CreatePasswordPageProps) {
       <Text textStyle="h5" mb={3}>
         Create password
       </Text>
-      <Text textStyle="bodyText5" mb="3rem">
+      <Text textStyle="bodyText5" mb="20px">
         Enter a new password.
       </Text>
 
       <FormControl>
         <FormLabel textStyle="bodyText6" mb="4px" fontSize="16px">
-          Create new password{' '}
-          <Text as="span" color="red.500">
+          Create new password
+          <Text as="span" color="error.500">
             *
           </Text>
         </FormLabel>
@@ -83,8 +90,8 @@ export function CreatePasswordPage({ onNext }: CreatePasswordPageProps) {
 
       <FormControl mt="1.5rem">
         <FormLabel textStyle="bodyText6" mb="4px">
-          Rewrite password{' '}
-          <Text as="span" color="red.500">
+          Rewrite password
+          <Text as="span" color="error.500">
             *
           </Text>
         </FormLabel>
@@ -127,23 +134,26 @@ export function CreatePasswordPage({ onNext }: CreatePasswordPageProps) {
           </InputRightElement>
         </InputGroup>
         {!isPasswordMatch && confirmPassword ? (
-          <Text mt="6px" fontSize="sm" color="red.500">
+          <Text mt="6px" fontSize="sm" color="error.500">
             Passwords do not match.
           </Text>
         ) : null}
       </FormControl>
 
-      {!isPasswordValid && password ? (
-        <Text mt="10px" fontSize="sm" color="red.500">
-          Password must be at least 8 characters.
-        </Text>
+      {password.length > 0 && !isPasswordValid ? (
+        <List mt="10px" spacing="0.5px" fontSize="sm" color="error.500" pl="18px" styleType="disc">
+          <ListItem>Include at least 1 lowercase letter.</ListItem>
+          <ListItem>Include at least 1 uppercase letter.</ListItem>
+          <ListItem>Include at least 1 number.</ListItem>
+          <ListItem>Include at least 1 special character.</ListItem>
+          <ListItem>Be at least 8 characters long.</ListItem>
+        </List>
       ) : null}
 
       <Checkbox
         mt="1.25rem"
         isChecked={rememberMe}
         onChange={(e) => setRememberMe(e.target.checked)}
-        fontSize="14px"
         sx={{
           '.chakra-checkbox__control': {
             borderWidth: '1px',
@@ -166,7 +176,9 @@ export function CreatePasswordPage({ onNext }: CreatePasswordPageProps) {
           },
         }}
       >
-        Remember me
+        <Text textStyle="bodyText5" color="neutral.950" fontWeight="400">
+          Remember me
+        </Text>
       </Checkbox>
 
       <Button

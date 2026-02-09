@@ -6,7 +6,8 @@ labels:
 
 ingress:
   enabled: true
-  context: "api/v2(/|$)(.*)"
+  zuul: true
+  context: "api/v2/webhook(/|$)(.*)"
 # Init Containers Configs
 
 # Container Configs

@@ -8,6 +8,7 @@ interface AreaChartProps<T extends object> {
   color?: string
   height?: string
   legendLabel?: string
+  lineAccentColor?: string
 }
 
 export function AreaChart<T extends object>({
@@ -17,6 +18,7 @@ export function AreaChart<T extends object>({
   color = '#FFA100',
   height = '300px',
   legendLabel,
+  lineAccentColor = '#FFECCC',
 }: AreaChartProps<T>) {
   const option = {
     tooltip: {
@@ -27,12 +29,22 @@ export function AreaChart<T extends object>({
     },
     legend: legendLabel
       ? {
-          data: [legendLabel],
+          data: [
+            {
+              name: legendLabel,
+              itemStyle: {
+                color: lineAccentColor,
+              },
+            },
+          ],
           bottom: 0,
-          icon: 'square',
+          icon: 'roundRect',
+          itemWidth: 8,
+          itemHeight: 8,
           textStyle: {
             fontSize: 12,
             color: '#1C1C1C',
+            padding: [0, 0, 0, 4],
           },
         }
       : undefined,
@@ -87,11 +99,11 @@ export function AreaChart<T extends object>({
             colorStops: [
               {
                 offset: 0,
-                color: color + '80',
+                color: lineAccentColor,
               },
               {
                 offset: 1,
-                color: color + '10',
+                color: lineAccentColor,
               },
             ],
           },

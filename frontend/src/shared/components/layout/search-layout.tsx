@@ -32,6 +32,8 @@ export function SearchLayout({
       gap={4}
       border="0.5px solid"
       borderColor="neutral.200"
+      direction={{ base: 'column', sm: 'row' }}
+      alignItems={{ base: 'stretch', sm: 'center' }}
     >
       <InputGroup flex="1">
         <InputLeftElement pointerEvents="none" p="12px" w="auto" h="32px" alignItems="center">
@@ -52,7 +54,7 @@ export function SearchLayout({
         <Button
           onClick={onActionClick}
           h="32px"
-          w="160px"
+          w={{ base: 'full', sm: '160px' }}
           fontSize="14px"
           variant="primary"
           leftIcon={<FiDownload size="16" />}

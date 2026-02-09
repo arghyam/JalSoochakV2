@@ -56,6 +56,9 @@ public class BfmReading {
     @Column(name = "reading_url", length = 2048)
     private String readingUrl;
 
+    @Column(name = "quality_confidence", precision = 3, scale = 2)
+    private BigDecimal qualityConfidence;
+
     @Column(columnDefinition = "GEOMETRY")
     private String geolocation;
 

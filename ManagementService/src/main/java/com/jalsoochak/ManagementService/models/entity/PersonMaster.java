@@ -53,11 +53,19 @@ public class PersonMaster {
     @Column(name = "phone_number", unique = true)
     private String phoneNumber;
 
+    @Column(unique = true)
+    private String email;
+
+    @Column(name = "keycloak_user_id", unique = true)
+    private String keycloakUserId;
+
     @Column(name = "tenant_id", length = 50)
     private String tenantId;
 
-    @Column(name = "welcome_sent")
-    private boolean welcomeSent = false;
+    private String alternateNumber;
+
+    @Column(nullable = false)
+    private boolean profileCompleted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "person_type_id")
@@ -68,4 +76,6 @@ public class PersonMaster {
 
     @OneToMany(mappedBy = "person", fetch = FetchType.LAZY)
     private List<BfmReading> bfmReadings;
+
 }
+

@@ -23,8 +23,9 @@ export interface TokenResponse {
   expires_in: number
   refresh_expires_in: number
   token_type: string
-  person_type: string
+  user_role: string
   tenant_id: string
+  person_id: string
 }
 
 export interface RefreshRequest {
@@ -42,6 +43,7 @@ export interface AuthUser {
   role: string
   phoneNumber: string
   tenantId: string
+  personId: string
 }
 
 export interface LoginResponse {
@@ -52,11 +54,11 @@ export interface LoginResponse {
 
 export const authApi = {
   login: async (payload: LoginRequest): Promise<LoginResponse> => {
-    const response = await apiClient.post<TokenResponse>('/api/auth/login', {
+    const response = await apiClient.post<TokenResponse>('/api/v2/auth/login', {
       username: payload.phoneNumber,
       password: payload.password,
     })
-    const { access_token, refresh_token, id_token, person_type, tenant_id } = response.data
+    const { access_token, refresh_token, id_token, user_role, tenant_id, person_id } = response.data
 
     const userFromToken = extractUserFromJWT(id_token)
     if (!userFromToken) {
@@ -65,8 +67,9 @@ export const authApi = {
 
     const user: AuthUser = {
       ...userFromToken,
-      role: person_type || '',
-      tenantId: tenant_id || '',
+      role: user_role ?? '',
+      tenantId: tenant_id ?? '',
+      personId: person_id ?? '',
     }
 
     return {
@@ -77,10 +80,10 @@ export const authApi = {
   },
 
   refresh: async (refreshToken: string): Promise<LoginResponse> => {
-    const response = await apiClient.post<Partial<TokenResponse>>('/api/auth/refresh', {
+    const response = await apiClient.post<TokenResponse>('/api/v2/auth/refresh', {
       refreshToken,
     })
-    const { access_token, refresh_token, id_token, person_type, tenant_id } = response.data
+    const { access_token, refresh_token, id_token, user_role, tenant_id, person_id } = response.data
 
     if (!access_token || !refresh_token || !id_token) {
       throw new Error('Invalid token response')
@@ -93,8 +96,9 @@ export const authApi = {
 
     const user: AuthUser = {
       ...userFromToken,
-      role: person_type || '',
-      tenantId: tenant_id || '',
+      role: user_role ?? '',
+      tenantId: tenant_id ?? '',
+      personId: person_id ?? '',
     }
 
     return {
@@ -105,12 +109,12 @@ export const authApi = {
   },
 
   logout: async (refreshToken: string): Promise<void> => {
-    await apiClient.post('/api/auth/logout', {
+    await apiClient.post('/api/v2/auth/logout', {
       refreshToken,
     })
   },
 
   register: async (payload: RegisterRequest): Promise<void> => {
-    await apiClient.post('/api/auth/register', payload)
+    await apiClient.post('/api/v2/auth/register', payload)
   },
 }

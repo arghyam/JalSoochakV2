@@ -60,6 +60,14 @@ const theme = extendTheme({
     },
 
     //Body text
+
+    bodyText2: {
+      fontSize: '24px',
+      lineHeight: '36px',
+      fontWeight: '400',
+      letterSpacing: '0%',
+      color: 'neutral.950',
+    },
     bodyText3: {
       fontSize: '20px',
       lineHeight: '30px',
@@ -81,6 +89,12 @@ const theme = extendTheme({
       fontWeight: 'medium',
       fontSize: '14px',
       lineHeight: '21px',
+      color: 'neutral.950',
+    },
+    bodyText7: {
+      fontSize: '12px',
+      lineHeight: '16px',
+      fontWeight: '400',
       color: 'neutral.950',
     },
   },
@@ -159,6 +173,37 @@ const theme = extendTheme({
     active: '0px 0px 0px 4px rgba(50, 145, 209, 0.12)',
   },
   components: {
+    Heading: {
+      baseStyle: {
+        fontFamily: 'heading',
+        color: 'neutral.950',
+      },
+      sizes: {
+        h1: {
+          fontSize: '32px',
+          lineHeight: '48px',
+          fontWeight: '600',
+        },
+        h2: {
+          fontSize: '24px',
+          lineHeight: '36px',
+          fontWeight: '600',
+        },
+        h3: {
+          fontSize: '20px',
+          lineHeight: '30px',
+          fontWeight: '600',
+        },
+        h4: {
+          fontSize: '14px',
+          lineHeight: '20px',
+          fontWeight: '500',
+        },
+      },
+      defaultProps: {
+        size: 'h2',
+      },
+    },
     Input: {
       baseStyle: {
         field: {

@@ -10,7 +10,7 @@ labels:
 # Container Configs
 image:
   repository: "252649026375.dkr.ecr.ap-south-1.amazonaws.com/apigateway"
-  tag: "1f1602c243b3fa36205c859267320c75cffb58d1"
+  tag: "gateway-test-1"
 replicas: "1"
 # tracing-enabled: true
 # healthChecks:
@@ -24,3 +24,9 @@ env: |
     value: "8080"
   - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
     value: "http://servicediscovery:8761/eureka"
+  - name: CORS_ALLOWED_ORIGINS
+    value: "*"
+  - name: RATE_LIMIT_REPLENISH_RATE
+    value: "10"
+  - name: RATE_LIMIT_BURST_CAPACITY
+    value: "20"

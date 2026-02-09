@@ -1,5 +1,18 @@
 import { useEffect, useState } from 'react'
-import { Box, Flex, Grid, Text, Icon, Stack, Button, HStack, Badge } from '@chakra-ui/react'
+import {
+  Box,
+  Flex,
+  SimpleGrid,
+  Heading,
+  Text,
+  Icon,
+  Stack,
+  Button,
+  HStack,
+  Badge,
+  useBreakpointValue,
+} from '@chakra-ui/react'
+import { useTranslation } from 'react-i18next'
 import { getMockIngestionMonitorData } from '../../services/mock-data'
 import { BarLineChart } from '@/shared/components/charts/bar-line-chart'
 import { SearchableSelect } from '@/shared/components/common'
@@ -15,6 +28,7 @@ import { IoCloudOutline, IoCloseCircleOutline, IoWarningOutline } from 'react-ic
 import { BsCheck2Circle } from 'react-icons/bs'
 
 export function IngestionMonitorPage() {
+  const { t, i18n } = useTranslation(['super-admin', 'common'])
   const [data, setData] = useState<IngestionMonitorData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -22,6 +36,14 @@ export function IngestionMonitorPage() {
   const [timeFilter, setTimeFilter] = useState('7')
   const [statusFilter, setStatusFilter] = useState('all')
   const [retryKey, setRetryKey] = useState(0)
+
+  // Responsive values
+  const statsColumns = useBreakpointValue({ base: 1, sm: 2, lg: 4 }) ?? 4
+  const showExportText = useBreakpointValue({ base: false, md: true }) ?? true
+
+  useEffect(() => {
+    document.title = `${t('ingestionMonitor.title')} | JalSoochak`
+  }, [t])
 
   useEffect(() => {
     let isMounted = true
@@ -38,7 +60,7 @@ export function IngestionMonitorPage() {
       } catch (err) {
         if (isMounted) {
           console.error('Failed to fetch ingestion monitor data:', err)
-          setError('Failed to load ingestion data. Please try again.')
+          setError(t('common:toast.failedToLoad'))
         }
       } finally {
         if (isMounted) {
@@ -56,16 +78,18 @@ export function IngestionMonitorPage() {
   }, [stateFilter, timeFilter, retryKey])
 
   const formatTimestamp = (date: Date): string => {
-    let hours = date.getHours()
-    const minutes = String(date.getMinutes()).padStart(2, '0')
-    const ampm = hours >= 12 ? 'pm' : 'am'
-    hours = hours % 12 || 12
+    const timeFormatter = new Intl.DateTimeFormat(i18n.language, {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    })
+    const dateFormatter = new Intl.DateTimeFormat(i18n.language, {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    })
 
-    const day = String(date.getDate()).padStart(2, '0')
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const year = date.getFullYear()
-
-    return `${hours}:${minutes}${ampm} | ${day}-${month}-${year}`
+    return `${timeFormatter.format(date)} | ${dateFormatter.format(date)}`
   }
 
   const getStatusBadge = (status: IngestionLogEntry['status']) => {
@@ -73,17 +97,17 @@ export function IngestionMonitorPage() {
       successful: {
         bg: '#E1FFEA',
         color: '#079455',
-        label: 'Successful',
+        label: t('common:status.successful'),
       },
       warning: {
-        bg: '#FFF3CD',
-        color: '#CC8800',
-        label: 'Warning',
+        bg: '#FFF0DB',
+        color: '#F79009',
+        label: t('common:status.warning'),
       },
       failed: {
         bg: '#FEE4E2',
         color: '#D92D20',
-        label: 'Failed',
+        label: t('common:status.failed'),
       },
     }
 
@@ -96,9 +120,14 @@ export function IngestionMonitorPage() {
         py={0.5}
         borderRadius="16px"
         fontSize="12px"
+        lineHeight="16px"
         fontWeight="500"
         textTransform="capitalize"
         height="24px"
+        width="71px"
+        alignItems="center"
+        display="flex"
+        justifyContent="center"
       >
         {config.label}
       </Badge>
@@ -115,70 +144,85 @@ export function IngestionMonitorPage() {
 
   if (isLoading) {
     return (
-      <Flex h="64" align="center" justify="center">
-        <Text color="neutral.600">Loading...</Text>
-      </Flex>
+      <Box w="full">
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={5}>
+          {t('ingestionMonitor.title')}
+        </Heading>
+        <Flex role="status" aria-live="polite" h="64" align="center" justify="center">
+          <Text color="neutral.600">{t('common:loading')}</Text>
+        </Flex>
+      </Box>
     )
   }
 
   if (error) {
     return (
-      <Flex h="64" align="center" justify="center" direction="column" gap={4}>
-        <Text color="red.500">{error}</Text>
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => {
-            setStateFilter('all')
-            setTimeFilter('7')
-            setRetryKey((prev) => prev + 1)
-          }}
-        >
-          Retry
-        </Button>
-      </Flex>
+      <Box w="full">
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={5}>
+          {t('ingestionMonitor.title')}
+        </Heading>
+        <Flex h="64" align="center" justify="center" direction="column" gap={4} role="alert">
+          <Text color="error.500">{error}</Text>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              setStateFilter('all')
+              setTimeFilter('7')
+              setRetryKey((prev) => prev + 1)
+            }}
+          >
+            {t('common:retry')}
+          </Button>
+        </Flex>
+      </Box>
     )
   }
 
   if (!data) {
     return (
-      <Flex h="64" align="center" justify="center">
-        <Text color="neutral.600">No data available</Text>
-      </Flex>
+      <Box w="full">
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={5}>
+          {t('ingestionMonitor.title')}
+        </Heading>
+        <Flex h="64" align="center" justify="center">
+          <Text color="neutral.600">{t('common:noDataAvailable')}</Text>
+        </Flex>
+      </Box>
     )
   }
 
   const statsCards = [
     {
-      title: 'Total Ingestions',
-      value: data.stats.totalIngestions.toLocaleString(),
-      subtitle: 'Across all States/UTs',
+      title: t('ingestionMonitor.stats.totalIngestions'),
+      value: data.stats.totalIngestions.toLocaleString(i18n.language),
+      subtitle: t('ingestionMonitor.stats.acrossAllStatesUts'),
       icon: IoCloudOutline,
       iconBg: '#EBF4FA',
       iconColor: '#3291D1',
     },
     {
-      title: 'Successful Ingestions',
-      value: data.stats.successfulIngestions.toLocaleString(),
-      subtitle: `${data.stats.successRate}% success rate`,
+      title: t('ingestionMonitor.stats.successfulIngestions'),
+      value: data.stats.successfulIngestions.toLocaleString(i18n.language),
+      subtitle: t('ingestionMonitor.stats.successRate', { rate: data.stats.successRate }),
       subtitleColor: '#079455',
       icon: BsCheck2Circle,
       iconBg: '#E1FFEA',
       iconColor: '#079455',
     },
     {
-      title: 'Failed Ingestions',
-      value: data.stats.failedIngestions.toLocaleString(),
-      subtitle: `${data.stats.failureRate}% failure rate`,
+      title: t('ingestionMonitor.stats.failedIngestions'),
+      value: data.stats.failedIngestions.toLocaleString(i18n.language),
+      subtitle: t('ingestionMonitor.stats.failureRate', { rate: data.stats.failureRate }),
       subtitleColor: '#D92D20',
       icon: IoCloseCircleOutline,
       iconBg: '#FEE4E2',
       iconColor: '#D92D20',
     },
     {
-      title: 'Current Warnings',
-      value: data.stats.currentWarnings.toLocaleString(),
-      subtitle: 'Issues requiring attention',
+      title: t('ingestionMonitor.stats.currentWarnings'),
+      value: data.stats.currentWarnings.toLocaleString(i18n.language),
+      subtitle: t('ingestionMonitor.stats.issuesRequiringAttention'),
       icon: IoWarningOutline,
       iconBg: '#FFF3CD',
       iconColor: '#CC8800',
@@ -188,63 +232,87 @@ export function IngestionMonitorPage() {
   return (
     <Box w="full">
       {/* Page Header */}
-      <Flex justify="space-between" align="center" mb={5} h={12}>
-        <Text textStyle="h5">Ingestion Monitor</Text>
-      </Flex>
+      <Box mb={5} h={12}>
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }}>
+          {t('ingestionMonitor.title')}
+        </Heading>
+      </Box>
 
       <Stack gap={6}>
         {/* Filters Row */}
         <Flex
           justify="space-between"
-          align="center"
+          align={{ base: 'stretch', md: 'center' }}
           bg="white"
           py={4}
-          px={6}
+          px={{ base: 3, md: 6 }}
           border="0.5px"
           borderColor="neutral.200"
           borderRadius="12px"
-          h={16}
+          h={{ base: 'auto', md: 16 }}
+          flexDirection={{ base: 'column', md: 'row' }}
+          gap={{ base: 3, md: 0 }}
         >
-          <HStack spacing={2} h={8}>
+          <HStack spacing={2} h={{ base: 'auto', md: 8 }} flexWrap="wrap" gap={{ base: 2, md: 2 }}>
             <HStack spacing={2}>
-              <Icon as={BiFilterAlt} boxSize={5} />
+              <Icon as={BiFilterAlt} boxSize={5} aria-hidden="true" />
               <Text fontSize="14px" fontWeight="500">
-                Filters
+                {t('common:filters')}
               </Text>
             </HStack>
             <SearchableSelect
               options={STATE_FILTER_OPTIONS}
               value={stateFilter}
               onChange={setStateFilter}
-              placeholder="All States/UTs"
-              width="160px"
+              placeholder={t('ingestionMonitor.filters.allStatesUts')}
+              width={{ base: '100%', sm: '160px' }}
               fontSize="14px"
               textColor="neutral.400"
+              borderRadius="4px"
+              borderColor="neutral.400"
               height="32px"
+              aria-label={t('ingestionMonitor.filters.allStatesUts')}
             />
             <SearchableSelect
               options={TIME_FILTER_OPTIONS}
               value={timeFilter}
               onChange={setTimeFilter}
-              placeholder="Last 7 Days"
-              width="140px"
+              placeholder={t('ingestionMonitor.filters.lastDays', { days: 7 })}
+              width={{ base: '100%', sm: '140px' }}
               fontSize="14px"
               textColor="neutral.400"
+              borderColor="neutral.400"
+              borderRadius="4px"
               height="32px"
+              aria-label={t('ingestionMonitor.filters.lastDays', { days: 7 })}
             />
           </HStack>
-          <Button variant="primary" size="sm" leftIcon={<Icon as={FiDownload} boxSize={4} />}>
-            Export Data
+          <Button
+            variant="primary"
+            size="sm"
+            leftIcon={<Icon as={FiDownload} boxSize={4} aria-hidden="true" />}
+            w={{ base: 'full', md: 'auto' }}
+            aria-label={t('common:button.exportData')}
+          >
+            {showExportText ? t('common:button.exportData') : ''}
           </Button>
         </Flex>
 
         {/* Stats Cards */}
-        <Grid templateColumns="repeat(4, 1fr)" gap={7} h="200px" mb={1}>
+        <SimpleGrid
+          columns={statsColumns}
+          spacing={7}
+          mb={1}
+          height={{ base: 'auto', md: '200px' }}
+          as="section"
+          aria-label={t('ingestionMonitor.stats.totalIngestions')}
+        >
           {statsCards.map((stat) => {
             const StatIcon = stat.icon
             return (
               <Box
                 key={stat.title}
+                as="article"
                 bg="white"
                 borderWidth="0.5px"
                 borderColor="neutral.200"
@@ -262,7 +330,7 @@ export function IngestionMonitorPage() {
                     borderRadius="full"
                     bg={stat.iconBg}
                   >
-                    <Icon as={StatIcon} boxSize={5} color={stat.iconColor} />
+                    <Icon as={StatIcon} boxSize={5} color={stat.iconColor} aria-hidden="true" />
                   </Flex>
                   <Flex direction="column" gap={1}>
                     <Text color="neutral.600" fontSize="14px">
@@ -277,22 +345,25 @@ export function IngestionMonitorPage() {
               </Box>
             )
           })}
-        </Grid>
+        </SimpleGrid>
 
         {/* Ingestion Success Rate Chart */}
         <Box
+          as="section"
+          aria-labelledby="chart-title"
           bg="white"
           borderWidth="0.5px"
           borderColor="neutral.200"
           borderRadius="16px"
           boxShadow="default"
+          height={{ base: 'auto', md: '420px' }}
           py={6}
           px={4}
           mb={1}
         >
-          <Text textStyle="h8" mb={4}>
-            Ingestion Success Rate Over Time
-          </Text>
+          <Heading as="h2" size="h3" fontWeight="400" mb={4} id="chart-title">
+            {t('ingestionMonitor.charts.ingestionSuccessRate')}
+          </Heading>
           <BarLineChart
             data={data.chartData}
             xKey="month"
@@ -300,82 +371,114 @@ export function IngestionMonitorPage() {
             lineKey="failedIngestions"
             barColor="#3291D1"
             lineColor="#FFA100"
-            height="400px"
-            barLegendLabel="Successful Ingestions"
-            lineLegendLabel="Failed Ingestions"
+            height="326px"
+            barLegendLabel={t('overview.charts.successfulIngestions')}
+            lineLegendLabel={t('overview.charts.failedIngestions')}
           />
         </Box>
 
         {/* Detailed Ingestion Logs */}
         <Box
+          as="section"
+          aria-labelledby="logs-title"
           bg="white"
           borderWidth="0.5px"
           borderColor="neutral.200"
           borderRadius="12px"
           boxShadow="default"
+          height={{ base: 'auto', md: '395px' }}
           py={4}
-          px={4}
+          px={{ base: 3, md: 4 }}
         >
-          <Flex justify="space-between" align="center" mb={3}>
-            <Text fontSize="14px" fontWeight="500" color="neutral.700">
-              Detailed Ingestion Logs
-            </Text>
+          <Flex
+            justify="space-between"
+            align={{ base: 'stretch', sm: 'center' }}
+            mb={3}
+            flexDirection={{ base: 'column', sm: 'row' }}
+            gap={{ base: 2, sm: 0 }}
+          >
+            <Heading as="h2" size="h3" fontWeight="400" id="logs-title">
+              {t('ingestionMonitor.logs.title')}
+            </Heading>
             <SearchableSelect
               options={STATUS_FILTER_OPTIONS}
               value={statusFilter}
               onChange={setStatusFilter}
-              placeholder="Status"
-              width="120px"
-              fontSize="13px"
+              placeholder={t('common:statusLabel')}
+              width={{ base: '100%', sm: '120px' }}
+              fontSize="14px"
               height="32px"
+              aria-label={t('common:statusLabel')}
             />
           </Flex>
 
-          <Stack gap={0}>
+          <Stack gap={0} role="list" aria-label={t('ingestionMonitor.logs.title')}>
             {filteredLogs.map((log, index) => (
               <Box
                 key={log.id}
+                as="article"
+                role="listitem"
                 py={3}
                 borderTopWidth={index > 0 ? '1px' : '0'}
                 borderColor="neutral.100"
               >
-                <Flex justify="space-between" align="center" gap={4}>
-                  <Box minW={0} width="600px">
-                    <Text fontSize="13px" fontWeight="600" color="neutral.950" mb={0.5}>
+                <Flex
+                  justify="space-between"
+                  align={{ base: 'flex-start', md: 'center' }}
+                  gap={4}
+                  flexDirection={{ base: 'column', md: 'row' }}
+                >
+                  <Box width={{ base: 'auto', lg: '694px' }}>
+                    <Text fontSize="16px" fontWeight="400" color="neutral.950" mb={0.5}>
                       {log.title}
                       {log.status === 'successful' && log.recordsProcessed && (
                         <Text as="span" fontWeight="400">
                           {' '}
-                          Records Processed: {log.recordsProcessed.toLocaleString()}
+                          {t('ingestionMonitor.logs.recordsProcessed', {
+                            recordCount: log.recordsProcessed.toLocaleString(i18n.language),
+                          })}
                         </Text>
                       )}
                     </Text>
 
-                    <Text fontSize="12px" color="neutral.600" mb={0.5}>
-                      Batch ID: {log.batchId} Source System: {log.sourceSystem} Processing Time:{' '}
-                      {log.processingTime}
+                    <Text fontSize="16px" color="neutral.600" mb={0.5}>
+                      {t('ingestionMonitor.logs.batchId')} {log.batchId}{' '}
+                      {t('ingestionMonitor.logs.sourceSystem')} {log.sourceSystem}{' '}
+                      {t('ingestionMonitor.logs.processingTime')} {log.processingTime}
                     </Text>
 
                     {log.status === 'successful' && (
-                      <Text fontSize="12px" color="neutral.600">
-                        No anomalies detected during ingestion.
+                      <Text fontSize="16px" color="neutral.600">
+                        {t('ingestionMonitor.logs.noAnomalies')}
                       </Text>
                     )}
                     {log.status === 'warning' && log.issueDetails && (
-                      <Text fontSize="12px" color="neutral.600">
-                        Issue: {log.issueDetails}
+                      <Text fontSize="16px" color="neutral.600">
+                        {t('ingestionMonitor.logs.issue')} {log.issueDetails}
                       </Text>
                     )}
                     {log.status === 'failed' && log.errorDetails && (
-                      <Text fontSize="12px" color="neutral.600">
-                        Error: {log.errorDetails}
+                      <Text fontSize="16px" color="neutral.600">
+                        {t('ingestionMonitor.logs.error')} {log.errorDetails}
                       </Text>
                     )}
                   </Box>
-                  {getStatusBadge(log.status)}
-                  <Text fontSize="12px" color="neutral.600" whiteSpace="nowrap">
-                    {formatTimestamp(log.timestamp)}
-                  </Text>
+                  <Flex
+                    align="center"
+                    flexDirection={{ base: 'row', md: 'row' }}
+                    w={{ base: 'full', md: 'auto' }}
+                  >
+                    {getStatusBadge(log.status)}
+                  </Flex>
+                  <Flex
+                    align="center"
+                    flexDirection={{ base: 'row', md: 'row' }}
+                    w={{ base: 'full', md: 'auto' }}
+                  >
+                    <Text fontSize="16px" color="neutral.600" whiteSpace="nowrap">
+                      {formatTimestamp(log.timestamp)}
+                    </Text>
+                  </Flex>
                 </Flex>
               </Box>
             ))}

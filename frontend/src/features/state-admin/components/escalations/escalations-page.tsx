@@ -1,6 +1,20 @@
 import { useState, useEffect, useRef } from 'react'
-import { Box, Text, Button, Flex, Grid, IconButton, HStack, VStack } from '@chakra-ui/react'
-import { EditIcon, DeleteIcon } from '@chakra-ui/icons'
+import {
+  Box,
+  Text,
+  Button,
+  Flex,
+  SimpleGrid,
+  IconButton,
+  HStack,
+  Heading,
+  Spinner,
+  Stack,
+  useBreakpointValue,
+} from '@chakra-ui/react'
+import { FiEdit } from 'react-icons/fi'
+import { MdDeleteOutline } from 'react-icons/md'
+import { useTranslation } from 'react-i18next'
 import {
   getMockEscalations,
   getMockEscalationById,
@@ -12,10 +26,12 @@ import type { Escalation, EscalationLevel } from '../../types/escalations'
 import { AVAILABLE_ALERT_TYPES, AVAILABLE_ROLES, AVAILABLE_HOURS } from '../../types/escalations'
 import { useToast } from '@/shared/hooks/use-toast'
 import { ToastContainer, SearchableSelect } from '@/shared/components/common'
+import { IoAddOutline } from 'react-icons/io5'
 
 type ViewMode = 'list' | 'add' | 'edit'
 
 export function EscalationsPage() {
+  const { t } = useTranslation(['state-admin', 'common'])
   const levelIdCounterRef = useRef(0)
   const generateLevelId = () => `level-${Date.now()}-${++levelIdCounterRef.current}`
   const [viewMode, setViewMode] = useState<ViewMode>('list')
@@ -23,6 +39,7 @@ export function EscalationsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const showAddButtonText = useBreakpointValue({ base: false, sm: true }) ?? true
 
   // Form state
   const [alertType, setAlertType] = useState('')
@@ -38,6 +55,10 @@ export function EscalationsPage() {
   const toast = useToast()
 
   useEffect(() => {
+    document.title = `${t('escalations.title')} | JalSoochak`
+  }, [t])
+
+  useEffect(() => {
     fetchEscalations()
   }, [])
 
@@ -48,7 +69,7 @@ export function EscalationsPage() {
       setEscalations(data)
     } catch (error) {
       console.error('Failed to fetch escalations:', error)
-      toast.addToast('Failed to load escalations', 'error')
+      toast.addToast(t('escalations.messages.failedToLoad'), 'error')
     } finally {
       setIsLoading(false)
     }
@@ -76,23 +97,23 @@ export function EscalationsPage() {
         setLevels(escalation.levels)
         setViewMode('edit')
       } else {
-        toast.addToast('Escalation not found', 'error')
+        toast.addToast(t('escalations.messages.notFound'), 'error')
       }
     } catch (error) {
       console.error('Failed to fetch escalation:', error)
-      toast.addToast('Failed to load escalation', 'error')
+      toast.addToast(t('escalations.messages.failedToLoadSingle'), 'error')
     }
   }
 
   const handleDeleteClick = async (id: string) => {
-    if (confirm('Are you sure you want to delete this escalation?')) {
+    if (confirm(t('escalations.messages.confirmDelete'))) {
       try {
         await deleteMockEscalation(id)
         await fetchEscalations()
-        toast.addToast('Escalation deleted successfully', 'success')
+        toast.addToast(t('escalations.messages.deletedSuccess'), 'success')
       } catch (error) {
         console.error('Failed to delete escalation:', error)
-        toast.addToast('Failed to delete escalation', 'error')
+        toast.addToast(t('escalations.messages.failedToDelete'), 'error')
       }
     }
   }
@@ -113,14 +134,14 @@ export function EscalationsPage() {
 
   const handleSave = async () => {
     if (!alertType) {
-      toast.addToast('Please select an alert type', 'error')
+      toast.addToast(t('escalations.messages.selectAlertType'), 'error')
       return
     }
 
     // Validate levels
     for (const level of levels) {
       if (!level.targetRole || level.escalateAfterHours <= 0) {
-        toast.addToast('All levels must have valid role and hours', 'error')
+        toast.addToast(t('escalations.messages.invalidLevels'), 'error')
         return
       }
     }
@@ -129,17 +150,17 @@ export function EscalationsPage() {
     try {
       if (viewMode === 'add') {
         await saveMockEscalation({ alertType, levels })
-        toast.addToast('Escalation added successfully', 'success')
+        toast.addToast(t('escalations.messages.addedSuccess'), 'success')
       } else if (viewMode === 'edit' && editingId) {
         await updateMockEscalation(editingId, { alertType, levels })
-        toast.addToast('Changes saved successfully', 'success')
+        toast.addToast(t('common:toast.changesSavedShort'), 'success')
       }
       await fetchEscalations()
       setViewMode('list')
       setEditingId(null)
     } catch (error) {
       console.error('Failed to save escalation:', error)
-      toast.addToast('Failed to save escalation', 'error')
+      toast.addToast(t('escalations.messages.failedToSave'), 'error')
     } finally {
       setIsSaving(false)
     }
@@ -167,8 +188,13 @@ export function EscalationsPage() {
   if (isLoading) {
     return (
       <Box w="full">
-        <Text textStyle="h5">Escalations</Text>
-        <Text color="neutral.600">Loading...</Text>
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={6}>
+          {t('escalations.title')}
+        </Heading>
+        <Flex align="center" role="status" aria-live="polite" aria-busy="true">
+          <Spinner size="md" color="primary.500" mr={3} />
+          <Text color="neutral.600">{t('common:loading')}</Text>
+        </Flex>
       </Box>
     )
   }
@@ -178,23 +204,41 @@ export function EscalationsPage() {
     return (
       <Box w="full">
         {/* Page Header */}
-        <Flex justify="space-between" align="center" mb={5}>
-          <Text textStyle="h5">Escalations</Text>
-        </Flex>
+        <Box mb={5}>
+          <Heading as="h1" size={{ base: 'h2', md: 'h1' }}>
+            {t('escalations.title')}
+          </Heading>
+        </Box>
 
         {/* All Escalations Section */}
         <Box
+          as="section"
+          aria-labelledby="escalations-heading"
           bg="neutral.25"
           borderWidth="0.5px"
           borderColor="neutral.100"
-          borderRadius="12px"
+          borderRadius={{ base: 'lg', md: 'xl' }}
           w="full"
-          minH="calc(100vh - 148px)"
-          py="24px"
-          px="16px"
+          minH={{ base: 'auto', lg: 'calc(100vh - 148px)' }}
+          py={{ base: 4, md: 6 }}
+          px={4}
         >
-          <Flex justify="space-between" align="center" mb={4}>
-            <Text textStyle="h8">All Escalations</Text>
+          <Flex
+            justify="space-between"
+            align="center"
+            mb={4}
+            flexDirection={{ base: 'column', sm: 'row' }}
+            gap={{ base: 3, sm: 0 }}
+          >
+            <Heading
+              as="h2"
+              id="escalations-heading"
+              size="h3"
+              fontWeight="400"
+              fontSize={{ base: 'md', md: 'xl' }}
+            >
+              {t('escalations.allEscalations')}
+            </Heading>
             <Button
               variant="secondary"
               size="sm"
@@ -204,71 +248,100 @@ export function EscalationsPage() {
               h="32px"
               px="12px"
               py="8px"
+              gap={1}
+              w={{ base: 'full', sm: 'auto' }}
             >
-              + Add New Escalation Type
+              <IoAddOutline size={24} aria-hidden="true" />
+              {showAddButtonText
+                ? t('escalations.addNewEscalationType')
+                : t('escalations.addNewShort')}
             </Button>
           </Flex>
 
           {/* Escalation Cards Grid */}
-          <Grid templateColumns="repeat(2, 1fr)" gap={4} w="full" maxW="1200px">
+          <SimpleGrid
+            columns={{ base: 1, lg: 2 }}
+            spacing={{ base: 4, md: 7 }}
+            w="full"
+            maxW="1200px"
+          >
             {escalations.map((escalation) => (
               <Box
                 key={escalation.id}
+                as="article"
+                aria-label={t('escalations.aria.escalationCard', { name: escalation.name })}
                 borderWidth="0.5px"
                 borderColor="neutral.200"
-                borderRadius="12px"
+                borderRadius={{ base: 'lg', md: 'xl' }}
                 bg="neutral.50"
-                py={6}
+                py={{ base: 4, md: 6 }}
                 px={4}
                 position="relative"
               >
                 {/* Card Header with Actions */}
                 <Flex justify="space-between" align="flex-start" mb={4}>
-                  <Text textStyle="h8" color="neutral.950">
+                  <Heading
+                    as="h3"
+                    size="h3"
+                    fontWeight="400"
+                    fontSize={{ base: 'md', md: 'xl' }}
+                    color="neutral.950"
+                  >
                     {escalation.name}
-                  </Text>
+                  </Heading>
                   <HStack spacing={1}>
                     <IconButton
-                      aria-label="Edit escalation"
-                      icon={<EditIcon h={5} w={5} />}
+                      aria-label={t('escalations.aria.editEscalation', { name: escalation.name })}
+                      icon={<FiEdit size={20} aria-hidden="true" />}
                       variant="ghost"
                       size="sm"
                       color="neutral.400"
                       _hover={{ bg: 'primary.50', color: 'primary.500' }}
                       onClick={() => handleEditClick(escalation.id)}
-                      h={6}
-                      w={6}
-                      minW={6}
+                      h={5}
+                      w={5}
+                      minW={5}
                     />
                     <IconButton
-                      aria-label="Delete escalation"
-                      icon={<DeleteIcon h={5} w={5} />}
+                      aria-label={t('escalations.aria.deleteEscalation', { name: escalation.name })}
+                      icon={<MdDeleteOutline size={20} aria-hidden="true" />}
                       variant="ghost"
                       size="sm"
                       color="neutral.400"
                       _hover={{ bg: 'error.50', color: 'error.500' }}
                       onClick={() => handleDeleteClick(escalation.id)}
-                      h={6}
-                      w={6}
-                      minW={6}
+                      h={5}
+                      w={5}
+                      minW={5}
                     />
                   </HStack>
                 </Flex>
 
                 {/* Escalation Levels */}
-                <VStack align="stretch" spacing={3}>
+                <Stack spacing={3}>
                   {escalation.levels.map((level) => (
-                    <Flex key={level.id} justify="space-between" align="center">
-                      <Text fontSize="14px">
-                        Level {level.levelNumber}: {getRoleLabel(level.targetRole)}
+                    <Flex
+                      key={level.id}
+                      justify="space-between"
+                      align={{ base: 'flex-start', sm: 'center' }}
+                      flexDirection={{ base: 'column', sm: 'row' }}
+                      gap={{ base: 1, sm: 0 }}
+                    >
+                      <Text fontSize={{ base: '12px', md: '14px' }}>
+                        {t('escalations.levelDisplay', {
+                          number: level.levelNumber,
+                          role: getRoleLabel(level.targetRole),
+                        })}
                       </Text>
-                      <Text fontSize="14px">Escalate after {level.escalateAfterHours} hours</Text>
+                      <Text fontSize={{ base: '12px', md: '14px' }}>
+                        {t('escalations.escalateAfterHours', { hours: level.escalateAfterHours })}
+                      </Text>
                     </Flex>
                   ))}
-                </VStack>
+                </Stack>
               </Box>
             ))}
-          </Grid>
+          </SimpleGrid>
         </Box>
 
         {/* Toast Container */}
@@ -282,35 +355,51 @@ export function EscalationsPage() {
     <Box w="full">
       {/* Page Header */}
       <Box mb={5}>
-        <Text textStyle="h5">Escalations</Text>
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }}>
+          {t('escalations.title')}
+        </Heading>
       </Box>
 
       {/* Form Card */}
       <Box
+        as="section"
+        aria-labelledby="escalation-form-heading"
         bg="white"
         borderWidth="0.5px"
         borderColor="neutral.100"
-        borderRadius="12px"
+        borderRadius={{ base: 'lg', md: 'xl' }}
         w="full"
-        minH="calc(100vh - 148px)"
-        py={6}
+        minH={{ base: 'auto', lg: 'calc(100vh - 148px)' }}
+        py={{ base: 4, md: 6 }}
         px={4}
       >
         <Flex
+          as="form"
+          role="form"
+          aria-label={t('escalations.aria.formLabel')}
           direction="column"
           w="full"
           h="full"
           justify="space-between"
-          minH="calc(100vh - 196px)"
+          minH={{ base: 'auto', lg: 'calc(100vh - 200px)' }}
+          gap={{ base: 6, lg: 0 }}
         >
           <Flex direction="column" gap={3}>
             {/* Card Header with Edit Icon */}
             <Flex justify="space-between" align="center" mb={1}>
-              <Text textStyle="h8">Escalations Rules</Text>
+              <Heading
+                as="h2"
+                id="escalation-form-heading"
+                size="h3"
+                fontWeight="400"
+                fontSize={{ base: 'md', md: 'xl' }}
+              >
+                {t('escalations.escalationRules')}
+              </Heading>
               {viewMode === 'edit' && (
                 <IconButton
-                  aria-label="Edit mode"
-                  icon={<EditIcon h={5} w={5} />}
+                  aria-label={t('escalations.aria.editMode')}
+                  icon={<FiEdit size={20} aria-hidden="true" />}
                   variant="ghost"
                   size="sm"
                   color="neutral.950"
@@ -325,95 +414,158 @@ export function EscalationsPage() {
 
             {/* Alert Type Selection */}
             <Box>
-              <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
-                Type of Alert*
+              <Text
+                as="label"
+                fontSize={{ base: 'xs', md: 'sm' }}
+                fontWeight="medium"
+                color="neutral.950"
+                mb={1}
+                display="block"
+              >
+                {t('escalations.typeOfAlert')}
+                <Text as="span" color="error.500" ml={1}>
+                  *
+                </Text>
               </Text>
               <SearchableSelect
                 options={AVAILABLE_ALERT_TYPES}
                 value={alertType}
                 onChange={setAlertType}
-                placeholder="Select"
-                width="486px"
+                placeholder={t('common:select')}
+                width={{ base: '100%', lg: '486px' }}
+                ariaLabel={t('escalations.aria.selectAlertType')}
               />
             </Box>
 
             {/* Escalation Levels */}
-            <Box>
-              <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
-                Level of Escalation*
-              </Text>
-
-              <VStack align="stretch">
-                {levels.map((level, index) => (
-                  <Flex key={level.id} w="full" justify="space-between">
-                    <Box>
-                      <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
-                        Level {index + 1}
+            <Flex
+              justify="space-between"
+              align="flex-start"
+              direction={{ base: 'column', lg: 'row' }}
+              gap={{ base: 4, lg: 6 }}
+            >
+              {/* Left Group: Level of Escalation */}
+              <Box flex={{ base: 'none', lg: 1 }}>
+                <Text
+                  as="label"
+                  fontSize={{ base: 'xs', md: 'sm' }}
+                  fontWeight="medium"
+                  color="neutral.950"
+                  mb={1}
+                  display="block"
+                >
+                  {t('escalations.levelOfEscalation')}
+                  <Text as="span" color="error.500" ml={1}>
+                    *
+                  </Text>
+                </Text>
+                <Stack spacing={3}>
+                  {levels.map((level, index) => (
+                    <Flex
+                      key={level.id}
+                      gap={3}
+                      align="center"
+                      direction={{ base: 'column', sm: 'row' }}
+                    >
+                      <Text
+                        fontSize={{ base: 'xs', md: 'sm' }}
+                        fontWeight="medium"
+                        color="neutral.950"
+                        whiteSpace="nowrap"
+                        w={{ base: 'full', sm: 'auto' }}
+                      >
+                        {t('escalations.level', { number: index + 1 })}
                       </Text>
                       <SearchableSelect
                         options={AVAILABLE_ROLES}
                         value={level.targetRole}
                         onChange={(value) => handleLevelChange(level.id, 'targetRole', value)}
-                        placeholder="Select"
-                        width="486px"
+                        placeholder={t('common:select')}
+                        width={{ base: '100%', sm: '420px' }}
+                        ariaLabel={t('escalations.aria.selectRole', { number: index + 1 })}
                       />
-                    </Box>
+                    </Flex>
+                  ))}
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={handleAddLevel}
+                    w={{ base: 'full', sm: '152px' }}
+                    fontSize="14px"
+                    fontWeight="400"
+                    h="32px"
+                    gap={1}
+                    mt={1}
+                  >
+                    <IoAddOutline size={24} aria-hidden="true" />
+                    {t('escalations.addNewLevel')}
+                  </Button>
+                </Stack>
+              </Box>
 
-                    <Box>
-                      <Text fontSize="sm" fontWeight="medium" color="neutral.950" mb={1}>
-                        Escalate after (hours)*
-                      </Text>
-                      <SearchableSelect
-                        options={AVAILABLE_HOURS}
-                        value={String(level.escalateAfterHours)}
-                        onChange={(value) =>
-                          handleLevelChange(level.id, 'escalateAfterHours', Number(value))
-                        }
-                        placeholder="Select"
-                        width="486px"
-                      />
-                    </Box>
-                  </Flex>
-                ))}
-
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={handleAddLevel}
-                  w="152px"
-                  fontSize="14px"
-                  fontWeight="400"
-                  h="32px"
-                  mt={1}
+              {/* Right Group: Escalate after (hours) */}
+              <Box flex={{ base: 'none', lg: 1 }}>
+                <Text
+                  as="label"
+                  fontSize={{ base: 'xs', md: 'sm' }}
+                  fontWeight="medium"
+                  color="neutral.950"
+                  mb={1}
+                  display="block"
                 >
-                  + Add New Level
-                </Button>
-              </VStack>
-            </Box>
+                  {t('escalations.escalateAfter')}
+                  <Text as="span" color="error.500" ml={1}>
+                    *
+                  </Text>
+                </Text>
+                <Stack spacing={3}>
+                  {levels.map((level, index) => (
+                    <SearchableSelect
+                      key={level.id}
+                      options={AVAILABLE_HOURS}
+                      value={String(level.escalateAfterHours)}
+                      onChange={(value) =>
+                        handleLevelChange(level.id, 'escalateAfterHours', Number(value))
+                      }
+                      placeholder={t('common:select')}
+                      width={{ base: '100%', lg: '486px' }}
+                      ariaLabel={t('escalations.aria.selectHours', { number: index + 1 })}
+                    />
+                  ))}
+                </Stack>
+              </Box>
+            </Flex>
           </Flex>
 
           {/* Action Buttons */}
-          <HStack spacing={3} justify="flex-end" mt={6}>
+          <HStack
+            spacing={3}
+            justify={{ base: 'stretch', sm: 'flex-end' }}
+            flexDirection={{ base: 'column-reverse', sm: 'row' }}
+            mt={{ base: 4, lg: 6 }}
+          >
             <Button
               variant="secondary"
               size="md"
-              width="174px"
+              width={{ base: 'full', sm: '174px' }}
               onClick={handleCancel}
               isDisabled={isSaving}
             >
-              Cancel
+              {t('common:button.cancel')}
             </Button>
             <Button
               variant="primary"
               size="md"
-              width="174px"
+              width={{ base: 'full', sm: '174px' }}
               onClick={handleSave}
               isLoading={isSaving}
               isDisabled={
                 !alertType || levels.some((l) => !l.targetRole || l.escalateAfterHours <= 0)
               }
             >
-              {viewMode === 'add' ? 'Add Escalation' : 'Save Changes'}
+              {viewMode === 'add'
+                ? t('escalations.buttons.addEscalation')
+                : t('common:button.saveChanges')}
             </Button>
           </HStack>
         </Flex>

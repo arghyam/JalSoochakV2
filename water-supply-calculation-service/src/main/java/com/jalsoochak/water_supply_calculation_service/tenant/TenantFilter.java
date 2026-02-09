@@ -21,7 +21,10 @@ public class TenantFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         return path.startsWith("/v3/api-docs")
                 || path.startsWith("/swagger-ui")
-                || path.startsWith("/swagger-ui.html");
+                || path.startsWith("/swagger-ui.html")
+                || path.equals("/api/v2/webhook/intro")
+                || path.equals("/api/v2/webhook/closing")
+                || path.equals("/api/v2/webhook/glific");
     }
 
     @Override
