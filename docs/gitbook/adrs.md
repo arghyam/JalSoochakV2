@@ -12,9 +12,9 @@
 * **Rationale:** Avoid vendor lock-in; support on-prem and different cloud providers.
 * **Status:** Accepted.
 
-**ADR-003: Single Shared MySQL Schema for Multi-tenancy (v2)**
+**ADR-003: Single Shared Database Schema for Multi-tenancy (v2)**
 
-* **Decision:** Use a single MySQL schema, scoped with tenant\_id in all domain tables.
+* **Decision:** Use a single Database schema, scoped with tenant\_id in all domain tables.
 * **Rationale:** Simpler operation and maintenance in early stages; easier to run country-level aggregates.
 * **Status:** Accepted; revisit when tenants > X or per-tenant data isolation mandated by policy (legally).
 

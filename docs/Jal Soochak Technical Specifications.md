@@ -60,7 +60,7 @@ Contents
 
 [**ADR-002: Cloud-neutral Kubernetes Deployment** 8](#_Toc215475591)
 
-[**ADR-003: Single Shared MySQL Schema for Multi-tenancy (v2)** 8](#_Toc215475592)
+[**ADR-003: Single Shared Database Schema for Multi-tenancy (v2)** 8](#_Toc215475592)
 
 [**ADR-004: Glific as WhatsApp Integration Layer** 9](#_Toc215475593)
 
@@ -80,7 +80,7 @@ Contents
 
 [**9.6 Dashboard APIs** 12](#_Toc215475601)
 
-[**10. Transactional Database Design (MySQL)** 12](#_Toc215475602)
+[**10. Transactional Database Design** 12](#_Toc215475602)
 
 [**10.1 Tenancy & Users** 12](#_Toc215475603)
 
@@ -145,7 +145,7 @@ JalSoochak is designed as a **Digital Public Good** and will adhere to DPG princ
 * No hard dependency on vendor-specific cloud services.
 * Deployable on:
   + Any **CNCF-compliant Kubernetes** cluster (on-prem or cloud).
-  + Standard **MySQL** and **Kafka** distributions.
+  + Standard **PostgreSQL** and **Kafka** distributions.
   + S3-compatible object storage.
 
 ### 2.3 Accessibility
@@ -163,7 +163,7 @@ JalSoochak is designed as a **Digital Public Good** and will adhere to DPG princ
 
 * **Encryption in transit:** All external endpoints over **HTTPS/TLS 1.2+**.
 * **Encryption at rest:**
-  + Database volumes (MySQL).
+  + Database volumes (PostgreSQL).
   + Object storage (for images, dumps).
   + Backups where stored.
 * **PII handling:**
@@ -189,7 +189,7 @@ JalSoochak is designed as a **Digital Public Good** and will adhere to DPG princ
 
 Implementation approach (v2):
 
-* **Single logical database (MySQL) with shared schema**.
+* **Single logical database (PostgreSQL) with shared schema**.
 * Almost all domain tables include a tenant\_id.
 * Services enforce tenant isolation at application level.
 * Future ADR leaves room for DB-per-tenant model if needed.
@@ -423,7 +423,7 @@ This requires:
 2. Glific receives and posts to JalSoochak **Messaging Orchestrator Webhook**.
 3. Orchestrator parses and validates message.
 4. Orchestrator posts to **Field Operations Service** (/submissions endpoint).
-5. Field Operations Service stores submission in MySQL.
+5. Field Operations Service stores submission in PostgreSQL.
 6. Events pushed to Kafka (field.submission.created).
 7. Dashboard queries use these submissions in near real-time.
 
@@ -451,7 +451,7 @@ This requires:
 **6.3 Components**
 
 * **Kubernetes cluster**
-* **MySQL cluster** (multi-AZ/high availability)
+* **PostgreSQL cluster** (multi-AZ/high availability)
 * **Kafka cluster** (e.g., Bitnami Helm chart or cloud-neutral Kafka distribution)
 * **Object storage** (S3-compatible, for images, file dumps)
 * **Reverse proxy / ingress** (NGINX Ingress, Traefik, etc.)
@@ -485,7 +485,7 @@ This requires:
 
 **7.3 Database & Messaging**
 
-* **Transactional DB:** MySQL
+* **Transactional DB:** PostgreSQL
 * **Caching (optional):** Redis
 * **Message Broker:** Kafka
 
@@ -508,9 +508,9 @@ This requires:
 * **Rationale:** Avoid vendor lock-in; support on-prem and different cloud providers.
 * **Status:** Accepted.
 
-**ADR-003: Single Shared MySQL Schema for Multi-tenancy (v2)**
+**ADR-003: Single Shared Database Schema for Multi-tenancy (v2)**
 
-* **Decision:** Use a single MySQL schema, scoped with tenant\_id in all domain tables.
+* **Decision:** Use a single Database schema, scoped with tenant\_id in all domain tables.
 * **Rationale:** Simpler operation and maintenance in early stages; easier to run country-level aggregates.
 * **Status:** Accepted; revisit when tenants > X or per-tenant data isolation mandated by policy (legally).
 
@@ -804,7 +804,7 @@ Aggregated across all tenants:
 
 }
 
-**10. Transactional Database Design (MySQL)**
+**10. Transactional Database Design**
 
 **10.1 Tenancy & Users**
 

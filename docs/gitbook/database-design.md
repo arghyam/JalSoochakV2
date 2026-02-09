@@ -1,4 +1,4 @@
-# JalSoochak  — Transactional Database Design (MySQL)
+# JalSoochak  — Transactional Database Design
 *(Migration-friendly, V1-compatible, multi-tenant)*
 
 This document defines the **transactional database schema** for JalSoochak .  

@@ -11,7 +11,7 @@
 
 Implementation approach (v2):
 
-* **Single logical database (MySQL) with shared schema**.
+* **Single logical database with shared schema**.
 * Almost all domain tables include a tenant\_id.
 * Services enforce tenant isolation at application level.
 * Future ADR leaves room for DB-per-tenant model if needed.

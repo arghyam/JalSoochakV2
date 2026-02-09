@@ -6,7 +6,7 @@
 graph TD
     A[Frontend (React)] --> B[API Gateway]
     B --> C[Microservices Backend]
-    C --> D[(MySQL Database)]
+    C --> D[(PostgreSQL Database)]
     C --> E{{"Kafka Messaging"}}
     E --> F[Glific WhatsApp]
     F --> B
@@ -108,7 +108,7 @@ graph TD
 2. Glific receives and posts to JalSoochak **Messaging Orchestrator Webhook**.
 3. Orchestrator parses and validates message.
 4. Orchestrator posts to **Field Operations Service** (/submissions endpoint).
-5. Field Operations Service stores submission in MySQL.
+5. Field Operations Service stores submission in PostgreSQL.
 6. Events pushed to Kafka (field.submission.created).
 7. Dashboard queries use these submissions in near real-time.
 
@@ -130,7 +130,7 @@ graph TD
     B --> F[Messaging Orchestrator Service]
     B --> G[Integration Service]
     B --> H[Dashboard API Service]
-    E --> I[(MySQL)]
+    E --> I[(PostgreSQL)]
     F --> I
     G --> I
     H --> I

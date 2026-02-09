@@ -15,7 +15,7 @@
 **6.3 Components**
 
 * **Kubernetes cluster**
-* **MySQL cluster** (multi-AZ/high availability)
+* **PostgreSQL cluster** (multi-AZ/high availability)
 * **Kafka cluster** (e.g., Bitnami Helm chart or cloud-neutral Kafka distribution)
 * **Object storage** (S3-compatible, for images, file dumps)
 * **Reverse proxy / ingress** (NGINX Ingress, Traefik, etc.)
@@ -47,7 +47,7 @@ graph TD
     F --> K[Messaging Pod]
     F --> L[Integration Pod]
     F --> M[Dashboard API Pod]
-    G --> N[(MySQL Cluster)]
+    G --> N[(PostgreSQL Cluster)]
     H --> N
     I --> N
     J --> N

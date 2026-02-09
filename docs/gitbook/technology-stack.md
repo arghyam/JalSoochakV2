@@ -16,7 +16,7 @@
 
 **7.3 Database & Messaging**
 
-* **Transactional DB:** MySQL
+* **Transactional DB:** PostgreSQL
 * **Caching (optional):** Redis
 * **Message Broker:** Kafka
 

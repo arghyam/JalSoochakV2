@@ -43,7 +43,7 @@ JalSoochak is designed as a **Digital Public Good** and will adhere to DPG princ
 * No hard dependency on vendor-specific cloud services.
 * Deployable on:
   + Any **CNCF-compliant Kubernetes** cluster (on-prem or cloud).
-  + Standard **MySQL** and **Kafka** distributions.
+  + Standard **PostgreSQL** and **Kafka** distributions.
   + S3-compatible object storage.
 
 ### 2.3 Accessibility
@@ -61,7 +61,7 @@ JalSoochak is designed as a **Digital Public Good** and will adhere to DPG princ
 
 * **Encryption in transit:** All external endpoints over **HTTPS/TLS 1.2+**.
 * **Encryption at rest:**
-  + Database volumes (MySQL).
+  + Database volumes.
   + Object storage (for images, dumps).
   + Backups where stored.
 * **PII handling:**
