@@ -62,6 +62,9 @@ public class SchemeMaster extends AuditEntity{
     @Column(name = "is_active")
     private Boolean isActive;
 
+    @Column(name = "tenant_id", length = 50)
+    private String tenantId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "village_id")
     private VillageMaster village;
