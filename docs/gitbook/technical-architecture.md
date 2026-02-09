@@ -1,5 +1,18 @@
 **5. Technical Architecture**
 
+**5.0 Software Architecture Diagram**
+
+```mermaid
+graph TD
+    A[Frontend (React)] --> B[API Gateway]
+    B --> C[Microservices Backend]
+    C --> D[(MySQL Database)]
+    C --> E{{"Kafka Messaging"}}
+    E --> F[Glific WhatsApp]
+    F --> B
+    G[State IT Systems] --> C
+```
+
 **5.1 Architectural Style**
 
 * **Microservices-based backend**, implemented in **Java + Spring Boot**.
@@ -105,3 +118,47 @@
 2. Frontend calls State Config Service API.
 3. Config persists to DB and optionally publishes config.updated events to Kafka.
 4. Messaging Orchestrator consumes updated rules.
+
+**5.4 Technical Architecture Diagram**
+
+```mermaid
+graph TD
+    A[API Gateway] --> B[Auth & Tenant Resolver]
+    B --> C[Tenant Admin Service]
+    B --> D[State Config Service]
+    B --> E[Field Operations Service]
+    B --> F[Messaging Orchestrator Service]
+    B --> G[Integration Service]
+    B --> H[Dashboard API Service]
+    E --> I[(MySQL)]
+    F --> I
+    G --> I
+    H --> I
+    F --> J{{"Kafka"}}
+    E --> J
+    J --> K[Glific]
+    L[Frontend] --> A
+    K --> F
+```
+
+  **5.5 Channels**
+
+  The system must accommodate five input channels per the PRD. These channels form the basis for calculating water supply quantity and regularity. The channels are:
+
+  - **BFM reading basis (Channel 1)** — BFM counter readings submitted by Pump Operators (WhatsApp/BFM forms). This is the primary channel and the focus of the current implementation.
+  - **Electricity consumption basis (Channel 2)** — Meter or utility-provided consumption data to infer pump usage.
+  - **Pump running duration basis (Channel 3)** — Pump runtime telemetry or derived durations from other signals.
+  - **Inform basis (Channel 4)** — Manual reports or state IT system flags indicating supply status.
+  - **IoT devices basis (Channel 5)** — Sensor/IoT telemetry reporting flows or status.
+
+  Scope & implementation approach:
+
+  - Current scope: fully implement Channel 1 (BFM readings) including ingestion, validation, storage, events, and dashboard integration.
+  - Mock adapters: provide lightweight mock implementations for Channels 2–5 that emit canonical submissions compatible with the Field Operations ingestion API. These mocks allow end-to-end testing of the Messaging Orchestrator, Field Operations, Kafka events, and dashboards without full provider integrations.
+  - Messaging Orchestrator: implement a channel-adapter abstraction. Each adapter converts channel-specific payloads into the canonical submission format consumed by the Field Operations Service.
+  - Configuration: per-tenant channel enablement and channel-specific thresholds live in the State Config Service.
+
+  Developer notes:
+
+  - Add tests and sample datasets for mock adapters under `/tests/mocks/channels/`.
+  - Use a feature-flag or environment variable to enable mock adapters in non-prod environments.

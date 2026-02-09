@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
-  title: JalSoochak V2 API
-  description: API specifications for JalSoochak V2, a Digital Public Good for water supply monitoring.
+  title: JalSoochak API
+  description: API specifications for JalSoochak, a Digital Public Good for water supply monitoring.
   version: 1.0.0
   contact:
     name: JalSoochak Team

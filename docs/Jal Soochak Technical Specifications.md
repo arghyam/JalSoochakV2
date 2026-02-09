@@ -1,8 +1,8 @@
-**JalSoochak V2 Technical Specifications**
+**JalSoochak Technical Specifications**
 
 Contents
 
-[**JalSoochak V2 Technical Specifications** 1](#_Toc215475563)
+[**JalSoochak Technical Specifications** 1](#_Toc215475563)
 
 [**1. Introduction** 2](#_Toc215475564)
 
@@ -104,9 +104,9 @@ Contents
 
 **1.1 Purpose**
 
-This document defines the **technical architecture**, **deployment model**, **technology stack**, **architectural decisions**, **API specifications**, and **transactional database design** of **JalSoochak v2**.
+This document defines the **technical architecture**, **deployment model**, **technology stack**, **architectural decisions**, **API specifications**, and **transactional database design** of **JalSoochak**.
 
-JalSoochak v2 will be built as a **Digital Public Good (DPG)** and is intended to be reusable by multiple states and countries for monitoring rural water supply using **WhatsApp-driven field data** and **public dashboards**.
+JalSoochak will be built as a **Digital Public Good (DPG)** and is intended to be reusable by multiple states and countries for monitoring rural water supply using **WhatsApp-driven field data** and **public dashboards**.
 
 **Terminology:**
 Throughout this document we use the term **Pump Operator** as the generic designation for field operators.
@@ -130,7 +130,7 @@ Analytics DB/schema will be documented separately.
 
 **2. DPG Orientation**
 
-JalSoochak v2 is designed as a **Digital Public Good** and will adhere to DPG principles:
+JalSoochak is designed as a **Digital Public Good** and will adhere to DPG principles:
 
 ### 2.1 Openness & Reusability
 

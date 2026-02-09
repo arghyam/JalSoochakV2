@@ -71,3 +71,23 @@ This requires:
 
 * A **Data Ingestion / Integration Service**.
 * Persistent **sync logs**, **error logs**, and **dedupe logic**.
+
+**3.5 Default offerings & State options**
+
+Loose coupling between the core platform and state-specific choices is achieved by providing a set of default offerings with per-state options. The platform ships with sensible defaults; States may enable or override options during onboarding. The PRD/System Specification lists the deployment choices in Table 1; the exact table is reproduced below.
+
+| Service Area | Default Option | Other Possible Option(s) |
+|---|---|---|
+| Image Ingestion Service | WhatsApp with Glific messaging service. | • State specific Mobile App<br>• WhatsApp with messaging services other than Glific (Twilio etc.) |
+| Image Processor Service | Home grown AI model | State preferred AI model |
+| Nudge Service | WhatsApp with Glific messaging service. | • State preferred channel or mobile App<br>• WhatsApp with messaging services other than Glific (Twilio etc.) |
+| Dashboards | Default packaged with JalSoochak | • State customized hosted on JalSoochak servers<br>• Own created using JalSoochak Analytics Service API |
+| Deployment | Cloud neutral on any of three hyperscalers - AWS, Azure and GCP | Bare metal |
+
+Table 1: JalSoochak Deployment Choices
+
+Implementation notes:
+
+- Default values and the list of options are stored in the `Tenant Admin` service and applied during onboarding; `State System Admin` can override via the `State Config` service.
+- Overrides are recorded in tenant metadata and audited.
+- During onboarding, choose the state-preferred options and capture any required provider credentials (e.g., Glific, Twilio, AI model endpoints).
