@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,40 +35,17 @@ public class PersonController {
     private final PersonService personService;
     private final TenantMasterRepository tenantMasterRepository;
 
+    @PreAuthorize("hasRole('super_user')")
     @PostMapping("/invite/user")
     public ResponseEntity<InviteToken> inviteUser(
             @Valid @RequestBody InviteRequest inviteRequest,
-            @RequestHeader("X-Tenant-ID") @NotBlank(message = "Tenant ID is required") String tenantId,
-            @RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-        if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "Missing or invalid Authorization header"
-            );
-        }
-
-        String token = authHeader.substring(7).trim();
-
-        if (token.isEmpty()) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "Authorization token is empty"
-            );
-        }
+            @RequestHeader("X-Tenant-ID") @NotBlank(message = "Tenant ID is required") String tenantId) {
 
         if (!tenantMasterRepository.existsByTenantName(tenantId)) {
             log.warn("Invalid tenant ID provided: {}", tenantId);
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Invalid tenant ID: " + tenantId
-            );
-        }
-
-        if (!personService.isSuperAdmin(token)) {
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN,
-                    "Only super admin can invite user"
             );
         }
 
@@ -105,7 +83,6 @@ public class PersonController {
         return ResponseEntity.ok(response);
     }
 
-
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestParam String refreshToken) {
         boolean success = personService.logout(refreshToken);
@@ -113,17 +90,13 @@ public class PersonController {
                 ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Logout failed");
     }
 
-
+    @PreAuthorize("hasRole('super_user')")
     @PostMapping("/bulk/invite")
     public ResponseEntity<?> bulkInvite(
             @RequestParam("file") MultipartFile file,
-            @RequestHeader("X-Tenant-ID") String tenantId,
-            @RequestHeader(value = "Authorization", required = false) String authHeader) {
-
-        if (authHeader == null || !authHeader.toLowerCase().startsWith("bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "Missing or invalid Authorization header"));
-        }
+            @RequestHeader("X-Tenant-ID") String tenantId) {
+        // NOTE: @PreAuthorize("hasRole('super_user')") was added as a security fix.
+        // Previously, any authenticated user could call this endpoint.
 
         try {
             Map<String, Object> result = personService.bulkInviteUsers(file, tenantId);

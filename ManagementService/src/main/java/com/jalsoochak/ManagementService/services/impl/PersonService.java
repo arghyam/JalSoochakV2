@@ -77,8 +77,6 @@ public class PersonService {
     private static final String ALLOWED_PERSON_TYPE = "Pump Operator";
 
 
-    private static final String SUPER_USER_ROLE = "super_user";
-
     private static final String NAME_REGEX = "^[A-Za-z]+$";
     private static final String FULL_NAME_REGEX = "^[A-Za-z]+(\\s[A-Za-z]+)*$";
     private static final String PHONE_REGEX = "^[0-9]{10}$";
@@ -337,27 +335,6 @@ public class PersonService {
 
     public boolean logout(String refreshToken) {
         return keycloakClient.logout(refreshToken);
-    }
-
-    public boolean isSuperAdmin(String accessToken) {
-        try {
-            Map<String, Object> userInfo = keycloakClient.getUserInfo(accessToken);
-            String username = (String) userInfo.get("preferred_username");
-            if (username == null || username.isBlank()) {
-                log.warn("preferred_username claim is missing or empty");
-                return false;
-            }
-
-            PersonMaster person = personMasterRepository.findByPhoneNumber(username)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-
-            return person.getPersonType() != null
-                    && SUPER_USER_ROLE.equals(person.getPersonType().getCName());
-
-        } catch (Exception e) {
-            log.error("Error verifying super admin", e);
-            return false;
-        }
     }
 
     private void assignRoleToUser(String userId, String roleName){
