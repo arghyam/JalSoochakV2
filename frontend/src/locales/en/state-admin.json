@@ -12,7 +12,7 @@
       "pendingDataSync": "Pending Data Sync",
       "requiresAttention": "Requires Attention",
       "activeIntegrations": "Active Integrations",
-      "integrationNames": "WhatsApp, Glyphic"
+      "integrationNames": "WhatsApp"
     },
     "charts": {
       "demandVsSupply": "Demand vs Supply",
