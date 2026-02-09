@@ -54,10 +54,7 @@ public class SchemeMaster extends AuditEntity{
     private BigDecimal latitude;
 
     @Column(name = "longitude", precision = 10, scale = 8)
-    private Double longitude;
-
-    @Column(columnDefinition = "GEOMETRY")
-    private String geolocation;
+    private BigDecimal longitude;
 
     @Column(name = "is_active")
     private Boolean isActive;

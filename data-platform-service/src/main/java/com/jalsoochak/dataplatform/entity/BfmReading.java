@@ -49,9 +49,6 @@ public class BfmReading extends AuditEntity {
     @Column(name = "reading_url", length = 2048)
     private String readingUrl;
 
-    @Column(columnDefinition = "GEOMETRY")
-    private String geolocation;
-
     @Column(name = "correlation_id", length = 36)
     private String correlationId;
 
