@@ -68,6 +68,11 @@ export function AllStatesPerformanceChart({
         type: 'category',
         boundaryGap: true,
         data: entities,
+        axisLine: {
+          lineStyle: {
+            color: '#E4E4E7',
+          },
+        },
         axisTick: {
           show: false,
         },
@@ -99,7 +104,7 @@ export function AllStatesPerformanceChart({
         interval: 25,
         splitLine: {
           lineStyle: {
-            color: '#E5E7EB',
+            color: '#E4E4E7',
           },
         },
       },

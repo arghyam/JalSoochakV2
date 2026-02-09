@@ -38,6 +38,14 @@ export function DemandSupplyChart({ data, className, height = '400px' }: DemandS
         name: 'Year',
         nameLocation: 'middle',
         nameGap: 28,
+        axisLine: {
+          lineStyle: {
+            color: '#E4E4E7',
+          },
+        },
+        axisTick: {
+          show: false,
+        },
         axisLabel: {
           rotate: 0,
           fontSize: bodyText7.fontSize,
@@ -68,6 +76,19 @@ export function DemandSupplyChart({ data, className, height = '400px' }: DemandS
           lineHeight: bodyText7.lineHeight,
           fontWeight: 400,
           color: bodyText7.color,
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#E4E4E7',
+          },
+        },
+        axisTick: {
+          show: false,
+        },
+        splitLine: {
+          lineStyle: {
+            color: '#E4E4E7',
+          },
         },
         interval: 25,
         max: 125,

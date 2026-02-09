@@ -67,6 +67,9 @@ export function WaterSupplyOutagesChart({
         axisTick: {
           show: false,
         },
+        axisLine: {
+          show: false,
+        },
         axisLabel: {
           rotate: 45,
           interval: 0,
@@ -106,7 +109,7 @@ export function WaterSupplyOutagesChart({
         interval: 25,
         splitLine: {
           lineStyle: {
-            color: '#E5E7EB',
+            color: '#E4E4E7',
           },
         },
       },
@@ -433,7 +436,7 @@ export function WaterSupplyOutagesChart({
           ref={scrollbarTrackRef}
           style={{
             height: '4px',
-            background: '#E5E7EB',
+            background: '#E4E4E7',
             borderRadius: '999px',
             position: 'relative',
           }}

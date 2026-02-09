@@ -43,6 +43,11 @@ export function SupplySubmissionRateChart({
         type: 'category',
         data: entities,
         name: '',
+        axisLine: {
+          lineStyle: {
+            color: '#E4E4E7',
+          },
+        },
         axisTick: {
           show: false,
         },
@@ -77,7 +82,7 @@ export function SupplySubmissionRateChart({
         interval: 25,
         splitLine: {
           lineStyle: {
-            color: '#E5E7EB',
+            color: '#E4E4E7',
           },
         },
       },
