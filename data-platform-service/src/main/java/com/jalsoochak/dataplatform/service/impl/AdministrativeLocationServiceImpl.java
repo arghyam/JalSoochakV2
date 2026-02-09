@@ -21,9 +21,12 @@ import com.jalsoochak.dataplatform.specification.AdministrativeLocationSpecifica
 public class AdministrativeLocationServiceImpl implements AdministrativeLocationService {
 
     private final AdministrativeLocationRepository administrativeLocationRepository;
+    private final AdministrativeLocationMapper administrativeLocationMapper;
 
-    public AdministrativeLocationServiceImpl(AdministrativeLocationRepository administrativeLocationRepository) {
+    public AdministrativeLocationServiceImpl(AdministrativeLocationRepository administrativeLocationRepository,
+                                            AdministrativeLocationMapper administrativeLocationMapper) {
         this.administrativeLocationRepository = administrativeLocationRepository;
+        this.administrativeLocationMapper = administrativeLocationMapper;
     }
 
     @Override
@@ -40,7 +43,7 @@ public class AdministrativeLocationServiceImpl implements AdministrativeLocation
             }
             
             List<AdministrativeLocationResponseDTO> responseDTOs = locations.stream()
-                    .map(AdministrativeLocationMapper::toResponseDTO)
+                    .map(administrativeLocationMapper::toResponseDTO)
                     .collect(Collectors.toList());
             
             return ApiResponseDTO.success(responseDTOs);
@@ -59,7 +62,7 @@ public class AdministrativeLocationServiceImpl implements AdministrativeLocation
         AdministrativeLocationMaster location = administrativeLocationRepository.findById(id)
                 .orElseThrow(() -> new AdministrativeLocationNotFoundException(id));
         
-        AdministrativeLocationResponseDTO responseDTO = AdministrativeLocationMapper.toResponseDTO(location);
+        AdministrativeLocationResponseDTO responseDTO = administrativeLocationMapper.toResponseDTO(location);
         return ApiResponseDTO.success(responseDTO);
     }
 

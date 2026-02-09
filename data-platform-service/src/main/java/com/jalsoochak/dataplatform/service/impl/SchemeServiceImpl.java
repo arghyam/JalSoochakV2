@@ -21,9 +21,11 @@ import com.jalsoochak.dataplatform.specification.SchemeSpecification;
 public class SchemeServiceImpl implements SchemeService {
     
     private final SchemeRepository schemeRepository;
+    private final SchemeMapper schemeMapper;
     
-    public SchemeServiceImpl(SchemeRepository schemeRepository) {
+    public SchemeServiceImpl(SchemeRepository schemeRepository, SchemeMapper schemeMapper) {
         this.schemeRepository = schemeRepository;
+        this.schemeMapper = schemeMapper;
     }
     
     @Override
@@ -40,7 +42,7 @@ public class SchemeServiceImpl implements SchemeService {
             }
             
             List<SchemeResponseDTO> responseDTOs = schemes.stream()
-                    .map(SchemeMapper::toResponseDTO)
+                    .map(schemeMapper::toResponseDTO)
                     .collect(Collectors.toList());
             
             return ApiResponseDTO.success(responseDTOs);
@@ -60,7 +62,7 @@ public class SchemeServiceImpl implements SchemeService {
         SchemeMaster scheme = schemeRepository.findById(id)
                 .orElseThrow(() -> new SchemeNotFoundException(id));
         
-        SchemeResponseDTO responseDTO = SchemeMapper.toResponseDTO(scheme);
+        SchemeResponseDTO responseDTO = schemeMapper.toResponseDTO(scheme);
         return ApiResponseDTO.success(responseDTO);
     }
     

@@ -21,9 +21,11 @@ import com.jalsoochak.dataplatform.specification.VillageSpecification;
 public class VillageServiceImpl implements VillageService {
     
     private final VillageRepository villageRepository;
+    private final VillageMapper villageMapper;
     
-    public VillageServiceImpl(VillageRepository villageRepository) {
+    public VillageServiceImpl(VillageRepository villageRepository, VillageMapper villageMapper) {
         this.villageRepository = villageRepository;
+        this.villageMapper = villageMapper;
     }
     
     @Override
@@ -40,7 +42,7 @@ public class VillageServiceImpl implements VillageService {
             }
             
             List<VillageResponseDTO> responseDTOs = villages.stream()
-                    .map(VillageMapper::toResponseDTO)
+                    .map(villageMapper::toResponseDTO)
                     .collect(Collectors.toList());
             
             return ApiResponseDTO.success(responseDTOs);
@@ -60,7 +62,7 @@ public class VillageServiceImpl implements VillageService {
         VillageMaster village = villageRepository.findById(id)
                 .orElseThrow(() -> new VillageNotFoundException(id));
         
-        VillageResponseDTO responseDTO = VillageMapper.toResponseDTO(village);
+        VillageResponseDTO responseDTO = villageMapper.toResponseDTO(village);
         return ApiResponseDTO.success(responseDTO);
     }
     

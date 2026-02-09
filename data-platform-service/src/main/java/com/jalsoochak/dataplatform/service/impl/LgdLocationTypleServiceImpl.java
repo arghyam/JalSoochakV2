@@ -18,9 +18,12 @@ import com.jalsoochak.dataplatform.service.LgdLocationTypeService;
 public class LgdLocationTypleServiceImpl implements LgdLocationTypeService {
 
     private final LgdLocationTypeRepository lgdLocationTypeRepository;
+    private final LgdLocationTypeMapper lgdLocationTypeMapper;
 
-    public LgdLocationTypleServiceImpl(LgdLocationTypeRepository lgdLocationTypeRepository) {
+    public LgdLocationTypleServiceImpl(LgdLocationTypeRepository lgdLocationTypeRepository,
+                                      LgdLocationTypeMapper lgdLocationTypeMapper) {
         this.lgdLocationTypeRepository = lgdLocationTypeRepository;
+        this.lgdLocationTypeMapper = lgdLocationTypeMapper;
     }
 
     @Override
@@ -29,7 +32,7 @@ public class LgdLocationTypleServiceImpl implements LgdLocationTypeService {
         List<LgdLocationTypeMaster> locationTypes = lgdLocationTypeRepository.findAll();
         
         List<LgdLocationTypeResponseDTO> responseDTOs = locationTypes.stream()
-                .map(LgdLocationTypeMapper::toResponseDTO)
+                .map(lgdLocationTypeMapper::toResponseDTO)
                 .collect(Collectors.toList());
         
         return ApiResponseDTO.success(responseDTOs);
@@ -44,7 +47,7 @@ public class LgdLocationTypleServiceImpl implements LgdLocationTypeService {
         LgdLocationTypeMaster locationType = lgdLocationTypeRepository.findById(id)
                 .orElseThrow(() -> new LgdLocationTypeNotFoundException(id));
         
-        LgdLocationTypeResponseDTO responseDTO = LgdLocationTypeMapper.toResponseDTO(locationType);
+        LgdLocationTypeResponseDTO responseDTO = lgdLocationTypeMapper.toResponseDTO(locationType);
         return ApiResponseDTO.success(responseDTO);
     }
     

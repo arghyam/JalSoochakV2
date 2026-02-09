@@ -21,9 +21,12 @@ import com.jalsoochak.dataplatform.specification.LgdLocationSpecification;
 public class LgdLocationServiceImpl implements LgdLocationService {
 
     private final LgdLocationRepository lgdLocationRepository;
+    private final LgdLocationMapper lgdLocationMapper;
 
-    public LgdLocationServiceImpl(LgdLocationRepository lgdLocationRepository) {
+    public LgdLocationServiceImpl(LgdLocationRepository lgdLocationRepository,
+                                 LgdLocationMapper lgdLocationMapper) {
         this.lgdLocationRepository = lgdLocationRepository;
+        this.lgdLocationMapper = lgdLocationMapper;
     }
 
     @Override
@@ -40,7 +43,7 @@ public class LgdLocationServiceImpl implements LgdLocationService {
             }
             
             List<LgdLocationResponseDTO> responseDTOs = locations.stream()
-                    .map(LgdLocationMapper::toResponseDTO)
+                    .map(lgdLocationMapper::toResponseDTO)
                     .collect(Collectors.toList());
             
             return ApiResponseDTO.success(responseDTOs);
@@ -59,7 +62,7 @@ public class LgdLocationServiceImpl implements LgdLocationService {
         LgdLocationMaster location = lgdLocationRepository.findById(id)
                 .orElseThrow(() -> new LgdLocationNotFoundException(id));
         
-        LgdLocationResponseDTO responseDTO = LgdLocationMapper.toResponseDTO(location);
+        LgdLocationResponseDTO responseDTO = lgdLocationMapper.toResponseDTO(location);
         return ApiResponseDTO.success(responseDTO);
     }
 

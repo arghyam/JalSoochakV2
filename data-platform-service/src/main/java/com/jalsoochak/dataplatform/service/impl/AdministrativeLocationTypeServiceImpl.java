@@ -18,9 +18,12 @@ import com.jalsoochak.dataplatform.service.AdministrativeLocationTypeService;
 public class AdministrativeLocationTypeServiceImpl implements AdministrativeLocationTypeService{
     
     private final AdministrativeLocationTypeRepository administrativeLocationTypeRepository;
+    private final AdministrativeLocationTypeMapper administrativeLocationTypeMapper;
 
-    public AdministrativeLocationTypeServiceImpl(AdministrativeLocationTypeRepository administrativeLocationTypeRepository) {
+    public AdministrativeLocationTypeServiceImpl(AdministrativeLocationTypeRepository administrativeLocationTypeRepository,
+                                                AdministrativeLocationTypeMapper administrativeLocationTypeMapper) {
         this.administrativeLocationTypeRepository = administrativeLocationTypeRepository;
+        this.administrativeLocationTypeMapper = administrativeLocationTypeMapper;
     }
 
     @Override
@@ -29,7 +32,7 @@ public class AdministrativeLocationTypeServiceImpl implements AdministrativeLoca
         List<AdministrativeLocationTypeMaster> locationTypes = administrativeLocationTypeRepository.findAll();
         
         List<AdministrativeLocationTypeResponseDTO> responseDTOs = locationTypes.stream()
-                .map(AdministrativeLocationTypeMapper::toResponseDTO)
+                .map(administrativeLocationTypeMapper::toResponseDTO)
                 .collect(Collectors.toList());
         
         return ApiResponseDTO.success(responseDTOs);
@@ -44,7 +47,7 @@ public class AdministrativeLocationTypeServiceImpl implements AdministrativeLoca
         AdministrativeLocationTypeMaster locationType = administrativeLocationTypeRepository.findById(id)
                 .orElseThrow(() -> new AdministrativeLocationTypeNotFoundException(id));
         
-        AdministrativeLocationTypeResponseDTO responseDTO = AdministrativeLocationTypeMapper.toResponseDTO(locationType);
+        AdministrativeLocationTypeResponseDTO responseDTO = administrativeLocationTypeMapper.toResponseDTO(locationType);
         return ApiResponseDTO.success(responseDTO);
     }
     
