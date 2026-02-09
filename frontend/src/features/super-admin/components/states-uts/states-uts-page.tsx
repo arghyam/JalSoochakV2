@@ -55,7 +55,7 @@ export function StatesUTsPage() {
     const dateFormatter = new Intl.DateTimeFormat(i18n.language, {
       month: '2-digit',
       day: '2-digit',
-      year: '2-digit',
+      year: 'numeric',
     })
     const timeFormatter = new Intl.DateTimeFormat(i18n.language, {
       hour: 'numeric',

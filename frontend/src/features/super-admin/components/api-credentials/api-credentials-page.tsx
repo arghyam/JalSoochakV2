@@ -67,7 +67,7 @@ export function ApiCredentialsPage() {
     return new Intl.DateTimeFormat(i18n.language, {
       day: '2-digit',
       month: '2-digit',
-      year: '2-digit',
+      year: 'numeric',
     }).format(date)
   }
 
@@ -75,7 +75,7 @@ export function ApiCredentialsPage() {
     const dateFormatter = new Intl.DateTimeFormat(i18n.language, {
       day: '2-digit',
       month: '2-digit',
-      year: '2-digit',
+      year: 'numeric',
     })
     const timeFormatter = new Intl.DateTimeFormat(i18n.language, {
       hour: 'numeric',
