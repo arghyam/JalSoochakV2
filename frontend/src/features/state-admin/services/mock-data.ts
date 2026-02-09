@@ -260,7 +260,7 @@ let mockEscalations: Escalation[] = [
       {
         id: 'level-2-3',
         levelNumber: 3,
-        targetRole: 'sub-divisional officer',
+        targetRole: 'sub-divisional-officer',
         escalateAfterHours: 48,
       },
     ],
@@ -304,7 +304,7 @@ let mockEscalations: Escalation[] = [
       {
         id: 'level-4-3',
         levelNumber: 3,
-        targetRole: 'sub-divisional officer',
+        targetRole: 'sub-divisional-officer',
         escalateAfterHours: 48,
       },
     ],

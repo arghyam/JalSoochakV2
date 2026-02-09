@@ -25,7 +25,7 @@ export interface RoleOption {
 export const AVAILABLE_ROLES: RoleOption[] = [
   { value: 'pump-operator', label: 'Pump Operator' },
   { value: 'section-officer', label: 'Section Officer' },
-  { value: 'sub-divisional officer', label: 'Sub-Divisional Officer' },
+  { value: 'sub-divisional-officer', label: 'Sub-Divisional Officer' },
 ]
 
 export interface HoursOption {
