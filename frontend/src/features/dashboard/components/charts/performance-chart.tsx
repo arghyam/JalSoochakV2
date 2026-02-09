@@ -41,6 +41,11 @@ export function AllStatesPerformanceChart({
       : defaultItemWidth
   const itemWidth = Math.min(defaultItemWidth, effectiveItemWidth)
   const barWidth = Math.min(34, Math.max(16, Math.floor(itemWidth * 0.45)))
+  const longestEntityLabel = useMemo(() => {
+    return data.reduce((longest, item) => {
+      return item.name.length > longest.length ? item.name : longest
+    }, '')
+  }, [data])
 
   const option = useMemo<echarts.EChartsOption>(() => {
     const sortedData = [...data].sort((a, b) => b.quantity - a.quantity)
@@ -125,6 +130,7 @@ export function AllStatesPerformanceChart({
   }, [data, bodyText7, barWidth])
 
   const axisOption = useMemo<echarts.EChartsOption>(() => {
+    const placeholderLabel = longestEntityLabel || 'W'
     return {
       tooltip: {
         show: false,
@@ -133,12 +139,12 @@ export function AllStatesPerformanceChart({
         left: 0,
         right: 0,
         top: '10%',
-        bottom: '5%',
+        bottom: '2%',
         containLabel: true,
       },
       xAxis: {
         type: 'category',
-        data: [''],
+        data: [placeholderLabel],
         axisTick: {
           show: false,
         },
@@ -149,7 +155,10 @@ export function AllStatesPerformanceChart({
           show: true,
           rotate: 45,
           margin: 15,
-          formatter: () => '',
+          fontSize: bodyText7.fontSize,
+          lineHeight: bodyText7.lineHeight,
+          fontWeight: 400,
+          formatter: (value: string) => value,
           color: 'transparent',
         },
       },
@@ -183,7 +192,7 @@ export function AllStatesPerformanceChart({
       ],
       animation: false,
     }
-  }, [bodyText7])
+  }, [bodyText7, longestEntityLabel])
 
   const containerHeight = typeof height === 'number' ? `${height}px` : height
   const legendItems = [
