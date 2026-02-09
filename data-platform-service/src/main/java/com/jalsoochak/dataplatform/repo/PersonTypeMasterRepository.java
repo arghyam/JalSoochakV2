@@ -12,6 +12,4 @@ public interface PersonTypeMasterRepository extends JpaRepository<PersonTypeMast
 
     Optional<PersonTypeMaster> findById(Long id);
     
-    Optional<PersonTypeMaster> findByCName(String cName);
-    
 }

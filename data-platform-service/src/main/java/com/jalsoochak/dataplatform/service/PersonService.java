@@ -13,6 +13,6 @@ public interface PersonService {
     
     ApiResponseDTO<PersonResponseDTO> getPersonById(Long id);
     
-    ApiResponseDTO<PersonResponseDTO> createPerson(CreatePersonRequestDTO request);
+    ApiResponseDTO<PersonResponseDTO> createPerson(CreatePersonRequestDTO request, Long userId);
     
 }

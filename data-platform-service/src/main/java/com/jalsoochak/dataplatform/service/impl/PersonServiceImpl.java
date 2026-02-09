@@ -1,5 +1,6 @@
 package com.jalsoochak.dataplatform.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,11 +28,14 @@ public class PersonServiceImpl implements PersonService {
     
     private final PersonRepository personRepository;
     private final PersonTypeMasterRepository personTypeMasterRepository;
+    private final PersonMapper personMapper;
     
     public PersonServiceImpl(PersonRepository personRepository, 
-                            PersonTypeMasterRepository personTypeMasterRepository) {
+                            PersonTypeMasterRepository personTypeMasterRepository,
+                            PersonMapper personMapper) {
         this.personRepository = personRepository;
         this.personTypeMasterRepository = personTypeMasterRepository;
+        this.personMapper = personMapper;
     }
     
     @Override
@@ -48,7 +52,7 @@ public class PersonServiceImpl implements PersonService {
             }
             
             List<PersonResponseDTO> responseDTOs = persons.stream()
-                    .map(PersonMapper::toResponseDTO)
+                    .map(personMapper::toResponseDTO)
                     .collect(Collectors.toList());
             
             return ApiResponseDTO.success(responseDTOs);
@@ -67,13 +71,13 @@ public class PersonServiceImpl implements PersonService {
         PersonMaster person = personRepository.findById(id)
                 .orElseThrow(() -> new PersonNotFoundException(id));
         
-        PersonResponseDTO responseDTO = PersonMapper.toResponseDTO(person);
+        PersonResponseDTO responseDTO = personMapper.toResponseDTO(person);
         return ApiResponseDTO.success(responseDTO);
     }
     
     @Override
     @Transactional
-    public ApiResponseDTO<PersonResponseDTO> createPerson(CreatePersonRequestDTO request) {
+    public ApiResponseDTO<PersonResponseDTO> createPerson(CreatePersonRequestDTO request, Long userId) {
         // Validate phone number uniqueness
         if (personRepository.existsByPhoneNumber(request.getPhoneNumber())) {
             throw new DuplicatePhoneNumberException(request.getPhoneNumber());
@@ -96,8 +100,11 @@ public class PersonServiceImpl implements PersonService {
                 .isActive(true)
                 .build();
         
+        person.setCreatedBy(userId);
+        person.setCreatedAt(LocalDateTime.now());
+        
         PersonMaster savedPerson = personRepository.save(person);
-        PersonResponseDTO responseDTO = PersonMapper.toResponseDTO(savedPerson);
+        PersonResponseDTO responseDTO = personMapper.toResponseDTO(savedPerson);
         return ApiResponseDTO.success(responseDTO);
     }
     

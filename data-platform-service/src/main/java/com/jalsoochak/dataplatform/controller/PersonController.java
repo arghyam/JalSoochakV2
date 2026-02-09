@@ -60,13 +60,14 @@ public class PersonController {
      * Create a new person with role-based validation
      * 
      * @param request Person creation request
-     * @param currentUserId Current user's ID from header (for authorization)
+     * @param userId Current user's ID from header (for audit tracking)
      * @return Created person details
      */
     @PostMapping("/create")
     public ResponseEntity<ApiResponseDTO<PersonResponseDTO>> createPerson(
-            @Valid @RequestBody CreatePersonRequestDTO request) {
-        ApiResponseDTO<PersonResponseDTO> response = personService.createPerson(request);
+            @Valid @RequestBody CreatePersonRequestDTO request,
+            @RequestHeader(value = "X-User-Id", required = false) Long userId) {
+        ApiResponseDTO<PersonResponseDTO> response = personService.createPerson(request, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
