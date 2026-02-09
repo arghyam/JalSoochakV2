@@ -1,4 +1,4 @@
-package com.jalsoochak;
+package com.jalsoochak.dataplatform;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
