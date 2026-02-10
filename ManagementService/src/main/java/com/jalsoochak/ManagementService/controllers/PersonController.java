@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping({"/api/v2/auth", "/auth"})
+@RequestMapping({"/api/v2", "/api/v1"})
 @RequiredArgsConstructor
 @Slf4j
 @Validated
@@ -36,7 +37,7 @@ public class PersonController {
     private final TenantMasterRepository tenantMasterRepository;
 
     @PreAuthorize("hasRole('super_user')")
-    @PostMapping("/invite/user")
+    @PostMapping("/user")
     public ResponseEntity<InviteToken> inviteUser(
             @Valid @RequestBody InviteRequest inviteRequest,
             @RequestHeader("X-Tenant-ID") @NotBlank(message = "Tenant ID is required") String tenantId) {
@@ -54,7 +55,7 @@ public class PersonController {
         return ResponseEntity.ok(new InviteToken(inviteToken, message));
     }
 
-    @PostMapping("/complete/profile")
+    @PutMapping("/complete-profile")
     public ResponseEntity<String> completeProfile(
             @Valid @RequestBody RegisterRequest registerRequest) {
 
@@ -91,7 +92,7 @@ public class PersonController {
     }
 
     @PreAuthorize("hasRole('super_user')")
-    @PostMapping("/bulk/invite")
+    @PostMapping("/users")
     public ResponseEntity<?> bulkInvite(
             @RequestParam("file") MultipartFile file,
             @RequestHeader("X-Tenant-ID") String tenantId) {

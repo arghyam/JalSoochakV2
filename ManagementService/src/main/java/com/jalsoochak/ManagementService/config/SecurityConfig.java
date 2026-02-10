@@ -40,12 +40,16 @@ public class SecurityConfig {
         http
                 .cors(c -> c.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers( "/auth/login",
-                                "/auth/refresh",
-                                "/auth/complete/profile",
-                                "/api/v2/auth/login",
-                                "/api/v2/auth/refresh",
-                                "/api/v2/auth/complete/profile").permitAll()
+                        .requestMatchers(
+                                "/api/v1/login",
+                                "/api/v1/refresh",
+                                "/api/v1/complete-profile",
+                                "/api/v2/login",
+                                "/api/v2/refresh",
+                                "/api/v2/complete-profile",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

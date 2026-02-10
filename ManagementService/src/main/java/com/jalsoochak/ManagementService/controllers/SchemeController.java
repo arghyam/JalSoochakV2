@@ -27,10 +27,11 @@ public class SchemeController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/centre/{centreSchemeId}")
-    public ResponseEntity<ApiResponseDTO<SchemeResponseDTO>> getSchemeByCentreId(
-            @PathVariable Integer centreSchemeId) {
-        ApiResponseDTO<SchemeResponseDTO> response = schemeService.getSchemeByCentreId(centreSchemeId);
-        return ResponseEntity.ok(response);
-    }
+    // TODO: Implement scheme lookup by centreSchemeId
+    // @GetMapping("/centre/{centreSchemeId}")
+    // public ResponseEntity<ApiResponseDTO<SchemeResponseDTO>> getSchemeByCentreId(
+    //         @PathVariable Integer centreSchemeId) {
+    //     ApiResponseDTO<SchemeResponseDTO> response = schemeService.getSchemeByCentreId(centreSchemeId);
+    //     return ResponseEntity.ok(response);
+    // }
 }
