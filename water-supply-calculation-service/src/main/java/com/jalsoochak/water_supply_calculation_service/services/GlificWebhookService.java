@@ -166,7 +166,13 @@ public class GlificWebhookService {
                             "Message template not found for flow type and language code: " + languageCode,
                             HttpStatus.NOT_FOUND));
 
-            String formattedMessage = formatTemplate(messageTemplate.getTemplateText());
+            PersonMaster operator = personRepository
+                    .findByPhoneNumber(introRequest.getContactId())
+                    .orElseThrow(() -> new ApiException(
+                            "Operator not found: " + introRequest.getContactId(),
+                            HttpStatus.NOT_FOUND));
+
+            String formattedMessage = formatTemplate(messageTemplate.getTemplateText(), operator.getFullName());
 
             return IntroResponse.builder()
                     .success(true)
@@ -211,6 +217,19 @@ public class GlificWebhookService {
                     .build();
         }
     }
+
+    private String formatTemplate(String templateText, String username) {
+        if (templateText == null || templateText.isBlank()) {
+            return "";
+        }
+
+        return templateText
+                .replace("{{username}}", username == null ? "there" : username)
+                .trim()
+                .replace("\\n", "\n")
+                .replaceAll("\n{3,}", "\n\n");
+    }
+
 
 
     private String formatTemplate(String templateText) {

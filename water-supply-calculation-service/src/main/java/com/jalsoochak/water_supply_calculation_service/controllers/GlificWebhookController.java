@@ -5,7 +5,6 @@ import com.jalsoochak.water_supply_calculation_service.models.app.requests.Glifi
 import com.jalsoochak.water_supply_calculation_service.models.app.requests.IntroRequest;
 import com.jalsoochak.water_supply_calculation_service.models.app.responses.ClosingResponse;
 import com.jalsoochak.water_supply_calculation_service.models.app.responses.CreateReadingResponse;
-import com.jalsoochak.water_supply_calculation_service.models.app.responses.ImageAnalysisResponse;
 import com.jalsoochak.water_supply_calculation_service.models.app.responses.IntroResponse;
 import com.jalsoochak.water_supply_calculation_service.services.GlificWebhookService;
 import jakarta.validation.Valid;
