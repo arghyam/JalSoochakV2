@@ -88,11 +88,6 @@ export const mockFilterVillages: FilterOptionsByKey = {
   ],
 }
 
-export const mockFilterDuration = [
-  { value: 'last_7_days', label: 'Last 7 Days' },
-  { value: 'last_30_days', label: 'Last 30 Days' },
-]
-
 export const mockFilterSchemes = [
   { value: 'jal-jeevan-mission', label: 'Jal Jeevan Mission' },
   { value: 'swachh-bharat-mission', label: 'Swachh Bharat Mission' },

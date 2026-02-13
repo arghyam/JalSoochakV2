@@ -21,11 +21,11 @@ import {
   PhotoEvidenceComplianceTable,
   AllGramPanchayatsTable,
 } from './tables'
-import { LoadingSpinner, SearchableSelect } from '@/shared/components/common'
+import { DateRangePicker, LoadingSpinner, SearchableSelect } from '@/shared/components/common'
 import { MdOutlineWaterDrop, MdArrowUpward, MdArrowDownward } from 'react-icons/md'
 import { AiOutlineHome, AiOutlineInfoCircle } from 'react-icons/ai'
 import waterTapIcon from '@/assets/media/water-tap_1822589 1.svg'
-import type { SearchableSelectOption } from '@/shared/components/common'
+import type { DateRange, SearchableSelectOption } from '@/shared/components/common'
 import type { EntityPerformance } from '../types'
 import { SearchLayout, FilterLayout } from '@/shared/components/layout'
 import {
@@ -34,7 +34,6 @@ import {
   mockFilterBlocks,
   mockFilterGramPanchayats,
   mockFilterVillages,
-  mockFilterDuration,
   mockFilterSchemes,
   mockDistrictPerformanceByState,
   mockBlockPerformanceByDistrict,
@@ -50,7 +49,7 @@ type StoredFilters = {
   selectedBlock?: string
   selectedGramPanchayat?: string
   selectedVillage?: string
-  selectedDuration?: string
+  selectedDuration?: DateRange
   selectedScheme?: string
   filterTabIndex?: number
 }
@@ -76,6 +75,13 @@ export function CentralDashboard() {
   const navigate = useNavigate()
   const { data, isLoading, error } = useDashboardData('central')
   const [storedFilters] = useState(() => getStoredFilters())
+  const initialDuration =
+    storedFilters.selectedDuration &&
+    typeof storedFilters.selectedDuration === 'object' &&
+    'startDate' in storedFilters.selectedDuration &&
+    'endDate' in storedFilters.selectedDuration
+      ? storedFilters.selectedDuration
+      : null
   const [selectedState, setSelectedState] = useState(storedFilters.selectedState ?? '')
   const [selectedDistrict, setSelectedDistrict] = useState(storedFilters.selectedDistrict ?? '')
   const [selectedBlock, setSelectedBlock] = useState(storedFilters.selectedBlock ?? '')
@@ -83,7 +89,7 @@ export function CentralDashboard() {
     storedFilters.selectedGramPanchayat ?? ''
   )
   const [selectedVillage, setSelectedVillage] = useState(storedFilters.selectedVillage ?? '')
-  const [selectedDuration, setSelectedDuration] = useState(storedFilters.selectedDuration ?? '')
+  const [selectedDuration, setSelectedDuration] = useState<DateRange | null>(initialDuration)
   const [selectedScheme, setSelectedScheme] = useState(storedFilters.selectedScheme ?? '')
   const [performanceState, setPerformanceState] = useState('')
   const [filterTabIndex, setFilterTabIndex] = useState(
@@ -157,7 +163,7 @@ export function CentralDashboard() {
     setSelectedBlock('')
     setSelectedGramPanchayat('')
     setSelectedVillage('')
-    setSelectedDuration('')
+    setSelectedDuration(null)
     setSelectedScheme('')
   }
 
@@ -445,11 +451,12 @@ export function CentralDashboard() {
               disabled={!isAdvancedEnabled}
               isFilter={true}
             />
+
             <SearchableSelect
-              options={mockFilterDuration}
-              value={selectedDuration}
-              onChange={setSelectedDuration}
-              placeholder="Duration"
+              options={mockFilterSchemes}
+              value={selectedScheme}
+              onChange={setSelectedScheme}
+              placeholder="Scheme"
               width={{
                 base: '100%',
                 sm: 'calc(50% - 12px)',
@@ -465,11 +472,11 @@ export function CentralDashboard() {
               disabled={!isAdvancedEnabled}
               isFilter={true}
             />
-            <SearchableSelect
-              options={mockFilterSchemes}
-              value={selectedScheme}
-              onChange={setSelectedScheme}
-              placeholder="Scheme"
+
+            <DateRangePicker
+              value={selectedDuration}
+              onChange={setSelectedDuration}
+              placeholder="Duration"
               width={{
                 base: '100%',
                 sm: 'calc(50% - 12px)',
