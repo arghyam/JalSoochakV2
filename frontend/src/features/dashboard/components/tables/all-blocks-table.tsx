@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Box, Flex, Icon, Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
 import { BiSortAlt2 } from 'react-icons/bi'
 import type { EntityPerformance } from '../../types'
@@ -7,10 +8,32 @@ interface AllBlocksTableProps {
   maxItems?: number
 }
 
+type SortColumn = 'coverage' | 'quantity' | 'regularity' | 'compositeScore' | null
+type SortDirection = 'asc' | 'desc' | null
+
 export function AllBlocksTable({ data, maxItems }: AllBlocksTableProps) {
+  const [sortColumn, setSortColumn] = useState<SortColumn>(null)
+  const [sortDirection, setSortDirection] = useState<SortDirection>(null)
   const safeMaxItems =
     typeof maxItems === 'number' && Number.isFinite(maxItems) ? Math.max(0, maxItems) : undefined
   const rows = typeof safeMaxItems === 'number' ? data.slice(0, safeMaxItems) : data
+  const sortedRows =
+    sortColumn && sortDirection
+      ? [...rows].sort((a, b) => {
+          const aValue = a[sortColumn]
+          const bValue = b[sortColumn]
+          return sortDirection === 'asc' ? aValue - bValue : bValue - aValue
+        })
+      : rows
+
+  const handleSort = (column: Exclude<SortColumn, null>) => {
+    if (sortColumn !== column) {
+      setSortColumn(column)
+      setSortDirection('desc')
+      return
+    }
+    setSortDirection((current) => (current === 'desc' ? 'asc' : 'desc'))
+  }
 
   return (
     <Box borderRadius="lg" overflow="hidden">
@@ -47,26 +70,62 @@ export function AllBlocksTable({ data, maxItems }: AllBlocksTableProps) {
           >
             <Tr>
               <Th>Blocks</Th>
-              <Th>
-                <Flex align="center">
+              <Th
+                cursor="pointer"
+                aria-sort={
+                  sortColumn === 'coverage'
+                    ? sortDirection === 'asc'
+                      ? 'ascending'
+                      : 'descending'
+                    : undefined
+                }
+              >
+                <Flex align="center" onClick={() => handleSort('coverage')}>
                   <Box as="span">Coverage (%)</Box>
                   <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" />
                 </Flex>
               </Th>
-              <Th>
-                <Flex align="center">
+              <Th
+                cursor="pointer"
+                aria-sort={
+                  sortColumn === 'quantity'
+                    ? sortDirection === 'asc'
+                      ? 'ascending'
+                      : 'descending'
+                    : undefined
+                }
+              >
+                <Flex align="center" onClick={() => handleSort('quantity')}>
                   <Box as="span">Quantity (LPCD)</Box>
                   <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" />
                 </Flex>
               </Th>
-              <Th>
-                <Flex align="center">
+              <Th
+                cursor="pointer"
+                aria-sort={
+                  sortColumn === 'regularity'
+                    ? sortDirection === 'asc'
+                      ? 'ascending'
+                      : 'descending'
+                    : undefined
+                }
+              >
+                <Flex align="center" onClick={() => handleSort('regularity')}>
                   <Box as="span">Regularity (%)</Box>
                   <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" />
                 </Flex>
               </Th>
-              <Th>
-                <Flex align="center">
+              <Th
+                cursor="pointer"
+                aria-sort={
+                  sortColumn === 'compositeScore'
+                    ? sortDirection === 'asc'
+                      ? 'ascending'
+                      : 'descending'
+                    : undefined
+                }
+              >
+                <Flex align="center" onClick={() => handleSort('compositeScore')}>
                   <Box as="span">Average (%)</Box>
                   <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" />
                 </Flex>
@@ -86,7 +145,7 @@ export function AllBlocksTable({ data, maxItems }: AllBlocksTableProps) {
               },
             }}
           >
-            {rows.map((block) => (
+            {sortedRows.map((block) => (
               <Tr key={block.id} _odd={{ bg: 'primary.25' }}>
                 <Td>{block.name}</Td>
                 <Td>{block.coverage.toFixed(0)}%</Td>
