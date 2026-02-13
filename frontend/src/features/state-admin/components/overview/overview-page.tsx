@@ -212,8 +212,9 @@ export function OverviewPage() {
             yKeys={['Demand', 'Supply']}
             colors={['#3291D1', '#ADD3EB']}
             height="416px"
-            xAxisLabel="Year"
-            yAxisLabel="Quantity (units)"
+            xAxisLabel={t('overview.charts.Year')}
+            legendLabels={[t('overview.charts.Demand'), t('overview.charts.Supply')]}
+            yAxisLabel={t('overview.charts.Quantity')}
           />
         </Box>
 
