@@ -336,6 +336,7 @@ export function CentralDashboard() {
   const pumpOperatorsTotal = data.pumpOperators.reduce((total, item) => total + item.value, 0)
   const leadingPumpOperators = data.leadingPumpOperators ?? []
   const bottomPumpOperators = data.bottomPumpOperators ?? []
+  const operatorsPerformanceTable = [...leadingPumpOperators, ...bottomPumpOperators]
   const villagePhotoEvidenceRows = data.photoEvidenceCompliance.map((row) => ({
     ...row,
     name: villagePumpOperatorDetails.name,
@@ -1042,7 +1043,7 @@ export function CentralDashboard() {
             </Box>
             <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="526px">
               <Text textStyle="bodyText3" fontWeight="400" mb={2}>
-                Supply Data Submission Rate
+                Reading Submission Rate
               </Text>
               <SupplySubmissionRateChart
                 data={supplySubmissionRateData}
@@ -1111,7 +1112,7 @@ export function CentralDashboard() {
           </Box>
           <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
             <Text textStyle="bodyText3" fontWeight="400" mb={2}>
-              Supply Data Submission Rate
+              Reading Submission Rate
             </Text>
             <SupplySubmissionRateChart
               data={supplySubmissionRateData}
@@ -1122,21 +1123,22 @@ export function CentralDashboard() {
         </Grid>
       ) : null}
 
-      {/* Pump Operator Performance Tables */}
+      {/* Pump Operator Performance Table */}
       {!selectedVillage && isDistrictSelected ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="350px">
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6}>
             <PumpOperatorsPerformanceTable
-              title="Leading Pump Operators Performance"
-              data={leadingPumpOperators}
+              title="Operators Performance Table"
+              data={operatorsPerformanceTable}
             />
           </Box>
-          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="350px">
-            <PumpOperatorsPerformanceTable
-              title="Bottom Pump Operators Performance"
-              data={bottomPumpOperators}
-            />
-          </Box>
+          <Box
+            display={{ base: 'none', lg: 'block' }}
+            borderRadius="12px"
+            borderWidth="0.5px"
+            borderColor="transparent"
+            bg="transparent"
+          />
         </Grid>
       ) : null}
 

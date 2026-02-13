@@ -56,6 +56,7 @@ export interface PhotoEvidenceComplianceData {
 export interface PumpOperatorPerformanceData {
   id: string
   name: string
+  block: string
   village: string
   reportingRate: number
   photoCompliance: number

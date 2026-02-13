@@ -1,4 +1,6 @@
-import { Box, Flex, Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
+import { useState } from 'react'
+import { Box, Flex, Icon, Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
+import { BiSortAlt2 } from 'react-icons/bi'
 import type { PumpOperatorPerformanceData } from '../../types'
 
 interface PumpOperatorsPerformanceTableProps {
@@ -7,14 +9,36 @@ interface PumpOperatorsPerformanceTableProps {
   maxItems?: number
 }
 
+type SortColumn = 'reportingRate' | 'waterSupplied' | null
+type SortDirection = 'asc' | 'desc' | null
+
 export function PumpOperatorsPerformanceTable({
   data,
   title,
   maxItems,
 }: PumpOperatorsPerformanceTableProps) {
+  const [sortColumn, setSortColumn] = useState<SortColumn>(null)
+  const [sortDirection, setSortDirection] = useState<SortDirection>(null)
   const safeMaxItems =
     typeof maxItems === 'number' && Number.isFinite(maxItems) ? Math.max(0, maxItems) : undefined
   const rows = typeof safeMaxItems === 'number' ? data.slice(0, safeMaxItems) : data
+  const sortedRows =
+    sortColumn && sortDirection
+      ? [...rows].sort((a, b) => {
+          const aValue = a[sortColumn]
+          const bValue = b[sortColumn]
+          return sortDirection === 'asc' ? aValue - bValue : bValue - aValue
+        })
+      : rows
+
+  const handleSort = (column: Exclude<SortColumn, null>) => {
+    if (sortColumn !== column) {
+      setSortColumn(column)
+      setSortDirection('desc')
+      return
+    }
+    setSortDirection((current) => (current === 'desc' ? 'asc' : 'desc'))
+  }
 
   return (
     <Box borderRadius="lg" overflow="hidden">
@@ -40,20 +64,36 @@ export function PumpOperatorsPerformanceTable({
           >
             <Tr>
               <Th>Name</Th>
+              <Th>Block</Th>
               <Th>Village</Th>
-              <Th>
-                <Flex align="center">
+              <Th
+                cursor="pointer"
+                aria-sort={
+                  sortColumn === 'reportingRate'
+                    ? sortDirection === 'asc'
+                      ? 'ascending'
+                      : 'descending'
+                    : undefined
+                }
+              >
+                <Flex align="center" onClick={() => handleSort('reportingRate')}>
                   <Box as="span">Reporting Rate (%)</Box>
+                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" />
                 </Flex>
               </Th>
-              <Th>
-                <Flex align="center">
-                  <Box as="span">Photo Compliance</Box>
-                </Flex>
-              </Th>
-              <Th>
-                <Flex align="center">
+              <Th
+                cursor="pointer"
+                aria-sort={
+                  sortColumn === 'waterSupplied'
+                    ? sortDirection === 'asc'
+                      ? 'ascending'
+                      : 'descending'
+                    : undefined
+                }
+              >
+                <Flex align="center" onClick={() => handleSort('waterSupplied')}>
                   <Box as="span">Water Supplied</Box>
+                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" />
                 </Flex>
               </Th>
             </Tr>
@@ -71,12 +111,12 @@ export function PumpOperatorsPerformanceTable({
               },
             }}
           >
-            {rows.map((operator) => (
+            {sortedRows.map((operator) => (
               <Tr key={operator.id} _odd={{ bg: 'primary.25' }}>
                 <Td>{operator.name}</Td>
+                <Td>{operator.block}</Td>
                 <Td>{operator.village}</Td>
                 <Td>{operator.reportingRate}</Td>
-                <Td>{operator.photoCompliance}</Td>
                 <Td>{operator.waterSupplied} LPCD</Td>
               </Tr>
             ))}
