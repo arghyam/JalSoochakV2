@@ -570,19 +570,21 @@ export function EscalationsPage() {
                         width={{ base: '100%', lg: '294px', xl: '486px' }}
                         ariaLabel={t('escalations.aria.selectHours', { number: index + 1 })}
                       />
-                      <IconButton
-                        aria-label={t('escalations.aria.deleteLevel', {
-                          number: index + 1,
-                        })}
-                        icon={<MdDeleteOutline size={24} aria-hidden="true" />}
-                        variant="ghost"
-                        size="sm"
-                        color="neutral.400"
-                        onClick={() => handleRemoveLevel(level.id)}
-                        h="36px"
-                        minW="36px"
-                        _hover={{ bg: 'error.50', color: 'error.500' }}
-                      />
+                      {levels.length > 1 && (
+                        <IconButton
+                          aria-label={t('escalations.aria.deleteLevel', {
+                            number: index + 1,
+                          })}
+                          icon={<MdDeleteOutline size={24} aria-hidden="true" />}
+                          variant="ghost"
+                          size="sm"
+                          color="neutral.400"
+                          onClick={() => handleRemoveLevel(level.id)}
+                          h="36px"
+                          minW="36px"
+                          _hover={{ bg: 'error.50', color: 'error.500' }}
+                        />
+                      )}
                     </Flex>
                   ))}
                 </Stack>
