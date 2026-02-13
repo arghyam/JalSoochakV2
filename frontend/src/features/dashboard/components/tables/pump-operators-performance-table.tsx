@@ -45,7 +45,21 @@ export function PumpOperatorsPerformanceTable({
       <Box textStyle="bodyText3" fontWeight="400" mb="16px">
         {title}
       </Box>
-      <Box>
+      <Box
+        maxH="330px"
+        overflowY="auto"
+        overflowX="auto"
+        pr={2}
+        sx={{
+          '&::-webkit-scrollbar': { width: '4px' },
+          '&::-webkit-scrollbar-track': { bg: 'neutral.100', borderRadius: '999px' },
+          '&::-webkit-scrollbar-thumb': {
+            bg: 'neutral.300',
+            borderRadius: '999px',
+            minHeight: '165px',
+          },
+        }}
+      >
         <Table size="sm">
           <Thead
             sx={{

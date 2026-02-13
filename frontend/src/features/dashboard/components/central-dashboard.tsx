@@ -1123,8 +1123,26 @@ export function CentralDashboard() {
         </Grid>
       ) : null}
 
+      {/* Operators Performance + All Blocks */}
+      {!selectedVillage && isDistrictSelected && !isBlockSelected ? (
+        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="430px">
+            <PumpOperatorsPerformanceTable
+              title="Operators Performance Table"
+              data={operatorsPerformanceTable}
+            />
+          </Box>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="430px">
+            <Text textStyle="bodyText3" fontWeight="400" mb="16px">
+              All Blocks
+            </Text>
+            <AllBlocksTable data={blockTableData} />
+          </Box>
+        </Grid>
+      ) : null}
+
       {/* Pump Operator Performance Table */}
-      {!selectedVillage && isDistrictSelected ? (
+      {!selectedVillage && isDistrictSelected && isBlockSelected ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
           <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6}>
             <PumpOperatorsPerformanceTable
@@ -1138,26 +1156,6 @@ export function CentralDashboard() {
             borderWidth="0.5px"
             borderColor="transparent"
             bg="transparent"
-          />
-        </Grid>
-      ) : null}
-
-      {/* All Blocks */}
-      {!selectedVillage && isDistrictSelected && !isBlockSelected ? (
-        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="430px">
-            <Text textStyle="bodyText3" fontWeight="400" mb="16px">
-              All Blocks
-            </Text>
-            <AllBlocksTable data={blockTableData} />
-          </Box>
-          <Box
-            display={{ base: 'none', lg: 'block' }}
-            borderRadius="12px"
-            borderWidth="0.5px"
-            borderColor="transparent"
-            bg="transparent"
-            h="430px"
           />
         </Grid>
       ) : null}
