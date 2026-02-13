@@ -25,7 +25,7 @@ import {
 import type { Escalation, EscalationLevel } from '../../types/escalations'
 import { AVAILABLE_ALERT_TYPES, AVAILABLE_ROLES, AVAILABLE_HOURS } from '../../types/escalations'
 import { useToast } from '@/shared/hooks/use-toast'
-import { ToastContainer, SearchableSelect } from '@/shared/components/common'
+import { ToastContainer, SearchableSelect, ConfirmationDialog } from '@/shared/components/common'
 import { IoAddOutline } from 'react-icons/io5'
 
 type ViewMode = 'list' | 'add' | 'edit'
@@ -39,6 +39,8 @@ export function EscalationsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
   const showAddButtonText = useBreakpointValue({ base: false, sm: true }) ?? true
 
   // Form state
@@ -105,17 +107,29 @@ export function EscalationsPage() {
     }
   }
 
-  const handleDeleteClick = async (id: string) => {
-    if (confirm(t('escalations.messages.confirmDelete'))) {
-      try {
-        await deleteMockEscalation(id)
-        await fetchEscalations()
-        toast.addToast(t('escalations.messages.deletedSuccess'), 'success')
-      } catch (error) {
-        console.error('Failed to delete escalation:', error)
-        toast.addToast(t('escalations.messages.failedToDelete'), 'error')
-      }
+  const handleDeleteClick = (id: string) => {
+    setDeletingId(id)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!deletingId) return
+
+    setIsDeleting(true)
+    try {
+      await deleteMockEscalation(deletingId)
+      await fetchEscalations()
+      toast.addToast(t('escalations.messages.deletedSuccess'), 'success')
+      setDeletingId(null)
+    } catch (error) {
+      console.error('Failed to delete escalation:', error)
+      toast.addToast(t('escalations.messages.failedToDelete'), 'error')
+    } finally {
+      setIsDeleting(false)
     }
+  }
+
+  const handleCancelDelete = () => {
+    setDeletingId(null)
   }
 
   const handleCancel = () => {
@@ -167,6 +181,15 @@ export function EscalationsPage() {
   }
 
   const handleAddLevel = () => {
+    const hasUnfilledLevel = levels.some(
+      (level) => !level.targetRole || level.escalateAfterHours <= 0
+    )
+
+    if (hasUnfilledLevel) {
+      toast.addToast(t('escalations.messages.fillExisting'), 'error')
+      return
+    }
+
     const newLevel: EscalationLevel = {
       id: generateLevelId(),
       levelNumber: levels.length + 1,
@@ -174,6 +197,15 @@ export function EscalationsPage() {
       escalateAfterHours: 0,
     }
     setLevels([...levels, newLevel])
+  }
+
+  const handleRemoveLevel = (id: string) => {
+    const updatedLevels = levels.filter((l) => l.id !== id)
+    const renumberedLevels = updatedLevels.map((level, index) => ({
+      ...level,
+      levelNumber: index + 1,
+    }))
+    setLevels(renumberedLevels)
   }
 
   const handleLevelChange = (id: string, field: keyof EscalationLevel, value: string | number) => {
@@ -344,6 +376,18 @@ export function EscalationsPage() {
           </SimpleGrid>
         </Box>
 
+        {/* Delete Confirmation Dialog */}
+        <ConfirmationDialog
+          open={deletingId !== null}
+          onClose={handleCancelDelete}
+          onConfirm={handleConfirmDelete}
+          title={t('escalations.messages.confirmDeleteTitle')}
+          message={t('escalations.messages.confirmDelete')}
+          confirmLabel={t('common:button.delete')}
+          cancelLabel={t('common:button.cancel')}
+          isLoading={isDeleting}
+        />
+
         {/* Toast Container */}
         <ToastContainer toasts={toast.toasts} onRemove={toast.removeToast} />
       </Box>
@@ -432,7 +476,7 @@ export function EscalationsPage() {
                 value={alertType}
                 onChange={setAlertType}
                 placeholder={t('common:select')}
-                width={{ base: '100%', lg: '486px' }}
+                width={{ base: '100%', lg: '350px', xl: '486px' }}
                 ariaLabel={t('escalations.aria.selectAlertType')}
               />
             </Box>
@@ -441,11 +485,11 @@ export function EscalationsPage() {
             <Flex
               justify="space-between"
               align="flex-start"
-              direction={{ base: 'column', lg: 'row' }}
+              direction="row"
               gap={{ base: 4, lg: 6 }}
             >
               {/* Left Group: Level of Escalation */}
-              <Box flex={{ base: 'none', lg: 1 }}>
+              <Box flex={{ base: 1, lg: 1 }}>
                 <Text
                   as="label"
                   fontSize={{ base: 'xs', md: 'sm' }}
@@ -461,18 +505,13 @@ export function EscalationsPage() {
                 </Text>
                 <Stack spacing={3}>
                   {levels.map((level, index) => (
-                    <Flex
-                      key={level.id}
-                      gap={3}
-                      align="center"
-                      direction={{ base: 'column', sm: 'row' }}
-                    >
+                    <Flex key={level.id} gap={3} align="center" direction="row">
                       <Text
                         fontSize={{ base: 'xs', md: 'sm' }}
                         fontWeight="medium"
                         color="neutral.950"
                         whiteSpace="nowrap"
-                        w={{ base: 'full', sm: 'auto' }}
+                        w={{ base: 'auto' }}
                       >
                         {t('escalations.level', { number: index + 1 })}
                       </Text>
@@ -481,7 +520,7 @@ export function EscalationsPage() {
                         value={level.targetRole}
                         onChange={(value) => handleLevelChange(level.id, 'targetRole', value)}
                         placeholder={t('common:select')}
-                        width={{ base: '100%', sm: '420px' }}
+                        width={{ base: '100%', lg: '294px', xl: '430px' }}
                         ariaLabel={t('escalations.aria.selectRole', { number: index + 1 })}
                       />
                     </Flex>
@@ -490,7 +529,7 @@ export function EscalationsPage() {
                     variant="secondary"
                     size="sm"
                     onClick={handleAddLevel}
-                    w={{ base: 'full', sm: '152px' }}
+                    w={{ base: 'auto', sm: '152px' }}
                     fontSize="14px"
                     fontWeight="400"
                     h="32px"
@@ -504,7 +543,7 @@ export function EscalationsPage() {
               </Box>
 
               {/* Right Group: Escalate after (hours) */}
-              <Box flex={{ base: 'none', lg: 1 }}>
+              <Box flex={{ base: 1, lg: 1 }}>
                 <Text
                   as="label"
                   fontSize={{ base: 'xs', md: 'sm' }}
@@ -520,17 +559,31 @@ export function EscalationsPage() {
                 </Text>
                 <Stack spacing={3}>
                   {levels.map((level, index) => (
-                    <SearchableSelect
-                      key={level.id}
-                      options={AVAILABLE_HOURS}
-                      value={String(level.escalateAfterHours)}
-                      onChange={(value) =>
-                        handleLevelChange(level.id, 'escalateAfterHours', Number(value))
-                      }
-                      placeholder={t('common:select')}
-                      width={{ base: '100%', lg: '486px' }}
-                      ariaLabel={t('escalations.aria.selectHours', { number: index + 1 })}
-                    />
+                    <Flex key={level.id} gap={2} align="center">
+                      <SearchableSelect
+                        options={AVAILABLE_HOURS}
+                        value={String(level.escalateAfterHours)}
+                        onChange={(value) =>
+                          handleLevelChange(level.id, 'escalateAfterHours', Number(value))
+                        }
+                        placeholder={t('common:select')}
+                        width={{ base: '100%', lg: '294px', xl: '486px' }}
+                        ariaLabel={t('escalations.aria.selectHours', { number: index + 1 })}
+                      />
+                      <IconButton
+                        aria-label={t('escalations.aria.deleteLevel', {
+                          number: index + 1,
+                        })}
+                        icon={<MdDeleteOutline size={24} aria-hidden="true" />}
+                        variant="ghost"
+                        size="sm"
+                        color="neutral.400"
+                        onClick={() => handleRemoveLevel(level.id)}
+                        h="36px"
+                        minW="36px"
+                        _hover={{ bg: 'error.50', color: 'error.500' }}
+                      />
+                    </Flex>
                   ))}
                 </Stack>
               </Box>

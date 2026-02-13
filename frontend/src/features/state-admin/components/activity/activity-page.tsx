@@ -39,9 +39,9 @@ export function ActivityPage() {
     const ampm = hours >= 12 ? 'pm' : 'am'
 
     hours = hours % 12
-    hours = hours ? hours : 12 // Handle midnight (0 hours)
+    hours = hours ? hours : 12
 
-    return `${month}-${day}-${year}, ${hours}:${minutes}${ampm}`
+    return `${day}-${month}-${year}, ${hours}:${minutes}${ampm}`
   }
 
   const columns: DataTableColumn<ActivityLog>[] = [
@@ -72,12 +72,15 @@ export function ActivityPage() {
       render: (row) => (
         <Box
           as="span"
-          display="inline-block"
+          display="inline-flex"
           px={2}
           py={0.5}
           borderRadius="16px"
           h={6}
           maxW="96px"
+          width="71px"
+          alignItems="center"
+          justifyContent="center"
           textStyle="h10"
           fontWeight="400"
           bg={row.status === 'Success' ? 'success.50' : 'error.50'}

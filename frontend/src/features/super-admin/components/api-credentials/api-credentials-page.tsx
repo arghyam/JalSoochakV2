@@ -21,7 +21,7 @@ import type { ApiCredentialsData, ApiCredential } from '../../types/api-credenti
 import { STATUS_FILTER_OPTIONS } from '../../types/api-credentials'
 
 export function ApiCredentialsPage() {
-  const { t, i18n } = useTranslation(['super-admin', 'common'])
+  const { t } = useTranslation(['super-admin', 'common'])
   const [data, setData] = useState<ApiCredentialsData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -64,25 +64,24 @@ export function ApiCredentialsPage() {
   }, [])
 
   const formatDate = (date: Date): string => {
-    return new Intl.DateTimeFormat(i18n.language, {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    }).format(date)
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const year = date.getFullYear()
+
+    return `${day}-${month}-${year}`
   }
 
   const formatLastUsed = (date: Date): string => {
-    const dateFormatter = new Intl.DateTimeFormat(i18n.language, {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    })
-    const timeFormatter = new Intl.DateTimeFormat(i18n.language, {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    })
-    return `${dateFormatter.format(date)}, ${timeFormatter.format(date)}`
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const year = date.getFullYear()
+    let hours = date.getHours()
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+    const ampm = hours >= 12 ? 'pm' : 'am'
+
+    hours = hours % 12
+    hours = hours ? hours : 12
+    return `${day}-${month}-${year}, ${hours}:${minutes}${ampm}`
   }
 
   const handleGenerateKey = async (credentialId: string) => {

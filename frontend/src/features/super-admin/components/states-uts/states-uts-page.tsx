@@ -22,7 +22,7 @@ import type { StateUT } from '../../types/states-uts'
 import { ROUTES } from '@/shared/constants/routes'
 
 export function StatesUTsPage() {
-  const { t, i18n } = useTranslation(['super-admin', 'common'])
+  const { t } = useTranslation(['super-admin', 'common'])
   const navigate = useNavigate()
   const [states, setStates] = useState<StateUT[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -52,18 +52,17 @@ export function StatesUTsPage() {
   }
 
   const formatTimestamp = (date: Date): string => {
-    const dateFormatter = new Intl.DateTimeFormat(i18n.language, {
-      month: '2-digit',
-      day: '2-digit',
-      year: 'numeric',
-    })
-    const timeFormatter = new Intl.DateTimeFormat(i18n.language, {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    })
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const year = date.getFullYear()
+    let hours = date.getHours()
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+    const ampm = hours >= 12 ? 'pm' : 'am'
 
-    return `${dateFormatter.format(date)}, ${timeFormatter.format(date)}`
+    hours = hours % 12
+    hours = hours ? hours : 12
+
+    return `${day}-${month}-${year}, ${hours}:${minutes}${ampm}`
   }
 
   const filteredStates = states.filter((state) =>

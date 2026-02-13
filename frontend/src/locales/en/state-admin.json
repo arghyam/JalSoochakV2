@@ -17,7 +17,11 @@
     "charts": {
       "demandVsSupply": "Demand vs Supply",
       "dailyIngestionMonitor": "Daily Ingestion Monitor",
-      "successRate": "Success Rate"
+      "successRate": "Success Rate",
+      "Demand": "Demand",
+      "Supply": "Supply",
+      "Quantity": "Quantity (units)",
+      "Year": "Year"
     },
     "months": {
       "january": "January",
@@ -143,11 +147,14 @@
       "failedToLoadSingle": "Failed to load escalation",
       "failedToDelete": "Failed to delete escalation",
       "failedToSave": "Failed to save escalation",
-      "confirmDelete": "Are you sure you want to delete this escalation?"
+      "confirmDeleteTitle": "Delete Escalation",
+      "confirmDelete": "Are you sure you want to delete this escalation?",
+      "fillExisting": "Please fill the existing escalation level first"
     },
     "aria": {
       "editEscalation": "Edit escalation {{name}}",
       "deleteEscalation": "Delete escalation {{name}}",
+      "deleteLevel": "Delete level {{number}}",
       "editMode": "Edit mode",
       "selectAlertType": "Select alert type",
       "selectRole": "Select role for level {{number}}",
