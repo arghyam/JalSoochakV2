@@ -50,20 +50,14 @@ const formatISODate = (date: Date) => {
   return `${year}-${month}-${day}`
 }
 
-const formatDisplayDate = (value: string) => {
+const toDisplayValue = (value: string) => {
   const [year, month, day] = value.split('-')
   if (!year || !month || !day) return value
   return `${day}/${month}/${year}`
 }
 
 const toDisplayRange = (startDate: string, endDate: string) =>
-  `${formatDisplayDate(startDate)} - ${formatDisplayDate(endDate)}`
-
-const toDisplayValue = (value: string) => {
-  const [year, month, day] = value.split('-')
-  if (!year || !month || !day) return value
-  return `${day}/${month}/${year}`
-}
+  `${toDisplayValue(startDate)} - ${toDisplayValue(endDate)}`
 
 const toIsoValue = (value: string) => {
   const [day, month, year] = value.split('/')
