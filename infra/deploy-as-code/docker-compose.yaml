@@ -1,0 +1,175 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: jalsoochak-postgres
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init-keycloak-db.sql:/docker-entrypoint-initdb.d/init-keycloak-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: 252649026375.dkr.ecr.ap-south-1.amazonaws.com/redis:7.2.4
+    container_name: jalsoochak-redis
+    ports:
+      - "6379:6379"
+
+  kafka:
+    image: venkatramireddyb/kafka-bitnami:debian-12
+    container_name: jalsoochak-kafka
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_KRAFT_CLUSTER_ID=${KAFKA_CLUSTER_ID}
+    ports:
+      - "9092:9092"
+
+  keycloak:
+    image: venkatramireddyb/keycloak-bitnami:26.3.3-debian-12-r0
+    container_name: jalsoochak-keycloak
+    environment:
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+      - KEYCLOAK_DATABASE_HOST=postgres
+      - KEYCLOAK_DATABASE_PORT=5432
+      - KEYCLOAK_DATABASE_NAME=${KEYCLOAK_DATABASE_NAME}
+      - KEYCLOAK_DATABASE_USER=${KEYCLOAK_DATABASE_USER}
+      - KEYCLOAK_DATABASE_PASSWORD=${KEYCLOAK_DATABASE_PASSWORD}
+      - KEYCLOAK_HTTP_RELATIVE_PATH=/keycloak
+    ports:
+      - "8081:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  servicediscovery:
+    image: 252649026375.dkr.ecr.ap-south-1.amazonaws.com/servicediscoveryserver:7379cff732298df677ea6e750e12a4763a480f73
+    container_name: jalsoochak-servicediscovery
+    ports:
+      - "8761:8761"
+
+  apigateway:
+    image: 252649026375.dkr.ecr.ap-south-1.amazonaws.com/apigateway:swagger
+    container_name: jalsoochak-apigateway
+    environment:
+      - SERVER_PORT=8080
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://servicediscovery:8761/eureka
+      - CORS_ALLOWED_ORIGINS=*
+    ports:
+      - "8080:8080"
+    depends_on:
+      - servicediscovery
+
+  managementservice:
+    image: 252649026375.dkr.ecr.ap-south-1.amazonaws.com/managementservice:8df18bf363cadc490fdaf077b9bc758ad62627b4
+    container_name: jalsoochak-managementservice
+    environment:
+      - SERVER_PORT=8080
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://servicediscovery:8761/eureka
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/${DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080/keycloak
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      servicediscovery:
+        condition: service_started
+
+  messaging-orchestrator-service:
+    image: 252649026375.dkr.ecr.ap-south-1.amazonaws.com/messaging-orchestrator-service:c54fc15c00359b135e3e5661a13c24a2515899f3
+    container_name: jalsoochak-messaging-orchestrator
+    environment:
+      - SERVER_PORT=8080
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://servicediscovery:8761/eureka
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/${DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - GLIFIC_USERNAME=${GLIFIC_USERNAME}
+      - GLIFIC_PASSWORD=${GLIFIC_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      servicediscovery:
+        condition: service_started
+
+  water-supply-calculation-service:
+    image: 252649026375.dkr.ecr.ap-south-1.amazonaws.com/water-supply-calculation-service:e65c4080f4bc1c7bf5f8d27ff648333036d02ac7
+    container_name: jalsoochak-water-supply
+    environment:
+      - SERVER_PORT=8080
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://servicediscovery:8761/eureka
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/${DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      servicediscovery:
+        condition: service_started
+
+  jalsoochak-frontend:
+    image: 252649026375.dkr.ecr.ap-south-1.amazonaws.com/jalsoochak-frontend:6d700c738a0ae7b8ab6d3275aabd96c466f35941
+    container_name: jalsoochak-frontend
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend/config.js:/usr/share/nginx/html/config.js
+
+  flowvision:
+    image: 252649026375.dkr.ecr.ap-south-1.amazonaws.com/arghyam/flowvision:1.0.0
+    container_name: jalsoochak-flowvision
+    environment:
+      - FLOWVISION_DB_USERNAME=${DB_USERNAME}
+      - FLOWVISION_DB_PASSWORD=${DB_PASSWORD}
+      - FLOWVISION_DB_HOST=postgres
+      - FLOWVISION_DB_PORT=5432
+      - FLOWVISION_DB_NAME=${DB_NAME}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: jalsoochak-prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: jalsoochak-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+
+volumes:
+  postgres_data:
