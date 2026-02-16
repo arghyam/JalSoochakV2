@@ -355,9 +355,35 @@ export function DateRangePicker({
                       type="text"
                       placeholder="dd/mm/yyyy"
                       value={draft?.startDate ?? ''}
-                      readOnly
                       onClick={() => openPicker(startDateInputRef)}
                       onFocus={() => openPicker(startDateInputRef)}
+                      onChange={(event) => {
+                        const nextValue = event.target.value
+                        setDraft((current) => {
+                          const currentEnd = current?.endDate ?? ''
+                          const shouldAdjustEnd =
+                            isValidDisplayDate(nextValue) &&
+                            isValidDisplayDate(currentEnd) &&
+                            toIsoValue(currentEnd) < toIsoValue(nextValue)
+                          return {
+                            startDate: nextValue,
+                            endDate: shouldAdjustEnd ? nextValue : currentEnd,
+                            preset: undefined,
+                          }
+                        })
+                        setDraftIso((current) => {
+                          const currentEnd = current?.endDate ?? ''
+                          if (!isValidDisplayDate(nextValue)) {
+                            return { startDate: '', endDate: currentEnd }
+                          }
+                          const nextStart = toIsoValue(nextValue)
+                          const shouldAdjustEnd = currentEnd && currentEnd < nextStart
+                          return {
+                            startDate: nextStart,
+                            endDate: shouldAdjustEnd ? nextStart : currentEnd,
+                          }
+                        })
+                      }}
                       borderColor="neutral.200"
                       _hover={{ borderColor: 'neutral.300' }}
                       _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
@@ -409,9 +435,20 @@ export function DateRangePicker({
                       type="text"
                       placeholder="dd/mm/yyyy"
                       value={draft?.endDate ?? ''}
-                      readOnly
                       onClick={() => openPicker(endDateInputRef)}
                       onFocus={() => openPicker(endDateInputRef)}
+                      onChange={(event) => {
+                        const nextValue = event.target.value
+                        setDraft((current) => ({
+                          startDate: current?.startDate ?? '',
+                          endDate: nextValue,
+                          preset: undefined,
+                        }))
+                        setDraftIso((current) => ({
+                          startDate: current?.startDate ?? '',
+                          endDate: isValidDisplayDate(nextValue) ? toIsoValue(nextValue) : '',
+                        }))
+                      }}
                       borderColor="neutral.200"
                       _hover={{ borderColor: 'neutral.300' }}
                       _focus={{ borderColor: 'primary.500', boxShadow: 'none' }}
