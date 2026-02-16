@@ -16,15 +16,15 @@ export function AllGramPanchayatsTable({ data, maxItems }: AllGramPanchayatsTabl
   const [sortDirection, setSortDirection] = useState<SortDirection>(null)
   const safeMaxItems =
     typeof maxItems === 'number' && Number.isFinite(maxItems) ? Math.max(0, maxItems) : undefined
-  const rows = typeof safeMaxItems === 'number' ? data.slice(0, safeMaxItems) : data
   const sortedRows =
     sortColumn && sortDirection
-      ? [...rows].sort((a, b) => {
+      ? [...data].sort((a, b) => {
           const aValue = a[sortColumn]
           const bValue = b[sortColumn]
           return sortDirection === 'asc' ? aValue - bValue : bValue - aValue
         })
-      : rows
+      : data
+  const rows = typeof safeMaxItems === 'number' ? sortedRows.slice(0, safeMaxItems) : sortedRows
 
   const handleSort = (column: Exclude<SortColumn, null>) => {
     if (sortColumn !== column) {
@@ -145,7 +145,7 @@ export function AllGramPanchayatsTable({ data, maxItems }: AllGramPanchayatsTabl
               },
             }}
           >
-            {sortedRows.map((item) => (
+            {rows.map((item) => (
               <Tr key={item.id} _odd={{ bg: 'primary.25' }}>
                 <Td>{item.name}</Td>
                 <Td>{item.coverage.toFixed(0)}%</Td>

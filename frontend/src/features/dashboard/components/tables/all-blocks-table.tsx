@@ -16,15 +16,15 @@ export function AllBlocksTable({ data, maxItems }: AllBlocksTableProps) {
   const [sortDirection, setSortDirection] = useState<SortDirection>(null)
   const safeMaxItems =
     typeof maxItems === 'number' && Number.isFinite(maxItems) ? Math.max(0, maxItems) : undefined
-  const rows = typeof safeMaxItems === 'number' ? data.slice(0, safeMaxItems) : data
   const sortedRows =
     sortColumn && sortDirection
-      ? [...rows].sort((a, b) => {
+      ? [...data].sort((a, b) => {
           const aValue = a[sortColumn]
           const bValue = b[sortColumn]
           return sortDirection === 'asc' ? aValue - bValue : bValue - aValue
         })
-      : rows
+      : data
+  const rows = typeof safeMaxItems === 'number' ? sortedRows.slice(0, safeMaxItems) : sortedRows
 
   const handleSort = (column: Exclude<SortColumn, null>) => {
     if (sortColumn !== column) {
@@ -145,7 +145,7 @@ export function AllBlocksTable({ data, maxItems }: AllBlocksTableProps) {
               },
             }}
           >
-            {sortedRows.map((block) => (
+            {rows.map((block) => (
               <Tr key={block.id} _odd={{ bg: 'primary.25' }}>
                 <Td>{block.name}</Td>
                 <Td>{block.coverage.toFixed(0)}%</Td>
