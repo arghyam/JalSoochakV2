@@ -990,7 +990,7 @@ export function CentralDashboard() {
         </>
       ) : !selectedVillage ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px" minW={0}>
             {isDistrictSelected ? (
               <>
                 <Flex align="center" justify="space-between" mb="40px">

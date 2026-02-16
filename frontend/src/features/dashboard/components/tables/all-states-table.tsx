@@ -13,18 +13,22 @@ export function AllStatesTable({ data, maxItems }: AllStatesTableProps) {
   const rows = typeof safeMaxItems === 'number' ? data.slice(0, safeMaxItems) : data
 
   return (
-    <Box borderRadius="lg" overflow="hidden">
+    <Box borderRadius="lg" overflow="visible">
       <Box
         maxH="416px"
-        overflowY="auto"
+        overflow="auto"
+        w="full"
+        maxW="100%"
         pr={2}
+        pb={2}
         sx={{
-          '&::-webkit-scrollbar': { width: '4px' },
+          WebkitOverflowScrolling: 'touch',
+          '&::-webkit-scrollbar': { width: '4px', height: '4px' },
           '&::-webkit-scrollbar-track': { bg: 'neutral.100', borderRadius: '999px' },
           '&::-webkit-scrollbar-thumb': { bg: 'neutral.300', borderRadius: '999px' },
         }}
       >
-        <Table size="sm">
+        <Table size="sm" minW="720px" w="max-content">
           <Thead
             sx={{
               position: 'sticky',
@@ -37,6 +41,8 @@ export function AllStatesTable({ data, maxItems }: AllStatesTableProps) {
                 fontWeight: '500',
                 px: 3,
                 py: 5,
+                minW: '140px',
+                whiteSpace: 'nowrap',
               },
             }}
           >
@@ -78,6 +84,7 @@ export function AllStatesTable({ data, maxItems }: AllStatesTableProps) {
                 height: '40px',
                 lineHeight: '40px',
                 whiteSpace: 'nowrap',
+                minW: '140px',
               },
             }}
           >
