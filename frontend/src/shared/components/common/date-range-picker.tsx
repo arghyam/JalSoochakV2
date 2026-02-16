@@ -355,7 +355,6 @@ export function DateRangePicker({
                       type="text"
                       placeholder="dd/mm/yyyy"
                       value={draft?.startDate ?? ''}
-                      onClick={() => openPicker(startDateInputRef)}
                       onFocus={() => openPicker(startDateInputRef)}
                       onChange={(event) => {
                         const nextValue = event.target.value
@@ -435,7 +434,6 @@ export function DateRangePicker({
                       type="text"
                       placeholder="dd/mm/yyyy"
                       value={draft?.endDate ?? ''}
-                      onClick={() => openPicker(endDateInputRef)}
                       onFocus={() => openPicker(endDateInputRef)}
                       onChange={(event) => {
                         const nextValue = event.target.value
