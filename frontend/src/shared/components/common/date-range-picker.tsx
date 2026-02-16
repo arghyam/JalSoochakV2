@@ -391,6 +391,8 @@ export function DateRangePicker({
                       ref={startDateInputRef}
                       type="date"
                       value={draftIso?.startDate ?? ''}
+                      tabIndex={-1}
+                      aria-hidden="true"
                       onChange={(event) => {
                         const nextValue = event.target.value
                         setDraftIso((current) => {
@@ -456,6 +458,8 @@ export function DateRangePicker({
                       type="date"
                       min={draftIso?.startDate || undefined}
                       value={draftIso?.endDate ?? ''}
+                      tabIndex={-1}
+                      aria-hidden="true"
                       onChange={(event) => {
                         const nextValue = event.target.value
                         setDraftIso((current) => ({
