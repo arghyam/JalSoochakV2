@@ -51,6 +51,12 @@ type StoredFilters = {
   selectedVillage?: string
   selectedDuration?: DateRange
   selectedScheme?: string
+  selectedDepartmentState?: string
+  selectedDepartmentZone?: string
+  selectedDepartmentCircle?: string
+  selectedDepartmentDivision?: string
+  selectedDepartmentSubdivision?: string
+  selectedDepartmentVillage?: string
   filterTabIndex?: number
 }
 
@@ -91,6 +97,24 @@ export function CentralDashboard() {
   const [selectedVillage, setSelectedVillage] = useState(storedFilters.selectedVillage ?? '')
   const [selectedDuration, setSelectedDuration] = useState<DateRange | null>(initialDuration)
   const [selectedScheme, setSelectedScheme] = useState(storedFilters.selectedScheme ?? '')
+  const [selectedDepartmentState, setSelectedDepartmentState] = useState(
+    storedFilters.selectedDepartmentState ?? ''
+  )
+  const [selectedDepartmentZone, setSelectedDepartmentZone] = useState(
+    storedFilters.selectedDepartmentZone ?? ''
+  )
+  const [selectedDepartmentCircle, setSelectedDepartmentCircle] = useState(
+    storedFilters.selectedDepartmentCircle ?? ''
+  )
+  const [selectedDepartmentDivision, setSelectedDepartmentDivision] = useState(
+    storedFilters.selectedDepartmentDivision ?? ''
+  )
+  const [selectedDepartmentSubdivision, setSelectedDepartmentSubdivision] = useState(
+    storedFilters.selectedDepartmentSubdivision ?? ''
+  )
+  const [selectedDepartmentVillage, setSelectedDepartmentVillage] = useState(
+    storedFilters.selectedDepartmentVillage ?? ''
+  )
   const [performanceState, setPerformanceState] = useState('')
   const [filterTabIndex, setFilterTabIndex] = useState(
     typeof storedFilters.filterTabIndex === 'number' ? storedFilters.filterTabIndex : 0
@@ -99,6 +123,7 @@ export function CentralDashboard() {
   const isDistrictSelected = Boolean(selectedDistrict)
   const isBlockSelected = Boolean(selectedBlock)
   const isGramPanchayatSelected = Boolean(selectedGramPanchayat)
+  const isDepartmentStateSelected = Boolean(selectedDepartmentState)
   const emptyOptions: SearchableSelectOption[] = []
   const isAdvancedEnabled = Boolean(selectedState && selectedDistrict)
   const districtTableData =
@@ -157,6 +182,14 @@ export function CentralDashboard() {
     setSelectedGramPanchayat(value)
     setSelectedVillage('')
   }
+  const handleDepartmentStateChange = (value: string) => {
+    setSelectedDepartmentState(value)
+    setSelectedDepartmentZone('')
+    setSelectedDepartmentCircle('')
+    setSelectedDepartmentDivision('')
+    setSelectedDepartmentSubdivision('')
+    setSelectedDepartmentVillage('')
+  }
   const handleClearFilters = () => {
     setSelectedState('')
     setSelectedDistrict('')
@@ -165,6 +198,12 @@ export function CentralDashboard() {
     setSelectedVillage('')
     setSelectedDuration(null)
     setSelectedScheme('')
+    setSelectedDepartmentState('')
+    setSelectedDepartmentZone('')
+    setSelectedDepartmentCircle('')
+    setSelectedDepartmentDivision('')
+    setSelectedDepartmentSubdivision('')
+    setSelectedDepartmentVillage('')
   }
 
   useEffect(() => {
@@ -176,6 +215,12 @@ export function CentralDashboard() {
       selectedVillage,
       selectedDuration,
       selectedScheme,
+      selectedDepartmentState,
+      selectedDepartmentZone,
+      selectedDepartmentCircle,
+      selectedDepartmentDivision,
+      selectedDepartmentSubdivision,
+      selectedDepartmentVillage,
       filterTabIndex,
     }
     try {
@@ -188,6 +233,12 @@ export function CentralDashboard() {
     selectedBlock,
     selectedDistrict,
     selectedDuration,
+    selectedDepartmentCircle,
+    selectedDepartmentDivision,
+    selectedDepartmentState,
+    selectedDepartmentSubdivision,
+    selectedDepartmentVillage,
+    selectedDepartmentZone,
     selectedGramPanchayat,
     selectedScheme,
     selectedState,
@@ -497,9 +548,29 @@ export function CentralDashboard() {
         ) : (
           <>
             <SearchableSelect
+              options={mockFilterStates}
+              value={selectedDepartmentState}
+              onChange={handleDepartmentStateChange}
+              placeholder="States/UTs"
+              required
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
+              height="32px"
+              borderRadius="4px"
+              fontSize="sm"
+              textColor="neutral.400"
+              borderColor="neutral.400"
+              isFilter={true}
+            />
+            <SearchableSelect
               options={emptyOptions}
-              value=""
-              onChange={() => {}}
+              value={selectedDepartmentZone}
+              onChange={setSelectedDepartmentZone}
               placeholder="Zone"
               width={{
                 base: '100%',
@@ -511,15 +582,15 @@ export function CentralDashboard() {
               height="32px"
               borderRadius="4px"
               fontSize="sm"
-              textColor="neutral.300"
-              borderColor="neutral.300"
-              disabled
+              textColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
+              borderColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
+              disabled={!isDepartmentStateSelected}
               isFilter={true}
             />
             <SearchableSelect
               options={emptyOptions}
-              value=""
-              onChange={() => {}}
+              value={selectedDepartmentCircle}
+              onChange={setSelectedDepartmentCircle}
               placeholder="Circle"
               width={{
                 base: '100%',
@@ -531,15 +602,15 @@ export function CentralDashboard() {
               height="32px"
               borderRadius="4px"
               fontSize="sm"
-              textColor="neutral.300"
-              borderColor="neutral.300"
-              disabled
+              textColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
+              borderColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
+              disabled={!isDepartmentStateSelected}
               isFilter={true}
             />
             <SearchableSelect
               options={emptyOptions}
-              value=""
-              onChange={() => {}}
+              value={selectedDepartmentDivision}
+              onChange={setSelectedDepartmentDivision}
               placeholder="Division"
               width={{
                 base: '100%',
@@ -551,15 +622,15 @@ export function CentralDashboard() {
               height="32px"
               borderRadius="4px"
               fontSize="sm"
-              textColor="neutral.300"
-              borderColor="neutral.300"
-              disabled
+              textColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
+              borderColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
+              disabled={!isDepartmentStateSelected}
               isFilter={true}
             />
             <SearchableSelect
               options={emptyOptions}
-              value=""
-              onChange={() => {}}
+              value={selectedDepartmentSubdivision}
+              onChange={setSelectedDepartmentSubdivision}
               placeholder="Subdivision"
               width={{
                 base: '100%',
@@ -571,15 +642,15 @@ export function CentralDashboard() {
               height="32px"
               borderRadius="4px"
               fontSize="sm"
-              textColor="neutral.300"
-              borderColor="neutral.300"
-              disabled
+              textColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
+              borderColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
+              disabled={!isDepartmentStateSelected}
               isFilter={true}
             />
             <SearchableSelect
               options={emptyOptions}
-              value=""
-              onChange={() => {}}
+              value={selectedDepartmentVillage}
+              onChange={setSelectedDepartmentVillage}
               placeholder="Village"
               width={{
                 base: '100%',
@@ -591,9 +662,9 @@ export function CentralDashboard() {
               height="32px"
               borderRadius="4px"
               fontSize="sm"
-              textColor="neutral.300"
-              borderColor="neutral.300"
-              disabled
+              textColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
+              borderColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
+              disabled={!isDepartmentStateSelected}
               isFilter={true}
             />
           </>
