@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from 'react'
-import { Box, useTheme } from '@chakra-ui/react'
+import { Box, useBreakpointValue, useTheme } from '@chakra-ui/react'
 import * as echarts from 'echarts'
 import { EChartsWrapper } from './echarts-wrapper'
 import { getBodyText7Style } from './chart-text-style'
@@ -22,6 +22,7 @@ export function AllStatesPerformanceChart({
 }: AllStatesPerformanceChartProps) {
   const theme = useTheme()
   const bodyText7 = getBodyText7Style(theme)
+  const isCompact = useBreakpointValue({ base: true, md: false }) ?? false
   const normalizedMaxItems =
     typeof maxItems === 'number' && Number.isFinite(maxItems) ? Math.max(1, maxItems) : 1
   const chartScrollRef = useRef<HTMLDivElement>(null)
@@ -33,14 +34,25 @@ export function AllStatesPerformanceChart({
   const thumbLeftRef = useRef(0)
   const [containerWidth, setContainerWidth] = useState(0)
 
-  const defaultItemWidth = 80
-  const minItemWidth = 56
+  const defaultItemWidth = isCompact ? 68 : 80
+  const minItemWidth = isCompact ? 44 : 56
   const effectiveItemWidth =
     containerWidth > 0
       ? Math.max(minItemWidth, Math.floor(containerWidth / Math.max(data.length, 1)))
       : defaultItemWidth
   const itemWidth = Math.min(defaultItemWidth, effectiveItemWidth)
-  const barWidth = Math.min(34, Math.max(16, Math.floor(itemWidth * 0.45)))
+  const barWidth = Math.min(
+    isCompact ? 28 : 34,
+    Math.max(isCompact ? 12 : 16, Math.floor(itemWidth * 0.45))
+  )
+  const axisLabelFontSize = isCompact ? Math.max(10, bodyText7.fontSize - 2) : bodyText7.fontSize
+  const axisLabelLineHeight = isCompact
+    ? Math.max(12, bodyText7.lineHeight - 2)
+    : bodyText7.lineHeight
+  const axisLabelMargin = isCompact ? 10 : 15
+  const axisLabelRotate = isCompact ? 60 : 45
+  const axisWidth = isCompact ? '56px' : '72px'
+  const axisLabelOffset = isCompact ? '-32px' : '-40px'
   const longestEntityLabel = useMemo(() => {
     return data.reduce((longest, item) => {
       return item.name.length > longest.length ? item.name : longest
@@ -58,7 +70,7 @@ export function AllStatesPerformanceChart({
         show: false,
       },
       grid: {
-        left: 24,
+        left: isCompact ? 12 : 24,
         right: '4%',
         top: '10%',
         bottom: '2%',
@@ -79,11 +91,11 @@ export function AllStatesPerformanceChart({
         axisLabel: {
           showMaxLabel: true,
           showMinLabel: true,
-          rotate: 45,
+          rotate: axisLabelRotate,
           interval: 0,
-          margin: 15,
-          fontSize: bodyText7.fontSize,
-          lineHeight: bodyText7.lineHeight,
+          margin: axisLabelMargin,
+          fontSize: axisLabelFontSize,
+          lineHeight: axisLabelLineHeight,
           fontWeight: 400,
           color: bodyText7.color,
         },
@@ -132,7 +144,16 @@ export function AllStatesPerformanceChart({
         },
       ],
     }
-  }, [data, bodyText7, barWidth])
+  }, [
+    axisLabelFontSize,
+    axisLabelLineHeight,
+    axisLabelMargin,
+    axisLabelRotate,
+    barWidth,
+    bodyText7,
+    data,
+    isCompact,
+  ])
 
   const axisOption = useMemo<echarts.EChartsOption>(() => {
     const placeholderLabel = longestEntityLabel || 'W'
@@ -158,10 +179,10 @@ export function AllStatesPerformanceChart({
         },
         axisLabel: {
           show: true,
-          rotate: 45,
-          margin: 15,
-          fontSize: bodyText7.fontSize,
-          lineHeight: bodyText7.lineHeight,
+          rotate: axisLabelRotate,
+          margin: axisLabelMargin,
+          fontSize: axisLabelFontSize,
+          lineHeight: axisLabelLineHeight,
           fontWeight: 400,
           formatter: (value: string) => value,
           color: 'transparent',
@@ -173,8 +194,8 @@ export function AllStatesPerformanceChart({
         axisLabel: {
           align: 'right',
           margin: 2,
-          fontSize: bodyText7.fontSize,
-          lineHeight: bodyText7.lineHeight,
+          fontSize: axisLabelFontSize,
+          lineHeight: axisLabelLineHeight,
           fontWeight: 400,
           color: bodyText7.color,
         },
@@ -197,7 +218,14 @@ export function AllStatesPerformanceChart({
       ],
       animation: false,
     }
-  }, [bodyText7, longestEntityLabel])
+  }, [
+    axisLabelFontSize,
+    axisLabelLineHeight,
+    axisLabelMargin,
+    axisLabelRotate,
+    bodyText7,
+    longestEntityLabel,
+  ])
 
   const containerHeight = typeof height === 'number' ? `${height}px` : height
   const legendItems = [
@@ -304,22 +332,25 @@ export function AllStatesPerformanceChart({
       className={className}
       style={{
         width: '100%',
+        minWidth: 0,
         height: containerHeight,
         display: 'flex',
         flexDirection: 'column',
       }}
     >
-      <Box flex={1} minH={0} overflow="visible" display="flex">
-        <Box width="72px" flexShrink={0} position="relative">
+      <Box flex={1} minH={0} minW={0} overflow="visible" display="flex">
+        <Box width={axisWidth} flexShrink={0} position="relative">
           <EChartsWrapper option={axisOption} height="100%" />
           <Box
             position="absolute"
-            left="-40px"
+            left={axisLabelOffset}
             top="50%"
             transform="translateY(-50%) rotate(-90deg)"
             transformOrigin="center"
             textStyle="bodyText7"
             fontWeight="400"
+            fontSize={axisLabelFontSize}
+            lineHeight={`${axisLabelLineHeight}px`}
             color={bodyText7.color}
             whiteSpace="nowrap"
           >
@@ -332,6 +363,7 @@ export function AllStatesPerformanceChart({
           overflowY="hidden"
           height="100%"
           flex="1"
+          minW={0}
           onScroll={updateThumbFromScroll}
           sx={{
             scrollbarWidth: 'none',
@@ -363,6 +395,8 @@ export function AllStatesPerformanceChart({
           alignItems: 'center',
           justifyContent: 'center',
           gap: '16px',
+          flexWrap: 'wrap',
+          rowGap: '6px',
           paddingTop: '8px',
         }}
       >
