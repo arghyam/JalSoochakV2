@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useTheme } from '@chakra-ui/react'
+import { useBreakpointValue, useTheme } from '@chakra-ui/react'
 import * as echarts from 'echarts'
 import { EChartsWrapper } from './echarts-wrapper'
 import { getBodyText7Style } from './chart-text-style'
@@ -26,6 +26,8 @@ export function WaterSupplyOutagesChart({
 }: WaterSupplyOutagesChartProps) {
   const theme = useTheme()
   const bodyText7 = getBodyText7Style(theme)
+  const barWidth = useBreakpointValue({ base: 28, sm: 28, md: 42, lg: 66 }) ?? 66
+  const barRadius = useBreakpointValue({ base: 8, sm: 10, md: 12 }) ?? 12
 
   const option = useMemo<echarts.EChartsOption>(() => {
     const districts = data.map((entry) => entry.district)
@@ -98,10 +100,10 @@ export function WaterSupplyOutagesChart({
           type: 'bar',
           stack: 'outages',
           data: data.map((entry) => entry.sourceDrying),
-          barWidth: 66,
+          barWidth,
           itemStyle: {
             color: outageColors.sourceDrying,
-            borderRadius: [0, 0, 12, 12],
+            borderRadius: [0, 0, barRadius, barRadius],
           },
         },
         {
@@ -109,7 +111,7 @@ export function WaterSupplyOutagesChart({
           type: 'bar',
           stack: 'outages',
           data: data.map((entry) => entry.valveIssue),
-          barWidth: 66,
+          barWidth,
           itemStyle: {
             color: outageColors.valveIssue,
           },
@@ -119,7 +121,7 @@ export function WaterSupplyOutagesChart({
           type: 'bar',
           stack: 'outages',
           data: data.map((entry) => entry.pumpFailure),
-          barWidth: 66,
+          barWidth,
           itemStyle: {
             color: outageColors.pumpFailure,
           },
@@ -129,7 +131,7 @@ export function WaterSupplyOutagesChart({
           type: 'bar',
           stack: 'outages',
           data: data.map((entry) => entry.pipelineLeak),
-          barWidth: 66,
+          barWidth,
           itemStyle: {
             color: outageColors.pipelineLeak,
           },
@@ -139,15 +141,15 @@ export function WaterSupplyOutagesChart({
           type: 'bar',
           stack: 'outages',
           data: data.map((entry) => entry.electricityFailure),
-          barWidth: 66,
+          barWidth,
           itemStyle: {
             color: outageColors.electricityFailure,
-            borderRadius: [12, 12, 0, 0],
+            borderRadius: [barRadius, barRadius, 0, 0],
           },
         },
       ],
     }
-  }, [data, bodyText7])
+  }, [data, bodyText7, barWidth, barRadius])
 
   const containerHeight = typeof height === 'number' ? `${height}px` : height
   const legendItems = [
