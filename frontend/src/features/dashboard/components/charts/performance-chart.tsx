@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useTheme } from '@chakra-ui/react'
+import { useBreakpointValue, useTheme } from '@chakra-ui/react'
 import * as echarts from 'echarts'
 import { EChartsWrapper } from './echarts-wrapper'
 import { getBodyText7Style } from './chart-text-style'
@@ -22,6 +22,7 @@ export function AllStatesPerformanceChart({
 }: AllStatesPerformanceChartProps) {
   const theme = useTheme()
   const bodyText7 = getBodyText7Style(theme)
+  const barWidth = useBreakpointValue({ base: 16, sm: 20, md: 34 }) ?? 34
 
   const option = useMemo<echarts.EChartsOption>(() => {
     const sortedData = [...data].sort((a, b) => b.quantity - a.quantity).slice(0, maxItems)
@@ -100,7 +101,7 @@ export function AllStatesPerformanceChart({
           name: 'Quantity',
           type: 'bar',
           data: quantity,
-          barWidth: 34,
+          barWidth,
           itemStyle: {
             color: '#3291D1',
             borderRadius: [4, 4, 0, 0],
@@ -110,7 +111,7 @@ export function AllStatesPerformanceChart({
           name: 'Regularity',
           type: 'bar',
           data: regularity,
-          barWidth: 34,
+          barWidth,
           barGap: '30%',
           itemStyle: {
             color: '#ADD3ED',
@@ -119,7 +120,7 @@ export function AllStatesPerformanceChart({
         },
       ],
     }
-  }, [data, maxItems, bodyText7, entityLabel])
+  }, [data, maxItems, bodyText7, entityLabel, barWidth])
 
   const containerHeight = typeof height === 'number' ? `${height}px` : height
   const legendItems = [
