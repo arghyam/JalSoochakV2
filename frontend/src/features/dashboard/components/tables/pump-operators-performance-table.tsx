@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Box, Flex, Icon, Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
+import { Box, Icon, Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
 import { BiSortAlt2 } from 'react-icons/bi'
 import type { PumpOperatorPerformanceData } from '../../types'
 
@@ -81,7 +81,6 @@ export function PumpOperatorsPerformanceTable({
               <Th>Block</Th>
               <Th>Village</Th>
               <Th
-                cursor="pointer"
                 aria-sort={
                   sortColumn === 'reportingRate'
                     ? sortDirection === 'asc'
@@ -90,13 +89,25 @@ export function PumpOperatorsPerformanceTable({
                     : undefined
                 }
               >
-                <Flex align="center" onClick={() => handleSort('reportingRate')}>
+                <Box
+                  as="button"
+                  type="button"
+                  onClick={() => handleSort('reportingRate')}
+                  display="inline-flex"
+                  alignItems="center"
+                  gap={1}
+                  cursor="pointer"
+                  textAlign="left"
+                  width="100%"
+                  bg="none"
+                  border="none"
+                  p={0}
+                >
                   <Box as="span">Reporting Rate (%)</Box>
-                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" />
-                </Flex>
+                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" aria-hidden />
+                </Box>
               </Th>
               <Th
-                cursor="pointer"
                 aria-sort={
                   sortColumn === 'waterSupplied'
                     ? sortDirection === 'asc'
@@ -105,10 +116,23 @@ export function PumpOperatorsPerformanceTable({
                     : undefined
                 }
               >
-                <Flex align="center" onClick={() => handleSort('waterSupplied')}>
+                <Box
+                  as="button"
+                  type="button"
+                  onClick={() => handleSort('waterSupplied')}
+                  display="inline-flex"
+                  alignItems="center"
+                  gap={1}
+                  cursor="pointer"
+                  textAlign="left"
+                  width="100%"
+                  bg="none"
+                  border="none"
+                  p={0}
+                >
                   <Box as="span">Water Supplied</Box>
-                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" />
-                </Flex>
+                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" aria-hidden />
+                </Box>
               </Th>
             </Tr>
           </Thead>

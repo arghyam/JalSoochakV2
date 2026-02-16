@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Box, Flex, Icon, Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
+import { Box, Icon, Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
 import { BiSortAlt2 } from 'react-icons/bi'
 import type { EntityPerformance } from '../../types'
 
@@ -71,7 +71,6 @@ export function AllBlocksTable({ data, maxItems }: AllBlocksTableProps) {
             <Tr>
               <Th>Blocks</Th>
               <Th
-                cursor="pointer"
                 aria-sort={
                   sortColumn === 'coverage'
                     ? sortDirection === 'asc'
@@ -80,13 +79,25 @@ export function AllBlocksTable({ data, maxItems }: AllBlocksTableProps) {
                     : undefined
                 }
               >
-                <Flex align="center" onClick={() => handleSort('coverage')}>
+                <Box
+                  as="button"
+                  type="button"
+                  onClick={() => handleSort('coverage')}
+                  display="inline-flex"
+                  alignItems="center"
+                  gap={1}
+                  cursor="pointer"
+                  textAlign="left"
+                  width="100%"
+                  bg="none"
+                  border="none"
+                  p={0}
+                >
                   <Box as="span">Coverage (%)</Box>
-                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" />
-                </Flex>
+                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" aria-hidden />
+                </Box>
               </Th>
               <Th
-                cursor="pointer"
                 aria-sort={
                   sortColumn === 'quantity'
                     ? sortDirection === 'asc'
@@ -95,13 +106,25 @@ export function AllBlocksTable({ data, maxItems }: AllBlocksTableProps) {
                     : undefined
                 }
               >
-                <Flex align="center" onClick={() => handleSort('quantity')}>
+                <Box
+                  as="button"
+                  type="button"
+                  onClick={() => handleSort('quantity')}
+                  display="inline-flex"
+                  alignItems="center"
+                  gap={1}
+                  cursor="pointer"
+                  textAlign="left"
+                  width="100%"
+                  bg="none"
+                  border="none"
+                  p={0}
+                >
                   <Box as="span">Quantity (LPCD)</Box>
-                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" />
-                </Flex>
+                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" aria-hidden />
+                </Box>
               </Th>
               <Th
-                cursor="pointer"
                 aria-sort={
                   sortColumn === 'regularity'
                     ? sortDirection === 'asc'
@@ -110,13 +133,25 @@ export function AllBlocksTable({ data, maxItems }: AllBlocksTableProps) {
                     : undefined
                 }
               >
-                <Flex align="center" onClick={() => handleSort('regularity')}>
+                <Box
+                  as="button"
+                  type="button"
+                  onClick={() => handleSort('regularity')}
+                  display="inline-flex"
+                  alignItems="center"
+                  gap={1}
+                  cursor="pointer"
+                  textAlign="left"
+                  width="100%"
+                  bg="none"
+                  border="none"
+                  p={0}
+                >
                   <Box as="span">Regularity (%)</Box>
-                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" />
-                </Flex>
+                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" aria-hidden />
+                </Box>
               </Th>
               <Th
-                cursor="pointer"
                 aria-sort={
                   sortColumn === 'compositeScore'
                     ? sortDirection === 'asc'
@@ -125,10 +160,23 @@ export function AllBlocksTable({ data, maxItems }: AllBlocksTableProps) {
                     : undefined
                 }
               >
-                <Flex align="center" onClick={() => handleSort('compositeScore')}>
+                <Box
+                  as="button"
+                  type="button"
+                  onClick={() => handleSort('compositeScore')}
+                  display="inline-flex"
+                  alignItems="center"
+                  gap={1}
+                  cursor="pointer"
+                  textAlign="left"
+                  width="100%"
+                  bg="none"
+                  border="none"
+                  p={0}
+                >
                   <Box as="span">Average (%)</Box>
-                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" />
-                </Flex>
+                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" aria-hidden />
+                </Box>
               </Th>
             </Tr>
           </Thead>
