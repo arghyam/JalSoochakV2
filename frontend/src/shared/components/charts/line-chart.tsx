@@ -9,6 +9,7 @@ interface LineChartProps<T extends object> {
   height?: string
   xAxisLabel?: string
   yAxisLabel?: string
+  legendLabels?: string[]
 }
 
 export function LineChart<T extends object>({
@@ -19,7 +20,10 @@ export function LineChart<T extends object>({
   height = '300px',
   xAxisLabel,
   yAxisLabel,
+  legendLabels,
 }: LineChartProps<T>) {
+  const seriesNames = yKeys.map((key, index) => legendLabels?.[index] ?? String(key))
+
   const option = {
     tooltip: {
       trigger: 'axis',
@@ -28,7 +32,7 @@ export function LineChart<T extends object>({
       },
     },
     legend: {
-      data: yKeys.map(String),
+      data: seriesNames,
       bottom: 0,
       icon: 'roundRect',
       itemWidth: 8,
@@ -89,7 +93,7 @@ export function LineChart<T extends object>({
       },
     },
     series: yKeys.map((key, index) => ({
-      name: String(key),
+      name: seriesNames[index],
       type: 'line',
       data: data.map((item) => item[key]),
       smooth: true,

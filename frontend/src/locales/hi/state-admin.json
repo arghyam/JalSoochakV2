@@ -17,7 +17,11 @@
     "charts": {
       "demandVsSupply": "मांग बनाम आपूर्ति",
       "dailyIngestionMonitor": "दैनिक अंतर्ग्रहण मॉनिटर",
-      "successRate": "सफलता दर"
+      "successRate": "सफलता दर",
+      "Demand": "मांग",
+      "Supply": "आपूर्ति",
+      "Quantity": "मात्रा (इकाइयाँ)",
+      "Year": "वर्ष"
     },
     "months": {
       "january": "जनवरी",
@@ -121,7 +125,7 @@
     "title": "वृद्धि",
     "allEscalations": "सभी वृद्धि",
     "escalationRules": "वृद्धि नियम",
-    "addNewEscalationType": "+ नया वृद्धि प्रकार जोड़ें",
+    "addNewEscalationType": "नया वृद्धि प्रकार जोड़ें",
     "addNewShort": "नया जोड़ें",
     "typeOfAlert": "अलर्ट का प्रकार",
     "levelOfEscalation": "वृद्धि का स्तर",
@@ -129,7 +133,7 @@
     "levelDisplay": "स्तर {{number}}: {{role}}",
     "escalateAfter": "इसके बाद वृद्धि (घंटे)",
     "escalateAfterHours": "{{hours}} घंटे बाद वृद्धि",
-    "addNewLevel": "+ नया स्तर जोड़ें",
+    "addNewLevel": "नया स्तर जोड़ें",
     "buttons": {
       "addEscalation": "वृद्धि जोड़ें"
     },
@@ -143,11 +147,14 @@
       "failedToLoadSingle": "वृद्धि लोड करने में विफल",
       "failedToDelete": "वृद्धि हटाने में विफल",
       "failedToSave": "वृद्धि सहेजने में विफल",
-      "confirmDelete": "क्या आप वाकई इस वृद्धि को हटाना चाहते हैं?"
+      "confirmDeleteTitle": "वृद्धि हटाएं",
+      "confirmDelete": "क्या आप वाकई इस वृद्धि को हटाना चाहते हैं?",
+      "fillExisting": "कृपया पहले मौजूदा वृद्धि स्तर भरें"
     },
     "aria": {
       "editEscalation": "{{name}} वृद्धि संपादित करें",
       "deleteEscalation": "{{name}} वृद्धि हटाएं",
+      "deleteLevel": "स्तर {{number}} हटाएं",
       "editMode": "संपादन मोड",
       "selectAlertType": "अलर्ट प्रकार चुनें",
       "selectRole": "स्तर {{number}} के लिए भूमिका चुनें",

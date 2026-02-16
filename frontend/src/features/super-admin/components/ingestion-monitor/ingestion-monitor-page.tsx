@@ -78,18 +78,17 @@ export function IngestionMonitorPage() {
   }, [stateFilter, timeFilter, retryKey])
 
   const formatTimestamp = (date: Date): string => {
-    const timeFormatter = new Intl.DateTimeFormat(i18n.language, {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    })
-    const dateFormatter = new Intl.DateTimeFormat(i18n.language, {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    })
+    let hours = date.getHours()
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+    const ampm = hours >= 12 ? 'pm' : 'am'
 
-    return `${timeFormatter.format(date)} | ${dateFormatter.format(date)}`
+    hours = hours % 12
+    hours = hours ? hours : 12
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const year = date.getFullYear()
+
+    return `${hours}:${minutes}${ampm} | ${day}-${month}-${year}`
   }
 
   const getStatusBadge = (status: IngestionLogEntry['status']) => {
