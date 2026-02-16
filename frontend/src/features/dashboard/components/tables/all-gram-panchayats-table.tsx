@@ -1,4 +1,5 @@
-import { Box, Flex, Icon, Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
+import { useState } from 'react'
+import { Box, Icon, Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
 import { BiSortAlt2 } from 'react-icons/bi'
 import type { EntityPerformance } from '../../types'
 
@@ -7,10 +8,32 @@ interface AllGramPanchayatsTableProps {
   maxItems?: number
 }
 
+type SortColumn = 'coverage' | 'quantity' | 'regularity' | 'compositeScore' | null
+type SortDirection = 'asc' | 'desc' | null
+
 export function AllGramPanchayatsTable({ data, maxItems }: AllGramPanchayatsTableProps) {
+  const [sortColumn, setSortColumn] = useState<SortColumn>(null)
+  const [sortDirection, setSortDirection] = useState<SortDirection>(null)
   const safeMaxItems =
     typeof maxItems === 'number' && Number.isFinite(maxItems) ? Math.max(0, maxItems) : undefined
-  const rows = typeof safeMaxItems === 'number' ? data.slice(0, safeMaxItems) : data
+  const sortedRows =
+    sortColumn && sortDirection
+      ? [...data].sort((a, b) => {
+          const aValue = a[sortColumn]
+          const bValue = b[sortColumn]
+          return sortDirection === 'asc' ? aValue - bValue : bValue - aValue
+        })
+      : data
+  const rows = typeof safeMaxItems === 'number' ? sortedRows.slice(0, safeMaxItems) : sortedRows
+
+  const handleSort = (column: Exclude<SortColumn, null>) => {
+    if (sortColumn !== column) {
+      setSortColumn(column)
+      setSortDirection('desc')
+      return
+    }
+    setSortDirection((current) => (current === 'desc' ? 'asc' : 'desc'))
+  }
 
   return (
     <Box borderRadius="lg" overflow="hidden">
@@ -47,29 +70,113 @@ export function AllGramPanchayatsTable({ data, maxItems }: AllGramPanchayatsTabl
           >
             <Tr>
               <Th>Gram Panchayat</Th>
-              <Th>
-                <Flex align="center">
+              <Th
+                aria-sort={
+                  sortColumn === 'coverage'
+                    ? sortDirection === 'asc'
+                      ? 'ascending'
+                      : 'descending'
+                    : undefined
+                }
+              >
+                <Box
+                  as="button"
+                  type="button"
+                  onClick={() => handleSort('coverage')}
+                  display="inline-flex"
+                  alignItems="center"
+                  gap={1}
+                  cursor="pointer"
+                  textAlign="left"
+                  width="100%"
+                  bg="none"
+                  border="none"
+                  p={0}
+                >
                   <Box as="span">Coverage (%)</Box>
-                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" />
-                </Flex>
+                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" aria-hidden />
+                </Box>
               </Th>
-              <Th>
-                <Flex align="center">
+              <Th
+                aria-sort={
+                  sortColumn === 'quantity'
+                    ? sortDirection === 'asc'
+                      ? 'ascending'
+                      : 'descending'
+                    : undefined
+                }
+              >
+                <Box
+                  as="button"
+                  type="button"
+                  onClick={() => handleSort('quantity')}
+                  display="inline-flex"
+                  alignItems="center"
+                  gap={1}
+                  cursor="pointer"
+                  textAlign="left"
+                  width="100%"
+                  bg="none"
+                  border="none"
+                  p={0}
+                >
                   <Box as="span">Quantity (LPCD)</Box>
-                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" />
-                </Flex>
+                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" aria-hidden />
+                </Box>
               </Th>
-              <Th>
-                <Flex align="center">
+              <Th
+                aria-sort={
+                  sortColumn === 'regularity'
+                    ? sortDirection === 'asc'
+                      ? 'ascending'
+                      : 'descending'
+                    : undefined
+                }
+              >
+                <Box
+                  as="button"
+                  type="button"
+                  onClick={() => handleSort('regularity')}
+                  display="inline-flex"
+                  alignItems="center"
+                  gap={1}
+                  cursor="pointer"
+                  textAlign="left"
+                  width="100%"
+                  bg="none"
+                  border="none"
+                  p={0}
+                >
                   <Box as="span">Regularity (%)</Box>
-                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" />
-                </Flex>
+                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" aria-hidden />
+                </Box>
               </Th>
-              <Th>
-                <Flex align="center">
+              <Th
+                aria-sort={
+                  sortColumn === 'compositeScore'
+                    ? sortDirection === 'asc'
+                      ? 'ascending'
+                      : 'descending'
+                    : undefined
+                }
+              >
+                <Box
+                  as="button"
+                  type="button"
+                  onClick={() => handleSort('compositeScore')}
+                  display="inline-flex"
+                  alignItems="center"
+                  gap={1}
+                  cursor="pointer"
+                  textAlign="left"
+                  width="100%"
+                  bg="none"
+                  border="none"
+                  p={0}
+                >
                   <Box as="span">Average (%)</Box>
-                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" />
-                </Flex>
+                  <Icon as={BiSortAlt2} boxSize="16px" color="neutral.500" aria-hidden />
+                </Box>
               </Th>
             </Tr>
           </Thead>

@@ -88,11 +88,6 @@ export const mockFilterVillages: FilterOptionsByKey = {
   ],
 }
 
-export const mockFilterDuration = [
-  { value: 'last_7_days', label: 'Last 7 Days' },
-  { value: 'last_30_days', label: 'Last 30 Days' },
-]
-
 export const mockFilterSchemes = [
   { value: 'jal-jeevan-mission', label: 'Jal Jeevan Mission' },
   { value: 'swachh-bharat-mission', label: 'Swachh Bharat Mission' },
@@ -1478,6 +1473,7 @@ const mockLeadingPumpOperators: PumpOperatorPerformanceData[] = [
   {
     id: 'lp-1',
     name: 'Vikash',
+    block: 'Rajpura',
     village: 'Bilipur',
     reportingRate: 90,
     photoCompliance: 88,
@@ -1486,6 +1482,7 @@ const mockLeadingPumpOperators: PumpOperatorPerformanceData[] = [
   {
     id: 'lp-2',
     name: 'Navdeep',
+    block: 'Banur',
     village: 'Dhablan',
     reportingRate: 88,
     photoCompliance: 85,
@@ -1494,6 +1491,7 @@ const mockLeadingPumpOperators: PumpOperatorPerformanceData[] = [
   {
     id: 'lp-3',
     name: 'Nitish',
+    block: 'Samana',
     village: 'Karamgarh',
     reportingRate: 84,
     photoCompliance: 82,
@@ -1502,6 +1500,7 @@ const mockLeadingPumpOperators: PumpOperatorPerformanceData[] = [
   {
     id: 'lp-4',
     name: 'Navdeep',
+    block: 'Banur',
     village: 'Dhablan',
     reportingRate: 88,
     photoCompliance: 85,
@@ -1510,6 +1509,7 @@ const mockLeadingPumpOperators: PumpOperatorPerformanceData[] = [
   {
     id: 'lp-5',
     name: 'Nitish',
+    block: 'Samana',
     village: 'Karamgarh',
     reportingRate: 84,
     photoCompliance: 82,
@@ -1521,6 +1521,7 @@ const mockBottomPumpOperators: PumpOperatorPerformanceData[] = [
   {
     id: 'bp-1',
     name: 'Karan',
+    block: 'Bassi',
     village: 'Kakrala',
     reportingRate: 70,
     photoCompliance: 75,
@@ -1529,6 +1530,7 @@ const mockBottomPumpOperators: PumpOperatorPerformanceData[] = [
   {
     id: 'bp-2',
     name: 'Shashwat',
+    block: 'Derabassi',
     village: 'Bhedoura',
     reportingRate: 60,
     photoCompliance: 64,
@@ -1537,6 +1539,7 @@ const mockBottomPumpOperators: PumpOperatorPerformanceData[] = [
   {
     id: 'bp-3',
     name: 'Nipun',
+    block: 'Banur',
     village: 'Dhablan',
     reportingRate: 60,
     photoCompliance: 58,
@@ -1545,6 +1548,7 @@ const mockBottomPumpOperators: PumpOperatorPerformanceData[] = [
   {
     id: 'bp-4',
     name: 'Shashwat',
+    block: 'Derabassi',
     village: 'Bhedoura',
     reportingRate: 60,
     photoCompliance: 64,
@@ -1553,6 +1557,7 @@ const mockBottomPumpOperators: PumpOperatorPerformanceData[] = [
   {
     id: 'bp-5',
     name: 'Nipun',
+    block: 'Banur',
     village: 'Dhablan',
     reportingRate: 60,
     photoCompliance: 58,

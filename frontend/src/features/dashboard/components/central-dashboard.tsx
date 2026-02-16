@@ -21,11 +21,11 @@ import {
   PhotoEvidenceComplianceTable,
   AllGramPanchayatsTable,
 } from './tables'
-import { LoadingSpinner, SearchableSelect } from '@/shared/components/common'
+import { DateRangePicker, LoadingSpinner, SearchableSelect } from '@/shared/components/common'
 import { MdOutlineWaterDrop, MdArrowUpward, MdArrowDownward } from 'react-icons/md'
 import { AiOutlineHome, AiOutlineInfoCircle } from 'react-icons/ai'
 import waterTapIcon from '@/assets/media/water-tap_1822589 1.svg'
-import type { SearchableSelectOption } from '@/shared/components/common'
+import type { DateRange, SearchableSelectOption } from '@/shared/components/common'
 import type { EntityPerformance } from '../types'
 import { SearchLayout, FilterLayout } from '@/shared/components/layout'
 import {
@@ -34,7 +34,6 @@ import {
   mockFilterBlocks,
   mockFilterGramPanchayats,
   mockFilterVillages,
-  mockFilterDuration,
   mockFilterSchemes,
   mockDistrictPerformanceByState,
   mockBlockPerformanceByDistrict,
@@ -50,8 +49,14 @@ type StoredFilters = {
   selectedBlock?: string
   selectedGramPanchayat?: string
   selectedVillage?: string
-  selectedDuration?: string
+  selectedDuration?: DateRange
   selectedScheme?: string
+  selectedDepartmentState?: string
+  selectedDepartmentZone?: string
+  selectedDepartmentCircle?: string
+  selectedDepartmentDivision?: string
+  selectedDepartmentSubdivision?: string
+  selectedDepartmentVillage?: string
   filterTabIndex?: number
 }
 
@@ -76,6 +81,13 @@ export function CentralDashboard() {
   const navigate = useNavigate()
   const { data, isLoading, error } = useDashboardData('central')
   const [storedFilters] = useState(() => getStoredFilters())
+  const initialDuration =
+    storedFilters.selectedDuration &&
+    typeof storedFilters.selectedDuration === 'object' &&
+    'startDate' in storedFilters.selectedDuration &&
+    'endDate' in storedFilters.selectedDuration
+      ? storedFilters.selectedDuration
+      : null
   const [selectedState, setSelectedState] = useState(storedFilters.selectedState ?? '')
   const [selectedDistrict, setSelectedDistrict] = useState(storedFilters.selectedDistrict ?? '')
   const [selectedBlock, setSelectedBlock] = useState(storedFilters.selectedBlock ?? '')
@@ -83,8 +95,26 @@ export function CentralDashboard() {
     storedFilters.selectedGramPanchayat ?? ''
   )
   const [selectedVillage, setSelectedVillage] = useState(storedFilters.selectedVillage ?? '')
-  const [selectedDuration, setSelectedDuration] = useState(storedFilters.selectedDuration ?? '')
+  const [selectedDuration, setSelectedDuration] = useState<DateRange | null>(initialDuration)
   const [selectedScheme, setSelectedScheme] = useState(storedFilters.selectedScheme ?? '')
+  const [selectedDepartmentState, setSelectedDepartmentState] = useState(
+    storedFilters.selectedDepartmentState ?? ''
+  )
+  const [selectedDepartmentZone, setSelectedDepartmentZone] = useState(
+    storedFilters.selectedDepartmentZone ?? ''
+  )
+  const [selectedDepartmentCircle, setSelectedDepartmentCircle] = useState(
+    storedFilters.selectedDepartmentCircle ?? ''
+  )
+  const [selectedDepartmentDivision, setSelectedDepartmentDivision] = useState(
+    storedFilters.selectedDepartmentDivision ?? ''
+  )
+  const [selectedDepartmentSubdivision, setSelectedDepartmentSubdivision] = useState(
+    storedFilters.selectedDepartmentSubdivision ?? ''
+  )
+  const [selectedDepartmentVillage, setSelectedDepartmentVillage] = useState(
+    storedFilters.selectedDepartmentVillage ?? ''
+  )
   const [performanceState, setPerformanceState] = useState('')
   const [filterTabIndex, setFilterTabIndex] = useState(
     typeof storedFilters.filterTabIndex === 'number' ? storedFilters.filterTabIndex : 0
@@ -93,6 +123,7 @@ export function CentralDashboard() {
   const isDistrictSelected = Boolean(selectedDistrict)
   const isBlockSelected = Boolean(selectedBlock)
   const isGramPanchayatSelected = Boolean(selectedGramPanchayat)
+  const isDepartmentStateSelected = Boolean(selectedDepartmentState)
   const emptyOptions: SearchableSelectOption[] = []
   const isAdvancedEnabled = Boolean(selectedState && selectedDistrict)
   const districtTableData =
@@ -151,14 +182,28 @@ export function CentralDashboard() {
     setSelectedGramPanchayat(value)
     setSelectedVillage('')
   }
+  const handleDepartmentStateChange = (value: string) => {
+    setSelectedDepartmentState(value)
+    setSelectedDepartmentZone('')
+    setSelectedDepartmentCircle('')
+    setSelectedDepartmentDivision('')
+    setSelectedDepartmentSubdivision('')
+    setSelectedDepartmentVillage('')
+  }
   const handleClearFilters = () => {
     setSelectedState('')
     setSelectedDistrict('')
     setSelectedBlock('')
     setSelectedGramPanchayat('')
     setSelectedVillage('')
-    setSelectedDuration('')
+    setSelectedDuration(null)
     setSelectedScheme('')
+    setSelectedDepartmentState('')
+    setSelectedDepartmentZone('')
+    setSelectedDepartmentCircle('')
+    setSelectedDepartmentDivision('')
+    setSelectedDepartmentSubdivision('')
+    setSelectedDepartmentVillage('')
   }
 
   useEffect(() => {
@@ -170,6 +215,12 @@ export function CentralDashboard() {
       selectedVillage,
       selectedDuration,
       selectedScheme,
+      selectedDepartmentState,
+      selectedDepartmentZone,
+      selectedDepartmentCircle,
+      selectedDepartmentDivision,
+      selectedDepartmentSubdivision,
+      selectedDepartmentVillage,
       filterTabIndex,
     }
     try {
@@ -182,6 +233,12 @@ export function CentralDashboard() {
     selectedBlock,
     selectedDistrict,
     selectedDuration,
+    selectedDepartmentCircle,
+    selectedDepartmentDivision,
+    selectedDepartmentState,
+    selectedDepartmentSubdivision,
+    selectedDepartmentVillage,
+    selectedDepartmentZone,
     selectedGramPanchayat,
     selectedScheme,
     selectedState,
@@ -330,6 +387,7 @@ export function CentralDashboard() {
   const pumpOperatorsTotal = data.pumpOperators.reduce((total, item) => total + item.value, 0)
   const leadingPumpOperators = data.leadingPumpOperators ?? []
   const bottomPumpOperators = data.bottomPumpOperators ?? []
+  const operatorsPerformanceTable = [...leadingPumpOperators, ...bottomPumpOperators]
   const villagePhotoEvidenceRows = data.photoEvidenceCompliance.map((row) => ({
     ...row,
     name: villagePumpOperatorDetails.name,
@@ -445,26 +503,7 @@ export function CentralDashboard() {
               disabled={!isAdvancedEnabled}
               isFilter={true}
             />
-            <SearchableSelect
-              options={mockFilterDuration}
-              value={selectedDuration}
-              onChange={setSelectedDuration}
-              placeholder="Duration"
-              width={{
-                base: '100%',
-                sm: 'calc(50% - 12px)',
-                md: 'calc(33.333% - 12px)',
-                lg: 'calc(25% - 12px)',
-                xl: '162px',
-              }}
-              height="32px"
-              borderRadius="4px"
-              fontSize="sm"
-              textColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
-              borderColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
-              disabled={!isAdvancedEnabled}
-              isFilter={true}
-            />
+
             <SearchableSelect
               options={mockFilterSchemes}
               value={selectedScheme}
@@ -485,13 +524,53 @@ export function CentralDashboard() {
               disabled={!isAdvancedEnabled}
               isFilter={true}
             />
+
+            <DateRangePicker
+              value={selectedDuration}
+              onChange={setSelectedDuration}
+              placeholder="Duration"
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
+              height="32px"
+              borderRadius="4px"
+              fontSize="sm"
+              textColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
+              borderColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
+              disabled={!isAdvancedEnabled}
+              isFilter={true}
+            />
           </>
         ) : (
           <>
             <SearchableSelect
+              options={mockFilterStates}
+              value={selectedDepartmentState}
+              onChange={handleDepartmentStateChange}
+              placeholder="States/UTs"
+              required
+              width={{
+                base: '100%',
+                sm: 'calc(50% - 12px)',
+                md: 'calc(33.333% - 12px)',
+                lg: 'calc(25% - 12px)',
+                xl: '162px',
+              }}
+              height="32px"
+              borderRadius="4px"
+              fontSize="sm"
+              textColor="neutral.400"
+              borderColor="neutral.400"
+              isFilter={true}
+            />
+            <SearchableSelect
               options={emptyOptions}
-              value=""
-              onChange={() => {}}
+              value={selectedDepartmentZone}
+              onChange={setSelectedDepartmentZone}
               placeholder="Zone"
               width={{
                 base: '100%',
@@ -503,15 +582,15 @@ export function CentralDashboard() {
               height="32px"
               borderRadius="4px"
               fontSize="sm"
-              textColor="neutral.300"
-              borderColor="neutral.300"
-              disabled
+              textColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
+              borderColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
+              disabled={!isDepartmentStateSelected}
               isFilter={true}
             />
             <SearchableSelect
               options={emptyOptions}
-              value=""
-              onChange={() => {}}
+              value={selectedDepartmentCircle}
+              onChange={setSelectedDepartmentCircle}
               placeholder="Circle"
               width={{
                 base: '100%',
@@ -523,15 +602,15 @@ export function CentralDashboard() {
               height="32px"
               borderRadius="4px"
               fontSize="sm"
-              textColor="neutral.300"
-              borderColor="neutral.300"
-              disabled
+              textColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
+              borderColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
+              disabled={!isDepartmentStateSelected}
               isFilter={true}
             />
             <SearchableSelect
               options={emptyOptions}
-              value=""
-              onChange={() => {}}
+              value={selectedDepartmentDivision}
+              onChange={setSelectedDepartmentDivision}
               placeholder="Division"
               width={{
                 base: '100%',
@@ -543,15 +622,15 @@ export function CentralDashboard() {
               height="32px"
               borderRadius="4px"
               fontSize="sm"
-              textColor="neutral.300"
-              borderColor="neutral.300"
-              disabled
+              textColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
+              borderColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
+              disabled={!isDepartmentStateSelected}
               isFilter={true}
             />
             <SearchableSelect
               options={emptyOptions}
-              value=""
-              onChange={() => {}}
+              value={selectedDepartmentSubdivision}
+              onChange={setSelectedDepartmentSubdivision}
               placeholder="Subdivision"
               width={{
                 base: '100%',
@@ -563,15 +642,15 @@ export function CentralDashboard() {
               height="32px"
               borderRadius="4px"
               fontSize="sm"
-              textColor="neutral.300"
-              borderColor="neutral.300"
-              disabled
+              textColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
+              borderColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
+              disabled={!isDepartmentStateSelected}
               isFilter={true}
             />
             <SearchableSelect
               options={emptyOptions}
-              value=""
-              onChange={() => {}}
+              value={selectedDepartmentVillage}
+              onChange={setSelectedDepartmentVillage}
               placeholder="Village"
               width={{
                 base: '100%',
@@ -583,9 +662,9 @@ export function CentralDashboard() {
               height="32px"
               borderRadius="4px"
               fontSize="sm"
-              textColor="neutral.300"
-              borderColor="neutral.300"
-              disabled
+              textColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
+              borderColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
+              disabled={!isDepartmentStateSelected}
               isFilter={true}
             />
           </>
@@ -1035,7 +1114,7 @@ export function CentralDashboard() {
             </Box>
             <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="526px">
               <Text textStyle="bodyText3" fontWeight="400" mb={2}>
-                Supply Data Submission Rate
+                Reading Submission Rate
               </Text>
               <SupplySubmissionRateChart
                 data={supplySubmissionRateData}
@@ -1104,7 +1183,7 @@ export function CentralDashboard() {
           </Box>
           <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
             <Text textStyle="bodyText3" fontWeight="400" mb={2}>
-              Supply Data Submission Rate
+              Reading Submission Rate
             </Text>
             <SupplySubmissionRateChart
               data={supplySubmissionRateData}
@@ -1115,32 +1194,32 @@ export function CentralDashboard() {
         </Grid>
       ) : null}
 
-      {/* Pump Operator Performance Tables */}
-      {!selectedVillage && isDistrictSelected ? (
-        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="350px">
-            <PumpOperatorsPerformanceTable
-              title="Leading Pump Operators Performance"
-              data={leadingPumpOperators}
-            />
-          </Box>
-          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="350px">
-            <PumpOperatorsPerformanceTable
-              title="Bottom Pump Operators Performance"
-              data={bottomPumpOperators}
-            />
-          </Box>
-        </Grid>
-      ) : null}
-
-      {/* All Blocks */}
+      {/* Operators Performance + All Blocks */}
       {!selectedVillage && isDistrictSelected && !isBlockSelected ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="430px">
+            <PumpOperatorsPerformanceTable
+              title="Operators Performance Table"
+              data={operatorsPerformanceTable}
+            />
+          </Box>
           <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="430px">
             <Text textStyle="bodyText3" fontWeight="400" mb="16px">
               All Blocks
             </Text>
             <AllBlocksTable data={blockTableData} />
+          </Box>
+        </Grid>
+      ) : null}
+
+      {/* Pump Operator Performance Table */}
+      {!selectedVillage && isDistrictSelected && isBlockSelected ? (
+        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6}>
+            <PumpOperatorsPerformanceTable
+              title="Operators Performance Table"
+              data={operatorsPerformanceTable}
+            />
           </Box>
           <Box
             display={{ base: 'none', lg: 'block' }}
@@ -1148,7 +1227,6 @@ export function CentralDashboard() {
             borderWidth="0.5px"
             borderColor="transparent"
             bg="transparent"
-            h="430px"
           />
         </Grid>
       ) : null}
