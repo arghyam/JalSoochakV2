@@ -30,6 +30,7 @@ export function WaterSupplyOutagesChart({
   const bodyText7 = getBodyText7Style(theme)
   const barWidth = useBreakpointValue({ base: 28, sm: 28, md: 42, lg: 66 }) ?? 66
   const barRadius = useBreakpointValue({ base: 8, sm: 10, md: 12 }) ?? 12
+  const barCategoryGap = '24px'
   const chartScrollRef = useRef<HTMLDivElement>(null)
   const scrollbarTrackRef = useRef<HTMLDivElement>(null)
   const scrollbarThumbRef = useRef<HTMLDivElement>(null)
@@ -39,13 +40,7 @@ export function WaterSupplyOutagesChart({
   const thumbLeftRef = useRef(0)
   const [containerWidth, setContainerWidth] = useState(0)
 
-  const defaultItemWidth = 90
-  const minItemWidth = 70
-  const effectiveItemWidth =
-    containerWidth > 0
-      ? Math.max(minItemWidth, Math.floor(containerWidth / Math.max(data.length, 1)))
-      : defaultItemWidth
-  const itemWidth = Math.min(defaultItemWidth, effectiveItemWidth)
+  const itemWidth = barWidth + 24
 
   const option = useMemo<echarts.EChartsOption>(() => {
     const districts = data.map((entry) => entry.district)
@@ -121,6 +116,7 @@ export function WaterSupplyOutagesChart({
           stack: 'outages',
           data: data.map((entry) => entry.sourceDrying),
           barWidth,
+          barCategoryGap,
           itemStyle: {
             color: outageColors.sourceDrying,
             borderRadius: [0, 0, barRadius, barRadius],
@@ -132,6 +128,7 @@ export function WaterSupplyOutagesChart({
           stack: 'outages',
           data: data.map((entry) => entry.valveIssue),
           barWidth,
+          barCategoryGap,
           itemStyle: {
             color: outageColors.valveIssue,
           },
@@ -142,6 +139,7 @@ export function WaterSupplyOutagesChart({
           stack: 'outages',
           data: data.map((entry) => entry.pumpFailure),
           barWidth,
+          barCategoryGap,
           itemStyle: {
             color: outageColors.pumpFailure,
           },
@@ -152,6 +150,7 @@ export function WaterSupplyOutagesChart({
           stack: 'outages',
           data: data.map((entry) => entry.pipelineLeak),
           barWidth,
+          barCategoryGap,
           itemStyle: {
             color: outageColors.pipelineLeak,
           },
@@ -162,6 +161,7 @@ export function WaterSupplyOutagesChart({
           stack: 'outages',
           data: data.map((entry) => entry.electricityFailure),
           barWidth,
+          barCategoryGap,
           itemStyle: {
             color: outageColors.electricityFailure,
             borderRadius: [barRadius, barRadius, 0, 0],
@@ -169,7 +169,7 @@ export function WaterSupplyOutagesChart({
         },
       ],
     }
-  }, [data, bodyText7, barWidth, barRadius])
+  }, [data, bodyText7, barWidth, barRadius, barCategoryGap])
 
   const axisOption = useMemo<echarts.EChartsOption>(() => {
     return {
@@ -242,10 +242,8 @@ export function WaterSupplyOutagesChart({
     { label: 'Source drying', color: outageColors.sourceDrying },
   ]
   const baseChartWidth = data.length * itemWidth
-  const chartPixelWidth =
-    containerWidth > 0 ? Math.max(baseChartWidth, containerWidth) : baseChartWidth
   const shouldScroll = containerWidth > 0 && baseChartWidth > containerWidth
-  const chartWidth = shouldScroll ? `${chartPixelWidth}px` : '100%'
+  const chartWidth = `${baseChartWidth}px`
 
   const getTrackWidth = () => {
     return scrollbarTrackRef.current?.getBoundingClientRect().width ?? 0
@@ -385,6 +383,7 @@ export function WaterSupplyOutagesChart({
             style={{
               width: chartWidth,
               height: '100%',
+              margin: shouldScroll ? '0' : '0 auto',
             }}
           >
             <EChartsWrapper option={option} height="100%" />

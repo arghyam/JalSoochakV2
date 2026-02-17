@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useTheme } from '@chakra-ui/react'
+import { useBreakpointValue, useTheme } from '@chakra-ui/react'
 import * as echarts from 'echarts'
 import { EChartsWrapper } from './echarts-wrapper'
 import { getBodyText7Style } from './chart-text-style'
@@ -23,6 +23,16 @@ export function PumpOperatorsChart({
   const theme = useTheme()
   const bodyText7 = getBodyText7Style(theme)
   const noteColor = theme?.colors?.neutral?.['950'] ?? bodyText7.color ?? '#667085'
+  const pieRadius = useBreakpointValue<(string | number)[]>({
+    base: ['50%', '75%'],
+    sm: ['50%', '85%'],
+    md: ['50%', '85%'],
+  }) ?? ['50%', '85%']
+  const pieCenter = useBreakpointValue<[string, string]>({
+    base: ['50%', '42%'],
+    sm: ['50%', '45%'],
+    md: ['50%', '45%'],
+  }) ?? ['50%', '45%']
 
   const option = useMemo<echarts.EChartsOption>(() => {
     return {
@@ -32,8 +42,8 @@ export function PumpOperatorsChart({
       series: [
         {
           type: 'pie',
-          radius: ['55%', '90%'],
-          center: ['50%', '50%'],
+          radius: pieRadius,
+          center: pieCenter,
           startAngle: 360,
           clockwise: true,
           avoidLabelOverlap: true,
@@ -53,7 +63,7 @@ export function PumpOperatorsChart({
         },
       ],
     }
-  }, [data])
+  }, [data, pieCenter, pieRadius])
 
   const containerHeight = typeof height === 'number' ? `${height}px` : height
   const chartSize = 300

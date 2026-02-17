@@ -21,7 +21,7 @@ export function ImageSubmissionStatusChart({
   const theme = useTheme()
   const bodyText7 = getBodyText7Style(theme)
   const pieRadius = useBreakpointValue<(string | number)[]>({
-    base: ['0%', '65%'],
+    base: ['0%', '75%'],
     sm: ['0%', '70%'],
     md: ['0%', '68%'],
   }) ?? ['0%', '68%']

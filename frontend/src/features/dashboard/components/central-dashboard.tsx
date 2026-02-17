@@ -1167,7 +1167,7 @@ export function CentralDashboard() {
           </Grid>
         </>
       ) : !selectedVillage ? (
-        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
           <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px" minW={0}>
             {isDistrictSelected ? (
               <>
@@ -1198,7 +1198,7 @@ export function CentralDashboard() {
               </>
             )}
           </Box>
-          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px" minW={0}>
             <Text textStyle="bodyText3" fontWeight="400" mb={2}>
               Reading Submission Rate
             </Text>
