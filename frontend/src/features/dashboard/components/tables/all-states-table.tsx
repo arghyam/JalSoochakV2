@@ -13,13 +13,14 @@ export function AllStatesTable({ data, maxItems }: AllStatesTableProps) {
   const rows = typeof safeMaxItems === 'number' ? data.slice(0, safeMaxItems) : data
 
   return (
-    <Box borderRadius="lg" overflow="visible" minW={0}>
+    <Box borderRadius="lg" overflow="visible" minW={0} w="full">
       <Box
         maxH="416px"
         overflowY="auto"
         overflowX="auto"
         w="full"
         maxW="100%"
+        minW={0}
         pr={2}
         pb={2}
         sx={{
@@ -77,6 +78,9 @@ export function AllStatesTable({ data, maxItems }: AllStatesTableProps) {
           </Thead>
           <Tbody
             sx={{
+              tr: {
+                cursor: 'pointer',
+              },
               td: {
                 textStyle: 'bodyText7',
                 fontWeight: '400',
