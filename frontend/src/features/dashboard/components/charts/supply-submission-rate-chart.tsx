@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useTheme } from '@chakra-ui/react'
+import { Box, useBreakpointValue, useTheme } from '@chakra-ui/react'
 import * as echarts from 'echarts'
 import { EChartsWrapper } from './echarts-wrapper'
 import { getBodyText7Style } from './chart-text-style'
@@ -21,6 +21,8 @@ export function SupplySubmissionRateChart({
   entityLabel = 'States/UTs',
 }: SupplySubmissionRateChartProps) {
   const theme = useTheme()
+  const barWidth = useBreakpointValue({ base: 28, sm: 28, md: 42, lg: 66 }) ?? 66
+  const barRadius = useBreakpointValue({ base: 8, sm: 10, md: 12 }) ?? 12
 
   const option = useMemo<echarts.EChartsOption>(() => {
     const chartData = data.slice(0, maxItems)
@@ -91,10 +93,10 @@ export function SupplySubmissionRateChart({
           name: 'Submission Rate',
           type: 'bar',
           data: rates,
-          barWidth: 66,
+          barWidth,
           itemStyle: {
             color: '#3291D1',
-            borderRadius: [12, 12, 12, 12],
+            borderRadius: [barRadius, barRadius, barRadius, barRadius],
           },
           emphasis: {
             disabled: true,
@@ -116,7 +118,11 @@ export function SupplySubmissionRateChart({
         },
       ],
     }
-  }, [data, entityLabel, maxItems, theme])
+  }, [data, entityLabel, maxItems, theme, barWidth, barRadius])
 
-  return <EChartsWrapper option={option} className={className} height={height} />
+  return (
+    <Box width="100%" maxW={{ base: '280px', sm: '100%' }} mx={{ base: 'auto', sm: '0' }}>
+      <EChartsWrapper option={option} className={className} height={height} />
+    </Box>
+  )
 }

@@ -1026,7 +1026,16 @@ export function CentralDashboard() {
       {/* Performance + Demand vs Supply Charts */}
       {!selectedVillage ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
-          <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
+          <Box
+            bg="white"
+            borderWidth="1px"
+            borderRadius="lg"
+            p={4}
+            h="536px"
+            w="full"
+            minW="250px"
+            justifySelf={{ base: 'center', md: 'stretch' }}
+          >
             <Flex align="center" justify="space-between">
               <Text textStyle="bodyText3" fontWeight="400">
                 {selectedGramPanchayat
@@ -1096,7 +1105,7 @@ export function CentralDashboard() {
               }
             />
           </Box>
-          <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
+          <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px" minW={0}>
             <Text textStyle="bodyText3" fontWeight="400" mb={2}>
               Demand vs Supply
             </Text>
@@ -1151,7 +1160,7 @@ export function CentralDashboard() {
         </>
       ) : !selectedVillage ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px" minW={0}>
             {isDistrictSelected ? (
               <>
                 <Flex align="center" justify="space-between" mb="40px">
