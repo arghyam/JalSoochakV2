@@ -949,6 +949,8 @@ export function CentralDashboard() {
               pl="16px"
               pr="16px"
               h="523px"
+              w="full"
+              minW={0}
             >
               <Text textStyle="bodyText3" fontWeight="400" mb="0px">
                 Image Submission Status
@@ -965,6 +967,8 @@ export function CentralDashboard() {
               pl="16px"
               pr="16px"
               h="523px"
+              w="full"
+              minW={0}
             >
               <Text textStyle="bodyText3" fontWeight="400" mb={2}>
                 Issue Type Breakdown
@@ -986,6 +990,8 @@ export function CentralDashboard() {
             pl="16px"
             pr="16px"
             h="523px"
+            w="full"
+            minW={0}
           >
             <Text textStyle="bodyText3" fontWeight="400" mb="0px">
               Image Submission Status
@@ -1002,6 +1008,8 @@ export function CentralDashboard() {
             pl="16px"
             pr="16px"
             h="523px"
+            w="full"
+            minW={0}
           >
             <Text textStyle="bodyText3" fontWeight="400" mb={2}>
               Water Supply Outages
