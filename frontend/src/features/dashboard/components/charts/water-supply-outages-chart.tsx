@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from 'react'
-import { Box, useTheme } from '@chakra-ui/react'
+import { Box, useBreakpointValue, useTheme } from '@chakra-ui/react'
 import * as echarts from 'echarts'
 import { EChartsWrapper } from './echarts-wrapper'
 import { getBodyText7Style } from './chart-text-style'
@@ -28,6 +28,8 @@ export function WaterSupplyOutagesChart({
 }: WaterSupplyOutagesChartProps) {
   const theme = useTheme()
   const bodyText7 = getBodyText7Style(theme)
+  const barWidth = useBreakpointValue({ base: 28, sm: 28, md: 42, lg: 66 }) ?? 66
+  const barRadius = useBreakpointValue({ base: 8, sm: 10, md: 12 }) ?? 12
   const chartScrollRef = useRef<HTMLDivElement>(null)
   const scrollbarTrackRef = useRef<HTMLDivElement>(null)
   const scrollbarThumbRef = useRef<HTMLDivElement>(null)
@@ -44,7 +46,6 @@ export function WaterSupplyOutagesChart({
       ? Math.max(minItemWidth, Math.floor(containerWidth / Math.max(data.length, 1)))
       : defaultItemWidth
   const itemWidth = Math.min(defaultItemWidth, effectiveItemWidth)
-  const barWidth = Math.min(66, Math.max(24, Math.floor(itemWidth * 0.75)))
 
   const option = useMemo<echarts.EChartsOption>(() => {
     const districts = data.map((entry) => entry.district)
@@ -122,7 +123,7 @@ export function WaterSupplyOutagesChart({
           barWidth,
           itemStyle: {
             color: outageColors.sourceDrying,
-            borderRadius: [0, 0, 12, 12],
+            borderRadius: [0, 0, barRadius, barRadius],
           },
         },
         {
@@ -163,12 +164,12 @@ export function WaterSupplyOutagesChart({
           barWidth,
           itemStyle: {
             color: outageColors.electricityFailure,
-            borderRadius: [12, 12, 0, 0],
+            borderRadius: [barRadius, barRadius, 0, 0],
           },
         },
       ],
     }
-  }, [data, bodyText7, barWidth])
+  }, [data, bodyText7, barWidth, barRadius])
 
   const axisOption = useMemo<echarts.EChartsOption>(() => {
     return {
