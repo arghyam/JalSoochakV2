@@ -949,6 +949,8 @@ export function CentralDashboard() {
               pl="16px"
               pr="16px"
               h="523px"
+              w="full"
+              minW={0}
             >
               <Text textStyle="bodyText3" fontWeight="400" mb="0px">
                 Image Submission Status
@@ -965,6 +967,8 @@ export function CentralDashboard() {
               pl="16px"
               pr="16px"
               h="523px"
+              w="full"
+              minW={0}
             >
               <Text textStyle="bodyText3" fontWeight="400" mb={2}>
                 Issue Type Breakdown
@@ -986,6 +990,8 @@ export function CentralDashboard() {
             pl="16px"
             pr="16px"
             h="523px"
+            w="full"
+            minW={0}
           >
             <Text textStyle="bodyText3" fontWeight="400" mb="0px">
               Image Submission Status
@@ -1002,6 +1008,8 @@ export function CentralDashboard() {
             pl="16px"
             pr="16px"
             h="523px"
+            w="full"
+            minW={0}
           >
             <Text textStyle="bodyText3" fontWeight="400" mb={2}>
               Water Supply Outages
@@ -1159,7 +1167,7 @@ export function CentralDashboard() {
           </Grid>
         </>
       ) : !selectedVillage ? (
-        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
+        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
           <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px" minW={0}>
             {isDistrictSelected ? (
               <>
@@ -1190,7 +1198,7 @@ export function CentralDashboard() {
               </>
             )}
           </Box>
-          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px" minW={0}>
             <Text textStyle="bodyText3" fontWeight="400" mb={2}>
               Reading Submission Rate
             </Text>
@@ -1206,7 +1214,16 @@ export function CentralDashboard() {
       {/* Operators Performance + All Blocks */}
       {!selectedVillage && isDistrictSelected && !isBlockSelected ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="430px">
+          <Box
+            bg="white"
+            borderWidth="1px"
+            borderRadius="lg"
+            px={4}
+            py={6}
+            h="430px"
+            w="full"
+            minW={0}
+          >
             <PumpOperatorsPerformanceTable
               title="Operators Performance Table"
               data={operatorsPerformanceTable}
@@ -1224,7 +1241,7 @@ export function CentralDashboard() {
       {/* Pump Operator Performance Table */}
       {!selectedVillage && isDistrictSelected && isBlockSelected ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6}>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} w="full" minW={0}>
             <PumpOperatorsPerformanceTable
               title="Operators Performance Table"
               data={operatorsPerformanceTable}

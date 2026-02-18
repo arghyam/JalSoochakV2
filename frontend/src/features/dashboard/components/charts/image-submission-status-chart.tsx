@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useTheme } from '@chakra-ui/react'
+import { useBreakpointValue, useTheme } from '@chakra-ui/react'
 import * as echarts from 'echarts'
 import { EChartsWrapper } from './echarts-wrapper'
 import { getBodyText7Style } from './chart-text-style'
@@ -20,6 +20,16 @@ export function ImageSubmissionStatusChart({
 }: ImageSubmissionStatusChartProps) {
   const theme = useTheme()
   const bodyText7 = getBodyText7Style(theme)
+  const pieRadius = useBreakpointValue<(string | number)[]>({
+    base: ['0%', '75%'],
+    sm: ['0%', '70%'],
+    md: ['0%', '68%'],
+  }) ?? ['0%', '68%']
+  const pieCenter = useBreakpointValue<[string, string]>({
+    base: ['50%', '42%'],
+    sm: ['50%', '45%'],
+    md: ['50%', '45%'],
+  }) ?? ['50%', '45%']
 
   const option = useMemo<echarts.EChartsOption>(() => {
     return {
@@ -29,8 +39,8 @@ export function ImageSubmissionStatusChart({
       series: [
         {
           type: 'pie',
-          radius: ['0%', '68%'],
-          center: ['50%', '45%'],
+          radius: pieRadius,
+          center: pieCenter,
           avoidLabelOverlap: true,
           label: {
             show: false,
@@ -48,7 +58,7 @@ export function ImageSubmissionStatusChart({
         },
       ],
     }
-  }, [data, bodyText7])
+  }, [data, bodyText7, pieCenter, pieRadius])
 
   const containerHeight = typeof height === 'number' ? `${height}px` : height
 
@@ -57,12 +67,13 @@ export function ImageSubmissionStatusChart({
       className={className}
       style={{
         width: '100%',
+        minWidth: 0,
         height: containerHeight,
         display: 'flex',
         flexDirection: 'column',
       }}
     >
-      <div style={{ flex: 1, minHeight: 0 }}>
+      <div style={{ flex: 1, minHeight: 0, minWidth: 0 }}>
         <EChartsWrapper option={option} height="100%" />
       </div>
       <div
@@ -72,6 +83,8 @@ export function ImageSubmissionStatusChart({
           justifyContent: 'center',
           gap: '16px',
           paddingTop: '8px',
+          flexWrap: 'wrap',
+          rowGap: '6px',
         }}
       >
         {data.map((entry, index) => (
