@@ -41,7 +41,7 @@ export function PumpOperatorsPerformanceTable({
   }
 
   return (
-    <Box borderRadius="lg" overflow="hidden">
+    <Box borderRadius="lg" overflow="hidden" w="full" minW={0}>
       <Box textStyle="bodyText3" fontWeight="400" mb="16px">
         {title}
       </Box>
@@ -49,6 +49,8 @@ export function PumpOperatorsPerformanceTable({
         maxH="330px"
         overflowY="auto"
         overflowX="auto"
+        w="full"
+        minW={0}
         pr={2}
         sx={{
           '&::-webkit-scrollbar': { width: '4px' },
@@ -60,7 +62,7 @@ export function PumpOperatorsPerformanceTable({
           },
         }}
       >
-        <Table size="sm">
+        <Table size="sm" w="max-content" minW="100%">
           <Thead
             sx={{
               position: 'sticky',

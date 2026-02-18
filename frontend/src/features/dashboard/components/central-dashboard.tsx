@@ -1214,7 +1214,16 @@ export function CentralDashboard() {
       {/* Operators Performance + All Blocks */}
       {!selectedVillage && isDistrictSelected && !isBlockSelected ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="430px">
+          <Box
+            bg="white"
+            borderWidth="1px"
+            borderRadius="lg"
+            px={4}
+            py={6}
+            h="430px"
+            w="full"
+            minW={0}
+          >
             <PumpOperatorsPerformanceTable
               title="Operators Performance Table"
               data={operatorsPerformanceTable}
@@ -1232,7 +1241,7 @@ export function CentralDashboard() {
       {/* Pump Operator Performance Table */}
       {!selectedVillage && isDistrictSelected && isBlockSelected ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6}>
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} w="full" minW={0}>
             <PumpOperatorsPerformanceTable
               title="Operators Performance Table"
               data={operatorsPerformanceTable}
