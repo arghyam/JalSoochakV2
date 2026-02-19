@@ -43,12 +43,15 @@ export function AllBlocksTable({ data, maxItems }: AllBlocksTableProps) {
         overflowX="auto"
         pr={2}
         sx={{
-          '&::-webkit-scrollbar': { width: '4px' },
+          '&::-webkit-scrollbar': { width: '4px', height: '4px' },
           '&::-webkit-scrollbar-track': { bg: 'neutral.100', borderRadius: '999px' },
           '&::-webkit-scrollbar-thumb': {
             bg: 'neutral.300',
             borderRadius: '999px',
             minHeight: '165px',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            cursor: 'pointer',
           },
         }}
       >

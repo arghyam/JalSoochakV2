@@ -53,16 +53,19 @@ export function PumpOperatorsPerformanceTable({
         minW={0}
         pr={2}
         sx={{
-          '&::-webkit-scrollbar': { width: '4px' },
+          '&::-webkit-scrollbar': { width: '4px', height: '4px' },
           '&::-webkit-scrollbar-track': { bg: 'neutral.100', borderRadius: '999px' },
           '&::-webkit-scrollbar-thumb': {
             bg: 'neutral.300',
             borderRadius: '999px',
             minHeight: '165px',
           },
+          '&::-webkit-scrollbar-thumb:hover': {
+            cursor: 'pointer',
+          },
         }}
       >
-        <Table size="sm" w="max-content" minW="100%">
+        <Table size="sm" w="full" minW={{ base: '640px', md: '100%' }}>
           <Thead
             sx={{
               position: 'sticky',
