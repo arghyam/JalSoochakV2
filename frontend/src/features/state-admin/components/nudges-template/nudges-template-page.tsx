@@ -2,10 +2,13 @@ import { useState, useEffect } from 'react'
 import { Box, Text, Button, Flex, Textarea, Tag, Heading, Spinner, Stack } from '@chakra-ui/react'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { useTranslation } from 'react-i18next'
-import { getMockNudgeTemplates, updateMockNudgeTemplate } from '../../services/mock-data'
 import type { NudgeTemplate } from '../../types/nudges'
 import { useToast } from '@/shared/hooks/use-toast'
 import { ToastContainer, SearchableSelect } from '@/shared/components/common'
+import {
+  useNudgeTemplatesQuery,
+  useUpdateNudgeTemplateMutation,
+} from '../../services/query/use-state-admin-queries'
 
 interface LanguageOption {
   value: string
@@ -25,8 +28,9 @@ interface TemplateState {
 
 export function NudgesTemplatePage() {
   const { t } = useTranslation(['state-admin', 'common'])
+  const { data: fetchedTemplates, isLoading, isError } = useNudgeTemplatesQuery()
+  const updateNudgeTemplateMutation = useUpdateNudgeTemplateMutation()
   const [templates, setTemplates] = useState<NudgeTemplate[]>([])
-  const [isLoading, setIsLoading] = useState(true)
   const [savingTemplateId, setSavingTemplateId] = useState<string | null>(null)
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
   const [templateStates, setTemplateStates] = useState<Record<string, TemplateState>>({})
@@ -38,38 +42,25 @@ export function NudgesTemplatePage() {
   }, [t])
 
   useEffect(() => {
-    fetchTemplates()
-  }, [])
-
-  const fetchTemplates = async () => {
-    setIsLoading(true)
-    try {
-      const data = await getMockNudgeTemplates()
-      setTemplates(data)
-      if (data.length > 0) {
-        setSelectedTemplateId(data[0].id)
-      }
-
-      // Initialize state for each template with first available language
-      const initialStates: Record<string, TemplateState> = {}
-      data.forEach((template) => {
-        const firstMessage = template.messages[0]
-        if (firstMessage) {
-          initialStates[template.id] = {
-            selectedLanguage: firstMessage.language,
-            message: firstMessage.message,
-            originalMessage: firstMessage.message,
-          }
-        }
-      })
-      setTemplateStates(initialStates)
-    } catch (error) {
-      console.error('Failed to fetch nudge templates:', error)
-      toast.addToast(t('nudges.messages.failedToLoad'), 'error')
-    } finally {
-      setIsLoading(false)
+    if (!fetchedTemplates) return
+    setTemplates(fetchedTemplates)
+    if (fetchedTemplates.length > 0) {
+      setSelectedTemplateId(fetchedTemplates[0].id)
     }
-  }
+
+    const initialStates: Record<string, TemplateState> = {}
+    fetchedTemplates.forEach((template) => {
+      const firstMessage = template.messages[0]
+      if (firstMessage) {
+        initialStates[template.id] = {
+          selectedLanguage: firstMessage.language,
+          message: firstMessage.message,
+          originalMessage: firstMessage.message,
+        }
+      }
+    })
+    setTemplateStates(initialStates)
+  }, [fetchedTemplates])
 
   const handleLanguageChange = (templateId: string, language: string) => {
     const template = templates.find((t) => t.id === templateId)
@@ -110,9 +101,12 @@ export function NudgesTemplatePage() {
 
     setSavingTemplateId(templateId)
     try {
-      const updatedTemplate = await updateMockNudgeTemplate(templateId, {
-        language: state.selectedLanguage,
-        message: state.message,
+      const updatedTemplate = await updateNudgeTemplateMutation.mutateAsync({
+        id: templateId,
+        payload: {
+          language: state.selectedLanguage,
+          message: state.message,
+        },
       })
 
       // Update templates list
@@ -162,6 +156,17 @@ export function NudgesTemplatePage() {
           <Spinner size="md" color="primary.500" mr={3} />
           <Text color="neutral.600">{t('common:loading')}</Text>
         </Flex>
+      </Box>
+    )
+  }
+
+  if (isError) {
+    return (
+      <Box w="full">
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={6}>
+          {t('nudges.title')}
+        </Heading>
+        <Text color="error.500">{t('nudges.messages.failedToLoad')}</Text>
       </Box>
     )
   }

@@ -15,25 +15,24 @@ import {
   Spinner,
 } from '@chakra-ui/react'
 import { useTranslation } from 'react-i18next'
-import {
-  getMockThresholdConfiguration,
-  saveMockThresholdConfiguration,
-} from '../../services/mock-data'
-import type { ThresholdConfiguration } from '../../types/thresholds'
 import { useToast } from '@/shared/hooks/use-toast'
 import { ToastContainer } from '@/shared/components/common'
+import {
+  useSaveThresholdConfigurationMutation,
+  useThresholdConfigurationQuery,
+} from '../../services/query/use-state-admin-queries'
 
 export function ThresholdsPage() {
   const { t } = useTranslation(['state-admin', 'common'])
-  const [config, setConfig] = useState<ThresholdConfiguration | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
+  const { data: config, isLoading, isError } = useThresholdConfigurationQuery()
+  const saveThresholdMutation = useSaveThresholdConfigurationMutation()
 
-  // Form state
-  const [coverage, setCoverage] = useState('')
-  const [continuity, setContinuity] = useState('')
-  const [quantity, setQuantity] = useState('')
-  const [regularity, setRegularity] = useState('')
+  const [formDraft, setFormDraft] = useState<{
+    coverage?: string
+    continuity?: string
+    quantity?: string
+    regularity?: string
+  }>({})
 
   const toast = useToast()
 
@@ -41,34 +40,13 @@ export function ThresholdsPage() {
     document.title = `${t('thresholds.title')} | JalSoochak`
   }, [t])
 
-  useEffect(() => {
-    fetchConfiguration()
-  }, [])
-
-  const fetchConfiguration = async () => {
-    setIsLoading(true)
-    try {
-      const data = await getMockThresholdConfiguration()
-      setConfig(data)
-      setCoverage(data.coverage)
-      setContinuity(data.continuity)
-      setQuantity(data.quantity)
-      setRegularity(data.regularity)
-    } catch (error) {
-      console.error('Failed to fetch threshold configuration:', error)
-      toast.addToast(t('thresholds.messages.failedToLoad'), 'error')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const coverage = formDraft.coverage ?? config?.coverage ?? ''
+  const continuity = formDraft.continuity ?? config?.continuity ?? ''
+  const quantity = formDraft.quantity ?? config?.quantity ?? ''
+  const regularity = formDraft.regularity ?? config?.regularity ?? ''
 
   const handleCancel = () => {
-    if (config) {
-      setCoverage(config.coverage)
-      setContinuity(config.continuity)
-      setQuantity(config.quantity)
-      setRegularity(config.regularity)
-    }
+    setFormDraft({})
   }
 
   const handleSave = async () => {
@@ -77,22 +55,18 @@ export function ThresholdsPage() {
       return
     }
 
-    setIsSaving(true)
     try {
-      const savedConfig = await saveMockThresholdConfiguration({
+      await saveThresholdMutation.mutateAsync({
         coverage,
         continuity,
         quantity,
         regularity,
         isConfigured: true,
       })
-      setConfig(savedConfig)
       toast.addToast(t('common:toast.changesSavedShort'), 'success')
     } catch (error) {
       console.error('Failed to save threshold configuration:', error)
       toast.addToast(t('thresholds.messages.failedToSave'), 'error')
-    } finally {
-      setIsSaving(false)
     }
   }
 
@@ -113,6 +87,17 @@ export function ThresholdsPage() {
           <Spinner size="md" color="primary.500" mr={3} />
           <Text color="neutral.600">{t('common:loading')}</Text>
         </Flex>
+      </Box>
+    )
+  }
+
+  if (isError || !config) {
+    return (
+      <Box w="full">
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={6}>
+          {t('thresholds.title')}
+        </Heading>
+        <Text color="error.500">{t('thresholds.messages.failedToLoad')}</Text>
       </Box>
     )
   }
@@ -190,7 +175,9 @@ export function ThresholdsPage() {
                 </Text>
                 <NumberInput
                   value={coverage}
-                  onChange={(valueString) => setCoverage(valueString)}
+                  onChange={(valueString) =>
+                    setFormDraft((prev) => ({ ...prev, coverage: valueString }))
+                  }
                   min={0}
                   w={{ base: 'full', xl: '490px' }}
                 >
@@ -238,7 +225,9 @@ export function ThresholdsPage() {
                 </Text>
                 <NumberInput
                   value={continuity}
-                  onChange={(valueString) => setContinuity(valueString)}
+                  onChange={(valueString) =>
+                    setFormDraft((prev) => ({ ...prev, continuity: valueString }))
+                  }
                   min={0}
                   w={{ base: 'full', xl: '490px' }}
                 >
@@ -286,7 +275,9 @@ export function ThresholdsPage() {
                 </Text>
                 <NumberInput
                   value={quantity}
-                  onChange={(valueString) => setQuantity(valueString)}
+                  onChange={(valueString) =>
+                    setFormDraft((prev) => ({ ...prev, quantity: valueString }))
+                  }
                   min={0}
                   w={{ base: 'full', xl: '490px' }}
                 >
@@ -334,7 +325,9 @@ export function ThresholdsPage() {
                 </Text>
                 <NumberInput
                   value={regularity}
-                  onChange={(valueString) => setRegularity(valueString)}
+                  onChange={(valueString) =>
+                    setFormDraft((prev) => ({ ...prev, regularity: valueString }))
+                  }
                   min={0}
                   w={{ base: 'full', xl: '490px' }}
                 >
@@ -370,7 +363,7 @@ export function ThresholdsPage() {
               size="md"
               width={{ base: 'full', sm: '174px' }}
               onClick={handleCancel}
-              isDisabled={isSaving || !hasChanges}
+              isDisabled={saveThresholdMutation.isPending || !hasChanges}
             >
               {t('common:button.cancel')}
             </Button>
@@ -379,7 +372,7 @@ export function ThresholdsPage() {
               size="md"
               width={{ base: 'full', sm: '174px' }}
               onClick={handleSave}
-              isLoading={isSaving}
+              isLoading={saveThresholdMutation.isPending}
               isDisabled={!coverage || !continuity || !quantity || !regularity || !hasChanges}
             >
               {t('common:button.save')}

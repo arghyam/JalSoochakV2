@@ -17,15 +17,14 @@ import { SearchIcon, EditIcon } from '@chakra-ui/icons'
 import { FiEye } from 'react-icons/fi'
 import { IoAddOutline } from 'react-icons/io5'
 import { DataTable, type DataTableColumn } from '@/shared/components/common'
-import { getMockStatesUTsData } from '../../services/mock-data'
 import type { StateUT } from '../../types/states-uts'
 import { ROUTES } from '@/shared/constants/routes'
+import { useStatesUTsQuery } from '../../services/query/use-super-admin-queries'
 
 export function StatesUTsPage() {
   const { t } = useTranslation(['super-admin', 'common'])
   const navigate = useNavigate()
-  const [states, setStates] = useState<StateUT[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const { data: states = [], isLoading } = useStatesUTsQuery()
   const [searchQuery, setSearchQuery] = useState('')
 
   // Responsive values
@@ -34,22 +33,6 @@ export function StatesUTsPage() {
   useEffect(() => {
     document.title = `${t('statesUts.title')} | JalSoochak`
   }, [t])
-
-  useEffect(() => {
-    fetchStates()
-  }, [])
-
-  const fetchStates = async () => {
-    setIsLoading(true)
-    try {
-      const data = await getMockStatesUTsData()
-      setStates(data)
-    } catch (error) {
-      console.error('Failed to fetch states:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
   const formatTimestamp = (date: Date): string => {
     const month = String(date.getMonth() + 1).padStart(2, '0')

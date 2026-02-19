@@ -15,15 +15,20 @@ import {
 import { useTranslation } from 'react-i18next'
 import { SearchIcon } from '@chakra-ui/icons'
 import { BiKey } from 'react-icons/bi'
-import { getMockApiCredentialsData, generateApiKey, sendApiKey } from '../../services/mock-data'
 import { SearchableSelect } from '@/shared/components/common'
-import type { ApiCredentialsData, ApiCredential } from '../../types/api-credentials'
+import type { ApiCredential } from '../../types/api-credentials'
 import { STATUS_FILTER_OPTIONS } from '../../types/api-credentials'
+import {
+  useApiCredentialsQuery,
+  useGenerateApiKeyMutation,
+  useSendApiKeyMutation,
+} from '../../services/query/use-super-admin-queries'
 
 export function ApiCredentialsPage() {
   const { t } = useTranslation(['super-admin', 'common'])
-  const [data, setData] = useState<ApiCredentialsData | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const { data, isLoading, isError } = useApiCredentialsQuery()
+  const generateApiKeyMutation = useGenerateApiKeyMutation()
+  const sendApiKeyMutation = useSendApiKeyMutation()
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [generatingKeyFor, setGeneratingKeyFor] = useState<string | null>(null)
@@ -36,32 +41,6 @@ export function ApiCredentialsPage() {
   useEffect(() => {
     document.title = `${t('apiCredentials.title')} | JalSoochak`
   }, [t])
-
-  useEffect(() => {
-    let isMounted = true
-
-    const fetchData = async () => {
-      setIsLoading(true)
-      try {
-        const result = await getMockApiCredentialsData()
-        if (isMounted) {
-          setData(result)
-        }
-      } catch (err) {
-        console.error('Failed to fetch API credentials data:', err)
-      } finally {
-        if (isMounted) {
-          setIsLoading(false)
-        }
-      }
-    }
-
-    fetchData()
-
-    return () => {
-      isMounted = false
-    }
-  }, [])
 
   const formatDate = (date: Date): string => {
     const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -87,16 +66,7 @@ export function ApiCredentialsPage() {
   const handleGenerateKey = async (credentialId: string) => {
     setGeneratingKeyFor(credentialId)
     try {
-      const newKey = await generateApiKey(credentialId)
-      setData((prev) => {
-        if (!prev) return prev
-        return {
-          ...prev,
-          credentials: prev.credentials.map((cred) =>
-            cred.id === credentialId ? { ...cred, apiKey: newKey } : cred
-          ),
-        }
-      })
+      await generateApiKeyMutation.mutateAsync(credentialId)
     } catch (err) {
       console.error('Failed to generate API key:', err)
     } finally {
@@ -107,7 +77,7 @@ export function ApiCredentialsPage() {
   const handleSendKey = async (credentialId: string) => {
     setSendingKeyFor(credentialId)
     try {
-      await sendApiKey(credentialId)
+      await sendApiKeyMutation.mutateAsync(credentialId)
     } catch (err) {
       console.error('Failed to send API key:', err)
     } finally {
@@ -166,6 +136,19 @@ export function ApiCredentialsPage() {
         </Heading>
         <Flex role="status" aria-live="polite" h="64" align="center" justify="center">
           <Text color="neutral.600">{t('common:loading')}</Text>
+        </Flex>
+      </Box>
+    )
+  }
+
+  if (isError) {
+    return (
+      <Box w="full">
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={5}>
+          {t('apiCredentials.title')}
+        </Heading>
+        <Flex h="64" align="center" justify="center">
+          <Text color="error.500">{t('common:toast.failedToLoad')}</Text>
         </Flex>
       </Box>
     )

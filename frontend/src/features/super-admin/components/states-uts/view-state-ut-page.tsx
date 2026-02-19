@@ -1,59 +1,46 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Box, Heading, Text, Flex, SimpleGrid, IconButton } from '@chakra-ui/react'
 import { useTranslation } from 'react-i18next'
 import { EditIcon } from '@chakra-ui/icons'
 import { Toggle, ToastContainer } from '@/shared/components/common'
 import { useToast } from '@/shared/hooks/use-toast'
-import { getStateUTById, updateStateUTStatus } from '../../services/mock-data'
 import type { StateUT } from '../../types/states-uts'
 import { ROUTES } from '@/shared/constants/routes'
+import {
+  useStateUTByIdQuery,
+  useUpdateStateUTStatusMutation,
+} from '../../services/query/use-super-admin-queries'
 
 export function ViewStateUTPage() {
   const { t } = useTranslation(['super-admin', 'common'])
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
   const toast = useToast()
+  const stateUTQuery = useStateUTByIdQuery(id)
+  const updateStateUTStatusMutation = useUpdateStateUTStatusMutation()
 
-  const [state, setState] = useState<StateUT | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false)
+  const [statusDraft, setStatusDraft] = useState<'active' | 'inactive' | null>(null)
 
   useEffect(() => {
     document.title = `${t('statesUts.viewTitle')} | JalSoochak`
   }, [t])
 
-  const fetchState = useCallback(async (stateId: string) => {
-    setIsLoading(true)
-    try {
-      const data = await getStateUTById(stateId)
-      setState(data)
-    } catch (error) {
-      console.error('Failed to fetch state:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!id) {
-      setState(null)
-      setIsLoading(false)
-      return
-    }
-    fetchState(id)
-  }, [id, fetchState])
+  const state: StateUT | null = stateUTQuery.data ?? null
+  const status = statusDraft ?? state?.status
 
   const handleStatusToggle = async () => {
-    if (!state || isUpdatingStatus) return
+    if (!state || updateStateUTStatusMutation.isPending) return
 
-    const newStatus = state.status === 'active' ? 'inactive' : 'active'
-    setIsUpdatingStatus(true)
+    const newStatus = status === 'active' ? 'inactive' : 'active'
 
     try {
-      const updated = await updateStateUTStatus(state.id, newStatus)
+      const updated = await updateStateUTStatusMutation.mutateAsync({
+        id: state.id,
+        status: newStatus,
+      })
       if (updated) {
-        setState(updated)
+        setStatusDraft(newStatus)
         toast.addToast(
           newStatus === 'active'
             ? t('statesUts.messages.activatedSuccess')
@@ -66,8 +53,6 @@ export function ViewStateUTPage() {
     } catch (error) {
       console.error('Failed to update status:', error)
       toast.addToast(t('statesUts.messages.failedToUpdateStatus'), 'error')
-    } finally {
-      setIsUpdatingStatus(false)
     }
   }
 
@@ -77,7 +62,7 @@ export function ViewStateUTPage() {
     }
   }
 
-  if (isLoading) {
+  if (stateUTQuery.isLoading) {
     return (
       <Box w="full">
         <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={5}>
@@ -252,9 +237,9 @@ export function ViewStateUTPage() {
             {t('statesUts.statusSection.activated')}
           </Text>
           <Toggle
-            isChecked={state.status === 'active'}
+            isChecked={status === 'active'}
             onChange={handleStatusToggle}
-            isDisabled={isUpdatingStatus}
+            isDisabled={updateStateUTStatusMutation.isPending}
             aria-labelledby="activated-label"
           />
         </Flex>

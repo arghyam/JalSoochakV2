@@ -13,24 +13,24 @@ import {
   Spinner,
 } from '@chakra-ui/react'
 import { useTranslation } from 'react-i18next'
-import {
-  getMockIntegrationConfiguration,
-  saveMockIntegrationConfiguration,
-} from '../../services/mock-data'
-import type { IntegrationConfiguration } from '../../types/integration'
 import { useToast } from '@/shared/hooks/use-toast'
 import { ToastContainer } from '@/shared/components/common'
+import {
+  useIntegrationConfigurationQuery,
+  useSaveIntegrationConfigurationMutation,
+} from '../../services/query/use-state-admin-queries'
 
 export function IntegrationPage() {
   const { t } = useTranslation(['state-admin', 'common'])
-  const [config, setConfig] = useState<IntegrationConfiguration | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
+  const { data: config, isLoading, isError } = useIntegrationConfigurationQuery()
+  const saveIntegrationMutation = useSaveIntegrationConfigurationMutation()
 
-  const [whatsappBusinessAccountName, setWhatsappBusinessAccountName] = useState('')
-  const [senderPhoneNumber, setSenderPhoneNumber] = useState('')
-  const [whatsappBusinessAccountId, setWhatsappBusinessAccountId] = useState('')
-  const [apiAccessToken, setApiAccessToken] = useState('')
+  const [formValues, setFormValues] = useState<{
+    whatsappBusinessAccountName?: string
+    senderPhoneNumber?: string
+    whatsappBusinessAccountId?: string
+    apiAccessToken?: string
+  }>({})
 
   const toast = useToast()
 
@@ -38,34 +38,15 @@ export function IntegrationPage() {
     document.title = `${t('integration.title')} | JalSoochak`
   }, [t])
 
-  useEffect(() => {
-    const fetchConfig = async () => {
-      try {
-        const data = await getMockIntegrationConfiguration()
-        setConfig(data)
-        setWhatsappBusinessAccountName(data.whatsappBusinessAccountName)
-        setSenderPhoneNumber(data.senderPhoneNumber)
-        setWhatsappBusinessAccountId(data.whatsappBusinessAccountId)
-        setApiAccessToken(data.apiAccessToken)
-      } catch (error) {
-        console.error('Failed to fetch integration configuration:', error)
-        toast.addToast(t('integration.messages.failedToLoad'), 'error')
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchConfig()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const whatsappBusinessAccountName =
+    formValues.whatsappBusinessAccountName ?? config?.whatsappBusinessAccountName ?? ''
+  const senderPhoneNumber = formValues.senderPhoneNumber ?? config?.senderPhoneNumber ?? ''
+  const whatsappBusinessAccountId =
+    formValues.whatsappBusinessAccountId ?? config?.whatsappBusinessAccountId ?? ''
+  const apiAccessToken = formValues.apiAccessToken ?? config?.apiAccessToken ?? ''
 
   const handleCancel = () => {
-    if (config) {
-      setWhatsappBusinessAccountName(config.whatsappBusinessAccountName)
-      setSenderPhoneNumber(config.senderPhoneNumber)
-      setWhatsappBusinessAccountId(config.whatsappBusinessAccountId)
-      setApiAccessToken(config.apiAccessToken)
-    }
+    setFormValues({})
   }
 
   const handleSave = async () => {
@@ -79,21 +60,17 @@ export function IntegrationPage() {
       return
     }
 
-    setIsSaving(true)
     try {
-      const savedConfig = await saveMockIntegrationConfiguration({
+      await saveIntegrationMutation.mutateAsync({
         whatsappBusinessAccountName,
         senderPhoneNumber,
         whatsappBusinessAccountId,
         apiAccessToken,
       })
-      setConfig(savedConfig)
       toast.addToast(t('common:toast.changesSavedShort'), 'success')
     } catch (error) {
       console.error('Failed to save integration configuration:', error)
       toast.addToast(t('common:toast.failedToSave'), 'error')
-    } finally {
-      setIsSaving(false)
     }
   }
 
@@ -114,6 +91,17 @@ export function IntegrationPage() {
           <Spinner size="md" color="primary.500" mr={3} />
           <Text color="neutral.600">{t('common:loading')}</Text>
         </Flex>
+      </Box>
+    )
+  }
+
+  if (isError || !config) {
+    return (
+      <Box w="full">
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={6}>
+          {t('integration.title')}
+        </Heading>
+        <Text color="error.500">{t('integration.messages.failedToLoad')}</Text>
       </Box>
     )
   }
@@ -172,7 +160,12 @@ export function IntegrationPage() {
                   fontSize="14px"
                   fontWeight="400"
                   value={whatsappBusinessAccountName}
-                  onChange={(e) => setWhatsappBusinessAccountName(e.target.value)}
+                  onChange={(e) =>
+                    setFormValues((prev) => ({
+                      ...prev,
+                      whatsappBusinessAccountName: e.target.value,
+                    }))
+                  }
                   size="md"
                   h="36px"
                   maxW={{ base: '100%', lg: '486px' }}
@@ -195,7 +188,12 @@ export function IntegrationPage() {
                   fontSize="14px"
                   fontWeight="400"
                   value={senderPhoneNumber}
-                  onChange={(e) => setSenderPhoneNumber(e.target.value)}
+                  onChange={(e) =>
+                    setFormValues((prev) => ({
+                      ...prev,
+                      senderPhoneNumber: e.target.value,
+                    }))
+                  }
                   size="md"
                   h="36px"
                   maxW={{ base: '100%', lg: '486px' }}
@@ -218,7 +216,12 @@ export function IntegrationPage() {
                   fontSize="14px"
                   fontWeight="400"
                   value={whatsappBusinessAccountId}
-                  onChange={(e) => setWhatsappBusinessAccountId(e.target.value)}
+                  onChange={(e) =>
+                    setFormValues((prev) => ({
+                      ...prev,
+                      whatsappBusinessAccountId: e.target.value,
+                    }))
+                  }
                   size="md"
                   h="36px"
                   maxW={{ base: '100%', lg: '486px' }}
@@ -242,7 +245,12 @@ export function IntegrationPage() {
                   fontWeight="400"
                   type="password"
                   value={apiAccessToken}
-                  onChange={(e) => setApiAccessToken(e.target.value)}
+                  onChange={(e) =>
+                    setFormValues((prev) => ({
+                      ...prev,
+                      apiAccessToken: e.target.value,
+                    }))
+                  }
                   size="md"
                   h="36px"
                   maxW={{ base: '100%', lg: '486px' }}
@@ -270,7 +278,7 @@ export function IntegrationPage() {
               size="md"
               width={{ base: 'full', sm: '174px' }}
               onClick={handleCancel}
-              isDisabled={isSaving}
+              isDisabled={saveIntegrationMutation.isPending}
             >
               {t('common:button.cancel')}
             </Button>
@@ -279,7 +287,7 @@ export function IntegrationPage() {
               size="md"
               width={{ base: 'full', sm: '174px' }}
               onClick={handleSave}
-              isLoading={isSaving}
+              isLoading={saveIntegrationMutation.isPending}
               isDisabled={
                 !whatsappBusinessAccountName ||
                 !senderPhoneNumber ||
