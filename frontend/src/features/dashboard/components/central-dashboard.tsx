@@ -1229,7 +1229,7 @@ export function CentralDashboard() {
               data={operatorsPerformanceTable}
             />
           </Box>
-          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="430px">
+          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="430px" minW={0}>
             <Text textStyle="bodyText3" fontWeight="400" mb="16px">
               All Blocks
             </Text>
