@@ -1,9 +1,10 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
+import { Flex } from '@chakra-ui/react'
 import { useAuthStore } from '@/app/store'
 import { AUTH_ROLES, type AuthRole } from '@/shared/constants/auth'
 import { ROUTES } from '@/shared/constants/routes'
-import { ForbiddenPage, SessionExpiredPage } from '@/shared/components/common'
+import { ForbiddenPage, SessionExpiredPage, LoadingSpinner } from '@/shared/components/common'
 
 interface ProtectedRouteProps {
   children: ReactNode
@@ -17,7 +18,15 @@ export function ProtectedRoute({
   allowedRoles,
 }: ProtectedRouteProps) {
   const location = useLocation()
-  const { isAuthenticated, user, sessionExpired } = useAuthStore()
+  const { isAuthenticated, user, sessionExpired, isBootstrapping } = useAuthStore()
+
+  if (isBootstrapping) {
+    return (
+      <Flex h="100vh" align="center" justify="center">
+        <LoadingSpinner />
+      </Flex>
+    )
+  }
 
   if (sessionExpired) {
     return <SessionExpiredPage />
@@ -35,12 +44,28 @@ export function ProtectedRoute({
 }
 
 export function RedirectIfAuthenticated({ children }: { children: ReactNode }) {
-  const { isAuthenticated, user } = useAuthStore()
+  const { isAuthenticated, user, isBootstrapping } = useAuthStore()
+  const location = useLocation()
+
+  if (isBootstrapping) {
+    return (
+      <Flex h="100vh" align="center" justify="center">
+        <LoadingSpinner />
+      </Flex>
+    )
+  }
 
   if (!isAuthenticated || !user) {
     return <>{children}</>
   }
 
+  const from = (location.state as { from?: Location } | null)?.from
+  if (from?.pathname) {
+    const destination = `${from.pathname}${from.search ?? ''}${from.hash ?? ''}`
+    return <Navigate to={destination} replace />
+  }
+
+  // Default: role-based home
   if (user.role === AUTH_ROLES.SUPER_ADMIN) {
     return <Navigate to={ROUTES.SUPER_ADMIN} replace />
   }
