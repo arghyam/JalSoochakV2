@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Box,
@@ -12,27 +12,22 @@ import {
   Spinner,
 } from '@chakra-ui/react'
 import { useTranslation } from 'react-i18next'
-import { getMockSuperAdminOverviewData } from '../../services/mock-data'
 import { BarLineChart } from '@/shared/components/charts/bar-line-chart'
-import type { SuperAdminOverviewData } from '../../types/overview'
 import { MdOutlinePlace } from 'react-icons/md'
 import { BsCheck2Circle } from 'react-icons/bs'
 import { IoCloseCircleOutline, IoAddOutline } from 'react-icons/io5'
 import { ROUTES } from '@/shared/constants/routes'
 import i18n from '@/app/i18n'
+import { useSuperAdminOverviewQuery } from '../../services/query/use-super-admin-queries'
 
 export function OverviewPage() {
   const { t } = useTranslation(['super-admin', 'common'])
   const navigate = useNavigate()
-  const [data, setData] = useState<SuperAdminOverviewData | null>(null)
+  const { data, isLoading, isError } = useSuperAdminOverviewQuery()
 
   useEffect(() => {
     document.title = `${t('overview.title')} | JalSoochak`
   }, [t])
-
-  useEffect(() => {
-    getMockSuperAdminOverviewData().then(setData)
-  }, [])
 
   const formatTimestamp = (date: Date): string => {
     const locale = i18n.language === 'hi' ? 'hi-IN' : 'en-IN'
@@ -46,7 +41,7 @@ export function OverviewPage() {
     }).format(date)
   }
 
-  if (!data) {
+  if (isLoading) {
     return (
       <Flex
         h="64"
@@ -61,6 +56,16 @@ export function OverviewPage() {
       </Flex>
     )
   }
+
+  if (isError) {
+    return (
+      <Flex h="64" align="center" justify="center">
+        <Text color="error.500">{t('common:toast.failedToLoad')}</Text>
+      </Flex>
+    )
+  }
+
+  if (!data) return null
 
   const statsCards = [
     {

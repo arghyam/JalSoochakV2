@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   Box,
@@ -17,58 +17,43 @@ import { useTranslation } from 'react-i18next'
 import { EditIcon } from '@chakra-ui/icons'
 import { Toggle, ToastContainer } from '@/shared/components/common'
 import { useToast } from '@/shared/hooks/use-toast'
-import { getStateUTById, updateStateUT, updateStateUTStatus } from '../../services/mock-data'
 import type { StateUT } from '../../types/states-uts'
 import { ROUTES } from '@/shared/constants/routes'
+import {
+  useStateUTByIdQuery,
+  useUpdateStateUTMutation,
+  useUpdateStateUTStatusMutation,
+} from '../../services/query/use-super-admin-queries'
 
 export function EditStateUTPage() {
   const { t } = useTranslation(['super-admin', 'common'])
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
   const toast = useToast()
+  const stateUTQuery = useStateUTByIdQuery(id)
+  const updateStateUTMutation = useUpdateStateUTMutation()
+  const updateStateUTStatusMutation = useUpdateStateUTStatusMutation()
 
-  const [originalState, setOriginalState] = useState<StateUT | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
-  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false)
-
-  // Form state
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [phone, setPhone] = useState('')
-  const [secondaryEmail, setSecondaryEmail] = useState('')
-  const [contactNumber, setContactNumber] = useState('')
-  const [status, setStatus] = useState<'active' | 'inactive'>('active')
+  const [formDraft, setFormDraft] = useState<{
+    firstName?: string
+    lastName?: string
+    phone?: string
+    secondaryEmail?: string
+    contactNumber?: string
+    status?: 'active' | 'inactive'
+  }>({})
 
   useEffect(() => {
     document.title = `${t('statesUts.editTitle')} | JalSoochak`
   }, [t])
 
-  const fetchState = useCallback(async (stateId: string) => {
-    setIsLoading(true)
-    try {
-      const data = await getStateUTById(stateId)
-      if (data) {
-        setOriginalState(data)
-        setFirstName(data.admin.firstName)
-        setLastName(data.admin.lastName)
-        setPhone(data.admin.phone)
-        setSecondaryEmail(data.admin.secondaryEmail ?? '')
-        setContactNumber(data.admin.contactNumber ?? '')
-        setStatus(data.status)
-      }
-    } catch (error) {
-      console.error('Failed to fetch state:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (id) {
-      fetchState(id)
-    }
-  }, [id, fetchState])
+  const originalState: StateUT | null = stateUTQuery.data ?? null
+  const firstName = formDraft.firstName ?? originalState?.admin.firstName ?? ''
+  const lastName = formDraft.lastName ?? originalState?.admin.lastName ?? ''
+  const phone = formDraft.phone ?? originalState?.admin.phone ?? ''
+  const secondaryEmail = formDraft.secondaryEmail ?? originalState?.admin.secondaryEmail ?? ''
+  const contactNumber = formDraft.contactNumber ?? originalState?.admin.contactNumber ?? ''
+  const status = formDraft.status ?? originalState?.status ?? 'active'
 
   // Validation
   const isValidEmail = (emailStr: string): boolean => {
@@ -107,28 +92,25 @@ export function EditStateUTPage() {
   }, [originalState, firstName, lastName, phone, secondaryEmail, contactNumber])
 
   const handleStatusToggle = async () => {
-    if (!originalState || isUpdatingStatus) return
+    if (!originalState || updateStateUTStatusMutation.isPending) return
 
     const newStatus = status === 'active' ? 'inactive' : 'active'
-    setIsUpdatingStatus(true)
 
     try {
-      const updated = await updateStateUTStatus(originalState.id, newStatus)
-      if (updated) {
-        setStatus(newStatus)
-        setOriginalState(updated)
-        toast.addToast(
-          newStatus === 'active'
-            ? t('statesUts.messages.activatedSuccess')
-            : t('statesUts.messages.deactivatedSuccess'),
-          'success'
-        )
-      }
+      await updateStateUTStatusMutation.mutateAsync({
+        id: originalState.id,
+        status: newStatus,
+      })
+      setFormDraft((prev) => ({ ...prev, status: newStatus }))
+      toast.addToast(
+        newStatus === 'active'
+          ? t('statesUts.messages.activatedSuccess')
+          : t('statesUts.messages.deactivatedSuccess'),
+        'success'
+      )
     } catch (error) {
       console.error('Failed to update status:', error)
       toast.addToast(t('statesUts.messages.failedToUpdateStatus'), 'error')
-    } finally {
-      setIsUpdatingStatus(false)
     }
   }
 
@@ -145,32 +127,30 @@ export function EditStateUTPage() {
       return
     }
 
-    setIsSaving(true)
     try {
-      const updated = await updateStateUT(id, {
-        admin: {
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
-          phone: phone.trim(),
-          secondaryEmail: secondaryEmail.trim() || undefined,
-          contactNumber: contactNumber.trim() || undefined,
+      await updateStateUTMutation.mutateAsync({
+        id,
+        payload: {
+          admin: {
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            phone: phone.trim(),
+            secondaryEmail: secondaryEmail.trim() || undefined,
+            contactNumber: contactNumber.trim() || undefined,
+          },
         },
       })
-      if (updated) {
-        toast.addToast(t('common:toast.changesSaved'), 'success')
-        setTimeout(() => {
-          navigate(ROUTES.SUPER_ADMIN_STATES_UTS_VIEW.replace(':id', id))
-        }, 500)
-      }
+      toast.addToast(t('common:toast.changesSaved'), 'success')
+      setTimeout(() => {
+        navigate(ROUTES.SUPER_ADMIN_STATES_UTS_VIEW.replace(':id', id))
+      }, 500)
     } catch (error) {
       console.error('Failed to update state:', error)
       toast.addToast(t('common:toast.failedToSave'), 'error')
-    } finally {
-      setIsSaving(false)
     }
   }
 
-  if (isLoading) {
+  if (stateUTQuery.isLoading) {
     return (
       <Box w="full">
         <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={5}>
@@ -314,7 +294,7 @@ export function EditStateUTPage() {
                 </FormLabel>
                 <Input
                   value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
+                  onChange={(e) => setFormDraft((prev) => ({ ...prev, firstName: e.target.value }))}
                   placeholder={t('common:enter')}
                   borderColor="neutral.200"
                   h={9}
@@ -329,7 +309,7 @@ export function EditStateUTPage() {
                 </FormLabel>
                 <Input
                   value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
+                  onChange={(e) => setFormDraft((prev) => ({ ...prev, lastName: e.target.value }))}
                   placeholder={t('common:enter')}
                   borderColor="neutral.200"
                   h={9}
@@ -365,7 +345,7 @@ export function EditStateUTPage() {
                     // Only allow digits
                     const value = e.target.value.replace(/\D/g, '')
                     if (value.length <= 10) {
-                      setPhone(value)
+                      setFormDraft((prev) => ({ ...prev, phone: value }))
                     }
                   }}
                   placeholder="+91"
@@ -384,7 +364,9 @@ export function EditStateUTPage() {
                 <Input
                   type="email"
                   value={secondaryEmail}
-                  onChange={(e) => setSecondaryEmail(e.target.value)}
+                  onChange={(e) =>
+                    setFormDraft((prev) => ({ ...prev, secondaryEmail: e.target.value }))
+                  }
                   placeholder={t('common:enter')}
                   borderColor="neutral.200"
                   h={9}
@@ -403,7 +385,7 @@ export function EditStateUTPage() {
                     // Only allow digits
                     const value = e.target.value.replace(/\D/g, '')
                     if (value.length <= 10) {
-                      setContactNumber(value)
+                      setFormDraft((prev) => ({ ...prev, contactNumber: value }))
                     }
                   }}
                   placeholder={t('common:enter')}
@@ -427,7 +409,7 @@ export function EditStateUTPage() {
               <Toggle
                 isChecked={status === 'active'}
                 onChange={handleStatusToggle}
-                isDisabled={isUpdatingStatus}
+                isDisabled={updateStateUTStatusMutation.isPending}
                 aria-labelledby="activated-label"
               />
             </Flex>
@@ -445,7 +427,7 @@ export function EditStateUTPage() {
               size="md"
               width={{ base: 'full', sm: '174px' }}
               onClick={handleCancel}
-              isDisabled={isSaving}
+              isDisabled={updateStateUTMutation.isPending}
             >
               {t('common:button.cancel')}
             </Button>
@@ -454,7 +436,7 @@ export function EditStateUTPage() {
               variant="primary"
               size="md"
               width={{ base: 'full', sm: '174px' }}
-              isLoading={isSaving}
+              isLoading={updateStateUTMutation.isPending}
               isDisabled={!isFormValid || !hasChanges}
             >
               {t('common:button.saveChanges')}

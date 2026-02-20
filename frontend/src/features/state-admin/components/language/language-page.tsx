@@ -2,57 +2,40 @@ import { useState, useEffect } from 'react'
 import { Box, Text, Button, Flex, HStack, Heading, Spinner, SimpleGrid } from '@chakra-ui/react'
 import { useTranslation } from 'react-i18next'
 import { EditIcon } from '@chakra-ui/icons'
-import {
-  getMockLanguageConfiguration,
-  saveMockLanguageConfiguration,
-} from '../../services/mock-data'
-import type { LanguageConfiguration } from '../../types/language'
 import { AVAILABLE_LANGUAGES } from '../../types/language'
 import { useToast } from '@/shared/hooks/use-toast'
 import { ToastContainer, SearchableSelect } from '@/shared/components/common'
+import {
+  useLanguageConfigurationQuery,
+  useSaveLanguageConfigurationMutation,
+} from '../../services/query/use-state-admin-queries'
 
 export function LanguagePage() {
   const { t } = useTranslation(['state-admin', 'common'])
-  const [config, setConfig] = useState<LanguageConfiguration | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const { data: config, isLoading, isError } = useLanguageConfigurationQuery()
+  const saveLanguageConfigMutation = useSaveLanguageConfigurationMutation()
   const [isEditing, setIsEditing] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [primaryLanguage, setPrimaryLanguage] = useState('')
-  const [secondaryLanguage, setSecondaryLanguage] = useState('')
+  const [languageDraft, setLanguageDraft] = useState<{
+    primaryLanguage?: string
+    secondaryLanguage?: string
+  }>({})
   const toast = useToast()
 
   useEffect(() => {
     document.title = `${t('language.title')} | JalSoochak`
   }, [t])
 
-  useEffect(() => {
-    const fetchConfig = async () => {
-      try {
-        const data = await getMockLanguageConfiguration()
-        setConfig(data)
-        setPrimaryLanguage(data.primaryLanguage)
-        setSecondaryLanguage(data.secondaryLanguage || '')
-        setIsEditing(!data.isConfigured)
-      } catch (error) {
-        console.error('Failed to fetch language configuration:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchConfig()
-  }, [])
+  const effectiveIsEditing = isEditing || Boolean(config && !config.isConfigured)
+  const primaryLanguage = languageDraft.primaryLanguage ?? config?.primaryLanguage ?? ''
+  const secondaryLanguage = languageDraft.secondaryLanguage ?? config?.secondaryLanguage ?? ''
 
   const handleEdit = () => {
     setIsEditing(true)
   }
 
   const handleCancel = () => {
-    if (config) {
-      setPrimaryLanguage(config.primaryLanguage)
-      setSecondaryLanguage(config.secondaryLanguage || '')
-      setIsEditing(false)
-    }
+    setLanguageDraft({})
+    setIsEditing(false)
   }
 
   const handleSave = async () => {
@@ -60,21 +43,17 @@ export function LanguagePage() {
       return
     }
 
-    setIsSaving(true)
     try {
-      const savedConfig = await saveMockLanguageConfiguration({
+      await saveLanguageConfigMutation.mutateAsync({
         primaryLanguage,
         secondaryLanguage: secondaryLanguage || undefined,
         isConfigured: true,
       })
-      setConfig(savedConfig)
       setIsEditing(false)
       toast.addToast(t('common:toast.changesSavedShort'), 'success')
     } catch (error) {
       console.error('Failed to save language configuration:', error)
       toast.addToast(t('common:toast.failedToSave'), 'error')
-    } finally {
-      setIsSaving(false)
     }
   }
 
@@ -99,6 +78,17 @@ export function LanguagePage() {
           <Spinner size="md" color="primary.500" mr={3} />
           <Text color="neutral.600">{t('common:loading')}</Text>
         </Flex>
+      </Box>
+    )
+  }
+
+  if (isError || !config) {
+    return (
+      <Box w="full">
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={6}>
+          {t('language.title')}
+        </Heading>
+        <Text color="error.500">{t('common:toast.failedToLoad')}</Text>
       </Box>
     )
   }
@@ -138,7 +128,7 @@ export function LanguagePage() {
             >
               {t('language.configuration')}
             </Heading>
-            {config?.isConfigured && !isEditing && (
+            {config?.isConfigured && !effectiveIsEditing && (
               <Button
                 variant="ghost"
                 h={6}
@@ -157,7 +147,7 @@ export function LanguagePage() {
           </Flex>
 
           {/* View Mode */}
-          {!isEditing && config?.isConfigured ? (
+          {!effectiveIsEditing && config?.isConfigured ? (
             <Box w="full" h="full" minH={{ base: 'auto', lg: 'calc(100vh - 250px)' }}>
               <SimpleGrid columns={{ base: 1, md: 2 }} spacing={{ base: 4, md: 6 }} mb={4}>
                 <Box>
@@ -220,7 +210,9 @@ export function LanguagePage() {
                   <SearchableSelect
                     options={AVAILABLE_LANGUAGES}
                     value={primaryLanguage}
-                    onChange={setPrimaryLanguage}
+                    onChange={(value) =>
+                      setLanguageDraft((prev) => ({ ...prev, primaryLanguage: value }))
+                    }
                     placeholder={t('common:select')}
                     width="100%"
                     ariaLabel={t('language.aria.selectPrimaryLanguage')}
@@ -241,7 +233,9 @@ export function LanguagePage() {
                   <SearchableSelect
                     options={AVAILABLE_LANGUAGES}
                     value={secondaryLanguage}
-                    onChange={setSecondaryLanguage}
+                    onChange={(value) =>
+                      setLanguageDraft((prev) => ({ ...prev, secondaryLanguage: value }))
+                    }
                     placeholder={t('common:select')}
                     width="100%"
                     ariaLabel={t('language.aria.selectSecondaryLanguage')}
@@ -261,7 +255,7 @@ export function LanguagePage() {
                   size="md"
                   width={{ base: 'full', sm: '174px' }}
                   onClick={handleCancel}
-                  isDisabled={isSaving}
+                  isDisabled={saveLanguageConfigMutation.isPending}
                 >
                   {t('common:button.cancel')}
                 </Button>
@@ -270,7 +264,7 @@ export function LanguagePage() {
                   size="md"
                   width={{ base: 'full', sm: '174px' }}
                   onClick={handleSave}
-                  isLoading={isSaving}
+                  isLoading={saveLanguageConfigMutation.isPending}
                   isDisabled={!primaryLanguage}
                 >
                   {config?.isConfigured ? t('common:button.saveChanges') : t('common:button.save')}

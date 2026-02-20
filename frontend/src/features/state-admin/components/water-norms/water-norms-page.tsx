@@ -15,61 +15,43 @@ import {
 import { EditIcon } from '@chakra-ui/icons'
 import { MdDeleteOutline } from 'react-icons/md'
 import { useTranslation } from 'react-i18next'
-import {
-  getMockWaterNormsConfiguration,
-  saveMockWaterNormsConfiguration,
-} from '../../services/mock-data'
-import type { WaterNormsConfiguration, DistrictOverride } from '../../types/water-norms'
+import type { DistrictOverride } from '../../types/water-norms'
 import { AVAILABLE_DISTRICTS } from '../../types/water-norms'
 import { useToast } from '@/shared/hooks/use-toast'
 import { ToastContainer, SearchableSelect } from '@/shared/components/common'
+import {
+  useSaveWaterNormsConfigurationMutation,
+  useWaterNormsConfigurationQuery,
+} from '../../services/query/use-state-admin-queries'
 
 export function WaterNormsPage() {
   const { t } = useTranslation(['state-admin', 'common'])
-  const [config, setConfig] = useState<WaterNormsConfiguration | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [fetchError, setFetchError] = useState(false)
+  const { data: config, isLoading, isError } = useWaterNormsConfigurationQuery()
+  const saveWaterNormsMutation = useSaveWaterNormsConfigurationMutation()
   const [isEditing, setIsEditing] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [stateQuantity, setStateQuantity] = useState('')
-  const [districtOverrides, setDistrictOverrides] = useState<DistrictOverride[]>([])
+  const [stateQuantityDraft, setStateQuantityDraft] = useState<string | null>(null)
+  const [districtOverridesDraft, setDistrictOverridesDraft] = useState<DistrictOverride[] | null>(
+    null
+  )
   const toast = useToast()
 
   useEffect(() => {
     document.title = `${t('waterNorms.title')} | JalSoochak`
   }, [t])
 
-  useEffect(() => {
-    const fetchConfig = async () => {
-      try {
-        const data = await getMockWaterNormsConfiguration()
-        setConfig(data)
-        setStateQuantity(data.stateQuantity ? String(data.stateQuantity) : '')
-        setDistrictOverrides(data.districtOverrides || [])
-        setIsEditing(!data.isConfigured)
-      } catch (error) {
-        console.error('Failed to fetch water norms configuration:', error)
-        setFetchError(true)
-        toast.addToast(t('waterNorms.messages.failedToLoad'), 'error')
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchConfig()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const effectiveIsEditing = isEditing || Boolean(config && !config.isConfigured)
+  const stateQuantity =
+    stateQuantityDraft ?? (config?.stateQuantity ? String(config.stateQuantity) : '')
+  const districtOverrides = districtOverridesDraft ?? config?.districtOverrides ?? []
 
   const handleEdit = () => {
     setIsEditing(true)
   }
 
   const handleCancel = () => {
-    if (config) {
-      setStateQuantity(config.stateQuantity ? String(config.stateQuantity) : '')
-      setDistrictOverrides(config.districtOverrides || [])
-      setIsEditing(false)
-    }
+    setStateQuantityDraft(null)
+    setDistrictOverridesDraft(null)
+    setIsEditing(false)
   }
 
   const handleSave = async () => {
@@ -92,21 +74,19 @@ export function WaterNormsPage() {
       }
     }
 
-    setIsSaving(true)
     try {
-      const savedConfig = await saveMockWaterNormsConfiguration({
+      await saveWaterNormsMutation.mutateAsync({
         stateQuantity: quantity,
         districtOverrides,
         isConfigured: true,
       })
-      setConfig(savedConfig)
+      setStateQuantityDraft(null)
+      setDistrictOverridesDraft(null)
       setIsEditing(false)
       toast.addToast(t('common:toast.changesSavedShort'), 'success')
     } catch (error) {
       console.error('Failed to save water norms configuration:', error)
       toast.addToast(t('common:toast.failedToSave'), 'error')
-    } finally {
-      setIsSaving(false)
     }
   }
 
@@ -126,11 +106,11 @@ export function WaterNormsPage() {
       districtName: '',
       quantity: 0,
     }
-    setDistrictOverrides([...districtOverrides, newOverride])
+    setDistrictOverridesDraft([...districtOverrides, newOverride])
   }
 
   const handleRemoveDistrict = (id: string) => {
-    setDistrictOverrides(districtOverrides.filter((d) => d.id !== id))
+    setDistrictOverridesDraft(districtOverrides.filter((d) => d.id !== id))
   }
 
   const handleDistrictChange = (
@@ -138,7 +118,9 @@ export function WaterNormsPage() {
     field: keyof DistrictOverride,
     value: string | number
   ) => {
-    setDistrictOverrides(districtOverrides.map((d) => (d.id === id ? { ...d, [field]: value } : d)))
+    setDistrictOverridesDraft(
+      districtOverrides.map((d) => (d.id === id ? { ...d, [field]: value } : d))
+    )
   }
 
   const getDistrictLabel = (value: string) => {
@@ -165,7 +147,7 @@ export function WaterNormsPage() {
     )
   }
 
-  if (fetchError) {
+  if (isError || !config) {
     return (
       <Box w="full">
         <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={6}>
@@ -212,7 +194,7 @@ export function WaterNormsPage() {
             >
               {t('waterNorms.stateUtWaterNorms')}
             </Heading>
-            {config?.isConfigured && !isEditing && (
+            {config?.isConfigured && !effectiveIsEditing && (
               <Button
                 variant="ghost"
                 h={6}
@@ -231,7 +213,7 @@ export function WaterNormsPage() {
           </Flex>
 
           {/* View Mode */}
-          {!isEditing && config?.isConfigured ? (
+          {!effectiveIsEditing && config?.isConfigured ? (
             <Box w="full" h="full" minH={{ base: 'auto', lg: 'calc(100vh - 250px)' }}>
               {/* State Quantity */}
               <Box mb={7}>
@@ -318,7 +300,7 @@ export function WaterNormsPage() {
                     id="state-quantity"
                     placeholder={t('common:enter')}
                     value={stateQuantity}
-                    onChange={(e) => setStateQuantity(e.target.value)}
+                    onChange={(e) => setStateQuantityDraft(e.target.value)}
                     type="number"
                     w={{ base: 'full', lg: '319px', xl: '486px' }}
                     h="36px"
@@ -452,7 +434,7 @@ export function WaterNormsPage() {
                   size="md"
                   width={{ base: 'full', sm: '174px' }}
                   onClick={handleCancel}
-                  isDisabled={isSaving}
+                  isDisabled={saveWaterNormsMutation.isPending}
                 >
                   {t('common:button.cancel')}
                 </Button>
@@ -461,7 +443,7 @@ export function WaterNormsPage() {
                   size="md"
                   width={{ base: 'full', sm: '174px' }}
                   onClick={handleSave}
-                  isLoading={isSaving}
+                  isLoading={saveWaterNormsMutation.isPending}
                   isDisabled={!stateQuantity}
                 >
                   {config?.isConfigured ? t('common:button.saveChanges') : t('common:button.save')}

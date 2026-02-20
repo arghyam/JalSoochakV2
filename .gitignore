@@ -10,6 +10,11 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
+# ai specific rules
+.cursor
+.claude
+.codex
+
 # Package Files #
 *.jar
 *.war

@@ -18,10 +18,9 @@ import { ChevronDownIcon } from '@chakra-ui/icons'
 import { useTranslation } from 'react-i18next'
 import i18n from '@/app/i18n'
 import { useAuthStore } from '@/app/store'
-import { getMockOverviewData } from '../../services/mock-data'
 import { LineChart } from '@/shared/components/charts/line-chart'
 import { AreaChart } from '@/shared/components/charts/area-chart'
-import type { OverviewData } from '../../types/overview'
+import { useStateAdminOverviewQuery } from '../../services/query/use-state-admin-queries'
 import { BsCheck2Circle, BsPerson } from 'react-icons/bs'
 import { AiOutlineApi, AiOutlineWarning } from 'react-icons/ai'
 import { BiMessageDetail } from 'react-icons/bi'
@@ -43,7 +42,7 @@ type MonthKey =
 export function OverviewPage() {
   const { t } = useTranslation(['state-admin', 'common'])
   const user = useAuthStore((state) => state.user)
-  const [data, setData] = useState<OverviewData | null>(null)
+  const { data, isLoading, isError } = useStateAdminOverviewQuery()
   const [selectedMonth, setSelectedMonth] = useState<MonthKey>('december')
 
   useEffect(() => {
@@ -53,13 +52,9 @@ export function OverviewPage() {
     document.title = `${pageTitle} | JalSoochak`
   }, [t, user?.tenantId])
 
-  useEffect(() => {
-    getMockOverviewData().then(setData)
-  }, [])
-
   const monthOptions: MonthKey[] = ['december', 'november']
 
-  if (!data) {
+  if (isLoading) {
     return (
       <Flex
         h="64"
@@ -73,6 +68,18 @@ export function OverviewPage() {
         <Text color="neutral.600">{t('common:loading')}</Text>
       </Flex>
     )
+  }
+
+  if (isError) {
+    return (
+      <Flex h="64" align="center" justify="center">
+        <Text color="error.500">{t('common:toast.failedToLoad')}</Text>
+      </Flex>
+    )
+  }
+
+  if (!data) {
+    return null
   }
 
   const statsCards = [

@@ -5,5 +5,3 @@ export const AUTH_ROLES = {
 } as const
 
 export type AuthRole = (typeof AUTH_ROLES)[keyof typeof AUTH_ROLES]
-
-export const AUTH_STORAGE_KEY = 'JALSOOCHAK_AUTH_TOKEN'

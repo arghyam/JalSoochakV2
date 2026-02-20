@@ -11,6 +11,7 @@ export interface AuthState {
   refreshToken: string | null
   user: AuthUser | null
   isAuthenticated: boolean
+  isBootstrapping: boolean
   loading: boolean
   error: string | null
   login: (payload: LoginRequest) => Promise<string>
@@ -27,6 +28,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   refreshToken: null,
   user: null,
   isAuthenticated: false,
+  isBootstrapping: true,
   loading: false,
   error: null,
   sessionExpired: false,
@@ -97,6 +99,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY)
     if (!refreshToken) {
       set({
+        isBootstrapping: false,
         accessToken: null,
         refreshToken: null,
         user: null,
@@ -116,6 +119,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
 
       set({
+        isBootstrapping: false,
         accessToken,
         refreshToken: newRefreshToken,
         user,
@@ -128,6 +132,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       localStorage.removeItem(ACCESS_TOKEN_KEY)
 
       set({
+        isBootstrapping: false,
         accessToken: null,
         refreshToken: null,
         user: null,

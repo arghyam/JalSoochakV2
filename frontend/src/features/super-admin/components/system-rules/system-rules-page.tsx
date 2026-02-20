@@ -14,13 +14,12 @@ import {
   NumberDecrementStepper,
 } from '@chakra-ui/react'
 import { useTranslation } from 'react-i18next'
-import {
-  getMockSystemRulesConfiguration,
-  saveMockSystemRulesConfiguration,
-} from '../../services/mock-data'
-import type { SystemRulesConfiguration } from '../../types/system-rules'
 import { useToast } from '@/shared/hooks/use-toast'
 import { ToastContainer } from '@/shared/components/common'
+import {
+  useSaveSystemRulesConfigurationMutation,
+  useSystemRulesConfigurationQuery,
+} from '../../services/query/use-super-admin-queries'
 
 export function SystemRulesPage() {
   const { t } = useTranslation(['super-admin', 'common'])
@@ -28,46 +27,24 @@ export function SystemRulesPage() {
   useEffect(() => {
     document.title = `${t('systemRules.title')} | JalSoochak`
   }, [t])
-  const [config, setConfig] = useState<SystemRulesConfiguration | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
+  const { data: config, isLoading, isError } = useSystemRulesConfigurationQuery()
+  const saveSystemRulesMutation = useSaveSystemRulesConfigurationMutation()
 
-  // Form state
-  const [coverage, setCoverage] = useState('')
-  const [continuity, setContinuity] = useState('')
-  const [quantity, setQuantity] = useState('')
-  const [regularity, setRegularity] = useState('')
+  const [formDraft, setFormDraft] = useState<{
+    coverage?: string
+    continuity?: string
+    quantity?: string
+    regularity?: string
+  }>({})
 
   const toast = useToast()
-
-  useEffect(() => {
-    fetchConfiguration()
-  }, [])
-
-  const fetchConfiguration = async () => {
-    setIsLoading(true)
-    try {
-      const data = await getMockSystemRulesConfiguration()
-      setConfig(data)
-      setCoverage(data.coverage)
-      setContinuity(data.continuity)
-      setQuantity(data.quantity)
-      setRegularity(data.regularity)
-    } catch (error) {
-      console.error('Failed to fetch system rules configuration:', error)
-      toast.addToast(t('common:toast.failedToLoad'), 'error')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const coverage = formDraft.coverage ?? config?.coverage ?? ''
+  const continuity = formDraft.continuity ?? config?.continuity ?? ''
+  const quantity = formDraft.quantity ?? config?.quantity ?? ''
+  const regularity = formDraft.regularity ?? config?.regularity ?? ''
 
   const handleCancel = () => {
-    if (config) {
-      setCoverage(config.coverage)
-      setContinuity(config.continuity)
-      setQuantity(config.quantity)
-      setRegularity(config.regularity)
-    }
+    setFormDraft({})
   }
 
   const handleSave = async () => {
@@ -76,22 +53,18 @@ export function SystemRulesPage() {
       return
     }
 
-    setIsSaving(true)
     try {
-      const savedConfig = await saveMockSystemRulesConfiguration({
+      await saveSystemRulesMutation.mutateAsync({
         coverage,
         continuity,
         quantity,
         regularity,
         isConfigured: true,
       })
-      setConfig(savedConfig)
       toast.addToast(t('common:toast.changesSaved'), 'success')
     } catch (error) {
       console.error('Failed to save system rules configuration:', error)
       toast.addToast(t('common:toast.failedToSave'), 'error')
-    } finally {
-      setIsSaving(false)
     }
   }
 
@@ -113,6 +86,17 @@ export function SystemRulesPage() {
         <Flex role="status" aria-live="polite" align="center" justify="center" minH="200px">
           <Text color="neutral.600">{t('common:loading')}</Text>
         </Flex>
+      </Box>
+    )
+  }
+
+  if (isError || !config) {
+    return (
+      <Box w="full">
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={5}>
+          {t('systemRules.title')}
+        </Heading>
+        <Text color="error.500">{t('common:toast.failedToLoad')}</Text>
       </Box>
     )
   }
@@ -174,7 +158,9 @@ export function SystemRulesPage() {
                 </Text>
                 <NumberInput
                   value={coverage}
-                  onChange={(valueString) => setCoverage(valueString)}
+                  onChange={(valueString) =>
+                    setFormDraft((prev) => ({ ...prev, coverage: valueString }))
+                  }
                   min={0}
                   w={{ base: 'full', xl: '490px' }}
                 >
@@ -214,7 +200,9 @@ export function SystemRulesPage() {
                 </Text>
                 <NumberInput
                   value={continuity}
-                  onChange={(valueString) => setContinuity(valueString)}
+                  onChange={(valueString) =>
+                    setFormDraft((prev) => ({ ...prev, continuity: valueString }))
+                  }
                   min={0}
                   w={{ base: 'full', xl: '490px' }}
                 >
@@ -254,7 +242,9 @@ export function SystemRulesPage() {
                 </Text>
                 <NumberInput
                   value={quantity}
-                  onChange={(valueString) => setQuantity(valueString)}
+                  onChange={(valueString) =>
+                    setFormDraft((prev) => ({ ...prev, quantity: valueString }))
+                  }
                   min={0}
                   w={{ base: 'full', xl: '490px' }}
                 >
@@ -294,7 +284,9 @@ export function SystemRulesPage() {
                 </Text>
                 <NumberInput
                   value={regularity}
-                  onChange={(valueString) => setRegularity(valueString)}
+                  onChange={(valueString) =>
+                    setFormDraft((prev) => ({ ...prev, regularity: valueString }))
+                  }
                   min={0}
                   w={{ base: 'full', xl: '490px' }}
                 >
@@ -329,7 +321,7 @@ export function SystemRulesPage() {
               size="md"
               width={{ base: 'full', sm: '174px' }}
               onClick={handleCancel}
-              isDisabled={isSaving || !hasChanges}
+              isDisabled={saveSystemRulesMutation.isPending || !hasChanges}
             >
               {t('common:button.cancel')}
             </Button>
@@ -338,7 +330,7 @@ export function SystemRulesPage() {
               size="md"
               width={{ base: 'full', sm: '174px' }}
               onClick={handleSave}
-              isLoading={isSaving}
+              isLoading={saveSystemRulesMutation.isPending}
               isDisabled={!isFormValid || !hasChanges}
             >
               {t('common:button.save')}

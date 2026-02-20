@@ -1,33 +1,17 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Box, Text, Heading } from '@chakra-ui/react'
 import { useTranslation } from 'react-i18next'
 import { DataTable, type DataTableColumn } from '@/shared/components/common'
-import { getMockActivityData } from '../../services/mock-data'
 import type { ActivityLog } from '../../types/activity'
+import { useStateAdminActivityQuery } from '../../services/query/use-state-admin-queries'
 
 export function ActivityPage() {
   const { t } = useTranslation(['state-admin', 'common'])
-  const [activities, setActivities] = useState<ActivityLog[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const { data: activities = [], isLoading, isError } = useStateAdminActivityQuery()
 
   useEffect(() => {
     document.title = `${t('activity.title')} | JalSoochak`
   }, [t])
-
-  useEffect(() => {
-    const fetchActivities = async () => {
-      try {
-        const data = await getMockActivityData()
-        setActivities(data)
-      } catch (error) {
-        console.error('Failed to fetch activities:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchActivities()
-  }, [])
 
   const formatTimestamp = (date: Date): string => {
     const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -91,6 +75,17 @@ export function ActivityPage() {
       ),
     },
   ]
+
+  if (isError) {
+    return (
+      <Box w="full">
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={6}>
+          {t('activity.title')}
+        </Heading>
+        <Text color="error.500">{t('activity.messages.failedToLoad')}</Text>
+      </Box>
+    )
+  }
 
   return (
     <Box w="full">

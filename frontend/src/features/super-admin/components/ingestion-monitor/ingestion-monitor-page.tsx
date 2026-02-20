@@ -13,10 +13,9 @@ import {
   useBreakpointValue,
 } from '@chakra-ui/react'
 import { useTranslation } from 'react-i18next'
-import { getMockIngestionMonitorData } from '../../services/mock-data'
 import { BarLineChart } from '@/shared/components/charts/bar-line-chart'
 import { SearchableSelect } from '@/shared/components/common'
-import type { IngestionMonitorData, IngestionLogEntry } from '../../types/ingestion-monitor'
+import type { IngestionLogEntry } from '../../types/ingestion-monitor'
 import {
   STATE_FILTER_OPTIONS,
   TIME_FILTER_OPTIONS,
@@ -26,16 +25,14 @@ import { BiFilterAlt } from 'react-icons/bi'
 import { FiDownload } from 'react-icons/fi'
 import { IoCloudOutline, IoCloseCircleOutline, IoWarningOutline } from 'react-icons/io5'
 import { BsCheck2Circle } from 'react-icons/bs'
+import { useIngestionMonitorQuery } from '../../services/query/use-super-admin-queries'
 
 export function IngestionMonitorPage() {
   const { t, i18n } = useTranslation(['super-admin', 'common'])
-  const [data, setData] = useState<IngestionMonitorData | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const [stateFilter, setStateFilter] = useState('all')
   const [timeFilter, setTimeFilter] = useState('7')
   const [statusFilter, setStatusFilter] = useState('all')
-  const [retryKey, setRetryKey] = useState(0)
+  const { data, isLoading, isError } = useIngestionMonitorQuery(stateFilter, timeFilter)
 
   // Responsive values
   const statsColumns = useBreakpointValue({ base: 1, sm: 2, lg: 4 }) ?? 4
@@ -44,38 +41,6 @@ export function IngestionMonitorPage() {
   useEffect(() => {
     document.title = `${t('ingestionMonitor.title')} | JalSoochak`
   }, [t])
-
-  useEffect(() => {
-    let isMounted = true
-
-    const fetchData = async () => {
-      setIsLoading(true)
-      setError(null)
-      try {
-        // When switching to real API, filters will be passed here:
-        const result = await getMockIngestionMonitorData()
-        if (isMounted) {
-          setData(result)
-        }
-      } catch (err) {
-        if (isMounted) {
-          console.error('Failed to fetch ingestion monitor data:', err)
-          setError(t('common:toast.failedToLoad'))
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false)
-        }
-      }
-    }
-
-    fetchData()
-
-    return () => {
-      isMounted = false
-    }
-    // Re-fetch when filters change
-  }, [stateFilter, timeFilter, retryKey])
 
   const formatTimestamp = (date: Date): string => {
     let hours = date.getHours()
@@ -154,21 +119,20 @@ export function IngestionMonitorPage() {
     )
   }
 
-  if (error) {
+  if (isError) {
     return (
       <Box w="full">
         <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={5}>
           {t('ingestionMonitor.title')}
         </Heading>
         <Flex h="64" align="center" justify="center" direction="column" gap={4} role="alert">
-          <Text color="error.500">{error}</Text>
+          <Text color="error.500">{t('common:toast.failedToLoad')}</Text>
           <Button
             variant="secondary"
             size="sm"
             onClick={() => {
               setStateFilter('all')
               setTimeFilter('7')
-              setRetryKey((prev) => prev + 1)
             }}
           >
             {t('common:retry')}

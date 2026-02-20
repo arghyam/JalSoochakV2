@@ -1,33 +1,17 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Box, Flex, Text, Heading, Grid, Icon, Image, Select, Avatar } from '@chakra-ui/react'
+import { Box, Flex, Text, Heading, Grid, Icon, Image, Avatar } from '@chakra-ui/react'
 import { useDashboardData } from '../hooks/use-dashboard-data'
 import { KPICard } from './kpi-card'
-import {
-  IndiaMapChart,
-  DemandSupplyChart,
-  AllStatesPerformanceChart,
-  SupplySubmissionRateChart,
-  PumpOperatorsChart,
-  ImageSubmissionStatusChart,
-  IssueTypeBreakdownChart,
-  WaterSupplyOutagesChart,
-} from './charts'
-import {
-  AllBlocksTable,
-  AllDistrictsTable,
-  AllStatesTable,
-  PumpOperatorsPerformanceTable,
-  PhotoEvidenceComplianceTable,
-  AllGramPanchayatsTable,
-} from './tables'
-import { DateRangePicker, LoadingSpinner, SearchableSelect } from '@/shared/components/common'
+import { DashboardBody } from './screens/dashboard-body'
+import { IndiaMapChart } from './charts'
+import { LoadingSpinner } from '@/shared/components/common'
 import { MdOutlineWaterDrop, MdArrowUpward, MdArrowDownward } from 'react-icons/md'
 import { AiOutlineHome, AiOutlineInfoCircle } from 'react-icons/ai'
 import waterTapIcon from '@/assets/media/water-tap_1822589 1.svg'
 import type { DateRange, SearchableSelectOption } from '@/shared/components/common'
 import type { EntityPerformance } from '../types'
-import { SearchLayout, FilterLayout } from '@/shared/components/layout'
+import { DashboardFilters } from './filters/dashboard-filters'
 import {
   mockFilterStates,
   mockFilterDistricts,
@@ -395,281 +379,46 @@ export function CentralDashboard() {
 
   return (
     <Box>
-      <SearchLayout />
-      <FilterLayout
-        onClear={handleClearFilters}
-        activeTab={filterTabIndex}
+      <DashboardFilters
+        filterTabIndex={filterTabIndex}
         onTabChange={setFilterTabIndex}
-      >
-        {filterTabIndex === 0 ? (
-          <>
-            <SearchableSelect
-              options={mockFilterStates}
-              value={selectedState}
-              onChange={handleStateChange}
-              placeholder="States/UTs"
-              required
-              width={{
-                base: '100%',
-                sm: 'calc(50% - 12px)',
-                md: 'calc(33.333% - 12px)',
-                lg: 'calc(25% - 12px)',
-                xl: '162px',
-              }}
-              height="32px"
-              borderRadius="4px"
-              fontSize="sm"
-              textColor="neutral.400"
-              borderColor="neutral.400"
-              isFilter={true}
-            />
-            <SearchableSelect
-              options={districtOptions}
-              value={selectedDistrict}
-              onChange={handleDistrictChange}
-              placeholder="District"
-              required
-              width={{
-                base: '100%',
-                sm: 'calc(50% - 12px)',
-                md: 'calc(33.333% - 12px)',
-                lg: 'calc(25% - 12px)',
-                xl: '162px',
-              }}
-              height="32px"
-              borderRadius="4px"
-              fontSize="sm"
-              textColor="neutral.400"
-              borderColor="neutral.400"
-              isFilter={true}
-            />
-            <SearchableSelect
-              options={blockOptions}
-              value={selectedBlock}
-              onChange={handleBlockChange}
-              placeholder="Block"
-              width={{
-                base: '100%',
-                sm: 'calc(50% - 12px)',
-                md: 'calc(33.333% - 12px)',
-                lg: 'calc(25% - 12px)',
-                xl: '162px',
-              }}
-              height="32px"
-              borderRadius="4px"
-              fontSize="sm"
-              textColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
-              borderColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
-              disabled={!isAdvancedEnabled}
-              isFilter={true}
-            />
-            <SearchableSelect
-              options={gramPanchayatOptions}
-              value={selectedGramPanchayat}
-              onChange={handleGramPanchayatChange}
-              placeholder="Gram Panchayat"
-              width={{
-                base: '100%',
-                sm: 'calc(50% - 12px)',
-                md: 'calc(33.333% - 12px)',
-                lg: 'calc(25% - 12px)',
-                xl: '162px',
-              }}
-              height="32px"
-              borderRadius="4px"
-              fontSize="sm"
-              textColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
-              borderColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
-              disabled={!isAdvancedEnabled}
-              isFilter={true}
-            />
-            <SearchableSelect
-              options={villageOptions}
-              value={selectedVillage}
-              onChange={setSelectedVillage}
-              placeholder="Village"
-              width={{
-                base: '100%',
-                sm: 'calc(50% - 12px)',
-                md: 'calc(33.333% - 12px)',
-                lg: 'calc(25% - 12px)',
-                xl: '162px',
-              }}
-              height="32px"
-              borderRadius="4px"
-              fontSize="sm"
-              textColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
-              borderColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
-              disabled={!isAdvancedEnabled}
-              isFilter={true}
-            />
-
-            <SearchableSelect
-              options={mockFilterSchemes}
-              value={selectedScheme}
-              onChange={setSelectedScheme}
-              placeholder="Scheme"
-              width={{
-                base: '100%',
-                sm: 'calc(50% - 12px)',
-                md: 'calc(33.333% - 12px)',
-                lg: 'calc(25% - 12px)',
-                xl: '162px',
-              }}
-              height="32px"
-              borderRadius="4px"
-              fontSize="sm"
-              textColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
-              borderColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
-              disabled={!isAdvancedEnabled}
-              isFilter={true}
-            />
-
-            <DateRangePicker
-              value={selectedDuration}
-              onChange={setSelectedDuration}
-              placeholder="Duration"
-              width={{
-                base: '100%',
-                sm: 'calc(50% - 12px)',
-                md: 'calc(33.333% - 12px)',
-                lg: 'calc(25% - 12px)',
-                xl: '162px',
-              }}
-              height="32px"
-              borderRadius="4px"
-              fontSize="sm"
-              textColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
-              borderColor={isAdvancedEnabled ? 'neutral.400' : 'neutral.300'}
-              disabled={!isAdvancedEnabled}
-              isFilter={true}
-            />
-          </>
-        ) : (
-          <>
-            <SearchableSelect
-              options={mockFilterStates}
-              value={selectedDepartmentState}
-              onChange={handleDepartmentStateChange}
-              placeholder="States/UTs"
-              required
-              width={{
-                base: '100%',
-                sm: 'calc(50% - 12px)',
-                md: 'calc(33.333% - 12px)',
-                lg: 'calc(25% - 12px)',
-                xl: '162px',
-              }}
-              height="32px"
-              borderRadius="4px"
-              fontSize="sm"
-              textColor="neutral.400"
-              borderColor="neutral.400"
-              isFilter={true}
-            />
-            <SearchableSelect
-              options={emptyOptions}
-              value={selectedDepartmentZone}
-              onChange={setSelectedDepartmentZone}
-              placeholder="Zone"
-              width={{
-                base: '100%',
-                sm: 'calc(50% - 12px)',
-                md: 'calc(33.333% - 12px)',
-                lg: 'calc(25% - 12px)',
-                xl: '162px',
-              }}
-              height="32px"
-              borderRadius="4px"
-              fontSize="sm"
-              textColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
-              borderColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
-              disabled={!isDepartmentStateSelected}
-              isFilter={true}
-            />
-            <SearchableSelect
-              options={emptyOptions}
-              value={selectedDepartmentCircle}
-              onChange={setSelectedDepartmentCircle}
-              placeholder="Circle"
-              width={{
-                base: '100%',
-                sm: 'calc(50% - 12px)',
-                md: 'calc(33.333% - 12px)',
-                lg: 'calc(25% - 12px)',
-                xl: '162px',
-              }}
-              height="32px"
-              borderRadius="4px"
-              fontSize="sm"
-              textColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
-              borderColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
-              disabled={!isDepartmentStateSelected}
-              isFilter={true}
-            />
-            <SearchableSelect
-              options={emptyOptions}
-              value={selectedDepartmentDivision}
-              onChange={setSelectedDepartmentDivision}
-              placeholder="Division"
-              width={{
-                base: '100%',
-                sm: 'calc(50% - 12px)',
-                md: 'calc(33.333% - 12px)',
-                lg: 'calc(25% - 12px)',
-                xl: '162px',
-              }}
-              height="32px"
-              borderRadius="4px"
-              fontSize="sm"
-              textColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
-              borderColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
-              disabled={!isDepartmentStateSelected}
-              isFilter={true}
-            />
-            <SearchableSelect
-              options={emptyOptions}
-              value={selectedDepartmentSubdivision}
-              onChange={setSelectedDepartmentSubdivision}
-              placeholder="Subdivision"
-              width={{
-                base: '100%',
-                sm: 'calc(50% - 12px)',
-                md: 'calc(33.333% - 12px)',
-                lg: 'calc(25% - 12px)',
-                xl: '162px',
-              }}
-              height="32px"
-              borderRadius="4px"
-              fontSize="sm"
-              textColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
-              borderColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
-              disabled={!isDepartmentStateSelected}
-              isFilter={true}
-            />
-            <SearchableSelect
-              options={emptyOptions}
-              value={selectedDepartmentVillage}
-              onChange={setSelectedDepartmentVillage}
-              placeholder="Village"
-              width={{
-                base: '100%',
-                sm: 'calc(50% - 12px)',
-                md: 'calc(33.333% - 12px)',
-                lg: 'calc(25% - 12px)',
-                xl: '162px',
-              }}
-              height="32px"
-              borderRadius="4px"
-              fontSize="sm"
-              textColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
-              borderColor={isDepartmentStateSelected ? 'neutral.400' : 'neutral.300'}
-              disabled={!isDepartmentStateSelected}
-              isFilter={true}
-            />
-          </>
-        )}
-      </FilterLayout>
+        onClear={handleClearFilters}
+        isAdvancedEnabled={isAdvancedEnabled}
+        isDepartmentStateSelected={isDepartmentStateSelected}
+        emptyOptions={emptyOptions}
+        selectedState={selectedState}
+        selectedDistrict={selectedDistrict}
+        selectedBlock={selectedBlock}
+        selectedGramPanchayat={selectedGramPanchayat}
+        selectedVillage={selectedVillage}
+        selectedScheme={selectedScheme}
+        selectedDuration={selectedDuration}
+        selectedDepartmentState={selectedDepartmentState}
+        selectedDepartmentZone={selectedDepartmentZone}
+        selectedDepartmentCircle={selectedDepartmentCircle}
+        selectedDepartmentDivision={selectedDepartmentDivision}
+        selectedDepartmentSubdivision={selectedDepartmentSubdivision}
+        selectedDepartmentVillage={selectedDepartmentVillage}
+        districtOptions={districtOptions}
+        blockOptions={blockOptions}
+        gramPanchayatOptions={gramPanchayatOptions}
+        villageOptions={villageOptions}
+        mockFilterStates={mockFilterStates}
+        mockFilterSchemes={mockFilterSchemes}
+        onStateChange={handleStateChange}
+        onDistrictChange={handleDistrictChange}
+        onBlockChange={handleBlockChange}
+        onGramPanchayatChange={handleGramPanchayatChange}
+        setSelectedVillage={setSelectedVillage}
+        setSelectedScheme={setSelectedScheme}
+        setSelectedDuration={setSelectedDuration}
+        onDepartmentStateChange={handleDepartmentStateChange}
+        setSelectedDepartmentZone={setSelectedDepartmentZone}
+        setSelectedDepartmentCircle={setSelectedDepartmentCircle}
+        setSelectedDepartmentDivision={setSelectedDepartmentDivision}
+        setSelectedDepartmentSubdivision={setSelectedDepartmentSubdivision}
+        setSelectedDepartmentVillage={setSelectedDepartmentVillage}
+      />
 
       {/* KPI Cards */}
       <Grid templateColumns={{ base: '1fr', lg: 'repeat(3, 1fr)' }} gap={4} mb={6}>
@@ -921,343 +670,26 @@ export function CentralDashboard() {
           </Box>
         )}
       </Grid>
-
-      {selectedVillage ? (
-        <>
-          <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="536px">
-              <PhotoEvidenceComplianceTable
-                data={villagePhotoEvidenceRows}
-                showVillageColumn={false}
-              />
-            </Box>
-            <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px">
-              <Text textStyle="bodyText3" fontWeight="400" mb={2}>
-                Demand vs Supply
-              </Text>
-              <DemandSupplyChart data={data.demandSupply} height="418px" />
-            </Box>
-          </Grid>
-          <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-            <Box
-              bg="white"
-              borderWidth="0.5px"
-              borderRadius="12px"
-              borderColor="#E4E4E7"
-              pt="24px"
-              pb="24px"
-              pl="16px"
-              pr="16px"
-              h="523px"
-              w="full"
-              minW={0}
-            >
-              <Text textStyle="bodyText3" fontWeight="400" mb="0px">
-                Image Submission Status
-              </Text>
-              <ImageSubmissionStatusChart data={data.imageSubmissionStatus} height="406px" />
-            </Box>
-            <Box
-              bg="white"
-              borderWidth="0.5px"
-              borderRadius="12px"
-              borderColor="#E4E4E7"
-              pt="24px"
-              pb="24px"
-              pl="16px"
-              pr="16px"
-              h="523px"
-              w="full"
-              minW={0}
-            >
-              <Text textStyle="bodyText3" fontWeight="400" mb={2}>
-                Issue Type Breakdown
-              </Text>
-              <IssueTypeBreakdownChart data={waterSupplyOutagesData} height="400px" />
-            </Box>
-          </Grid>
-        </>
-      ) : /* Submission + Outages Charts */
-      isStateSelected ? (
-        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
-          <Box
-            bg="white"
-            borderWidth="0.5px"
-            borderRadius="12px"
-            borderColor="#E4E4E7"
-            pt="24px"
-            pb="24px"
-            pl="16px"
-            pr="16px"
-            h="523px"
-            w="full"
-            minW={0}
-          >
-            <Text textStyle="bodyText3" fontWeight="400" mb="0px">
-              Image Submission Status
-            </Text>
-            <ImageSubmissionStatusChart data={data.imageSubmissionStatus} height="406px" />
-          </Box>
-          <Box
-            bg="white"
-            borderWidth="0.5px"
-            borderRadius="12px"
-            borderColor="#E4E4E7"
-            pt="24px"
-            pb="24px"
-            pl="16px"
-            pr="16px"
-            h="523px"
-            w="full"
-            minW={0}
-          >
-            <Text textStyle="bodyText3" fontWeight="400" mb={2}>
-              Water Supply Outages
-            </Text>
-            <WaterSupplyOutagesChart
-              data={waterSupplyOutagesData}
-              height="400px"
-              xAxisLabel={
-                isGramPanchayatSelected
-                  ? 'Villages'
-                  : isBlockSelected
-                    ? 'Gram Panchayats'
-                    : isDistrictSelected
-                      ? 'Blocks'
-                      : 'Districts'
-              }
-            />
-          </Box>
-        </Grid>
-      ) : null}
-
-      {/* Performance + Demand vs Supply Charts */}
-      {!selectedVillage ? (
-        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
-          <Box
-            bg="white"
-            borderWidth="1px"
-            borderRadius="lg"
-            p={4}
-            h="536px"
-            w="full"
-            minW="250px"
-            justifySelf={{ base: 'center', md: 'stretch' }}
-          >
-            <Flex align="center" justify="space-between">
-              <Text textStyle="bodyText3" fontWeight="400">
-                {selectedGramPanchayat
-                  ? 'All Villages Performance'
-                  : isBlockSelected
-                    ? 'All Gram Panchayats Performance'
-                    : isDistrictSelected
-                      ? 'All Blocks Performance'
-                      : isStateSelected
-                        ? 'All Districts Performance'
-                        : 'All States/UTs Performance'}
-              </Text>
-              {!isStateSelected &&
-              !isDistrictSelected &&
-              !isBlockSelected &&
-              !selectedGramPanchayat ? (
-                <Select
-                  h="32px"
-                  maxW="120px"
-                  fontSize="14px"
-                  fontWeight="600"
-                  borderRadius="4px"
-                  borderColor="neutral.400"
-                  borderWidth="1px"
-                  bg="white"
-                  color="neutral.400"
-                  placeholder="Select"
-                  appearance="none"
-                  value={performanceState}
-                  onChange={(event) => setPerformanceState(event.target.value)}
-                  _focus={{
-                    borderColor: 'primary.500',
-                    boxShadow: 'none',
-                  }}
-                >
-                  <option value="Punjab">Punjab</option>
-                </Select>
-              ) : null}
-            </Flex>
-            <AllStatesPerformanceChart
-              data={
-                selectedGramPanchayat
-                  ? villageTableData
-                  : isBlockSelected
-                    ? gramPanchayatTableData
-                    : isDistrictSelected
-                      ? blockTableData
-                      : isStateSelected
-                        ? districtTableData
-                        : performanceState
-                          ? data.mapData
-                              .filter((state) => state.name === performanceState)
-                              .slice(0, 1)
-                          : data.mapData
-              }
-              height="440px"
-              entityLabel={
-                selectedGramPanchayat
-                  ? 'Villages'
-                  : isBlockSelected
-                    ? 'Gram Panchayats'
-                    : isDistrictSelected
-                      ? 'Blocks'
-                      : isStateSelected
-                        ? 'Districts'
-                        : 'States/UTs'
-              }
-            />
-          </Box>
-          <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px" minW={0}>
-            <Text textStyle="bodyText3" fontWeight="400" mb={2}>
-              Demand vs Supply
-            </Text>
-            <DemandSupplyChart data={data.demandSupply} height="418px" />
-          </Box>
-        </Grid>
-      ) : null}
-
-      {/* All States/Districts/Pump Operators + Submission Rate */}
-      {!selectedVillage && isBlockSelected ? (
-        <>
-          <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="526px">
-              <PhotoEvidenceComplianceTable data={data.photoEvidenceCompliance} />
-            </Box>
-            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="526px">
-              <Text textStyle="bodyText3" fontWeight="400" mb={2}>
-                Reading Submission Rate
-              </Text>
-              <SupplySubmissionRateChart
-                data={supplySubmissionRateData}
-                height="383px"
-                entityLabel={supplySubmissionRateLabel}
-              />
-            </Box>
-          </Grid>
-          <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
-              <Text textStyle="bodyText3" fontWeight="400" mb="16px">
-                {selectedGramPanchayat ? 'All Villages' : 'All Gram Panchayats'}
-              </Text>
-              <AllGramPanchayatsTable
-                data={selectedGramPanchayat ? villageTableData : gramPanchayatTableData}
-              />
-            </Box>
-            <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
-              <Flex align="center" justify="space-between" mb="40px">
-                <Text textStyle="bodyText3" fontWeight="400">
-                  Pump Operators
-                </Text>
-                <Text textStyle="bodyText3" fontWeight="400">
-                  Total: {pumpOperatorsTotal}
-                </Text>
-              </Flex>
-              <PumpOperatorsChart
-                data={data.pumpOperators}
-                height="360px"
-                note="Note: Active pump operators submit readings at least 30 days in a month."
-              />
-            </Box>
-          </Grid>
-        </>
-      ) : !selectedVillage ? (
-        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
-          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px" minW={0}>
-            {isDistrictSelected ? (
-              <>
-                <Flex align="center" justify="space-between" mb="40px">
-                  <Text textStyle="bodyText3" fontWeight="400">
-                    Pump Operators
-                  </Text>
-                  <Text textStyle="bodyText3" fontWeight="400">
-                    Total: {pumpOperatorsTotal}
-                  </Text>
-                </Flex>
-                <PumpOperatorsChart
-                  data={data.pumpOperators}
-                  height="360px"
-                  note="Note: Active pump operators submit readings at least 30 days in a month."
-                />
-              </>
-            ) : (
-              <>
-                <Text textStyle="bodyText3" fontWeight="400" mb="16px">
-                  {isStateSelected ? 'All Districts' : 'All States/UTs'}
-                </Text>
-                {isStateSelected ? (
-                  <AllDistrictsTable data={districtTableData} />
-                ) : (
-                  <AllStatesTable data={data.mapData} />
-                )}
-              </>
-            )}
-          </Box>
-          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px" minW={0}>
-            <Text textStyle="bodyText3" fontWeight="400" mb={2}>
-              Reading Submission Rate
-            </Text>
-            <SupplySubmissionRateChart
-              data={supplySubmissionRateData}
-              height="383px"
-              entityLabel={supplySubmissionRateLabel}
-            />
-          </Box>
-        </Grid>
-      ) : null}
-
-      {/* Operators Performance + All Blocks */}
-      {!selectedVillage && isDistrictSelected && !isBlockSelected ? (
-        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-          <Box
-            bg="white"
-            borderWidth="1px"
-            borderRadius="lg"
-            px={4}
-            py={6}
-            h="430px"
-            w="full"
-            minW={0}
-          >
-            <PumpOperatorsPerformanceTable
-              title="Operators Performance Table"
-              data={operatorsPerformanceTable}
-            />
-          </Box>
-          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="430px">
-            <Text textStyle="bodyText3" fontWeight="400" mb="16px">
-              All Blocks
-            </Text>
-            <AllBlocksTable data={blockTableData} />
-          </Box>
-        </Grid>
-      ) : null}
-
-      {/* Pump Operator Performance Table */}
-      {!selectedVillage && isDistrictSelected && isBlockSelected ? (
-        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={6} mb={6}>
-          <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} w="full" minW={0}>
-            <PumpOperatorsPerformanceTable
-              title="Operators Performance Table"
-              data={operatorsPerformanceTable}
-            />
-          </Box>
-          <Box
-            display={{ base: 'none', lg: 'block' }}
-            borderRadius="12px"
-            borderWidth="0.5px"
-            borderColor="transparent"
-            bg="transparent"
-          />
-        </Grid>
-      ) : null}
-
-      {/* Pump Operators now lives beside Submission Rate when district is selected */}
+      <DashboardBody
+        data={data}
+        isStateSelected={isStateSelected}
+        isDistrictSelected={isDistrictSelected}
+        isBlockSelected={isBlockSelected}
+        isGramPanchayatSelected={isGramPanchayatSelected}
+        selectedVillage={selectedVillage}
+        performanceState={performanceState}
+        onPerformanceStateChange={setPerformanceState}
+        districtTableData={districtTableData}
+        blockTableData={blockTableData}
+        gramPanchayatTableData={gramPanchayatTableData}
+        villageTableData={villageTableData}
+        supplySubmissionRateData={supplySubmissionRateData}
+        supplySubmissionRateLabel={supplySubmissionRateLabel}
+        waterSupplyOutagesData={waterSupplyOutagesData}
+        pumpOperatorsTotal={pumpOperatorsTotal}
+        operatorsPerformanceTable={operatorsPerformanceTable}
+        villagePhotoEvidenceRows={villagePhotoEvidenceRows}
+      />
     </Box>
   )
 }

@@ -11,13 +11,18 @@ import {
   HStack,
   FormControl,
   FormLabel,
+  Alert,
+  AlertIcon,
 } from '@chakra-ui/react'
 import { useTranslation } from 'react-i18next'
 import { SearchableSelect, ToastContainer } from '@/shared/components/common'
 import { useToast } from '@/shared/hooks/use-toast'
-import { createStateUT, getAssignedStateNames } from '../../services/mock-data'
 import { INDIAN_STATES_UTS } from '../../types/states-uts'
 import { ROUTES } from '@/shared/constants/routes'
+import {
+  useAssignedStateNamesQuery,
+  useCreateStateUTMutation,
+} from '../../services/query/use-super-admin-queries'
 
 export function AddStateUTPage() {
   const { t } = useTranslation(['super-admin', 'common'])
@@ -28,8 +33,12 @@ export function AddStateUTPage() {
     document.title = `${t('statesUts.addTitle')} | JalSoochak`
   }, [t])
 
-  const [isSaving, setIsSaving] = useState(false)
-  const [assignedStates, setAssignedStates] = useState<string[]>([])
+  const {
+    data: assignedStates = [],
+    isLoading: isAssignedStatesLoading,
+    isError: isAssignedStatesError,
+  } = useAssignedStateNamesQuery()
+  const createStateMutation = useCreateStateUTMutation()
 
   // Form state
   const [stateName, setStateName] = useState('')
@@ -40,12 +49,6 @@ export function AddStateUTPage() {
   const [phone, setPhone] = useState('')
   const [secondaryEmail, setSecondaryEmail] = useState('')
   const [contactNumber, setContactNumber] = useState('')
-
-  useEffect(() => {
-    // Get list of already assigned states
-    const assigned = getAssignedStateNames()
-    setAssignedStates(assigned)
-  }, [])
 
   // Filter available states (exclude already assigned)
   const availableStates = useMemo(() => {
@@ -105,9 +108,8 @@ export function AddStateUTPage() {
       return
     }
 
-    setIsSaving(true)
     try {
-      const newState = await createStateUT({
+      const newState = await createStateMutation.mutateAsync({
         name: stateName,
         code: stateCode,
         admin: {
@@ -127,8 +129,6 @@ export function AddStateUTPage() {
     } catch (error) {
       console.error('Failed to create state:', error)
       toast.addToast(t('statesUts.messages.failedToAdd'), 'error')
-    } finally {
-      setIsSaving(false)
     }
   }
 
@@ -161,6 +161,14 @@ export function AddStateUTPage() {
           </Text>
         </Flex>
       </Box>
+
+      {/* Assigned states fetch error */}
+      {isAssignedStatesError && (
+        <Alert status="error" borderRadius="8px" mb={4}>
+          <AlertIcon />
+          {t('statesUts.messages.failedToLoadAssignedStates')}
+        </Alert>
+      )}
 
       {/* Form Card */}
       <Box
@@ -208,7 +216,8 @@ export function AddStateUTPage() {
                   onChange={handleStateChange}
                   placeholder={t('common:select')}
                   placeholderColor="neutral.300"
-                  width="100%"
+                  width={{ base: '100%', xl: '486px' }}
+                  disabled={isAssignedStatesLoading || isAssignedStatesError}
                 />
               </FormControl>
               <FormControl>
@@ -357,7 +366,7 @@ export function AddStateUTPage() {
               size="md"
               width={{ base: 'full', sm: '174px' }}
               onClick={handleCancel}
-              isDisabled={isSaving}
+              isDisabled={createStateMutation.isPending}
             >
               {t('common:button.cancel')}
             </Button>
@@ -367,7 +376,7 @@ export function AddStateUTPage() {
               size="md"
               width={{ base: 'full', sm: 'auto' }}
               maxWidth={{ base: '100%', sm: '275px' }}
-              isLoading={isSaving}
+              isLoading={createStateMutation.isPending}
               isDisabled={!isFormValid}
             >
               {t('statesUts.buttons.addAndSendLink')}

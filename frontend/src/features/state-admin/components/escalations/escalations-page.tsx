@@ -12,42 +12,45 @@ import {
   Stack,
   useBreakpointValue,
 } from '@chakra-ui/react'
+import { useQueryClient } from '@tanstack/react-query'
 import { FiEdit } from 'react-icons/fi'
 import { MdDeleteOutline } from 'react-icons/md'
 import { useTranslation } from 'react-i18next'
-import {
-  getMockEscalations,
-  getMockEscalationById,
-  saveMockEscalation,
-  updateMockEscalation,
-  deleteMockEscalation,
-} from '../../services/mock-data'
 import type { Escalation, EscalationLevel } from '../../types/escalations'
 import { AVAILABLE_ALERT_TYPES, AVAILABLE_ROLES, AVAILABLE_HOURS } from '../../types/escalations'
 import { useToast } from '@/shared/hooks/use-toast'
 import { ToastContainer, SearchableSelect, ConfirmationDialog } from '@/shared/components/common'
 import { IoAddOutline } from 'react-icons/io5'
+import {
+  useCreateEscalationMutation,
+  useDeleteEscalationMutation,
+  useEscalationsQuery,
+  useUpdateEscalationMutation,
+} from '../../services/query/use-state-admin-queries'
+import { stateAdminApi } from '../../services/api/state-admin-api'
+import { stateAdminQueryKeys } from '../../services/query/state-admin-query-keys'
 
 type ViewMode = 'list' | 'add' | 'edit'
 
 export function EscalationsPage() {
   const { t } = useTranslation(['state-admin', 'common'])
+  const queryClient = useQueryClient()
+  const escalationsQuery = useEscalationsQuery()
+  const createEscalationMutation = useCreateEscalationMutation()
+  const updateEscalationMutation = useUpdateEscalationMutation()
+  const deleteEscalationMutation = useDeleteEscalationMutation()
   const levelIdCounterRef = useRef(0)
   const generateLevelId = () => `level-${Date.now()}-${++levelIdCounterRef.current}`
   const [viewMode, setViewMode] = useState<ViewMode>('list')
-  const [escalations, setEscalations] = useState<Escalation[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [isDeleting, setIsDeleting] = useState(false)
   const showAddButtonText = useBreakpointValue({ base: false, sm: true }) ?? true
 
   // Form state
   const [alertType, setAlertType] = useState('')
   const [levels, setLevels] = useState<EscalationLevel[]>([
     {
-      id: `level-${Date.now()}`,
+      id: 'level-initial',
       levelNumber: 1,
       targetRole: '',
       escalateAfterHours: 0,
@@ -59,23 +62,7 @@ export function EscalationsPage() {
   useEffect(() => {
     document.title = `${t('escalations.title')} | JalSoochak`
   }, [t])
-
-  useEffect(() => {
-    fetchEscalations()
-  }, [])
-
-  const fetchEscalations = async () => {
-    setIsLoading(true)
-    try {
-      const data = await getMockEscalations()
-      setEscalations(data)
-    } catch (error) {
-      console.error('Failed to fetch escalations:', error)
-      toast.addToast(t('escalations.messages.failedToLoad'), 'error')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const escalations: Escalation[] = escalationsQuery.data ?? []
 
   const handleAddNewClick = () => {
     setViewMode('add')
@@ -92,7 +79,10 @@ export function EscalationsPage() {
 
   const handleEditClick = async (id: string) => {
     try {
-      const escalation = await getMockEscalationById(id)
+      const escalation = await queryClient.fetchQuery({
+        queryKey: stateAdminQueryKeys.escalationById(id),
+        queryFn: () => stateAdminApi.getEscalationById(id),
+      })
       if (escalation) {
         setEditingId(id)
         setAlertType(escalation.alertType)
@@ -114,17 +104,13 @@ export function EscalationsPage() {
   const handleConfirmDelete = async () => {
     if (!deletingId) return
 
-    setIsDeleting(true)
     try {
-      await deleteMockEscalation(deletingId)
-      await fetchEscalations()
+      await deleteEscalationMutation.mutateAsync(deletingId)
       toast.addToast(t('escalations.messages.deletedSuccess'), 'success')
       setDeletingId(null)
     } catch (error) {
       console.error('Failed to delete escalation:', error)
       toast.addToast(t('escalations.messages.failedToDelete'), 'error')
-    } finally {
-      setIsDeleting(false)
     }
   }
 
@@ -160,23 +146,22 @@ export function EscalationsPage() {
       }
     }
 
-    setIsSaving(true)
     try {
       if (viewMode === 'add') {
-        await saveMockEscalation({ alertType, levels })
+        await createEscalationMutation.mutateAsync({ alertType, levels })
         toast.addToast(t('escalations.messages.addedSuccess'), 'success')
       } else if (viewMode === 'edit' && editingId) {
-        await updateMockEscalation(editingId, { alertType, levels })
+        await updateEscalationMutation.mutateAsync({
+          id: editingId,
+          payload: { alertType, levels },
+        })
         toast.addToast(t('common:toast.changesSavedShort'), 'success')
       }
-      await fetchEscalations()
       setViewMode('list')
       setEditingId(null)
     } catch (error) {
       console.error('Failed to save escalation:', error)
       toast.addToast(t('escalations.messages.failedToSave'), 'error')
-    } finally {
-      setIsSaving(false)
     }
   }
 
@@ -217,7 +202,7 @@ export function EscalationsPage() {
     return role ? role.label : value
   }
 
-  if (isLoading) {
+  if (escalationsQuery.isLoading) {
     return (
       <Box w="full">
         <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={6}>
@@ -227,6 +212,17 @@ export function EscalationsPage() {
           <Spinner size="md" color="primary.500" mr={3} />
           <Text color="neutral.600">{t('common:loading')}</Text>
         </Flex>
+      </Box>
+    )
+  }
+
+  if (escalationsQuery.isError) {
+    return (
+      <Box w="full">
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={6}>
+          {t('escalations.title')}
+        </Heading>
+        <Text color="error.500">{t('escalations.messages.failedToLoad')}</Text>
       </Box>
     )
   }
@@ -385,7 +381,7 @@ export function EscalationsPage() {
           message={t('escalations.messages.confirmDelete')}
           confirmLabel={t('common:button.delete')}
           cancelLabel={t('common:button.cancel')}
-          isLoading={isDeleting}
+          isLoading={deleteEscalationMutation.isPending}
         />
 
         {/* Toast Container */}
@@ -604,7 +600,7 @@ export function EscalationsPage() {
               size="md"
               width={{ base: 'full', sm: '174px' }}
               onClick={handleCancel}
-              isDisabled={isSaving}
+              isDisabled={createEscalationMutation.isPending || updateEscalationMutation.isPending}
             >
               {t('common:button.cancel')}
             </Button>
@@ -613,7 +609,7 @@ export function EscalationsPage() {
               size="md"
               width={{ base: 'full', sm: '174px' }}
               onClick={handleSave}
-              isLoading={isSaving}
+              isLoading={createEscalationMutation.isPending || updateEscalationMutation.isPending}
               isDisabled={
                 !alertType || levels.some((l) => !l.targetRole || l.escalateAfterHours <= 0)
               }

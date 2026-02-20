@@ -53,7 +53,8 @@
       "status": "Status"
     },
     "messages": {
-      "noActivitiesFound": "No activities found"
+      "noActivitiesFound": "No activities found",
+      "failedToLoad": "Failed to load activity log"
     },
     "aria": {
       "tableSection": "Activity log table"

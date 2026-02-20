@@ -10,6 +10,7 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  Link as ChakraLink,
 } from '@chakra-ui/react'
 import { useTranslation } from 'react-i18next'
 import { MdOutlineMoving, MdOutlinePlace } from 'react-icons/md'
@@ -213,12 +214,14 @@ export function Sidebar({ onNavClick }: SidebarProps) {
               const ItemIcon = item.icon
 
               return (
-                <RouterLink
+                <ChakraLink
+                  as={RouterLink}
                   key={item.path}
                   to={item.path}
-                  style={{ textDecoration: 'none' }}
                   onClick={onNavClick}
                   aria-current={isActive ? 'page' : undefined}
+                  textDecoration="none"
+                  _hover={{ textDecoration: 'none' }}
                 >
                   <Flex
                     alignItems="center"
@@ -241,7 +244,7 @@ export function Sidebar({ onNavClick }: SidebarProps) {
                     )}
                     <Text isTruncated>{t(item.labelKey)}</Text>
                   </Flex>
-                </RouterLink>
+                </ChakraLink>
               )
             })}
           </Stack>
