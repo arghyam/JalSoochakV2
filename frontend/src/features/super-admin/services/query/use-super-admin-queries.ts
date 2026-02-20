@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { superAdminApi, type SaveSystemRulesPayload } from '../api/super-admin-api'
 import { superAdminQueryKeys } from './super-admin-query-keys'
 import type { CreateStateUTInput, StateUTStatus, UpdateStateUTInput } from '../../types/states-uts'
+import type { ApiCredentialsData } from '../../types/api-credentials'
 
 export function useSuperAdminOverviewQuery() {
   return useQuery({
@@ -49,7 +50,7 @@ export function useGenerateApiKeyMutation() {
     onSuccess: (newApiKey, stateId) => {
       queryClient.setQueryData(
         superAdminQueryKeys.apiCredentials(),
-        (previous: { credentials: Array<{ id: string; apiKey: string }> } | undefined) => {
+        (previous: ApiCredentialsData | undefined) => {
           if (!previous) return previous
           return {
             ...previous,

@@ -53,7 +53,8 @@
       "status": "स्थिति"
     },
     "messages": {
-      "noActivitiesFound": "कोई गतिविधि नहीं मिली"
+      "noActivitiesFound": "कोई गतिविधि नहीं मिली",
+      "failedToLoad": "गतिविधि लॉग लोड करने में विफल"
     },
     "aria": {
       "tableSection": "गतिविधि लॉग तालिका"

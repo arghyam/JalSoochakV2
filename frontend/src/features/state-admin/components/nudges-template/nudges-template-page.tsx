@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Box, Text, Button, Flex, Textarea, Tag, Heading, Spinner, Stack } from '@chakra-ui/react'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { useTranslation } from 'react-i18next'
@@ -36,6 +36,7 @@ export function NudgesTemplatePage() {
   const [templateStates, setTemplateStates] = useState<Record<string, TemplateState>>({})
 
   const toast = useToast()
+  const isInitialized = useRef(false)
 
   useEffect(() => {
     document.title = `${t('nudges.title')} | JalSoochak`
@@ -44,22 +45,42 @@ export function NudgesTemplatePage() {
   useEffect(() => {
     if (!fetchedTemplates) return
     setTemplates(fetchedTemplates)
-    if (fetchedTemplates.length > 0) {
-      setSelectedTemplateId(fetchedTemplates[0].id)
-    }
 
-    const initialStates: Record<string, TemplateState> = {}
-    fetchedTemplates.forEach((template) => {
-      const firstMessage = template.messages[0]
-      if (firstMessage) {
-        initialStates[template.id] = {
-          selectedLanguage: firstMessage.language,
-          message: firstMessage.message,
-          originalMessage: firstMessage.message,
-        }
+    if (!isInitialized.current) {
+      if (fetchedTemplates.length > 0) {
+        setSelectedTemplateId(fetchedTemplates[0].id)
       }
-    })
-    setTemplateStates(initialStates)
+      const initialStates: Record<string, TemplateState> = {}
+      fetchedTemplates.forEach((template) => {
+        const firstMessage = template.messages[0]
+        if (firstMessage) {
+          initialStates[template.id] = {
+            selectedLanguage: firstMessage.language,
+            message: firstMessage.message,
+            originalMessage: firstMessage.message,
+          }
+        }
+      })
+      setTemplateStates(initialStates)
+      isInitialized.current = true
+    } else {
+      setTemplateStates((prev) => {
+        const next = { ...prev }
+        fetchedTemplates.forEach((template) => {
+          if (!next[template.id]) {
+            const firstMessage = template.messages[0]
+            if (firstMessage) {
+              next[template.id] = {
+                selectedLanguage: firstMessage.language,
+                message: firstMessage.message,
+                originalMessage: firstMessage.message,
+              }
+            }
+          }
+        })
+        return next
+      })
+    }
   }, [fetchedTemplates])
 
   const handleLanguageChange = (templateId: string, language: string) => {

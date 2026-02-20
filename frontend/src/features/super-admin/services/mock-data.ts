@@ -400,11 +400,15 @@ export const getMockStatesUTsData = (): Promise<StateUT[]> => {
   })
 }
 
-export const getStateUTById = (id: string): Promise<StateUT | null> => {
-  return new Promise((resolve) => {
+export const getStateUTById = (id: string): Promise<StateUT> => {
+  return new Promise((resolve, reject) => {
     setTimeout(() => {
       const state = mockStatesUTsData.find((s) => s.id === id)
-      resolve(state ? { ...state } : null)
+      if (!state) {
+        reject(new Error(`StateUT with id "${id}" not found`))
+        return
+      }
+      resolve({ ...state })
     }, 300)
   })
 }
@@ -434,12 +438,12 @@ export const createStateUT = (data: CreateStateUTInput): Promise<StateUT> => {
   })
 }
 
-export const updateStateUT = (id: string, data: UpdateStateUTInput): Promise<StateUT | null> => {
-  return new Promise((resolve) => {
+export const updateStateUT = (id: string, data: UpdateStateUTInput): Promise<StateUT> => {
+  return new Promise((resolve, reject) => {
     setTimeout(() => {
       const index = mockStatesUTsData.findIndex((s) => s.id === id)
       if (index === -1) {
-        resolve(null)
+        reject(new Error(`StateUT with id "${id}" not found`))
         return
       }
       mockStatesUTsData[index] = {
@@ -461,12 +465,12 @@ export const updateStateUT = (id: string, data: UpdateStateUTInput): Promise<Sta
 export const updateStateUTStatus = (
   id: string,
   status: 'active' | 'inactive'
-): Promise<StateUT | null> => {
-  return new Promise((resolve) => {
+): Promise<StateUT> => {
+  return new Promise((resolve, reject) => {
     setTimeout(() => {
       const index = mockStatesUTsData.findIndex((s) => s.id === id)
       if (index === -1) {
-        resolve(null)
+        reject(new Error(`StateUT with id "${id}" not found`))
         return
       }
       mockStatesUTsData[index] = {

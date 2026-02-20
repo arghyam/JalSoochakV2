@@ -24,7 +24,7 @@ import { useStatesUTsQuery } from '../../services/query/use-super-admin-queries'
 export function StatesUTsPage() {
   const { t } = useTranslation(['super-admin', 'common'])
   const navigate = useNavigate()
-  const { data: states = [], isLoading } = useStatesUTsQuery()
+  const { data: states = [], isLoading, isError, refetch } = useStatesUTsQuery()
   const [searchQuery, setSearchQuery] = useState('')
 
   // Responsive values
@@ -46,6 +46,22 @@ export function StatesUTsPage() {
     hours = hours ? hours : 12
 
     return `${day}-${month}-${year}, ${hours}:${minutes}${ampm}`
+  }
+
+  if (isError) {
+    return (
+      <Box w="full">
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={5}>
+          {t('statesUts.title')}
+        </Heading>
+        <Flex h="64" align="center" justify="center" direction="column" gap={4} role="alert">
+          <Text color="error.500">{t('common:toast.failedToLoad')}</Text>
+          <Button variant="secondary" size="sm" onClick={() => void refetch()}>
+            {t('common:retry')}
+          </Button>
+        </Flex>
+      </Box>
+    )
   }
 
   const filteredStates = states.filter((state) =>

@@ -32,7 +32,7 @@ export function IngestionMonitorPage() {
   const [stateFilter, setStateFilter] = useState('all')
   const [timeFilter, setTimeFilter] = useState('7')
   const [statusFilter, setStatusFilter] = useState('all')
-  const { data, isLoading, isError, refetch } = useIngestionMonitorQuery(stateFilter, timeFilter)
+  const { data, isLoading, isError } = useIngestionMonitorQuery(stateFilter, timeFilter)
 
   // Responsive values
   const statsColumns = useBreakpointValue({ base: 1, sm: 2, lg: 4 }) ?? 4
@@ -130,10 +130,9 @@ export function IngestionMonitorPage() {
           <Button
             variant="secondary"
             size="sm"
-            onClick={async () => {
+            onClick={() => {
               setStateFilter('all')
               setTimeFilter('7')
-              await refetch()
             }}
           >
             {t('common:retry')}

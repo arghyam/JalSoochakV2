@@ -42,10 +42,10 @@ type SuperAdminDataProvider = {
   generateApiKey: (stateId: string) => Promise<string>
   sendApiKey: (stateId: string) => Promise<{ success: boolean }>
   getStatesUTsData: () => Promise<StateUT[]>
-  getStateUTById: (id: string) => Promise<StateUT | null>
+  getStateUTById: (id: string) => Promise<StateUT>
   createStateUT: (payload: CreateStateUTInput) => Promise<StateUT>
-  updateStateUT: (id: string, payload: UpdateStateUTInput) => Promise<StateUT | null>
-  updateStateUTStatus: (id: string, status: StateUTStatus) => Promise<StateUT | null>
+  updateStateUT: (id: string, payload: UpdateStateUTInput) => Promise<StateUT>
+  updateStateUTStatus: (id: string, status: StateUTStatus) => Promise<StateUT>
   getAssignedStateNames: () => Promise<string[]>
 }
 

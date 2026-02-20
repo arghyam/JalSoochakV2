@@ -11,6 +11,8 @@ import {
   HStack,
   FormControl,
   FormLabel,
+  Alert,
+  AlertIcon,
 } from '@chakra-ui/react'
 import { useTranslation } from 'react-i18next'
 import { SearchableSelect, ToastContainer } from '@/shared/components/common'
@@ -31,7 +33,11 @@ export function AddStateUTPage() {
     document.title = `${t('statesUts.addTitle')} | JalSoochak`
   }, [t])
 
-  const { data: assignedStates = [] } = useAssignedStateNamesQuery()
+  const {
+    data: assignedStates = [],
+    isLoading: isAssignedStatesLoading,
+    isError: isAssignedStatesError,
+  } = useAssignedStateNamesQuery()
   const createStateMutation = useCreateStateUTMutation()
 
   // Form state
@@ -156,6 +162,14 @@ export function AddStateUTPage() {
         </Flex>
       </Box>
 
+      {/* Assigned states fetch error */}
+      {isAssignedStatesError && (
+        <Alert status="error" borderRadius="8px" mb={4}>
+          <AlertIcon />
+          {t('statesUts.messages.failedToLoadAssignedStates')}
+        </Alert>
+      )}
+
       {/* Form Card */}
       <Box
         as="form"
@@ -202,7 +216,8 @@ export function AddStateUTPage() {
                   onChange={handleStateChange}
                   placeholder={t('common:select')}
                   placeholderColor="neutral.300"
-                  width="100%"
+                  width={{ base: '100%', xl: '486px' }}
+                  disabled={isAssignedStatesLoading || isAssignedStatesError}
                 />
               </FormControl>
               <FormControl>

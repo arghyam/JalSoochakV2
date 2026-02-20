@@ -81,6 +81,7 @@
       "noStatesFound": "No states/UTs found",
       "addedSuccess": "State/UT added successfully",
       "failedToAdd": "Failed to add State/UT",
+      "failedToLoadAssignedStates": "Failed to load assigned states. Please refresh and try again.",
       "activatedSuccess": "State/UT activated successfully",
       "deactivatedSuccess": "State/UT deactivated successfully",
       "failedToUpdateStatus": "Failed to update status"

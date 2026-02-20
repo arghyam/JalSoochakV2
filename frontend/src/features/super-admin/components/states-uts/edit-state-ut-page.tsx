@@ -97,19 +97,17 @@ export function EditStateUTPage() {
     const newStatus = status === 'active' ? 'inactive' : 'active'
 
     try {
-      const updated = await updateStateUTStatusMutation.mutateAsync({
+      await updateStateUTStatusMutation.mutateAsync({
         id: originalState.id,
         status: newStatus,
       })
-      if (updated) {
-        setFormDraft((prev) => ({ ...prev, status: newStatus }))
-        toast.addToast(
-          newStatus === 'active'
-            ? t('statesUts.messages.activatedSuccess')
-            : t('statesUts.messages.deactivatedSuccess'),
-          'success'
-        )
-      }
+      setFormDraft((prev) => ({ ...prev, status: newStatus }))
+      toast.addToast(
+        newStatus === 'active'
+          ? t('statesUts.messages.activatedSuccess')
+          : t('statesUts.messages.deactivatedSuccess'),
+        'success'
+      )
     } catch (error) {
       console.error('Failed to update status:', error)
       toast.addToast(t('statesUts.messages.failedToUpdateStatus'), 'error')
@@ -130,7 +128,7 @@ export function EditStateUTPage() {
     }
 
     try {
-      const updated = await updateStateUTMutation.mutateAsync({
+      await updateStateUTMutation.mutateAsync({
         id,
         payload: {
           admin: {
@@ -142,12 +140,10 @@ export function EditStateUTPage() {
           },
         },
       })
-      if (updated) {
-        toast.addToast(t('common:toast.changesSaved'), 'success')
-        setTimeout(() => {
-          navigate(ROUTES.SUPER_ADMIN_STATES_UTS_VIEW.replace(':id', id))
-        }, 500)
-      }
+      toast.addToast(t('common:toast.changesSaved'), 'success')
+      setTimeout(() => {
+        navigate(ROUTES.SUPER_ADMIN_STATES_UTS_VIEW.replace(':id', id))
+      }, 500)
     } catch (error) {
       console.error('Failed to update state:', error)
       toast.addToast(t('common:toast.failedToSave'), 'error')

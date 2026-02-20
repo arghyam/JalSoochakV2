@@ -7,7 +7,7 @@ import { useStateAdminActivityQuery } from '../../services/query/use-state-admin
 
 export function ActivityPage() {
   const { t } = useTranslation(['state-admin', 'common'])
-  const { data: activities = [], isLoading } = useStateAdminActivityQuery()
+  const { data: activities = [], isLoading, isError } = useStateAdminActivityQuery()
 
   useEffect(() => {
     document.title = `${t('activity.title')} | JalSoochak`
@@ -75,6 +75,17 @@ export function ActivityPage() {
       ),
     },
   ]
+
+  if (isError) {
+    return (
+      <Box w="full">
+        <Heading as="h1" size={{ base: 'h2', md: 'h1' }} mb={6}>
+          {t('activity.title')}
+        </Heading>
+        <Text color="error.500">{t('activity.messages.failedToLoad')}</Text>
+      </Box>
+    )
+  }
 
   return (
     <Box w="full">
