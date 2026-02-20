@@ -5,13 +5,8 @@ import type {
   PumpOperatorPerformanceData,
   WaterSupplyOutageData,
 } from '../../types'
-import {
-  AllStatesPerformanceChart,
-  DemandSupplyChart,
-  PumpOperatorsChart,
-  SupplySubmissionRateChart,
-} from '../charts'
-import { AllDistrictsTable, AllStatesTable } from '../tables'
+import { AllStatesPerformanceChart, DemandSupplyChart, SupplySubmissionRateChart } from '../charts'
+import { AllStatesTable } from '../tables'
 import { BlockDashboardScreen } from './block-dashboard'
 import { DistrictDashboardScreen } from './district-dashboard'
 import { GramPanchayatDashboardScreen } from './gram-panchayat-dashboard'
@@ -139,15 +134,7 @@ export function DashboardBody({
           >
             <Flex align="center" justify="space-between">
               <Text textStyle="bodyText3" fontWeight="400">
-                {isGramPanchayatSelected
-                  ? 'All Villages Performance'
-                  : isBlockSelected
-                    ? 'All Gram Panchayats Performance'
-                    : isDistrictSelected
-                      ? 'All Blocks Performance'
-                      : isStateSelected
-                        ? 'All Districts Performance'
-                        : 'All States/UTs Performance'}
+                All States/UTs Performance
               </Text>
               {!isStateSelected &&
               !isDistrictSelected &&
@@ -178,32 +165,12 @@ export function DashboardBody({
             </Flex>
             <AllStatesPerformanceChart
               data={
-                isGramPanchayatSelected
-                  ? villageTableData
-                  : isBlockSelected
-                    ? gramPanchayatTableData
-                    : isDistrictSelected
-                      ? blockTableData
-                      : isStateSelected
-                        ? districtTableData
-                        : performanceState
-                          ? data.mapData
-                              .filter((state) => state.name === performanceState)
-                              .slice(0, 1)
-                          : data.mapData
+                performanceState
+                  ? data.mapData.filter((state) => state.name === performanceState).slice(0, 1)
+                  : data.mapData
               }
               height="440px"
-              entityLabel={
-                isGramPanchayatSelected
-                  ? 'Villages'
-                  : isBlockSelected
-                    ? 'Gram Panchayats'
-                    : isDistrictSelected
-                      ? 'Blocks'
-                      : isStateSelected
-                        ? 'Districts'
-                        : 'States/UTs'
-              }
+              entityLabel="States/UTs"
             />
           </Box>
           <Box bg="white" borderWidth="1px" borderRadius="lg" p={4} h="536px" minW={0}>
@@ -224,34 +191,12 @@ export function DashboardBody({
       !isGramPanchayatScreen ? (
         <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, minmax(0, 1fr))' }} gap={6} mb={6}>
           <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px" minW={0}>
-            {isDistrictSelected ? (
-              <>
-                <Flex align="center" justify="space-between" mb="40px">
-                  <Text textStyle="bodyText3" fontWeight="400">
-                    Pump Operators
-                  </Text>
-                  <Text textStyle="bodyText3" fontWeight="400">
-                    Total: {pumpOperatorsTotal}
-                  </Text>
-                </Flex>
-                <PumpOperatorsChart
-                  data={data.pumpOperators}
-                  height="360px"
-                  note="Note: Active pump operators submit readings at least 30 days in a month."
-                />
-              </>
-            ) : (
-              <>
-                <Text textStyle="bodyText3" fontWeight="400" mb="16px">
-                  {isStateSelected ? 'All Districts' : 'All States/UTs'}
-                </Text>
-                {isStateSelected ? (
-                  <AllDistrictsTable data={districtTableData} />
-                ) : (
-                  <AllStatesTable data={data.mapData} />
-                )}
-              </>
-            )}
+            <>
+              <Text textStyle="bodyText3" fontWeight="400" mb="16px">
+                All States/UTs
+              </Text>
+              <AllStatesTable data={data.mapData} />
+            </>
           </Box>
           <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px" minW={0}>
             <Text textStyle="bodyText3" fontWeight="400" mb={2}>

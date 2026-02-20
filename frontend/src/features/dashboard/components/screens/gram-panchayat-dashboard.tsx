@@ -83,7 +83,7 @@ export function GramPanchayatDashboardScreen({
           <Text textStyle="bodyText3" fontWeight="400" mb="16px">
             All Villages
           </Text>
-          <AllGramPanchayatsTable data={villageTableData} />
+          <AllGramPanchayatsTable data={villageTableData} nameColumnLabel="Village" />
         </Box>
         <Box bg="white" borderWidth="1px" borderRadius="lg" px={4} py={6} h="510px">
           <Flex align="center" justify="space-between" mb="40px">

@@ -6,12 +6,17 @@ import type { EntityPerformance } from '../../types'
 interface AllGramPanchayatsTableProps {
   data: EntityPerformance[]
   maxItems?: number
+  nameColumnLabel?: string
 }
 
 type SortColumn = 'coverage' | 'quantity' | 'regularity' | 'compositeScore' | null
 type SortDirection = 'asc' | 'desc' | null
 
-export function AllGramPanchayatsTable({ data, maxItems }: AllGramPanchayatsTableProps) {
+export function AllGramPanchayatsTable({
+  data,
+  maxItems,
+  nameColumnLabel = 'Gram Panchayat',
+}: AllGramPanchayatsTableProps) {
   const [sortColumn, setSortColumn] = useState<SortColumn>(null)
   const [sortDirection, setSortDirection] = useState<SortDirection>(null)
   const safeMaxItems =
@@ -69,7 +74,7 @@ export function AllGramPanchayatsTable({ data, maxItems }: AllGramPanchayatsTabl
             }}
           >
             <Tr>
-              <Th>Gram Panchayat</Th>
+              <Th>{nameColumnLabel}</Th>
               <Th
                 aria-sort={
                   sortColumn === 'coverage'
